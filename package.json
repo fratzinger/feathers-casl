@@ -1,6 +1,6 @@
 {
   "name": "feathers-casl",
-  "version": "0.0.2-0",
+  "version": "0.0.3",
   "description": "",
   "author": "fratzinger",
   "repository": {
@@ -13,7 +13,6 @@
     "test": "test",
     "lib": "src"
   },
-  "private": true,
   "scripts": {
     "compile": "shx rm -rf dist/ && tsc",
     "release:pre": "npm run compile && npm version prerelease && npm publish --tag pre",
