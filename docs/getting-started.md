@@ -16,7 +16,7 @@ It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CA
 - Allows permissions for all methods `create`, `find`, `get`, `update`, `patch`, `remove`, or `create`, `read`, `update`, `delete`
 - Define permissions not based on methods: `can('view', 'Settings')`
 - Restrict by conditions: `can('create', 'Task', { userId: user.id })`
-- Restrict by individual fields: `cannot('update', 'User', ["roleId"])`
+- Restrict by individual fields: `cannot('update', 'User', ['roleId'])`
 - Native support for restrictive `$select`: `can('read', 'User', ['id', 'username'])` -> `$select: ['id', 'username']`
 - Supports `channels` right away (every connection only gets updates based on `can('read' ...)`)
 - `channels`-support also regards restrictive fields
@@ -39,7 +39,7 @@ yarn add feathers-casl
 
 ```js
 // app.js
-const casl = require("feathers-casl");
+const casl = require('feathers-casl');
 
 app.configure(casl());
 ```
@@ -52,36 +52,36 @@ For most cases we want to define rules per user (or per user-role). So we first 
 
 ```js
 // src/services/authentication/authentication.abilites.js
-const { AbilityBuilder, createAliasResolver, makeAbilityFromRules } = require("feathers-casl");
+const { AbilityBuilder, createAliasResolver, makeAbilityFromRules } = require('feathers-casl');
 
 // don't forget this, as `read` is used internally
 const resolveAction = createAliasResolver({
-  update: "patch",       // define the same rules for update & patch
-  read: ["get", "find"], // use 'read' as a equivalent for 'get' & 'find'
-  delete: "remove"       // use 'delete' or 'remove'
+  update: 'patch',       // define the same rules for update & patch
+  read: ['get', 'find'], // use 'read' as a equivalent for 'get' & 'find'
+  delete: 'remove'       // use 'delete' or 'remove'
 });
 
 const defineRulesFor = (user) => {
   // also see https://casl.js.org/v5/en/guide/define-rules
   const { can, cannot, rules } = new AbilityBuilder();
 
-  if (user.role && user.role.name === "SuperAdmin") {
+  if (user.role && user.role.name === 'SuperAdmin') {
     // SuperAdmin can do evil
-    can("manage", "all");
+    can('manage', 'all');
     return rules;
   }
 
-  if (user.role && user.role.name === "Admin") {
-    can("create", "User");
+  if (user.role && user.role.name === 'Admin') {
+    can('create', 'User');
   }
 
-  can("read", "User");
-  can("update", "User", { id: user.id });
-  cannot("update", "User", ["roleId"], { id: user.id });
-  cannot("delete", "User", { id: user.id });
+  can('read', 'User');
+  can('update', 'User', { id: user.id });
+  cannot('update', 'User', ['roleId'], { id: user.id });
+  cannot('delete', 'User', { id: user.id });
 
-  can("manage", "Task", { userId: user.id });
-  can("create_multi", "Post", { userId: user.id })
+  can('manage', 'Task', { userId: user.id });
+  can('create_multi', 'Post', { userId: user.id })
 
   return rules;
 };
@@ -106,7 +106,7 @@ module.exports = {
 
 ```js
 // src/services/authentication/authentication.hooks.js
-const { defineAbilitiesFor } = require("./abilities");
+const { defineAbilitiesFor } = require('./abilities');
 
 module.exports = {
   before: {
@@ -156,12 +156,12 @@ The `authorize`-hook can be used for all methods and has support for `multi: tru
 
 ```js
 // src/services/tasks/tasks.hooks.js
-const { authenticate } = require("@feathersjs/authentication").hooks;
-const { authorize } = require("feathers-casl").hooks;
+const { authenticate } = require('@feathersjs/authentication').hooks;
+const { authorize } = require('feathers-casl').hooks;
 
 module.exports = {
   before: {
-    all: [authenticate("jwt")],
+    all: [authenticate('jwt')],
     find: [authorize()],
     get: [authorize()],
     create: [authorize()],
@@ -201,10 +201,10 @@ To unleash the full power of `feathers-casl` you want to add it to your `channel
 const {
   getChannelsWithReadAbility,
   makeDefaultOptions
-} = require("feathers-casl").channels;
+} = require('feathers-casl').channels;
 
 module.exports = function (app) {
-  if (typeof app.channel !== "function") {
+  if (typeof app.channel !== 'function') {
     // If no real-time functionality has been configured just return
     return;
   }

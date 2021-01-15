@@ -9,10 +9,10 @@ sidebarDepth: 3
 const {
   getChannelsWithReadAbility,
   makeOptions
-} = require("feathers-casl").channels;
+} = require('feathers-casl').channels;
 
 module.exports = function (app) {
-  if (typeof app.channel !== "function") {
+  if (typeof app.channel !== 'function') {
     // If no real-time functionality has been configured just return
     return;
   }

@@ -53,18 +53,25 @@ The best way to keep the rules, is in our `vuex`-store. So first, we add a custo
 
 ```js
 // src/store/vuex.plugin.casl.js
-import { Ability } from "@casl/ability";
+import { Ability } from '@casl/ability';
+import { BaseModel } from '@/src/store/feathers/client.js';
+
+const detectSubjectType = (subject) => {
+  if (typeof subject === 'string') return subject;
+  if (!(subject instanceof BaseModel)) return undefined;
+  return subject.constructor.servicePath;
+}
 
 const resolveAction = createAliasResolver({
-  update: "patch",       // define the same rules for update & patch
-  read: ["get", "find"], // use 'read' as a equivalent for 'get' & 'find'
-  delete: "remove"       // use 'delete' or 'remove'
+  update: 'patch',       // define the same rules for update & patch
+  read: ['get', 'find'], // use 'read' as a equivalent for 'get' & 'find'
+  delete: 'remove'       // use 'delete' or 'remove'
 });
 
-const ability = new Ability({ resolveAction }, []);
+const ability = new Ability({ detectSubjectType, resolveAction }, []);
 
 const caslPlugin = (store) => {
-  store.registerModule("casl", {
+  store.registerModule('casl', {
     namespaced: true,
     state: {
       ability: ability,
@@ -79,17 +86,17 @@ const caslPlugin = (store) => {
   });
   store.subscribeAction({
     after: (action, state) => {
-      if (action.type === "auth/responseHandler") {
+      if (action.type === 'auth/responseHandler') {
         const { rules } = action.payload;
         if (!rules || !state.auth.user) {
-          store.commit("casl/setRules", []);
+          store.commit('casl/setRules', []);
           return;
         }
 
-        store.commit("casl/setRules", rules);
+        store.commit('casl/setRules', rules);
         
-      } else if (action.type === "auth/logout") {
-        store.commit("casl/setRules", []);
+      } else if (action.type === 'auth/logout') {
+        store.commit('casl/setRules', []);
       }
     }
   });
@@ -106,7 +113,7 @@ export {
 ```js
 // src/store/index.js
 
-import { caslPlugin } from "@/store/vuex.plugin.casl"; // your previously defined file
+import { caslPlugin } from '@/store/vuex.plugin.casl'; // your previously defined file
 
 export const store = new Vuex.Store({
   plugins: [
@@ -126,7 +133,7 @@ Now it's more like conventional `@casl/vue` work and we're almost done. It's mos
 
 import Vue from 'vue';
 import { abilitiesPlugin } from '@casl/vue';
-import { store } from "@/store";
+import { store } from '@/store';
 
 Vue.use(abilitiesPlugin, store.state.casl.ability );
 ```
@@ -137,8 +144,8 @@ From here on, just follow the instructions at [@casl/vue](https://casl.js.org/v5
 
 ```vue
 <template>
-  <div v-if="$can('create', 'Post')">
-    <a @click="createPost">Add Post</a>
+  <div v-if='$can('create', 'Post')'>
+    <a @click='createPost'>Add Post</a>
   </div>
 </template>
 ```
