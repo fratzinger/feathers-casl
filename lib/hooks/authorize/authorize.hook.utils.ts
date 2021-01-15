@@ -26,7 +26,6 @@ export const makeOptions = (app: Application, options?: Partial<AuthorizeHookOpt
 
 export const makeDefaultOptions = (options?: AuthorizeHookOptions): AuthorizeHookOptions => {
   options = options || {} as AuthorizeHookOptions;
-  options.getModelName = options.getModelName || getContextPath;
   
   options.checkMultiActions = false;
   options.actionOnForbidden = options.actionOnForbidden || (() => {

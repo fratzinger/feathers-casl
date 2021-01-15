@@ -1,6 +1,7 @@
 import { Forbidden } from "@feathersjs/errors";
 import _isEmpty from "lodash/isEmpty";
 import _pick from "lodash/pick";
+import { subject } from "@casl/ability";
 
 import {
   mergeQuery,
@@ -9,10 +10,10 @@ import {
   isMulti
 } from "feathers-utils";
 
+import getModelName from "../../utils/getModelName";
 import getQueryFor from "../../utils/getQueryFor";
 import hasRestrictingFields from "../../utils/hasRestrictingFields";
 import hasRestrictingConditions from "../../utils/hasRestrictingConditions";
-import subjectHelper from "../../utils/subjectHelper";
 
 import {
   makeOptions,
@@ -46,7 +47,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
 
     options = makeOptions(context.app, options);
 
-    const modelName = options.getModelName(context);
+    const modelName = getModelName(options.modelName, context);
     if (!modelName) { return context; }
 
     const ability = await getAbility(context, options);
@@ -91,7 +92,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
 
       const item = await service.get(id, paramsGet);
 
-      throwUnlessCan(ability, method, subjectHelper(modelName, item, context), modelName);
+      throwUnlessCan(ability, method, subject(modelName, item), modelName);
       if (method === "get") {
         context.result = item;
         //pushSet(context, "params.skipHooks", "after");
@@ -100,7 +101,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
 
       // ensure that only allowed data gets changed
       if (["update", "patch"].includes(method)) {
-        const fields = hasRestrictingFields(ability, method, subjectHelper(modelName, item, context));
+        const fields = hasRestrictingFields(ability, method, subject(modelName, item));
         if (!fields) { return context; }
 
         const data = _pick(context.data, fields);
@@ -146,7 +147,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       // we have all information we need (maybe we need populated data?)
       const data = (Array.isArray(context.data)) ? context.data : [context.data];
       for (let i = 0; i < data.length; i++) {
-        throwUnlessCan(ability, method, subjectHelper(modelName, data[i], context), modelName);
+        throwUnlessCan(ability, method, subject(modelName, data[i]), modelName);
       }
       return context;
     }

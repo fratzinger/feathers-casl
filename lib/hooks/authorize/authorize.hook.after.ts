@@ -1,10 +1,10 @@
 import { getItems, replaceItems } from "feathers-hooks-common";
+import { subject } from "@casl/ability";
 import { permittedFieldsOf } from "@casl/ability/extra";
 import _pick from "lodash/pick";
+import { HookContext } from "@feathersjs/feathers";
 
 import { shouldSkip, mergeArrays } from "feathers-utils";
-
-import subjectHelper from "../../utils/subjectHelper";
 
 import {
   getPersistedConfig,
@@ -13,10 +13,11 @@ import {
   makeOptions
 } from "./authorize.hook.utils";
 
+import getModelName from "../../utils/getModelName";
+
 import {
   AuthorizeHookOptions
 } from "../../types";
-import { HookContext } from "@feathersjs/feathers";
 
 const HOOKNAME = "authorize";
 
@@ -32,7 +33,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
 
     options = makeOptions(context.app, options);
 
-    const modelName = options.getModelName(context);
+    const modelName = getModelName(options.modelName, context);
     if (!modelName) { return context; }
 
     const skipCheckConditions = getPersistedConfig(context, "skipRestrictingRead.conditions");
@@ -54,8 +55,8 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     const items = getItems(context);
 
     const forOneEl = (item: Record<string, unknown>) => {
-      if (!skipCheckConditions && !ability.can("read", subjectHelper(modelName, item, context))) { return undefined; }
-      let fields = permittedFieldsOf(ability, "read", subjectHelper(modelName, item, context));
+      if (!skipCheckConditions && !ability.can("read", subject(modelName, item))) { return undefined; }
+      let fields = permittedFieldsOf(ability, "read", subject(modelName, item));
       if (skipCheckFields || (fields.length === 0 && !$select)) {
         return item;
       }

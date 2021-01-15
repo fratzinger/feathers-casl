@@ -3,10 +3,12 @@ import _isEqual from "lodash/isEqual";
 import _pick from "lodash/pick";
 import _isEmpty from "lodash/isEmpty";
 import "@feathersjs/transport-commons";
+import { subject } from "@casl/ability";
 
 import { makeOptions } from "./channels.utils";
+
+import getModelName from "../utils/getModelName";
 import hasRestrictingFields from "../utils/hasRestrictingFields";
-import subjectHelper from "../utils/subjectHelper";
 
 import { Channel, RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
 import { ChannelOptions } from "../types";
@@ -14,7 +16,7 @@ import { ChannelOptions } from "../types";
 export default (app: Application, data: unknown, context: HookContext, options?: Partial<ChannelOptions>): Channel|Channel[] => {
   options = makeOptions(app, options);
   const { channelOnError, activated } = options;
-  const modelName = options.getModelName(context);
+  const modelName = getModelName(options.modelName, context);
 
   if (!activated || !modelName) {
     return (!channelOnError) ? new Channel() : app.channel(channelOnError);
@@ -24,7 +26,7 @@ export default (app: Application, data: unknown, context: HookContext, options?:
   //return app.channel(channels);
   const allConnections = app.channel(channels).connections;
 
-  const dataToTest = subjectHelper(modelName, data as Record<string, unknown>, context);
+  const dataToTest = subject(modelName, data as Record<string, unknown>);
 
   if (!options.restrictFields) {
     // return all fields for allowed 

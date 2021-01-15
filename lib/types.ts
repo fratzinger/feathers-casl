@@ -8,17 +8,16 @@ export interface AuthorizeHookOptions {
   actionOnForbidden?(): void
   checkMultiActions?: boolean
   ability?: PureAbility | ((context: HookContext) => PureAbility | Promise<PureAbility>)
-  getModelName?: GetModelName
+  modelName?: GetModelName
 }
 
-export type SubjectHelper = (type: string, object: Record<string, unknown>, context?: HookContext) => Record<string, unknown>;
-export type GetModelName = (context: HookContext) => string
+export type GetModelName = string | ((context: HookContext) => string)
 
 export interface ChannelOptions {
   activated?: boolean
   channelOnError?: string[]
   ability?: PureAbility | ((app: Application, connection: RealTimeConnection, data: unknown, context: HookContext) => PureAbility)
-  getModelName?: GetModelName
+  modelName?: GetModelName
   restrictFields?: boolean
 }
 

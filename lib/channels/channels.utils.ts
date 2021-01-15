@@ -24,7 +24,7 @@ const defaultOptions: ChannelOptions = {
   ability: ((app: Application, connection: RealTimeConnection, data: Record<string, unknown>, context: HookContext): Ability => {
     return connection.ability;
   }),
-  getModelName: getContextPath,
+  modelName: getContextPath,
   restrictFields: true
 };
 

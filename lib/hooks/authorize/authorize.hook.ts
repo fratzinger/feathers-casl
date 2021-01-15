@@ -25,12 +25,7 @@ export default (options?: Partial<AuthorizeHookOptions>): ((context: HookContext
     }
 
     options = makeOptions(context.app, options);
-
-    const modelName = options.getModelName(context);
-    if (!modelName) {
-      return Promise.resolve(context);
-    }
-
+    
     return (context.type === "before") 
       ? await authorizeBefore(options)(context) 
       : await authorizeAfter(options)(context);

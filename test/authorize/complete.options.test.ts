@@ -133,6 +133,77 @@ describe("authorize-hook options", function () {
     });
   });
 
+  describe("modelName", function() {
+    it("use service.modelName with string", async function() {
+      const app = feathers();
+      app.use(
+        "test",
+        new Service({
+          multi: true,
+          paginate: {
+            default: 10,
+            max: 50
+          }
+        })
+      );
+      service = app.service("test");
+      //@ts-ignore
+      service.modelName = "Test";
+      //@ts-ignore
+      service.hooks({
+        before: {
+          all: [authorize({
+            //@ts-ignore
+            ability: defineAbility({ resolveAction }, (can) => {
+              can("create", "Test");
+            }),
+            modelName: "Test"
+          })],
+        }
+      });
+
+      const result = await service.create({ id: 0, test: true });
+      assert.ok(result);
+      await assert.rejects(() => {
+        return service.update(0, { test: false });
+      }, err => err.name === "Forbidden", "update throws Forbidden");
+    });
+    it("use service.modelName with function", async function() {
+      const app = feathers();
+      app.use(
+        "test",
+        new Service({
+          multi: true,
+          paginate: {
+            default: 10,
+            max: 50
+          }
+        })
+      );
+      service = app.service("test");
+      //@ts-ignore
+      service.modelName = "Test";
+      //@ts-ignore
+      service.hooks({
+        before: {
+          all: [authorize({
+            //@ts-ignore
+            ability: defineAbility({ resolveAction }, (can) => {
+              can("create", "Test");
+            }),
+            modelName: (context) => context.service.modelName
+          })],
+        }
+      });
+
+      const result = await service.create({ id: 0, test: true });
+      assert.ok(result);
+      await assert.rejects(() => {
+        return service.update(0, { test: false });
+      }, err => err.name === "Forbidden", "update throws Forbidden");
+    });
+  });
+
   describe("ability", function() {
     it("uses ability in options over params.ability", async function() {
       const app = feathers();
