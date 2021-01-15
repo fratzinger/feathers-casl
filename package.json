@@ -1,0 +1,69 @@
+{
+  "name": "feathers-casl",
+  "version": "0.0.1",
+  "description": "",
+  "author": "fratzinger",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fratzinger/feathers-utils"
+  },
+  "license": "MIT",
+  "main": "dist/",
+  "directories": {
+    "test": "test",
+    "lib": "src"
+  },
+  "private": true,
+  "scripts": {
+    "compile": "shx rm -rf dist/ && tsc",
+    "release:pre": "npm run compile && npm version prerelease && npm publish --tag pre",
+    "release:patch": "npm run compile && npm version patch && npm publish",
+    "release:minor": "npm run compile && npm version minor && npm publish",
+    "release:major": "npm run compile && npm version major && npm publish",
+    "test": "cross-env NODE_ENV=test TS_NODE_PROJECT='tsconfig.test.json' mocha --require ts-node/register 'test/**/*.test.ts' --timeout 5000",
+    "coverage": "nyc npm run test",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "docs": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  },
+  "dependencies": {
+    "@casl/ability": "^4.1.6",
+    "@feathersjs/errors": "^4.5.11",
+    "@feathersjs/feathers": "^4.5.11",
+    "@feathersjs/transport-commons": "^4.5.11",
+    "feathers-hooks-common": "^5.0.4",
+    "feathers-utils": "^1.1.0",
+    "lodash": "^4.17.20"
+  },
+  "devDependencies": {
+    "@feathersjs/authentication": "^4.5.11",
+    "@feathersjs/authentication-local": "^4.5.11",
+    "@feathersjs/authentication-oauth": "^4.5.11",
+    "@feathersjs/configuration": "^4.5.11",
+    "@feathersjs/express": "^4.5.11",
+    "@feathersjs/socketio": "github:feathersjs/socketio",
+    "@feathersjs/socketio-client": "^4.5.11",
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "@types/lodash": "^4.14.166",
+    "@types/mocha": "^8.2.0",
+    "@types/node": "^14.14.16",
+    "@typescript-eslint/eslint-plugin": "^4.11.0",
+    "@typescript-eslint/parser": "^4.11.0",
+    "@vuepress/plugin-active-header-links": "^1.8.0",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "eslint": "^7.16.0",
+    "eslint-plugin-security": "^1.4.0",
+    "feathers-memory": "^4.1.0",
+    "helmet": "^4.3.1",
+    "mocha": "^8.2.1",
+    "nyc": "^15.1.0",
+    "shx": "^0.3.3",
+    "socket.io-client": "^2.3.1",
+    "ts-node": "^9.1.1",
+    "type-fest": "^0.20.2",
+    "typescript": "^4.1.3",
+    "vuepress": "^1.8.0",
+    "vuepress-theme-default-prefers-color-scheme": "^2.0.0"
+  }
+}

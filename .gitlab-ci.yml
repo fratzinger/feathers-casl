@@ -1,0 +1,12 @@
+.feathers-casl:
+  only:
+    changes:
+      - packages/feathers-casl/**/*
+      - packages/feathers-utils/**/*
+
+test:feathers-casl:
+  variables:
+    DIR: packages/feathers-casl
+  extends:
+    - .feathers-casl
+    - .test
