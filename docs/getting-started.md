@@ -3,6 +3,15 @@ title: Getting Started
 sidebarDepth: 3
 ---
 
+<p align="center">
+  <img src="/img/logo.svg" width="150">
+</p>
+
+![npm](https://img.shields.io/npm/v/feathers-casl)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/fratzinger/feathers-casl/Node.js%20CI)
+![npm](https://img.shields.io/npm/dm/feathers-casl)
+[![GitHub license](https://img.shields.io/github/license/fratzinger/feathers-casl)](https://github.com/fratzinger/feathers-casl/blob/master/LICENSE)
+
 ## About
 
 Add access control with CASL to your feathers application.
