@@ -16,8 +16,23 @@ Add access control with CASL to your feathers application.
 This project is built for [FeathersJS](http://feathersjs.com). An open source web framework for building modern real-time applications.
 It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CASL** in feathers.js.
 
-## Documentation
+### Features
+- Fully powered by Feathers & CASL
+- Written in TypeScript
+- Allows permissions for all methods `create`, `find`, `get`, `update`, `patch`, `remove`, or `create`, `read`, `update`, `delete`
+- Define permissions not based on methods: `can('view', 'Settings')`
+- Restrict by conditions: `can('create', 'Task', { userId: user.id })`
+- Restrict by individual fields: `cannot('update', 'User', ['roleId'])`
+- Native support for restrictive `$select`: `can('read', 'User', ['id', 'username'])` -> `$select: ['id', 'username']`
+- Supports `channels` right away (every connection only gets updates based on `can('read' ...)`)
+- `channels`-support also regards restrictive fields
+- Disallow/allow `multi` methods (`create`, `patch`, `remove`) dynamically with: `can('remove_multi', 'Task', { userId: user.id })`
+- Support for dynamic rules stored in your database
+- Support to define abilities for anything (providers, users, roles, 3rd party apps, ...)
+- Baked in support for `@casl/angular`, `@casl/react`, `@casl/vue` and `@casl/aurelia`
 
+## Documentation
+You need more information? Please have a look:
 https://feathers-casl.netlify.app/
 
 ## Installation
