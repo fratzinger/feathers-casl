@@ -60,7 +60,7 @@ The `casl()` function can be configured, to provide app wide options to `feather
 For most cases we want to define rules per user (or per user-role). So we first add a function which returns an `ability` from `@casl/ability` with these rules:
 
 ```js
-// src/services/authentication/authentication.abilites.js
+// src/services/authentication/authentication.abilities.js
 const { AbilityBuilder, createAliasResolver, makeAbilityFromRules } = require('feathers-casl');
 
 // don't forget this, as `read` is used internally
@@ -209,7 +209,7 @@ To unleash the full power of `feathers-casl` you want to add it to your `channel
 ```js
 const {
   getChannelsWithReadAbility,
-  makeDefaultOptions
+  makeOptions
 } = require('feathers-casl').channels;
 
 module.exports = function (app) {

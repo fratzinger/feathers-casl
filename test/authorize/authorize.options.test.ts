@@ -42,7 +42,7 @@ describe("authorize-hook options", function () {
       });
     });
 
-    it("passes multi if explicitely defined", async function () {
+    it("passes multi if explicitly defined", async function () {
       const methods = [
         {
           method: "create",

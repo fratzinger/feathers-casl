@@ -52,7 +52,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
 
     const ability = await getAbility(context, options);
     if (!ability) {
-      // Interne Anfrage oder nicht authentifiziert -> Ignorieren
+      // Ignore internal or not authenticated requests
       return context;
     }
 
@@ -61,14 +61,14 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     }
 
     throwUnlessCan(
-      ability, 
-      method, 
-      modelName, 
-      modelName, 
+      ability,
+      method,
+      modelName,
+      modelName,
       options.actionOnForbidden
     );
 
-    // if context is with multiple items, there's a change that we need to handle each iteam seperately
+    // if context is with multiple items, there's a change that we need to handle each item separately
     if (isMulti(context)) {
       // if has conditions -> hide $select for after-hook, because
       if (hasRestrictingConditions(ability, "read", modelName)) {
@@ -89,7 +89,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       // get complete item for `throwUnlessCan`-check to be trustworthy
       // -> initial 'get' and 'remove' have no data at all
       // -> initial 'patch' maybe has just partial data
-      // -> initial 'update' maybe has completely changed data, for what the check could pass but not for inital data
+      // -> initial 'update' maybe has completely changed data, for what the check could pass but not for initial data
       const queryGet = Object.assign({}, params.query || {});
       delete queryGet.$select;
       const paramsGet = Object.assign({}, params, { query: queryGet });
@@ -99,13 +99,13 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       const item = await service.get(id, paramsGet);
 
       throwUnlessCan(
-        ability, 
-        method, 
-        subject(modelName, item), 
-        modelName, 
+        ability,
+        method,
+        subject(modelName, item),
+        modelName,
         options.actionOnForbidden
       );
-        
+
       if (method === "get") {
         context.result = item;
         //pushSet(context, "params.skipHooks", "after");
@@ -130,7 +130,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
         if (method === "patch") {
           context.data = data;
         } else {
-          // merge with inital data
+          // merge with initial data
           const itemPlain = await service._get(id);
           context.data = Object.assign({}, itemPlain, data);
         }
@@ -140,7 +140,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     } else if (method === "find" || (["patch", "remove"].includes(method) && id == null)) {
       // multi: find | patch | remove
       if (hasRestrictingConditions(ability, method, modelName)) {
-        // TODO: if query and context.params.query differ -> seperate calls
+        // TODO: if query and context.params.query differ -> separate calls
         const options: GetQueryOptions = {
           skipFields: method === "find"
         };
@@ -162,10 +162,10 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       const data = (Array.isArray(context.data)) ? context.data : [context.data];
       for (let i = 0; i < data.length; i++) {
         throwUnlessCan(
-          ability, 
-          method, 
-          subject(modelName, data[i]), 
-          modelName, 
+          ability,
+          method,
+          subject(modelName, data[i]),
+          modelName,
           options.actionOnForbidden
         );
       }
