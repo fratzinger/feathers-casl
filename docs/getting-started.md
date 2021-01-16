@@ -81,16 +81,16 @@ const defineRulesFor = (user) => {
   }
 
   if (user.role && user.role.name === 'Admin') {
-    can('create', 'User');
+    can('create', 'users');
   }
 
-  can('read', 'User');
-  can('update', 'User', { id: user.id });
-  cannot('update', 'User', ['roleId'], { id: user.id });
-  cannot('delete', 'User', { id: user.id });
+  can('read', 'users');
+  can('update', 'users', { id: user.id });
+  cannot('update', 'users', ['roleId'], { id: user.id });
+  cannot('delete', 'users', { id: user.id });
 
-  can('manage', 'Task', { userId: user.id });
-  can('create_multi', 'Post', { userId: user.id })
+  can('manage', 'tasks', { userId: user.id });
+  can('create_multi', 'posts', { userId: user.id })
 
   return rules;
 };
