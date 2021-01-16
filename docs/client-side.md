@@ -144,10 +144,23 @@ From here on, just follow the instructions at [@casl/vue](https://casl.js.org/v5
 
 ```vue
 <template>
-  <div v-if='$can('create', 'Post')'>
+  <div v-if="$can('create', 'posts')">
     <a @click='createPost'>Add Post</a>
   </div>
+  <!-- or even a specific item -->
+  <div>{{ post.title }}</div>
+  <button :disabled="$can('update', post)" @click="task.save"></button>
 </template>
+
+<script>
+export default {
+  data() {
+    return {
+      task: new this.$$FeathersVuex.api.Task({}),
+    }
+  }
+}
+</script>
 ```
 
 ## Aurelia
