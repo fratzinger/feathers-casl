@@ -231,6 +231,7 @@ describe("authorize-hook options", function () {
       });
 
       const params = {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         ability: defineAbility({ resolveAction }, () => {}),
       };
 
@@ -265,6 +266,7 @@ describe("authorize-hook options", function () {
       });
 
       const params = {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         ability: defineAbility({ resolveAction }, () => {}),
       };
 
@@ -298,6 +300,7 @@ describe("authorize-hook options", function () {
       });
 
       const params = {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         ability: defineAbility({ resolveAction }, () => {}),
       };
 
@@ -335,6 +338,7 @@ describe("authorize-hook options", function () {
       });
 
       const params = {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         ability: defineAbility({ resolveAction }, () => {}),
       };
 

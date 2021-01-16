@@ -108,6 +108,23 @@ describe("authorize-hook - complete", function () {
         "rejects for id not allowed"
       );
     });
+
+    it("throws if $select and restricted fields don't overlap", async function() {
+      const item = await service.create({ id: 0, test: true, userId: 1, supersecret: true, hidden: true });
+      assert(item.id !== undefined, "item has id");
+      const promise = service.get(item.id, {
+        query: { $select: ["id", "supersecret", "hidden"] },
+        //@ts-ignore
+        ability: defineAbility({ resolveAction }, (can) => {
+          can("read", "tests", ["test", "userId"]);
+        }),
+      });
+      await assert.rejects(
+        promise,
+        (err) => err.name === "Forbidden",
+        "rejects for id not allowed"
+      );
+    });
   });
 
   describe("beforeAndAfter - find", function () {
@@ -435,6 +452,24 @@ describe("authorize-hook - complete", function () {
 
       assert.rejects(promise, err => err.name === "Forbidden", "cannot create item");
     });
+
+    it("creates item and returns empty object for not overlapping '$select' and 'restricting fields'", async function() {
+      const item = { id: 0, test: true, userId: 1, supersecret: true, hidden: true };
+      const result = await service.create(
+        item,
+        {
+          query: { $select: ["id", "supersecret", "hidden"] },
+          //@ts-ignore
+          ability: defineAbility({ resolveAction }, (can) => {
+            can("read", "tests", ["test", "userId"]);
+            can("create", "tests");
+          }),
+        }
+      );
+      assert.deepStrictEqual(result, {}, "returned item is empty because of $select and restricting fields");
+      const itemInDb = await service.get(item.id);
+      assert.deepStrictEqual(itemInDb, item, "item in db is complete");
+    });
   });
 
   describe("beforeAndAfter - create:multi", function () {
@@ -614,6 +649,23 @@ describe("authorize-hook - complete", function () {
 
       assert.rejects(promise, err => err.name === "Forbidden", "cannot update item");
     });
+
+    it("updates item and returns empty object for not overlapping '$select' and 'restricting fields'", async function() {
+      const item = { id: 0, test: true, userId: 1, supersecret: true, hidden: true };
+      const updatedItem = { id: 0, test: false, userId: 1, supersecret: true, hidden: true };
+      await service.create(item);
+      const result = await service.update(item.id, updatedItem, {
+        query: { $select: ["id", "supersecret", "hidden"] },
+        //@ts-ignore
+        ability: defineAbility({ resolveAction }, (can) => {
+          can("read", "tests", ["test", "userId"]);
+          can(["create", "update"], "tests");
+        }),
+      });
+      assert.deepStrictEqual(result, {}, "returned item is empty because of $select and restricting fields");
+      const itemInDb = await service.get(item.id);
+      assert.deepStrictEqual(itemInDb, updatedItem, "item in db is complete");
+    });
   });
 
   describe("beforeAndAfter - patch:single", function () {
@@ -695,6 +747,23 @@ describe("authorize-hook - complete", function () {
       });
 
       assert.rejects(promise, err => err.name === "Forbidden", "cannot patch item");
+    });
+
+    it("patches item and returns empty object for not overlapping '$select' and 'restricting fields'", async function() {
+      const item = { id: 0, test: true, userId: 1, supersecret: true, hidden: true };
+      const updatedItem = { id: 0, test: false, userId: 1, supersecret: true, hidden: true };
+      await service.create(item);
+      const result = await service.patch(item.id, { test: false }, {
+        query: { $select: ["id", "supersecret", "hidden"] },
+        //@ts-ignore
+        ability: defineAbility({ resolveAction }, (can) => {
+          can("read", "tests", ["test", "userId"]);
+          can(["create", "update"], "tests");
+        }),
+      });
+      assert.deepStrictEqual(result, {}, "returned item is empty because of $select and restricting fields");
+      const itemInDb = await service.get(item.id);
+      assert.deepStrictEqual(itemInDb, updatedItem, "item in db is complete");
     });
   });
 
@@ -928,6 +997,25 @@ describe("authorize-hook - complete", function () {
       });
 
       assert.rejects(promise, err => err.name === "Forbidden", "cannot remove item");
+    });
+
+    it("removes item and returns empty object for not overlapping '$select' and 'restricting fields'", async function() {
+      const item = { id: 0, test: true, userId: 1, supersecret: true, hidden: true };
+      await service.create(item);
+      const result = await service.remove(item.id, {
+        query: { $select: ["id", "supersecret", "hidden"] },
+        //@ts-ignore
+        ability: defineAbility({ resolveAction }, (can) => {
+          can("read", "tests", ["test", "userId"]);
+          can(["create", "remove"], "tests");
+        }),
+      });
+      assert.deepStrictEqual(result, {}, "returned item is empty because of $select and restricting fields");
+      await assert.rejects(
+        service.get(item.id),
+        err => err.name === "NotFound",
+        "item was deleted"
+      );
     });
   });
 
