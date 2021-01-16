@@ -57,10 +57,16 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     }
 
     if (options.checkMultiActions) {
-      checkMulti(context, ability, modelName);
+      checkMulti(context, ability, modelName, options.actionOnForbidden);
     }
 
-    throwUnlessCan(ability, method, modelName, modelName);
+    throwUnlessCan(
+      ability, 
+      method, 
+      modelName, 
+      modelName, 
+      options.actionOnForbidden
+    );
 
     // if context is with multiple items, there's a change that we need to handle each iteam seperately
     if (isMulti(context)) {
@@ -87,12 +93,19 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       const queryGet = Object.assign({}, params.query || {});
       delete queryGet.$select;
       const paramsGet = Object.assign({}, params, { query: queryGet });
-      paramsGet.skipHooks = (params.skipHooks && params.skipHooks.slice()) || [];
+      paramsGet.skipHooks = (params.skipHooks?.slice()) || [];
       pushSet(paramsGet, "skipHooks", `${HOOKNAME}`, { unique: true });
 
       const item = await service.get(id, paramsGet);
 
-      throwUnlessCan(ability, method, subject(modelName, item), modelName);
+      throwUnlessCan(
+        ability, 
+        method, 
+        subject(modelName, item), 
+        modelName, 
+        options.actionOnForbidden
+      );
+        
       if (method === "get") {
         context.result = item;
         //pushSet(context, "params.skipHooks", "after");
@@ -108,6 +121,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
 
         // if fields are not overlapping -> throw
         if (_isEmpty(data)) {
+          if (options.actionOnForbidden) { options.actionOnForbidden(); }
           throw new Forbidden("You're not allowed to make this request");
         }
 
@@ -147,7 +161,13 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       // we have all information we need (maybe we need populated data?)
       const data = (Array.isArray(context.data)) ? context.data : [context.data];
       for (let i = 0; i < data.length; i++) {
-        throwUnlessCan(ability, method, subject(modelName, data[i]), modelName);
+        throwUnlessCan(
+          ability, 
+          method, 
+          subject(modelName, data[i]), 
+          modelName, 
+          options.actionOnForbidden
+        );
       }
       return context;
     }

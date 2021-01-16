@@ -6,7 +6,6 @@ import { Forbidden } from "@feathersjs/errors";
 
 import { PureAbility } from "@casl/ability";
 import { Application, HookContext } from "@feathersjs/feathers";
-import { getContextPath } from "../../utils/getDefaultModelName";
 
 import {
   isMulti
@@ -28,9 +27,6 @@ export const makeDefaultOptions = (options?: AuthorizeHookOptions): AuthorizeHoo
   options = options || {} as AuthorizeHookOptions;
   
   options.checkMultiActions = false;
-  options.actionOnForbidden = options.actionOnForbidden || (() => {
-    throw new Forbidden("You're not allowed to make this request");
-  });
   return options;
 };
 
@@ -70,13 +66,20 @@ const move = (context: HookContext, fromPath: Path, toPath: Path) => {
   return val;
 };
 
-export const throwUnlessCan = (ability: PureAbility, method: string, resource: string|Record<string, unknown>, modelName: string): void => {
+export const throwUnlessCan = (
+  ability: PureAbility, 
+  method: string, 
+  resource: string|Record<string, unknown>, 
+  modelName: string,
+  actionOnForbidden: () => void
+): void => {
   if (ability.cannot(method, resource)) {
+    if (actionOnForbidden) actionOnForbidden();
     throw new Forbidden(`You are not allowed to ${method} ${modelName}`);
   }
 };
 
-export const checkMulti = (context: HookContext, ability: PureAbility, modelName: string): boolean => {
+export const checkMulti = (context: HookContext, ability: PureAbility, modelName: string, actionOnForbidden: (() => void)): boolean => {
   const { method } = context;
   const currentIsMulti = isMulti(context);
   if (!currentIsMulti) { return true; }
@@ -86,7 +89,8 @@ export const checkMulti = (context: HookContext, ability: PureAbility, modelName
   ) {
     return true;
   }
-  
+
+  if (actionOnForbidden) actionOnForbidden();
   throw new Forbidden(`You're not allowed to multi-${method} ${modelName}`);
 };
 
@@ -95,7 +99,8 @@ export const hide$select = (context: HookContext): unknown => {
 };
 
 export const restore$select = (context: HookContext): unknown[]|undefined => {
-  return move(context, "params.casl.$select", "params.query.$select");
+  move(context, "params.casl.$select", "params.query.$select");
+  return _get(context, "params.query.$select");
 };
 
 export const get$select = (context: HookContext): unknown => {

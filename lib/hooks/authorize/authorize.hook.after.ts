@@ -2,6 +2,7 @@ import { getItems, replaceItems } from "feathers-hooks-common";
 import { subject } from "@casl/ability";
 import { permittedFieldsOf } from "@casl/ability/extra";
 import _pick from "lodash/pick";
+import _isEmpty from "lodash/isEmpty";
 import { HookContext } from "@feathersjs/feathers";
 
 import { shouldSkip, mergeArrays } from "feathers-utils";
@@ -18,6 +19,7 @@ import getModelName from "../../utils/getModelName";
 import {
   AuthorizeHookOptions
 } from "../../types";
+import { Forbidden } from "@feathersjs/errors";
 
 const HOOKNAME = "authorize";
 
@@ -60,7 +62,12 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       if (skipCheckFields || (fields.length === 0 && !$select)) {
         return item;
       }
-      fields = mergeArrays(fields, $select, "intersectOrFull") as string[];
+
+      // 
+      const intersect = (fields?.length && $select?.length) 
+        ? "intersect"
+        : "intersectOrFull";
+      fields = mergeArrays(fields, $select, intersect) as string[];
       //TODO: replace _pick with native
       return _pick(item, fields);
     };
@@ -76,6 +83,10 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
 
     } else {
       result = forOneEl(items);
+      if (context.method === "get" && _isEmpty(result)) {
+        if (options.actionOnForbidden) options.actionOnForbidden();
+        throw new Forbidden(`You're not allowed to ${context.method} ${modelName}`);
+      }
     }
 
     replaceItems(context, result);

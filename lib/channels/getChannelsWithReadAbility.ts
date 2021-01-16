@@ -3,7 +3,7 @@ import _isEqual from "lodash/isEqual";
 import _pick from "lodash/pick";
 import _isEmpty from "lodash/isEmpty";
 import "@feathersjs/transport-commons";
-import { subject } from "@casl/ability";
+import { PureAbility, subject } from "@casl/ability";
 
 import { makeOptions } from "./channels.utils";
 
@@ -13,7 +13,23 @@ import hasRestrictingFields from "../utils/hasRestrictingFields";
 import { Channel, RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
 import { ChannelOptions } from "../types";
 
-export default (app: Application, data: unknown, context: HookContext, options?: Partial<ChannelOptions>): Channel|Channel[] => {
+const getAbility = (
+  app: Application, 
+  data: Record<string, unknown>,
+  connection: RealTimeConnection,
+  context: HookContext,
+  options: Partial<ChannelOptions>
+): undefined|PureAbility => {
+  if (options.ability) {
+    return (typeof options.ability === "function") ?
+      options.ability(app, connection, data, context) :
+      options.ability;
+  } else {
+    return connection.ability;
+  }
+};
+
+export default (app: Application, data: Record<string, unknown>, context: HookContext, options?: Partial<ChannelOptions>): Channel|Channel[] => {
   options = makeOptions(app, options);
   const { channelOnError, activated } = options;
   const modelName = getModelName(options.modelName, context);
@@ -26,17 +42,13 @@ export default (app: Application, data: unknown, context: HookContext, options?:
   //return app.channel(channels);
   const allConnections = app.channel(channels).connections;
 
-  const dataToTest = subject(modelName, data as Record<string, unknown>);
+  const dataToTest = subject(modelName, data);
 
   if (!options.restrictFields) {
     // return all fields for allowed 
     let connections = allConnections
       .filter(connection => {
-        if (!options.ability) return false;
-        const ability = 
-          (typeof options.ability === "function") ?
-            options.ability(app, connection, data, context) :
-            options.ability;
+        const ability = getAbility(app, data, connection, context, options);
         return ability && ability.can("read", dataToTest);
       });
     connections = [...new Set(connections)];
