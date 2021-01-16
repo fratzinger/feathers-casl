@@ -1,7 +1,7 @@
 # feathers-casl
 
 <p align="center">
-    <img src="./docs/.vuepress/public/img/logo.svg" width="200">
+    <img src="https://feathers-casl.netlify.app/img/logo.svg" width="200">
 </p>
 
 ![npm](https://img.shields.io/npm/v/feathers-casl)
