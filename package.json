@@ -8,6 +8,14 @@
     "type": "git",
     "url": "https://github.com/fratzinger/feathers-utils"
   },
+  "keywords": [
+    "feathers",
+    "feathers.js",
+    "feathers-plugin",
+    "casl",
+    "permissions",
+    "authorization"
+  ],
   "license": "MIT",
   "main": "dist/",
   "directories": {
