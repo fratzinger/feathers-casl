@@ -49,7 +49,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
 
     params.ability = await getAbility(context, options);
     if (!params.ability) {
-      // Interne Anfrage oder nicht authentifiziert -> Ignorieren
+      // Ignore internal or not authenticated requests
       return context;
     }
 
@@ -63,8 +63,8 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
         return item;
       }
 
-      // 
-      const intersect = (fields?.length && $select?.length) 
+      //
+      const intersect = (fields?.length && $select?.length)
         ? "intersect"
         : "intersectOrFull";
       fields = mergeArrays(fields, $select, intersect) as string[];

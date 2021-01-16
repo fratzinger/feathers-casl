@@ -5,11 +5,11 @@ sidebarDepth: 3
 
 ## General
 
-Thanks to the awesome work of [https://github.com/stalniy](stalniy) and his isomorphic approach, you can use the packages `@casl/ability`, `@casl/angular`, `@casl/react`, `@casl/vue` and `@casl/aurelia`. It's pretty straight forward.
+Thanks to the awesome work of [stalniy](https://github.com/stalniy) and his isomorphic approach, you can use the packages `@casl/ability`, `@casl/angular`, `@casl/react`, `@casl/vue` and `@casl/aurelia`. It's pretty straight forward.
 
 ### Feathers client
 
-Since we defined the `ability` and `rules` in the `authentication:after/create` hook (see: [Getting Started](/getting-started.html#add-abilities-to-hooks-context)), we can use it on the client side. 
+Since we defined the `ability` and `rules` in the `authentication:after/create` hook (see: [Getting Started](/getting-started.html#add-abilities-to-hooks-context)), we can use it on the client side.
 
 ## Angular
 
@@ -94,7 +94,7 @@ const caslPlugin = (store) => {
         }
 
         store.commit('casl/setRules', rules);
-        
+
       } else if (action.type === 'auth/logout') {
         store.commit('casl/setRules', []);
       }
