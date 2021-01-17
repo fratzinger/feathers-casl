@@ -30,3 +30,7 @@ export const utils = {
   hasRestrictingConditions,
   hasRestrictingFields
 };
+
+if (typeof module !== "undefined") {
+  module.exports = Object.assign(initialize, module.exports);
+}
