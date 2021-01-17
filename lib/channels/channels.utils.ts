@@ -11,6 +11,9 @@ import {
 import { getContextPath } from "../utils/getDefaultModelName";
 
 export const makeOptions = (app: Application, options?: Partial<ChannelOptions>): ChannelOptions => {
+  if (!app) {
+    throw new Error("feathers-casl: You need to provide an 'app' to the channels:makeOptions function");
+  }
   options = options || {};
   const caslOptions: InitOptions|undefined = app.get("casl");
   const appOptions = caslOptions?.channels || makeDefaultOptions();
