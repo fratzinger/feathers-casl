@@ -23,7 +23,7 @@
     "lib": "src"
   },
   "scripts": {
-    "prepublish": "npm run lint && npm run test && npm run compile",
+    "preversion": "npm run lint && npm run test && npm run compile",
     "publish": "git push origin --tags && git push origin",
     "compile": "shx rm -rf dist/ && tsc",
     "release:pre": "npm version prerelease && npm publish --tag pre",

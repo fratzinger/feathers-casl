@@ -1,3 +1,4 @@
+/* eslint-disable */
 import assert from "assert";
 import feathers, { Application, HookContext } from "@feathersjs/feathers";
 import casl from "../lib/initialize";
@@ -20,6 +21,7 @@ describe("options", () => {
           calledActionOnForbidden = true;
         },
         checkMultiActions: true,
+        //@ts-ignore
         ability: (context: HookContext): Ability => {
           calledAbility = true;
           return defineAbility(() => {});
@@ -32,6 +34,7 @@ describe("options", () => {
       channels: {
         activated: false,
         channelOnError: ["Test"],
+        //@ts-ignore
         ability: (app: Application, connection: RealTimeConnection, data: unknown, context: HookContext): Ability => {
           calledChannelAbility = true;
           return defineAbility(() => {});
