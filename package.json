@@ -18,6 +18,7 @@
   ],
   "license": "MIT",
   "main": "dist/",
+  "types": "dist/",
   "directories": {
     "test": "test",
     "lib": "src"
