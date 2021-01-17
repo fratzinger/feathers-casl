@@ -1,4 +1,4 @@
-{
+module.exports = {
   "host": "localhost",
   "port": 3028,
   "paginate": {
@@ -27,4 +27,4 @@
       "passwordField": "password"
     }
   }
-}
+};

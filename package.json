@@ -23,16 +23,20 @@
     "lib": "src"
   },
   "scripts": {
+    "prepublish": "npm run lint && npm run test && npm run compile",
+    "publish": "git push origin --tags && git push origin",
     "compile": "shx rm -rf dist/ && tsc",
-    "release:pre": "npm run compile && npm version prerelease && npm publish --tag pre",
-    "release:patch": "npm run compile && npm version patch && npm publish",
-    "release:minor": "npm run compile && npm version minor && npm publish",
-    "release:major": "npm run compile && npm version major && npm publish",
+    "release:pre": "npm version prerelease && npm publish --tag pre",
+    "release:patch": "npm version patch && npm publish",
+    "release:minor": "npm version minor && npm publish",
+    "release:major": "npm version major && npm publish",
     "test": "cross-env NODE_ENV=test TS_NODE_PROJECT='tsconfig.test.json' mocha --require ts-node/register 'test/**/*.test.ts' --timeout 5000",
     "coverage": "nyc npm run test",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "docs": "vuepress dev docs",
-    "docs:build": "vuepress build docs"
+    "docs:build": "vuepress build docs",
+    "compile-src": "shx rm -rf src-dist/ && tsc -p tsconfig.src.json",
+    "start": "cross-env TS_NODE_PROJECT='tsconfig.src.json' npm run compile-src && node src-dist/src"
   },
   "dependencies": {
     "@casl/ability": "^4.1.6",
