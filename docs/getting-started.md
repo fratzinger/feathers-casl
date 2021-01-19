@@ -113,7 +113,7 @@ module.exports = {
 `feathers-casl` by default looks for `context.params.ability` in the `authorize`-hook and `connection.ability` in the channels. You want to `authorize` users who are `authenticated` first with `@feathers/authentication`. We can add hooks to the `/authentication` service to populate things to `context.params` and `connection` under the hood. We use this here to put `ability` on these objects, which makes it available to all hooks after the `authenticate(...)`-hook. This way we can define rules in just one place:
 ``
 
-```js
+```js{19-27}
 // src/services/authentication/authentication.hooks.js
 const { defineAbilitiesFor } = require('./abilities');
 
@@ -163,7 +163,7 @@ module.exports = {
 
 The `authorize`-hook can be used for all methods and has support for `multi: true`. You should use it as a `before` **AND** a `after` hook at the same time. Please make sure to define `before` at last position and `after` at first position. So you don't want to use it in `app.hooks` nor in `all`. For more information, see: [#authorize-hook](/hook-authorize.html)
 
-```js
+```js{9,12,15,18,21,24,30}
 // src/services/tasks/tasks.hooks.js
 const { authenticate } = require('@feathersjs/authentication').hooks;
 const { authorize } = require('feathers-casl').hooks;
@@ -220,7 +220,8 @@ module.exports = {
 
 To unleash the full power of `feathers-casl` you want to add it to your `channels.js` so every user just gets updates only to items they can really read. It's as simple as the following example. For more information see: [channels](/channels.html)
 
-```js
+```js{2-5,13,16}
+// src/channels.js
 const {
   getChannelsWithReadAbility,
   makeOptions
@@ -234,7 +235,6 @@ module.exports = function (app) {
 
   const caslOptions = makeOptions(app);
 
-  // eslint-disable-next-line no-unused-vars
   app.publish((data, context) => {
     return getChannelsWithReadAbility(app, data, context, caslOptions);
   });

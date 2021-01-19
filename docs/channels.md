@@ -5,7 +5,8 @@ sidebarDepth: 3
 
 ## Example
 
-```js
+```js{2-5,13,16}
+// src/services/authentication/authentication.hooks.js
 const {
   getChannelsWithReadAbility,
   makeOptions
