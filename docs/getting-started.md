@@ -29,7 +29,7 @@ It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CA
 - Native support for restrictive `$select`: `can('read', 'User', ['id', 'username'])` -> `$select: ['id', 'username']`
 - Supports `channels` right away (every connection only gets updates based on `can('read' ...)`)
 - `channels`-support also regards restrictive fields
-- Disallow/allow `multi` methods (`create`, `patch`, `remove`) dynamically with: `can('remove_multi', 'Task', { userId: user.id })`
+- Disallow/allow `multi` methods (`create`, `patch`, `remove`) dynamically with: `can('remove-multi', 'Task', { userId: user.id })`
 - Support for dynamic rules stored in your database
 - Support to define abilities for anything (providers, users, roles, 3rd party apps, ...)
 - Baked in support for `@casl/angular`, `@casl/react`, `@casl/vue` and `@casl/aurelia`
@@ -90,7 +90,7 @@ const defineRulesFor = (user) => {
   cannot('delete', 'users', { id: user.id });
 
   can('manage', 'tasks', { userId: user.id });
-  can('create_multi', 'posts', { userId: user.id })
+  can('create-multi', 'posts', { userId: user.id })
 
   return rules;
 };
