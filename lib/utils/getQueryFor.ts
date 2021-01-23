@@ -11,7 +11,7 @@ import {
   GetQueryOptions 
 } from "../types";
 
-export default (
+const getQueryFor = (
   ability: PureAbility, 
   method: string, 
   modelName: string, 
@@ -30,3 +30,5 @@ export default (
   const query = mergeQuery(condQuery, fieldsQuery, { defaultHandle: "combine" });
   return query;
 };
+
+export default getQueryFor;

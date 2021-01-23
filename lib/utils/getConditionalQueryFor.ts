@@ -67,7 +67,7 @@ const convertRuleToQuery = (rule: RawRuleFrom<AbilityTuple<string, Subject>, unk
   }
 };
 
-export default (ability: PureAbility, method: string, subject: Subject, options?: GetConditionalQueryOptions): Query => {
+const getConditionalQueryFor = (ability: PureAbility, method: string, subject: Subject, options?: GetConditionalQueryOptions): Query => {
   options = options || {};
   options.actionOnForbidden = options.actionOnForbidden || (() => {
     throw new Forbidden("You're not allowed to make this request");
@@ -81,8 +81,14 @@ export default (ability: PureAbility, method: string, subject: Subject, options?
     const rule = rules[i];
 
     const currentQuery = convertRuleToQuery(rule, options);
-    query = mergeQuery(query, currentQuery, { defaultHandle: "combine" });
+    query = mergeQuery(
+      query, 
+      currentQuery, { 
+        defaultHandle: "combine"
+      });
   }
 
   return query;
 };
+
+export default getConditionalQueryFor;

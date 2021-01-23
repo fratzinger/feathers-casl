@@ -4,8 +4,10 @@ import { Query } from "@feathersjs/feathers";
 import hasRestrictingFields from "./hasRestrictingFields";
 
 // eslint-disable-next-line no-unused-vars
-export default (ability: PureAbility, action: unknown, subject: unknown, options?: PermittedFieldsOptions<AnyAbility>): Query => {
+const getFieldsQueryFor = (ability: PureAbility, action: unknown, subject: unknown, options?: PermittedFieldsOptions<AnyAbility>): Query => {
   const fields = hasRestrictingFields(ability, action, subject, options);
   if (!fields) { return {}; }
   return { $select: fields };
 };
+
+export default getFieldsQueryFor;

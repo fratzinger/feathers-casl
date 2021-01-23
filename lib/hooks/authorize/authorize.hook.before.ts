@@ -150,7 +150,12 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
           if (!context.params.query) {
             context.params.query = query;
           } else {
-            context.params.query = mergeQuery(context.params.query, query, { defaultHandle: "intersect" });
+            context.params.query = mergeQuery(
+              context.params.query, 
+              query, { 
+                defaultHandle: "intersect",
+                service
+              });
           }
         }
       }
