@@ -68,7 +68,7 @@ const resolveAction = createAliasResolver({
   delete: 'remove'       // use 'delete' or 'remove'
 });
 
-const ability = new Ability({ detectSubjectType, resolveAction }, []);
+const ability = new Ability([], { detectSubjectType, resolveAction });
 
 const caslPlugin = (store) => {
   store.registerModule('casl', {
