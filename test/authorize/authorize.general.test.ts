@@ -164,7 +164,47 @@ describe("authorize-hook", function() {
         const context = makeContext(method, type);
         const query = Object.assign({}, context.params.query);
         //@ts-ignore
-        const promise = authorize()(context).then(result => {
+        const promise = authorize({ availableFields: ["id", "userId", "test"] })(context).then(result => {
+          assert.deepStrictEqual(result.params.query, query, "does not change query object");
+        });
+        promises.push(promise);
+      });
+    });
+    await Promise.all(promises);
+  });
+
+  it("passes for 'manage' 'all' permission with availableFields: undefined", async function() {
+    const makeContext = (method, type) => {
+      return {
+        service: {
+          modelName: "Test",
+        },
+        path: "tests",
+        method,
+        type,
+        data: {
+          id: 1,
+          userId: 1,
+          test: true
+        },
+        params: {
+          ability: defineAbility({ resolveAction }, (can) => {
+            can("manage", "all");
+          }),
+          query: {},
+        }
+      };
+    };
+
+    const types = ["before"];
+    const methods = ["find", "get", "create", "update", "patch", "remove"];
+    const promises = [];
+    types.forEach(type => {
+      methods.forEach(method => {
+        const context = makeContext(method, type);
+        const query = Object.assign({}, context.params.query);
+        //@ts-ignore
+        const promise = authorize({ availableFields: undefined })(context).then(result => {
           assert.deepStrictEqual(result.params.query, query, "does not change query object");
         });
         promises.push(promise);
@@ -224,13 +264,14 @@ describe("authorize-hook", function() {
         params: {
           ability: defineAbility({ resolveAction }, (can) => {
             can("create", "tests", { userId: 1 });
+            can("read", "tests");
           }),
           query: {}
         }
       };
 
       //@ts-ignore
-      await assert.doesNotReject(authorize()(context), "passes authorize hook");
+      await assert.doesNotReject(authorize({ availableFields: ["id", "userId", "test"] })(context), "passes authorize hook");
     });
 
     it("fails for create single", async function() {

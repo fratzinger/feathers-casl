@@ -12,6 +12,13 @@ const resolveAction = createAliasResolver({
 import { Application } from "@feathersjs/feathers";
 
 import authorize from "../../lib/hooks/authorize/authorize.hook";
+import { ServiceCaslOptions } from "../../lib/types";
+
+declare module "@feathersjs/adapter-commons" {
+  interface ServiceOptions {
+    casl: ServiceCaslOptions
+  }
+}
 
 describe("authorize-hook - complete", function () {
   let app: Application;
@@ -23,6 +30,9 @@ describe("authorize-hook - complete", function () {
       "tests",
       new Service({
         multi: true,
+        casl: {
+          availableFields: ["id", "hi", "test", "hallo"]
+        },
         paginate: {
           default: 10,
           max: 50
@@ -33,10 +43,16 @@ describe("authorize-hook - complete", function () {
     //@ts-ignore
     service.hooks({
       before: {
-        all: [authorize()],
+        all: [
+          authorize({ 
+            availableFields: ["id", "userId", "hi", "test", "published"] 
+          })
+        ],
       },
       after: {
-        all: [authorize()],
+        all: [authorize({
+          availableFields: ["id", "userId", "hi", "test", "published"]
+        })],
       },
     });
   });

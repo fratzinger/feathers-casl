@@ -4,7 +4,7 @@ import {
   defineAbility
 } from "@casl/ability";
 
-import getQueryFor from "../lib/utils/getQueryFor";
+import getQueryFor from "../../lib/utils/getQueryFor";
 
 const resolveAction = createAliasResolver({
   update: "patch",
@@ -12,7 +12,7 @@ const resolveAction = createAliasResolver({
   delete: "remove"
 });
 
-describe("getQueryFor-util", () => {
+describe("utils - getQueryFor", () => {
   describe("fields", function() {
     it("simple select", function() {
       const ability = defineAbility({ resolveAction }, (can) => {
@@ -26,10 +26,22 @@ describe("getQueryFor-util", () => {
         assert.deepStrictEqual(query, { $select: ["id"] }, "query has '$select'");
       });
     });
+
+    it("selects anything but certain value", function() {
+      const ability = defineAbility({ resolveAction }, (can, cannot) => {
+        can("manage", "Test");
+        cannot(["create", "read", "update", "remove"], "Test", ["secretField"]);
+      });
+
+      ["find", "get", "update", "patch", "remove"].forEach(method => {
+        const query = getQueryFor(ability, method, "Test", { availableFields: ["id", "test", "secretField"] });
+        assert.deepStrictEqual(query, { $select: ["id", "test"] }, `query has '$select' for "${method}"`);
+      });
+    });
   });
 
   describe("conditions", function() {
-    it("make right query for inverted rules", async function() {
+    it("makes right query for inverted rules", async function() {
       const pairs = [
         {
           query: { userId: 1 },
@@ -60,7 +72,7 @@ describe("getQueryFor-util", () => {
 
       pairs.forEach(({ query, inverted }) => {
         const ability = defineAbility({ resolveAction }, (can, cannot) => {
-          can("manage", "all");
+          can("manage", "all", ["userId"]);
           cannot("read", "Test", query);
           cannot("update", "Test", query);
           cannot("remove", "Test", query);
@@ -69,7 +81,7 @@ describe("getQueryFor-util", () => {
         const methods = ["find", "get", "update", "patch", "remove"];
 
         methods.forEach(method => {
-          const result = getQueryFor(ability, method, "Test");
+          const result = getQueryFor(ability, method, "Test", { availableFields: ["userId"] });
           assert.deepStrictEqual(result, inverted, `'${method}': for query: '${JSON.stringify(query)}' the inverted is: ${JSON.stringify(result)}`);
         });
       });

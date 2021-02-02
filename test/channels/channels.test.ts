@@ -28,6 +28,9 @@ describe("channels", function() {
   let client2: Application;
   let client3: Application;
   let client4: Application;
+  let user1: Record<string, unknown>;
+  let user2: Record<string, unknown>;
+  let user3: Record<string, unknown>;
   let users = [
     { id: 0, email: "1", password: "1" },
     { id: 1, email: "2", password: "2" },
@@ -51,6 +54,7 @@ describe("channels", function() {
       client.configure(socketio(socket));
       if (i === 0) {
         client1 = client;
+        user1 = user;
         const promise = client1.service("authentication").create({
           strategy: "local",
           email: "1",
@@ -59,6 +63,7 @@ describe("channels", function() {
         promises.push(promise);
       } else if (i === 1) {
         client2 = client;
+        user2 = user;
         const promise = client2.service("authentication").create({
           strategy: "local",
           email: "2",
@@ -67,6 +72,7 @@ describe("channels", function() {
         promises.push(promise);
       } else if (i === 2) {
         client3 = client;
+        user3 = user;
         const promise = client3.service("authentication").create({
           strategy: "local",
           email: "3",
@@ -131,7 +137,8 @@ describe("channels", function() {
           promiseTimeout(100, fulFill, `timeout - '${servicePath}:${methodName}'`)
             .finally(() => {
               client1.service(servicePath).removeAllListeners(event);
-            })
+            }),
+          "client1 receives message"
         );
       }
     }
@@ -188,12 +195,15 @@ describe("channels", function() {
             assert.doesNotReject(
               promiseTimeout(60, fulFill1, `timeout '${servicePath}:${methodName}'`).finally(() => {
                 client1.service(servicePath).removeAllListeners(event);
-              })
+              }),
+              "client1 receives message"
             ),
             assert.rejects(
               promiseTimeout(60, fulFill2, `timeout '${servicePath}:${methodName}'`).finally(() => {
                 client2.service(servicePath).removeAllListeners(event);
-              })
+              }),
+              () => true,
+              "client2 does not receive message"
             ),
           ]
         );
@@ -247,7 +257,9 @@ describe("channels", function() {
         await assert.doesNotReject(
           promiseTimeout(100, fulFill2, `timeout '${servicePath}:${methodName}'`).finally(() => {
             client1.service(servicePath).removeAllListeners(event);
-          })
+          }),
+          () => true,
+          "client2 receives message"
         );
       }
     }
@@ -292,14 +304,14 @@ describe("channels", function() {
 
         const fulFill1 = new Promise((resolve) => {
           client1.service(servicePath).on(event, (result) => {
-            assert.deepStrictEqual(result, user1Expected, "user1 receives full comment");
+            assert.deepStrictEqual(result, user1Expected, `user1 with id '${ user1.id }' with receives full comment for '${servicePath}:${methodName}'`);
             resolve(result);
           });
         });
 
         const fulFill2 = new Promise((resolve) => {
           client2.service(servicePath).on(event, (result) => {
-            assert.deepStrictEqual(result, user2Expected, "user2 receives subset");
+            assert.deepStrictEqual(result, user2Expected, `user2 with id '${ user2.id }' receives subset for '${servicePath}:${methodName}'`);
             resolve(result);
           });
         });
@@ -307,17 +319,21 @@ describe("channels", function() {
         //@ts-ignore
         service[methodName](...params);
         
-        const all = Promise.all([
-          promiseTimeout(100, fulFill1, `timeout '${servicePath}:${methodName}'`).finally(() => {
-            client1.service(servicePath).removeAllListeners(event);
-          }),
-          promiseTimeout(100, fulFill2, `timeout '${servicePath}:${methodName}'`).finally(() => {
-            client2.service(servicePath).removeAllListeners(event);
-          })
-        ]);
-
-        await assert.doesNotReject(
-          all
+        await Promise.all(
+          [
+            assert.doesNotReject(
+              promiseTimeout(100, fulFill1, `timeout '${servicePath}:${methodName}'`).finally(() => {
+                client1.service(servicePath).removeAllListeners(event);
+              }),
+              "client1 receives event"
+            ),
+            assert.doesNotReject(
+              promiseTimeout(100, fulFill2, `timeout '${servicePath}:${methodName}'`).finally(() => {
+                client2.service(servicePath).removeAllListeners(event);
+              }),
+              "client2 receives event"
+            )
+          ]
         );
       }
     }

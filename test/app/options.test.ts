@@ -1,10 +1,10 @@
 /* eslint-disable */
 import assert from "assert";
 import feathers, { Application, HookContext } from "@feathersjs/feathers";
-import casl from "../lib/initialize";
-import { Ability, defineAbility } from "../lib/index";
+import casl from "../../lib/initialize";
+import { Ability, defineAbility } from "../../lib/index";
 import { RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
-import { InitOptions } from "../lib/types";
+import { InitOptions } from "../../lib/types";
 
 describe("options", () => {
   it.skip("can set app options", () => {
