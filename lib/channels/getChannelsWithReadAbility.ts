@@ -55,7 +55,7 @@ export default (app: Application, data: Record<string, unknown>, context: HookCo
     return new Channel(connections, data);
   } else {
     // filter by restricted Fields
-    const connectionsPerFields: { fields: string[]|false, connections: RealTimeConnection[]}[] = [];
+    const connectionsPerFields: { fields: false | string[], connections: RealTimeConnection[]}[] = [];
     for (let i = 0, n = allConnections.length; i < n; i++) {
       const connection = allConnections[i];
       const { ability } = connection;
@@ -63,7 +63,16 @@ export default (app: Application, data: Record<string, unknown>, context: HookCo
         // connection cannot read item -> don't send data
         continue; 
       }
-      const fields = hasRestrictingFields(ability, "read", dataToTest);
+      const availableFields = (!options?.availableFields)
+        ? undefined
+        : (typeof options.availableFields === "function")
+          ? options.availableFields(context)
+          : options.availableFields;
+
+      const fields = hasRestrictingFields(ability, "read", dataToTest, { availableFields });
+      if (fields && (fields === true || fields.length === 0)) {
+        continue;
+      }
       const connField = connectionsPerFields.find(x => _isEqual(x.fields, fields));
       if (connField) {
         if (connField.connections.indexOf(connection) !== -1) {
@@ -74,7 +83,7 @@ export default (app: Application, data: Record<string, unknown>, context: HookCo
       } else {
         connectionsPerFields.push({
           connections: [connection],
-          fields: fields
+          fields: fields as string[] | false
         });
       }
     }

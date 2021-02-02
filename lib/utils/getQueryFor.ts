@@ -7,7 +7,6 @@ import { Query } from "@feathersjs/feathers";
 import { PureAbility } from "@casl/ability";
 
 import {
-  GetConditionalQueryOptions,
   GetQueryOptions 
 } from "../types";
 
@@ -15,19 +14,21 @@ const getQueryFor = (
   ability: PureAbility, 
   method: string, 
   modelName: string, 
-  options?: GetConditionalQueryOptions & GetQueryOptions
+  options?: GetQueryOptions
 ): Query => {
-  options = options || {};
+  options = options || {
+    availableFields: []
+  };
   const { skipConditional, skipFields } = options;
   if (skipConditional && skipFields) { return {}; }
-  const condQuery = (!skipConditional) 
+  const conditionsQuery = (!skipConditional) 
     ? getConditionalQueryFor(ability, method, modelName, { actionOnForbidden: options.actionOnForbidden })
     : {};
   const fieldsQuery = (!skipFields)
-    ? getFieldsQueryFor(ability, method, modelName)
+    ? getFieldsQueryFor(ability, method, modelName, { availableFields: options.availableFields })
     : {};
 
-  const query = mergeQuery(condQuery, fieldsQuery, { defaultHandle: "combine" });
+  const query = mergeQuery(conditionsQuery, fieldsQuery, { defaultHandle: "combine" });
   return query;
 };
 

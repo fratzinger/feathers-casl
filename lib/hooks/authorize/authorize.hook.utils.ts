@@ -27,6 +27,14 @@ export const makeDefaultOptions = (options?: AuthorizeHookOptions): AuthorizeHoo
   options = options || {} as AuthorizeHookOptions;
   
   options.checkMultiActions = false;
+  options.availableFields = (context: HookContext): string[] => {
+    const availableFields: string[] | ((context: HookContext) => string[]) = context.service.options?.casl?.availableFields;
+    if (!availableFields) return undefined;
+    return (typeof availableFields === "function")
+      ? availableFields(context)
+      : availableFields;
+  };
+  options.throwIfFieldsAreEmpty = true;
   return options;
 };
 

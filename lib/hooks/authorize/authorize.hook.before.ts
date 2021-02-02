@@ -14,6 +14,7 @@ import getModelName from "../../utils/getModelName";
 import getQueryFor from "../../utils/getQueryFor";
 import hasRestrictingFields from "../../utils/hasRestrictingFields";
 import hasRestrictingConditions from "../../utils/hasRestrictingConditions";
+import couldHaveRestrictingFields from "../../utils/couldHaveRestrictingFields";
 
 import {
   makeOptions,
@@ -30,7 +31,8 @@ import {
 
 import {
   AuthorizeHookOptions,
-  GetQueryOptions
+  GetQueryOptions,
+  HasRestrictingFieldsOptions
 } from "../../types";
 
 const HOOKNAME = "authorize";
@@ -68,6 +70,21 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       options.actionOnForbidden
     );
 
+    const availableFields = (!options?.availableFields)
+      ? undefined
+      : (typeof options.availableFields === "function")
+        ? options.availableFields(context)
+        : options.availableFields;
+    const hasRestrictingFieldsOptions: HasRestrictingFieldsOptions = {
+      availableFields: availableFields,
+      throwIfFieldsAreEmpty: options.throwIfFieldsAreEmpty
+    };
+
+    const readFieldsOptions: HasRestrictingFieldsOptions = {
+      availableFields: availableFields,
+      throwIfFieldsAreEmpty: false
+    };
+
     // if context is with multiple items, there's a change that we need to handle each item separately
     if (isMulti(context)) {
       // if has conditions -> hide $select for after-hook, because
@@ -78,7 +95,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       }
 
       // if has no restricting fields at all -> can skip _pick() in after-hook
-      if (!hasRestrictingFields(ability, "read", modelName)) {
+      if (!couldHaveRestrictingFields(ability, "read", modelName)) {
         setPersistedConfig(context, "skipRestrictingRead.fields", true);
       }
     }
@@ -114,9 +131,13 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
 
       // ensure that only allowed data gets changed
       if (["update", "patch"].includes(method)) {
-        const fields = hasRestrictingFields(ability, method, subject(modelName, item));
+        const fields = hasRestrictingFields(ability, method, subject(modelName, item), hasRestrictingFieldsOptions);
         if (!fields) { return context; }
-
+        if (fields === true || fields.length === 0) {
+          if (options.actionOnForbidden) { options.actionOnForbidden(); }
+          throw new Forbidden("You're not allowed to make this request");
+        }
+        
         const data = _pick(context.data, fields);
 
         // if fields are not overlapping -> throw
@@ -141,10 +162,13 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       // multi: find | patch | remove
       if (hasRestrictingConditions(ability, method, modelName)) {
         // TODO: if query and context.params.query differ -> separate calls
-        const options: GetQueryOptions = {
-          skipFields: method === "find"
+        
+        const getQueryOptions: GetQueryOptions = {
+          skipFields: method === "find",
+          availableFields,
+          throwIfFieldsAreEmpty: true
         };
-        const query = getQueryFor(ability, method, modelName, options);
+        const query = getQueryFor(ability, method, modelName, getQueryOptions);
 
         if (!_isEmpty(query)) {
           if (!context.params.query) {

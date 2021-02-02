@@ -1,9 +1,9 @@
 import { getItems, replaceItems } from "feathers-hooks-common";
 import { subject } from "@casl/ability";
-import { permittedFieldsOf } from "@casl/ability/extra";
 import _pick from "lodash/pick";
 import _isEmpty from "lodash/isEmpty";
 import { HookContext } from "@feathersjs/feathers";
+import hasRestrictingFields from "../../utils/hasRestrictingFields";
 
 import { shouldSkip, mergeArrays } from "feathers-utils";
 
@@ -17,7 +17,7 @@ import {
 import getModelName from "../../utils/getModelName";
 
 import {
-  AuthorizeHookOptions
+  AuthorizeHookOptions, HasRestrictingFieldsOptions
 } from "../../types";
 import { Forbidden } from "@feathersjs/errors";
 
@@ -56,12 +56,29 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     const { ability } = params;
     const items = getItems(context);
 
+    const availableFields = (!options?.availableFields)
+      ? undefined
+      : (typeof options.availableFields === "function")
+        ? options.availableFields(context)
+        : options.availableFields;
+    const hasRestrictingFieldsOptions: HasRestrictingFieldsOptions = {
+      availableFields: availableFields,
+      throwIfFieldsAreEmpty: false
+    };
+
     const forOneEl = (item: Record<string, unknown>) => {
-      if (!skipCheckConditions && !ability.can("read", subject(modelName, item))) { return undefined; }
-      let fields = permittedFieldsOf(ability, "read", subject(modelName, item));
-      if (skipCheckFields || (fields.length === 0 && !$select)) {
+      if (!skipCheckConditions && !ability.can("read", subject(modelName, item))) { 
+        return undefined; 
+      }
+      
+      let fields = hasRestrictingFields(ability, "read", subject(modelName, item), hasRestrictingFieldsOptions);
+      if (fields === true) {
+        return {};
+      }
+      if (skipCheckFields || (!fields && !$select)) {
         return item;
       }
+      if (!fields) fields = [];
 
       //
       const intersect = (fields?.length && $select?.length)

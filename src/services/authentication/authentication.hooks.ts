@@ -14,7 +14,7 @@ const defineAbilitiesFor = (user): Ability => {
       can("manage", "all");
     } else if (user.id === 1) {
       can("read", "articles", { published: true });
-      can("read", "comments", ["id", "title"], { userId: 1 });
+      can("read", "comments", ["id", "title"], { userId: user.id });
     } else if (user.id === 2) {
       can("read", "comments", { userId: user.id });
     }

@@ -19,7 +19,12 @@ const invertedMap = {
   }
 };
 
-const invertedProp = (prop: Record<string, unknown>, name: string): Record<string, unknown>|string => {
+const supportedOperators = Object.keys(invertedMap);
+
+const invertedProp = (
+  prop: Record<string, unknown>, 
+  name: string): Record<string, unknown>|string => 
+{
   const map = invertedMap[name];
   if (typeof map === "string") {
     return { [map]: prop[name] };
@@ -28,7 +33,10 @@ const invertedProp = (prop: Record<string, unknown>, name: string): Record<strin
   }
 };
 
-const convertRuleToQuery = (rule: RawRuleFrom<AbilityTuple<string, Subject>, unknown>, options: GetConditionalQueryOptions): Query => {
+const convertRuleToQuery = (
+  rule: RawRuleFrom<AbilityTuple<string, Subject>, unknown>, 
+  options: GetConditionalQueryOptions): Query => 
+{
   const { conditions, inverted } = rule;
   if (!conditions) {
     if (inverted && options?.actionOnForbidden) {
@@ -42,15 +50,7 @@ const convertRuleToQuery = (rule: RawRuleFrom<AbilityTuple<string, Subject>, unk
       if (_isPlainObject(conditions[prop])) {
         const obj = conditions[prop];
         for (const name in obj) {
-          if (![
-            "$gt",
-            "$gte",
-            "$lt",
-            "$lte",
-            "$in",
-            "$nin",
-            "$ne"
-          ].includes(name)) {
+          if (!supportedOperators.includes(name)) {
             console.error(`CASL: not supported property: ${name}`);
             continue;
           }

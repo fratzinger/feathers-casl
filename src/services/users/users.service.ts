@@ -1,5 +1,7 @@
 // Initializes the `users` service on path `/users`
 import { ServiceAddons } from "@feathersjs/feathers";
+import { MemoryServiceOptions } from "feathers-memory/types";
+import { ServiceCaslOptions } from "../../../lib/types";
 import { Application, CustomServiceAddons } from "../../declarations";
 import { Users } from "./users.class";
 import hooks from "./users.hooks";
@@ -12,9 +14,12 @@ declare module "../../declarations" {
 }
 
 export default function (app: Application): void {
-  const options = {
+  const options: Partial<MemoryServiceOptions> = {
     paginate: app.get("paginate"),
-    multi: true
+    multi: true,
+    casl: {
+      availableFields: ["id", "email", "password"]
+    }
   };
 
   // Initialize our service with any options it requires

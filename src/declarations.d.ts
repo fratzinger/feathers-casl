@@ -1,4 +1,5 @@
 import { Application as ExpressFeathers } from "@feathersjs/express";
+import { ServiceCaslOptions } from "../lib/types";
 
 // A mapping of service names to types. Will be extended in service files.
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -8,4 +9,10 @@ export type Application = ExpressFeathers<ServiceTypes>;
 
 export interface CustomServiceAddons {
   modelName: string
+}
+
+declare module "@feathersjs/adapter-commons" {
+  interface ServiceOptions {
+    casl: ServiceCaslOptions
+  }
 }
