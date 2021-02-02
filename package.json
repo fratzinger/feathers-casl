@@ -31,8 +31,8 @@
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
-    "test": "cross-env NODE_ENV=test TS_NODE_PROJECT='tsconfig.test.json' mocha --require ts-node/register 'test/**/*.test.ts' --timeout 5000",
-    "coverage": "nyc npm run test",
+    "mocha": "cross-env NODE_ENV=test TS_NODE_PROJECT='tsconfig.test.json' mocha --timeout 5000",
+    "test": "nyc npm run mocha",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "docs": "vuepress dev docs",
     "docs:build": "vuepress build docs",
@@ -45,7 +45,7 @@
     "@feathersjs/feathers": "^4.5.11",
     "@feathersjs/transport-commons": "^4.5.11",
     "feathers-hooks-common": "^5.0.4",
-    "feathers-utils": "^1.3.1",
+    "feathers-utils": "^1.4.0",
     "lodash": "^4.17.20"
   },
   "devDependencies": {
@@ -73,6 +73,7 @@
     "nyc": "^15.1.0",
     "shx": "^0.3.3",
     "socket.io-client": "^2.3.1",
+    "source-map-support": "^0.5.19",
     "ts-node": "^9.1.1",
     "type-fest": "^0.20.2",
     "typescript": "^4.1.3",

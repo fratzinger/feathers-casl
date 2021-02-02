@@ -8,5 +8,6 @@ module.exports = {
   spec: [
     "./test/**/*.test.ts",
   ],
-  exit: true
+  exit: true,
+  require: ["ts-node/register"]
 };
