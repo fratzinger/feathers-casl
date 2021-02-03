@@ -57,8 +57,9 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     const items = getItems(context);
 
     const forOneEl = (item: Record<string, unknown>) => {
-      if (!skipCheckConditions && !ability.can("read", subject(modelName, item))) { return undefined; }
-      let fields = permittedFieldsOf(ability, "read", subject(modelName, item));
+      const method = ["get", "find"].includes(context.method) ? context.method : "read";
+      if (!skipCheckConditions && !ability.can(method, subject(modelName, item))) { return undefined; }
+      let fields = permittedFieldsOf(ability, method, subject(modelName, item));
       if (skipCheckFields || (fields.length === 0 && !$select)) {
         return item;
       }

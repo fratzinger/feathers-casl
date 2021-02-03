@@ -64,7 +64,7 @@ describe("authorize-hook - complete", function () {
       const returnedItem = await service.get(item.id, {
         //@ts-ignore
         ability: defineAbility({ resolveAction }, (can) => {
-          can("read", "tests", ["id"], { userId: 1 });
+          can("get", "tests", ["id"], { userId: 1 });
         }),
       });
       assert.deepStrictEqual(
