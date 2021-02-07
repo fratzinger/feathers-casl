@@ -88,14 +88,14 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     // if context is with multiple items, there's a change that we need to handle each item separately
     if (isMulti(context)) {
       // if has conditions -> hide $select for after-hook, because
-      if (hasRestrictingConditions(ability, "read", modelName)) {
+      if (hasRestrictingConditions(ability, "find", modelName)) {
         hide$select(context);
       } else {
         setPersistedConfig(context, "skipRestrictingRead.conditions", true);
       }
 
       // if has no restricting fields at all -> can skip _pick() in after-hook
-      if (!couldHaveRestrictingFields(ability, "read", modelName)) {
+      if (!couldHaveRestrictingFields(ability, "find", modelName)) {
         setPersistedConfig(context, "skipRestrictingRead.fields", true);
       }
     }

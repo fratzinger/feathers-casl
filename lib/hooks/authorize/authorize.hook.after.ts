@@ -66,12 +66,13 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       throwIfFieldsAreEmpty: false
     };
 
-    const forOneEl = (item: Record<string, unknown>) => {
-      if (!skipCheckConditions && !ability.can("read", subject(modelName, item))) { 
+    const pickFieldsForItem = (item: Record<string, unknown>) => {
+      const method = (Array.isArray(items)) ? "find" : "get";
+      if (!skipCheckConditions && !ability.can(method, subject(modelName, item))) { 
         return undefined; 
       }
       
-      let fields = hasRestrictingFields(ability, "read", subject(modelName, item), hasRestrictingFieldsOptions);
+      let fields = hasRestrictingFields(ability, method, subject(modelName, item), hasRestrictingFieldsOptions);
       if (fields === true) {
         return {};
       }
@@ -93,13 +94,13 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     if (Array.isArray(items)) {
       result = [];
       for (let i = 0, n = items.length; i < n; i++) {
-        const item = forOneEl(items[i]);
+        const item = pickFieldsForItem(items[i]);
 
         if (item) { result.push(item); }
       }
 
     } else {
-      result = forOneEl(items);
+      result = pickFieldsForItem(items);
       if (context.method === "get" && _isEmpty(result)) {
         if (options.actionOnForbidden) options.actionOnForbidden();
         throw new Forbidden(`You're not allowed to ${context.method} ${modelName}`);
