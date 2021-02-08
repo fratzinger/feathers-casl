@@ -1,5 +1,5 @@
 import { HookContext } from "@feathersjs/feathers";
-import { PureAbility } from "@casl/ability";
+import { AnyAbility } from "@casl/ability";
 import { Application } from "@feathersjs/feathers";
 import "@feathersjs/transport-commons";
 import { RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
@@ -9,7 +9,7 @@ export interface ServiceCaslOptions {
 }
 
 export interface AuthorizeHookOptions {
-  ability?: PureAbility | ((context: HookContext) => PureAbility | Promise<PureAbility>)
+  ability?: AnyAbility | ((context: HookContext) => AnyAbility | Promise<AnyAbility>)
   actionOnForbidden?: (() => void)
   availableFields?: string[] | ((context: HookContext) => string[])
   checkMultiActions?: boolean
@@ -19,7 +19,7 @@ export interface AuthorizeHookOptions {
 export type GetModelName = string | ((context: HookContext) => string)
 
 export interface ChannelOptions {
-  ability?: PureAbility | ((app: Application, connection: RealTimeConnection, data: unknown, context: HookContext) => PureAbility)
+  ability?: AnyAbility | ((app: Application, connection: RealTimeConnection, data: unknown, context: HookContext) => AnyAbility)
   activated?: boolean
   availableFields?: string[] | ((context: HookContext) => string[])
   channelOnError?: string[]

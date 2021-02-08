@@ -1,4 +1,4 @@
-import { PureAbility, AnyAbility, Subject } from "@casl/ability";
+import { AnyAbility, Subject } from "@casl/ability";
 import { permittedFieldsOf, PermittedFieldsOptions } from "@casl/ability/extra";
 import { HasRestrictingFieldsOptions } from "../types";
 import getMinimalFields from "./getMinimalFields";
@@ -11,7 +11,7 @@ function areSameArray<T>(arr1: T[], arr2: T[]): boolean {
   return result;
 }
 
-const hasRestrictingFields = (ability: PureAbility, action: string, subject: Subject, options?: HasRestrictingFieldsOptions): boolean|string[] => {
+const hasRestrictingFields = (ability: AnyAbility, action: string, subject: Subject, options?: HasRestrictingFieldsOptions): boolean|string[] => {
   let fields: string[];
   if (typeof subject !== "string") {
     fields = getMinimalFields(ability, action, subject as Record<string, unknown>, {

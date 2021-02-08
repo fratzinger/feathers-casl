@@ -8,8 +8,9 @@ const resolveAction = createAliasResolver({
 });
 
 const defineAbilitiesFor = (user): Ability => {
+  //@ts-ignore
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  return defineAbility({ resolveAction }, (can, cannot) => {
+  return defineAbility((can, cannot) => {
     if (user.id === 0) {
       can("manage", "all");
     } else if (user.id === 1) {
@@ -18,7 +19,7 @@ const defineAbilitiesFor = (user): Ability => {
     } else if (user.id === 2) {
       can("read", "comments", { userId: user.id });
     }
-  });
+  }, { resolveAction });
 };
 
 export default {

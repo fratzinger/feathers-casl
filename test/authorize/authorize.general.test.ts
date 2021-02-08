@@ -66,8 +66,9 @@ describe("authorize.general.test.ts", function() {
             test: true
           },
           params: {
+            //@ts-ignore
             // eslint-disable-next-line @typescript-eslint/no-empty-function
-            ability: defineAbility({ resolveAction }, () => {}),
+            ability: defineAbility(() => {}, { resolveAction }),
             skipHooks: ["authorize"],
             query: {},
           }
@@ -110,8 +111,9 @@ describe("authorize.general.test.ts", function() {
             test: true
           },
           params: {
+            //@ts-ignore
             // eslint-disable-next-line @typescript-eslint/no-empty-function
-            ability: defineAbility({ resolveAction }, () => {}),
+            ability: defineAbility(() => {}, { resolveAction }),
             query: {}
           }
         };
@@ -150,9 +152,10 @@ describe("authorize.general.test.ts", function() {
             test: true
           },
           params: {
-            ability: defineAbility({ resolveAction }, (can) => {
+            //@ts-ignore
+            ability: defineAbility((can) => {
               can("manage", "all");
-            }),
+            }, { resolveAction }),
             query: {},
           }
         };
@@ -190,9 +193,10 @@ describe("authorize.general.test.ts", function() {
             test: true
           },
           params: {
-            ability: defineAbility({ resolveAction }, (can) => {
+            //@ts-ignore
+            ability: defineAbility((can) => {
               can("manage", "all");
-            }),
+            }, { resolveAction }),
             query: {},
           }
         };
@@ -230,9 +234,10 @@ describe("authorize.general.test.ts", function() {
             test: true
           },
           params: {
-            ability: defineAbility({ resolveAction }, (can) => {
+            //@ts-ignore
+            ability: defineAbility((can) => {
               can("create", "tests", { userId: 1 });
-            }),
+            }, { resolveAction }),
             query: {}
           }
         };
@@ -264,10 +269,11 @@ describe("authorize.general.test.ts", function() {
             }
           ],
           params: {
-            ability: defineAbility({ resolveAction }, (can) => {
+            //@ts-ignore
+            ability: defineAbility((can) => {
               can("create", "tests", { userId: 1 });
               can("read", "tests");
-            }),
+            }, { resolveAction }),
             query: {}
           }
         };
@@ -290,9 +296,10 @@ describe("authorize.general.test.ts", function() {
             test: true
           },
           params: {
-            ability: defineAbility({ resolveAction }, (can) => {
+            //@ts-ignore
+            ability: defineAbility((can) => {
               can("create", "tests", { userId: 1 });
-            }),
+            }, { resolveAction }),
             query: {}
           }
         };
@@ -329,9 +336,10 @@ describe("authorize.general.test.ts", function() {
             }
           ],
           params: {
-            ability: defineAbility({ resolveAction }, (can) => {
+            //@ts-ignore
+            ability: defineAbility((can) => {
               can("create", "tests", { userId: 1 });
-            }),
+            }, { resolveAction }),
             query: {}
           }
         };
@@ -433,12 +441,13 @@ describe("authorize.general.test.ts", function() {
               method,
               type,
               params: {
-                ability: defineAbility({ resolveAction }, (can, cannot) => {
+                //@ts-ignore
+                ability: defineAbility((can, cannot) => {
                   can("manage", "all");
                   cannot(["read", "update", "remove"], "tests", condition);
                   cannot("update", "tests", condition);
                   cannot("remove", "tests", condition);
-                }),
+                }, { resolveAction }),
                 query: {},
               }
             };
@@ -479,9 +488,10 @@ describe("authorize.general.test.ts", function() {
           result: Object.assign({}, expectedResult),
           id: 1,
           params: {
-            ability: defineAbility({ resolveAction }, (can) => {
+            //@ts-ignore
+            ability: defineAbility((can) => {
               can(["get", "create", "update", "patch", "remove"], "all");
-            }),
+            }, { resolveAction }),
             query: {},
           }
         };
@@ -516,9 +526,10 @@ describe("authorize.general.test.ts", function() {
           result: _cloneDeep(expectedResult),
           id: null,
           params: {
-            ability: defineAbility({ resolveAction }, (can) => {
+            //@ts-ignore
+            ability: defineAbility((can) => {
               can(["find", "create", "patch", "remove"], "all");
-            }),
+            }, { resolveAction }),
             query: {},
           }
         };

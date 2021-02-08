@@ -2,7 +2,7 @@ import _isPlainObject from "lodash/isPlainObject";
 import { Forbidden } from "@feathersjs/errors";
 import { mergeQuery } from "feathers-utils";
 
-import { PureAbility, RawRuleFrom, AbilityTuple, Subject } from "@casl/ability";
+import { AnyAbility, RawRuleFrom, AbilityTuple, Subject } from "@casl/ability";
 import { Query } from "@feathersjs/feathers";
 
 import { GetConditionalQueryOptions } from "../types";
@@ -67,13 +67,18 @@ const convertRuleToQuery = (
   }
 };
 
-const getConditionalQueryFor = (ability: PureAbility, method: string, subject: Subject, options?: GetConditionalQueryOptions): Query => {
+const getConditionalQueryFor = (
+  ability: AnyAbility, 
+  method: string, 
+  subjectType: string, 
+  options?: GetConditionalQueryOptions
+): Query => {
   options = options || {};
   options.actionOnForbidden = options.actionOnForbidden || (() => {
     throw new Forbidden("You're not allowed to make this request");
   });
 
-  const rules = ability.rulesFor(method, subject);
+  const rules = ability.rulesFor(method, subjectType);
 
   let query = {};
 

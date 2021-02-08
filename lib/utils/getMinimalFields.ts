@@ -1,9 +1,9 @@
-import { PureAbility } from "@casl/ability";
+import { AnyAbility, detectSubjectType } from "@casl/ability";
 import { mergeArrays } from "feathers-utils";
 import { GetMinimalFieldsOptions } from "../types";
 
 const getMinimalFields = (
-  ability: PureAbility, 
+  ability: AnyAbility, 
   action: string, 
   subject: Record<string, unknown>, 
   options: GetMinimalFieldsOptions): string[] => 
@@ -11,7 +11,7 @@ const getMinimalFields = (
   if (options.checkCan && !ability.can(action, subject)) {
     return [];
   }
-  const subjectType = subject.__caslSubjectType__;
+  const subjectType = detectSubjectType(subject);
   const rules = ability.possibleRulesFor(action, subjectType).filter(rule => {
     const { fields } = rule;
     const matched = rule.matchesConditions(subject);

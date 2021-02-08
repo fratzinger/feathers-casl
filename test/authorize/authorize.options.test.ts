@@ -49,9 +49,10 @@ describe("authorize.options.test.ts", function () {
           params: [
             [{ id: 0 }, { id: 1 }],
             {
-              ability: defineAbility({ resolveAction }, (can) => {
+              //@ts-ignore
+              ability: defineAbility((can) => {
                 can(["create-multi", "read-multi", "update-multi", "delete-multi"], "Test");
-              }),
+              }, { resolveAction }),
             },
           ],
         },
@@ -62,9 +63,10 @@ describe("authorize.options.test.ts", function () {
             { test: true },
             {
               query: { userId: 1 },
-              ability: defineAbility({ resolveAction }, (can) => {
+              //@ts-ignore
+              ability: defineAbility((can) => {
                 can(["create-multi", "read-multi", "update-multi", "delete-multi"], "Test");
-              }),
+              }, { resolveAction }),
             },
           ],
         },
@@ -74,9 +76,10 @@ describe("authorize.options.test.ts", function () {
             null,
             {
               query: { userId: 1 },
-              ability: defineAbility({ resolveAction }, (can) => {
+              //@ts-ignore
+              ability: defineAbility((can) => {
                 can(["create-multi", "read-multi", "update-multi", "delete-multi"], "Test");
-              }),
+              }, { resolveAction }),
             },
           ],
         },
@@ -94,9 +97,10 @@ describe("authorize.options.test.ts", function () {
           params: [
             [{ id: 0 }, { id: 1 }],
             {
-              ability: defineAbility({ resolveAction }, (can) => {
+              //@ts-ignore
+              ability: defineAbility((can) => {
                 can(["create", "read", "update", "delete"], "Test");
-              }),
+              }, { resolveAction }),
             },
           ],
         },
@@ -107,9 +111,10 @@ describe("authorize.options.test.ts", function () {
             { test: true },
             {
               query: { userId: 1 },
-              ability: defineAbility({ resolveAction }, (can) => {
+              //@ts-ignore
+              ability: defineAbility((can) => {
                 can(["create", "read", "update", "delete"], "Test");
-              }),
+              }, { resolveAction }),
             },
           ],
         },
@@ -119,9 +124,10 @@ describe("authorize.options.test.ts", function () {
             null,
             {
               query: { userId: 1 },
-              ability: defineAbility({ resolveAction }, (can) => {
+              //@ts-ignore
+              ability: defineAbility((can) => {
                 can(["create", "read", "update", "delete"], "Test");
-              }),
+              }, { resolveAction }),
             },
           ],
         },
@@ -154,9 +160,9 @@ describe("authorize.options.test.ts", function () {
         before: {
           all: [authorize({
             //@ts-ignore
-            ability: defineAbility({ resolveAction }, (can) => {
+            ability: defineAbility((can) => {
               can("create", "Test");
-            }),
+            }, { resolveAction }),
             modelName: "Test"
           })],
         }
@@ -188,9 +194,9 @@ describe("authorize.options.test.ts", function () {
         before: {
           all: [authorize({
             //@ts-ignore
-            ability: defineAbility({ resolveAction }, (can) => {
+            ability: defineAbility((can) => {
               can("create", "Test");
-            }),
+            }, { resolveAction }),
             modelName: (context) => context.service.modelName
           })],
         }
@@ -248,7 +254,7 @@ describe("authorize.options.test.ts", function () {
           all: [authorize({
             //@ts-ignore
             // eslint-disable-next-line @typescript-eslint/no-empty-function
-            ability: defineAbility({ resolveAction }, () => {})
+            ability: defineAbility(() => {}, { resolveAction })
           })],
         }
       });
@@ -279,15 +285,16 @@ describe("authorize.options.test.ts", function () {
           all: [authorize({
             //@ts-ignore
             // eslint-disable-next-line @typescript-eslint/no-empty-function
-            ability: defineAbility({ resolveAction }, () => {}),
+            ability: defineAbility(() => {}, { resolveAction }),
           })],
         }
       });
 
       const params = {
-        ability: defineAbility({ resolveAction }, (can) => {
+        //@ts-ignore
+        ability: defineAbility((can) => {
           can("manage", "all");
-        }),
+        }, { resolveAction }),
       };
 
       const result = await service.create({ test: true }, params);
@@ -312,9 +319,9 @@ describe("authorize.options.test.ts", function () {
         before: {
           all: [authorize({
             //@ts-ignore
-            ability: Promise.resolve(defineAbility({ resolveAction }, (can) => {
+            ability: Promise.resolve(defineAbility((can) => {
               can("manage", "all");
-            }))
+            }, { resolveAction }))
           })],
         }
       });
@@ -341,9 +348,9 @@ describe("authorize.options.test.ts", function () {
         before: {
           all: [authorize({
             //@ts-ignore
-            ability: () => defineAbility({ resolveAction }, (can) => {
+            ability: () => defineAbility((can) => {
               can("manage", "all");
-            }),
+            }, { resolveAction }),
           })],
         }
       });
@@ -370,11 +377,12 @@ describe("authorize.options.test.ts", function () {
         before: {
           all: [
             authorize({
-            //@ts-ignore
+              //@ts-ignore
               ability: () => {
-                return Promise.resolve(defineAbility({ resolveAction }, (can) => {
+                //@ts-ignore
+                return Promise.resolve(defineAbility((can) => {
                   can("manage", "all");
-                }));
+                }, { resolveAction }));
               }
             })
           ],
@@ -411,14 +419,13 @@ describe("authorize.options.test.ts", function () {
       types.forEach(type => {
         methods.forEach(method => {
           const context = makeContext(method, type);
-          const query = Object.assign({}, context.params.query);
           
           const promise = assert.rejects(
             authorize({ 
               availableFields: ["id", "userId", "test"],
               //@ts-ignore
               // eslint-disable-next-line @typescript-eslint/no-empty-function
-              ability: () => defineAbility({ resolveAction }, () => {})
+              ability: () => defineAbility(() => {}, { resolveAction })
             //@ts-ignore
             })(context),
             err => err.name === "Forbidden",

@@ -16,7 +16,8 @@ describe("utils - getMinimalFields", function() {
     });
     const availableFields = ["id", "test"];
     methods.forEach(method => {
-      const fields = getMinimalFields(ability, method, subject("tests", { id: 1, test: true }), { availableFields });
+      const record: Record<string, unknown> =  { id: 1, test: true };
+      const fields = getMinimalFields(ability, method, subject("tests", record), { availableFields });
       assert.deepStrictEqual(fields, ["id", "test"], `full array for method '${method}'`);
     });
   });
@@ -27,7 +28,8 @@ describe("utils - getMinimalFields", function() {
     });
     const availableFields = ["id", "test"];
     methods.forEach(method => {
-      const fields = getMinimalFields(ability, method, subject("tests", { id: 1, test: true }), { availableFields });
+      const record: Record<string, unknown> =  { id: 1, test: true };
+      const fields = getMinimalFields(ability, method, subject("tests", record), { availableFields });
       assert.deepStrictEqual(fields, ["id"], `subset of array for method '${method}'`);
     });
   });
@@ -38,7 +40,8 @@ describe("utils - getMinimalFields", function() {
     });
     const availableFields = undefined;
     methods.forEach(method => {
-      const fields = getMinimalFields(ability, method, subject("tests", { id: 1, test: true }), { availableFields });
+      const record: Record<string, unknown> =  { id: 1, test: true };
+      const fields = getMinimalFields(ability, method, subject("tests", record), { availableFields });
       assert.deepStrictEqual(fields, ["id"], `subset of array for method '${method}'`);
     });
   });
@@ -49,7 +52,8 @@ describe("utils - getMinimalFields", function() {
     });
     const availableFields = [];
     methods.forEach(method => {
-      const fields = getMinimalFields(ability, method, subject("tests", { id: 1, test: true }), { availableFields });
+      const record: Record<string, unknown> =  { id: 1, test: true };
+      const fields = getMinimalFields(ability, method, subject("tests", record), { availableFields });
       assert.deepStrictEqual(fields, [], `subset of array for method '${method}'`);
     });
   });
@@ -61,7 +65,11 @@ describe("utils - getMinimalFields", function() {
       cannot("manage", "tests", ["supersecret"]);
     });
     const availableFields = ["id", "name", "email", "supersecret", "password"];
-    const pairs = [
+    interface Pair {
+      input: Record<string, unknown>,
+      expected: string[]
+    }
+    const pairs: Pair[] = [
       {
         input: { id: 1 },
         expected: ["id", "name", "email", "password"]

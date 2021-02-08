@@ -4,14 +4,14 @@ import getFieldsQueryFor from "./getFieldsQueryFor";
 import getConditionalQueryFor from "./getConditionalQueryFor";
 
 import { Query } from "@feathersjs/feathers";
-import { PureAbility } from "@casl/ability";
+import { AnyAbility } from "@casl/ability";
 
 import {
   GetQueryOptions 
 } from "../types";
 
 const getQueryFor = (
-  ability: PureAbility, 
+  ability: AnyAbility, 
   method: string, 
   modelName: string, 
   options?: GetQueryOptions

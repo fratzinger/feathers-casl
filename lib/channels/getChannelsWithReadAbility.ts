@@ -3,7 +3,7 @@ import _isEqual from "lodash/isEqual";
 import _pick from "lodash/pick";
 import _isEmpty from "lodash/isEmpty";
 import "@feathersjs/transport-commons";
-import { PureAbility, subject } from "@casl/ability";
+import { AnyAbility, subject } from "@casl/ability";
 
 import { makeOptions } from "./channels.utils";
 
@@ -19,7 +19,7 @@ const getAbility = (
   connection: RealTimeConnection,
   context: HookContext,
   options: Partial<ChannelOptions>
-): undefined|PureAbility => {
+): undefined|AnyAbility => {
   if (options.ability) {
     return (typeof options.ability === "function") ?
       options.ability(app, connection, data, context) :

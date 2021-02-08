@@ -4,7 +4,7 @@ import _unset from "lodash/unset";
 
 import { Forbidden } from "@feathersjs/errors";
 
-import { PureAbility } from "@casl/ability";
+import { AnyAbility } from "@casl/ability";
 import { Application, HookContext } from "@feathersjs/feathers";
 
 import {
@@ -46,7 +46,7 @@ const getAppOptions = (app: Application): AuthorizeHookOptions | Record<string, 
     : {};
 };
 
-export const getAbility = (context: HookContext, options?: AuthorizeHookOptions): Promise<PureAbility|undefined> => {
+export const getAbility = (context: HookContext, options?: AuthorizeHookOptions): Promise<AnyAbility|undefined> => {
   options = options || {};
 
   // if params.ability is set, return it over options.ability
@@ -82,7 +82,7 @@ const move = (context: HookContext, fromPath: Path, toPath: Path) => {
 };
 
 export const throwUnlessCan = (
-  ability: PureAbility, 
+  ability: AnyAbility, 
   method: string, 
   resource: string|Record<string, unknown>, 
   modelName: string,
@@ -94,7 +94,7 @@ export const throwUnlessCan = (
   }
 };
 
-export const checkMulti = (context: HookContext, ability: PureAbility, modelName: string, actionOnForbidden: (() => void)): boolean => {
+export const checkMulti = (context: HookContext, ability: AnyAbility, modelName: string, actionOnForbidden: (() => void)): boolean => {
   const { method } = context;
   const currentIsMulti = isMulti(context);
   if (!currentIsMulti) { return true; }

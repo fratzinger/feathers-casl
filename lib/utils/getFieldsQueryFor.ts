@@ -1,10 +1,10 @@
-import { PureAbility, Subject } from "@casl/ability";
+import { AnyAbility, Subject } from "@casl/ability";
 import { Query } from "@feathersjs/feathers";
 import { GetFieldsQueryOptions } from "../types";
 import hasRestrictingFields from "./hasRestrictingFields";
 
 // eslint-disable-next-line no-unused-vars
-const getFieldsQueryFor = (ability: PureAbility, action: string, subject: Subject, options?: GetFieldsQueryOptions): Query => {
+const getFieldsQueryFor = (ability: AnyAbility, action: string, subject: Subject, options?: GetFieldsQueryOptions): Query => {
   const fields = hasRestrictingFields(ability, action, subject, options);
   if (!fields) { return {}; }
   if (fields === true) { 

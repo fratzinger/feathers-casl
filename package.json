@@ -40,7 +40,7 @@
     "start": "cross-env TS_NODE_PROJECT='tsconfig.src.json' npm run compile-src && node src-dist/src"
   },
   "dependencies": {
-    "@casl/ability": "^4.1.6",
+    "@casl/ability": "^5.2.2",
     "@feathersjs/errors": "^4.5.11",
     "@feathersjs/feathers": "^4.5.11",
     "@feathersjs/transport-commons": "^4.5.11",
