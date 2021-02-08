@@ -69,22 +69,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       modelName,
       options.actionOnForbidden
     );
-
-    const availableFields = (!options?.availableFields)
-      ? undefined
-      : (typeof options.availableFields === "function")
-        ? options.availableFields(context)
-        : options.availableFields;
-    const hasRestrictingFieldsOptions: HasRestrictingFieldsOptions = {
-      availableFields: availableFields,
-      throwIfFieldsAreEmpty: options.throwIfFieldsAreEmpty
-    };
-
-    const readFieldsOptions: HasRestrictingFieldsOptions = {
-      availableFields: availableFields,
-      throwIfFieldsAreEmpty: false
-    };
-
+    
     // if context is with multiple items, there's a change that we need to handle each item separately
     if (isMulti(context)) {
       // if has conditions -> hide $select for after-hook, because
@@ -99,6 +84,16 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
         setPersistedConfig(context, "skipRestrictingRead.fields", true);
       }
     }
+
+    const availableFields = (!options?.availableFields)
+      ? undefined
+      : (typeof options.availableFields === "function")
+        ? options.availableFields(context)
+        : options.availableFields;
+
+    const hasRestrictingFieldsOptions: HasRestrictingFieldsOptions = {
+      availableFields: availableFields
+    };
 
     if (["get", "patch", "update", "remove"].includes(method) && id != null) {
       // single: get | patch | update | remove
@@ -165,8 +160,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
         
         const getQueryOptions: GetQueryOptions = {
           skipFields: method === "find",
-          availableFields,
-          throwIfFieldsAreEmpty: true
+          availableFields
         };
         const query = getQueryFor(ability, method, modelName, getQueryOptions);
 

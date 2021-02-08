@@ -45,10 +45,6 @@ const hasRestrictingFields = (ability: PureAbility, action: string, subject: Sub
     }
   }
 
-  /*if (fields.length === 0 && options.throwIfFieldsAreEmpty) {
-    throw new Forbidden("You're not allowed to make this request");
-  }*/
-
   return true;
 };
 

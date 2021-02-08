@@ -19,34 +19,45 @@ import {
 
 export const makeOptions = (app: Application, options?: Partial<AuthorizeHookOptions>): AuthorizeHookOptions => {
   options = options || {};
-  const appOptions = app?.get("casl")?.authorizeHook || makeDefaultOptions();
-  return Object.assign(appOptions, options);
+  return Object.assign({}, defaultOptions, getAppOptions(app), options);
 };
 
-export const makeDefaultOptions = (options?: AuthorizeHookOptions): AuthorizeHookOptions => {
-  options = options || {} as AuthorizeHookOptions;
-  
-  options.checkMultiActions = false;
-  options.availableFields = (context: HookContext): string[] => {
+const defaultOptions: AuthorizeHookOptions = {
+  ability: undefined,
+  actionOnForbidden: undefined,
+  availableFields: (context: HookContext): string[] => {
     const availableFields: string[] | ((context: HookContext) => string[]) = context.service.options?.casl?.availableFields;
     if (!availableFields) return undefined;
     return (typeof availableFields === "function")
       ? availableFields(context)
       : availableFields;
-  };
-  options.throwIfFieldsAreEmpty = true;
-  return options;
+  },
+  checkMultiActions: false
 };
 
-export const getAppOptions = (app: Application): AuthorizeHookOptions => {
-  const caslOptions: InitOptions = app.get("casl");
-  if (caslOptions?.authorizeHook) {
-    return caslOptions.authorizeHook;
-  }
+export const makeDefaultOptions = (options?: Partial<AuthorizeHookOptions>): AuthorizeHookOptions => {
+  return Object.assign({}, defaultOptions, options);
+};
+
+const getAppOptions = (app: Application): AuthorizeHookOptions | Record<string, never> => {
+  const caslOptions: InitOptions = app?.get("casl");
+  return (caslOptions && caslOptions.authorizeHook)
+    ? caslOptions.authorizeHook
+    : {};
 };
 
 export const getAbility = (context: HookContext, options?: AuthorizeHookOptions): Promise<PureAbility|undefined> => {
   options = options || {};
+
+  // if params.ability is set, return it over options.ability
+  if (context?.params?.ability) { 
+    if (typeof context.params.ability === "function") {
+      const ability = context.params.ability(context);
+      return Promise.resolve(ability);
+    } else {
+      return Promise.resolve(context.params.ability);
+    }
+  }
 
   if (options?.ability) {
     if (typeof options.ability === "function") {
@@ -57,10 +68,6 @@ export const getAbility = (context: HookContext, options?: AuthorizeHookOptions)
     }
   }
   
-  if (context?.params?.ability) { 
-    return Promise.resolve(context.params.ability); 
-  }
-
   return Promise.resolve(undefined);
 };
 

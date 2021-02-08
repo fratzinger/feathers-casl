@@ -14,7 +14,6 @@ export interface AuthorizeHookOptions {
   availableFields?: string[] | ((context: HookContext) => string[])
   checkMultiActions?: boolean
   modelName?: GetModelName
-  throwIfFieldsAreEmpty?: boolean
 }
 
 export type GetModelName = string | ((context: HookContext) => string)
@@ -44,8 +43,7 @@ export interface GetQueryOptions
 }
 
 export interface HasRestrictingFieldsOptions {
-  availableFields: string[],
-  throwIfFieldsAreEmpty?: boolean
+  availableFields: string[]
 }
 
 export interface InitOptions {

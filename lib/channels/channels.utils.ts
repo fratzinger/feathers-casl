@@ -15,9 +15,7 @@ export const makeOptions = (app: Application, options?: Partial<ChannelOptions>)
     throw new Error("feathers-casl: You need to provide an 'app' to the channels:makeOptions function");
   }
   options = options || {};
-  const caslOptions: InitOptions|undefined = app.get("casl");
-  const appOptions = caslOptions?.channels || makeDefaultOptions();
-  return Object.assign(appOptions, options);
+  return Object.assign({}, defaultOptions, getAppOptions(app), options);
 };
 
 const defaultOptions: ChannelOptions = {
@@ -39,5 +37,12 @@ const defaultOptions: ChannelOptions = {
 };
 
 export const makeDefaultOptions = (options?: Partial<ChannelOptions>): ChannelOptions => {
-  return Object.assign({}, defaultOptions, options || {});
+  return Object.assign({}, defaultOptions, options);
+};
+
+const getAppOptions = (app: Application): ChannelOptions | Record<string, never> => {
+  const caslOptions: InitOptions = app?.get("casl");
+  return (caslOptions && caslOptions.channels)
+    ? caslOptions.channels
+    : {};
 };

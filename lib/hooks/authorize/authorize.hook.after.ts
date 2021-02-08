@@ -62,8 +62,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
         ? options.availableFields(context)
         : options.availableFields;
     const hasRestrictingFieldsOptions: HasRestrictingFieldsOptions = {
-      availableFields: availableFields,
-      throwIfFieldsAreEmpty: false
+      availableFields: availableFields
     };
 
     const pickFieldsForItem = (item: Record<string, unknown>) => {
