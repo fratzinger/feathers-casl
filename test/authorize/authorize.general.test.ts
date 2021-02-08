@@ -12,7 +12,7 @@ const resolveAction = createAliasResolver({
   delete: "remove"
 });
 
-describe("authorize-hook", function() {
+describe("authorize.general.test.ts", function() {
   describe("before", function() {
     it("passes if no ability", async function() {
       const makeContext = (method: string, type: string) => {
@@ -386,7 +386,7 @@ describe("authorize-hook", function() {
         await Promise.all(promises);
       });*/
   
-      /*it("make right query for inverted rules", async function() {
+      it("makes right query for inverted rules", async function() {
         const pairs = [
           {
             condition: { userId: 1 },
@@ -421,19 +421,21 @@ describe("authorize-hook", function() {
             return {
               service: {
                 modelName: "Test",
+                get() {
+                  return {
+                    id: 1,
+                    userId: 1,
+                    test: true
+                  };
+                }
               },
               path: "tests",
               method,
               type,
-              data: {
-                id: 1,
-                userId: 1,
-                test: true
-              },
               params: {
                 ability: defineAbility({ resolveAction }, (can, cannot) => {
                   can("manage", "all");
-                  cannot("read", "tests", condition);
+                  cannot(["read", "update", "remove"], "tests", condition);
                   cannot("update", "tests", condition);
                   cannot("remove", "tests", condition);
                 }),
@@ -443,13 +445,14 @@ describe("authorize-hook", function() {
           };
   
           const types = ["before"];
-          const methods = ["find", "get", "update", "patch", "remove"];
+          const methods = ["find"];
   
           types.forEach(type => {
             methods.forEach(method => {
               const context = makeContext(method, type);
               const query = Object.assign({}, context.params.query);
               assert.deepStrictEqual(query, {}, `'${type}:${method}': query is empty`);
+              //@ts-ignore
               const promise = authorize()(context).then(result => {
                 assert.deepStrictEqual(result.params.query, inverted, `'${type}:${method}': for condition: '${JSON.stringify(condition)}' the inverted is: ${JSON.stringify(result.params.query)}`);
               });
@@ -458,93 +461,8 @@ describe("authorize-hook", function() {
           });
         });
         await Promise.all(promises);
-      });*/
+      });
     });
-  
-    /*describe("fields", function() {
-      it("simple select", async function() {
-        const makeContext = (method = "find", type = "before") => {
-          return {
-            service: {
-              modelName: "Test"
-            },
-            path: "tests",
-            method,
-            type,
-            data: {
-              id: 1,
-              userId: 1,
-              test: true
-            },
-            params: {
-              ability: defineAbility({ resolveAction }, (can) => {
-                can("read", "tests", ["id"]);
-                can("update", "tests", ["id"]);
-                can("remove", "tests", ["id"]);
-              }),
-              query: {}
-            }
-          };
-        };
-  
-        const types = ["before"];
-        const methods = ["find", "get", "update", "patch", "remove"];
-        const promises = [];
-        types.forEach(type => {
-          methods.forEach(async method => {
-            const context = makeContext(method, type);
-            const promise = authorize()(context).then(result => {
-              assert.deepStrictEqual(result.params.query, { $select: ["id"] }, "query has '$select'");
-            });
-            promises.push(promise);
-          });
-        });
-        await Promise.all(promises);
-      });
-  
-    });*/
-  
-    /*describe("conditions and fields", function() {
-      it("simple condition and select", async function() {
-        const makeContext = (method = "find", type = "before") => {
-          return {
-            service: {
-              modelName: "Test"
-            },
-            path: "tests",
-            method,
-            type,
-            data: {
-              id: 1,
-              userId: 1,
-              test: true
-            },
-            params: {
-              ability: defineAbility({ resolveAction }, (can) => {
-                can("read", "tests", ["id"], { userId: 1 });
-                can("update", "tests", ["id"], { userId: 1 });
-                can("remove", "tests", ["id"], { userId: 1 });
-              }),
-              query: {}
-            }
-          };
-        };
-  
-        const types = ["before"];
-        const methods = ["find", "get", "update", "patch", "remove"];
-        const promises = [];
-        types.forEach(type => {
-          methods.forEach(async method => {
-            const context = makeContext(method, type);
-            const promise = authorize()(context).then(result => {
-              assert.deepStrictEqual(result.params.query, { $select: ["id"], userId: 1 }, `'${type}:${method}' query has '$select'`);
-            });
-            promises.push(promise);
-          });
-        });
-        await Promise.all(promises);
-      });
-    });*/
   });
   
   describe("after", function() {

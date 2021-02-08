@@ -13,7 +13,7 @@ import { Application } from "@feathersjs/feathers";
 
 import authorize from "../../lib/hooks/authorize/authorize.hook";
 
-describe("authorize-hook options", function () {
+describe("authorize.options.test.ts", function () {
   let app: Application;
   let service: Service;
 
@@ -205,7 +205,31 @@ describe("authorize-hook options", function () {
   });
 
   describe("ability", function() {
-    it("uses ability in options over params.ability", async function() {
+    it("works if no ability is set at all", async function() {
+      const app = feathers();
+      app.use(
+        "test",
+        new Service({
+          multi: true,
+          paginate: {
+            default: 10,
+            max: 50
+          }
+        })
+      );
+      service = app.service("test");
+      //@ts-ignore
+      service.hooks({
+        before: {
+          all: [authorize()],
+        }
+      });
+
+      const item = await service.create({ test: true });
+      assert.ok(item.test, "item was created");
+    });
+
+    it("uses ability in options", async function() {
       const app = feathers();
       app.use(
         "test",
@@ -223,21 +247,51 @@ describe("authorize-hook options", function () {
         before: {
           all: [authorize({
             //@ts-ignore
-            ability: defineAbility({ resolveAction }, (can) => {
-              can("manage", "all");
-            }),
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            ability: defineAbility({ resolveAction }, () => {})
+          })],
+        }
+      });
+
+      await assert.rejects(
+        service.create({ test: true }),
+        err => err.name === "Forbidden",
+        "throws even if no ability is set in params"
+      );
+    });
+
+    it("uses params.ability over options.ability", async function() {
+      const app = feathers();
+      app.use(
+        "test",
+        new Service({
+          multi: true,
+          paginate: {
+            default: 10,
+            max: 50
+          }
+        })
+      );
+      service = app.service("test");
+      //@ts-ignore
+      service.hooks({
+        before: {
+          all: [authorize({
+            //@ts-ignore
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            ability: defineAbility({ resolveAction }, () => {}),
           })],
         }
       });
 
       const params = {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        ability: defineAbility({ resolveAction }, () => {}),
+        ability: defineAbility({ resolveAction }, (can) => {
+          can("manage", "all");
+        }),
       };
 
       const result = await service.create({ test: true }, params);
       assert.ok(result);
-
     });
 
     it("uses ability as Promise", async function() {
@@ -265,12 +319,7 @@ describe("authorize-hook options", function () {
         }
       });
 
-      const params = {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        ability: defineAbility({ resolveAction }, () => {}),
-      };
-
-      const result = await service.create({ test: true }, params);
+      const result = await service.create({ test: true });
       assert.ok(result);
     });
 
@@ -299,12 +348,7 @@ describe("authorize-hook options", function () {
         }
       });
 
-      const params = {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        ability: defineAbility({ resolveAction }, () => {}),
-      };
-
-      const result = await service.create({ test: true }, params);
+      const result = await service.create({ test: true });
       assert.ok(result);
     });
 
@@ -337,13 +381,53 @@ describe("authorize-hook options", function () {
         }
       });
 
-      const params = {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        ability: defineAbility({ resolveAction }, () => {}),
-      };
-
-      const result = await service.create({ test: true }, params);
+      const result = await service.create({ test: true });
       assert.ok(result);
+    });
+
+    it("fails for empty ability in options", async function() {
+      const makeContext = (method, type) => {
+        return {
+          service: {
+            modelName: "Test",
+          },
+          path: "tests",
+          method,
+          type,
+          data: {
+            id: 1,
+            userId: 1,
+            test: true
+          },
+          params: {
+            query: {},
+          }
+        };
+      };
+  
+      const types = ["before"];
+      const methods = ["find", "get", "create", "update", "patch", "remove"];
+      const promises = [];
+      types.forEach(type => {
+        methods.forEach(method => {
+          const context = makeContext(method, type);
+          const query = Object.assign({}, context.params.query);
+          
+          const promise = assert.rejects(
+            authorize({ 
+              availableFields: ["id", "userId", "test"],
+              //@ts-ignore
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
+              ability: () => defineAbility({ resolveAction }, () => {})
+            //@ts-ignore
+            })(context),
+            err => err.name === "Forbidden",
+            `'${type}:${method}' throws Forbidden`
+          );
+          promises.push(promise);
+        });
+      });
+      await Promise.all(promises);
     });
   });
 });

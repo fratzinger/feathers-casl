@@ -20,7 +20,7 @@ declare module "@feathersjs/adapter-commons" {
   }
 }
 
-describe("authorize-hook - complete", function () {
+describe("authorize.complete.test.ts", function () {
   let app: Application;
   let service: Service;
 
@@ -59,19 +59,23 @@ describe("authorize-hook - complete", function () {
 
   describe("beforeAndAfter - get", function () {
     it("returns full item", async function () {
-      const item = await service.create({ test: true, userId: 1 });
-      assert(item.id !== undefined, "item has id");
-      const returnedItem = await service.get(item.id, {
-        //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
-          can("read", "tests", { userId: 1 });
-        }),
-      });
-      assert.deepStrictEqual(
-        returnedItem,
-        item,
-        "'create' and 'get' item are the same"
-      );
+      const readMethods = ["read", "get"];
+      for (const read of readMethods) {
+        const item = await service.create({ test: true, userId: 1 });
+        assert(item.id !== undefined, `item has id for read: '${read}'`);
+        const returnedItem = await service.get(item.id, {
+          //@ts-ignore
+          ability: defineAbility({ resolveAction }, (can) => {
+            can(read, "tests", { userId: 1 });
+          }),
+        });
+        assert.deepStrictEqual(
+          returnedItem,
+          item,
+          `'create' and 'get' item are the same for read: '${read}'`
+        );
+      }
+      
     });
 
     it("returns subset of fields", async function () {
@@ -145,21 +149,27 @@ describe("authorize-hook - complete", function () {
 
   describe("beforeAndAfter - find", function () {
     it("returns full items", async function () {
-      await service.create({ test: true, userId: 1 });
-      await service.create({ test: true, userId: 2 });
-      await service.create({ test: true, userId: 3 });
-      const items = (await service.find({ paginate: false })) as unknown[];
-      assert(items.length === 3, "has three items");
+      const readMethods = ["read", "find"];
 
-      const returnedItems = await service.find({
-        //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
-          can("read", "tests");
-        }),
-        paginate: false,
-      });
+      for (const read of readMethods) {
+        await service.remove(null);
 
-      assert.deepStrictEqual(returnedItems, items, "items are the same");
+        await service.create({ test: true, userId: 1 });
+        await service.create({ test: true, userId: 2 });
+        await service.create({ test: true, userId: 3 });
+        const items = (await service.find({ paginate: false })) as unknown[];
+        assert(items.length === 3, `has three items for read: '${read}'`);
+  
+        const returnedItems = await service.find({
+          //@ts-ignore
+          ability: defineAbility({ resolveAction }, (can) => {
+            can(read, "tests");
+          }),
+          paginate: false,
+        });
+  
+        assert.deepStrictEqual(returnedItems, items, `items are the same for read: '${read}'`);
+      }
     });
 
     it("returns only allowed items", async function () {
@@ -508,21 +518,28 @@ describe("authorize-hook - complete", function () {
     });
 
     it("can create multiple items and returns all items", async function () {
-      const allItems = (await service.find({ paginate: false })) as unknown[];
-      assert(allItems.length === 0, "has no items before");
-      const itemsArr = [
-        { id: 0, test: true, hi: "1", userId: 1 },
-        { id: 1, test: true, hi: "2", userId: 1 },
-        { id: 2, test: true, hi: "3", userId: 1 },
-      ];
-      const items = await service.create(itemsArr, {
-        //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
-          can("create", "tests", { userId: 1 }), can("read", "tests");
-        }),
-      });
+      const readMethods = ["read", "find"];
+      for (const read of readMethods) {
+        await service.remove(null);
+        const allItems = (await service.find({ paginate: false })) as unknown[];
+        assert(allItems.length === 0, `has no items before for read: '${read}'`);
+        const itemsArr = [
+          { test: true, hi: "1", userId: 1 },
+          { test: true, hi: "2", userId: 1 },
+          { test: true, hi: "3", userId: 1 },
+        ];
+        const items = await service.create(itemsArr, {
+          //@ts-ignore
+          ability: defineAbility({ resolveAction }, (can) => {
+            can("create", "tests", { userId: 1 });
+            can(read, "tests");
+          }),
+        });
 
-      assert.deepStrictEqual(items, itemsArr, "created items");
+        const expectedItems = (await service.find({ paginate: false })) as Record<string, unknown>[];
+  
+        assert.deepStrictEqual(items, expectedItems, `created items for read: '${read}'`);
+      }
     });
 
     it("rejects if one item can't be created", async function () {
@@ -595,15 +612,19 @@ describe("authorize-hook - complete", function () {
     it("can update one item and returns complete item", async function () {
       const item = await service.create({ test: true, userId: 1 });
 
-      const updatedItem = await service.update(item.id, { test: false, userId: 1 }, {
-        //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
-          can("update", "tests");
-          can("read", "tests");
-        })
-      });
+      const readMethod = ["read", "get"];
 
-      assert.deepStrictEqual(updatedItem, { id: item.id, test: false, userId: 1 }, "updated item correctly");
+      for (const read of readMethod) {
+        const updatedItem = await service.update(item.id, { test: false, userId: 1 }, {
+          //@ts-ignore
+          ability: defineAbility({ resolveAction }, can => {
+            can("update", "tests");
+            can(read, "tests");
+          })
+        });
+  
+        assert.deepStrictEqual(updatedItem, { id: item.id, test: false, userId: 1 }, `updated item correctly for read: '${read}'`);
+      }
     });
 
     it("tests against original data, not updated data", async function () {
@@ -706,17 +727,21 @@ describe("authorize-hook - complete", function () {
     });
 
     it("can patch one item and returns complete item", async function () {
-      const item = await service.create({ test: true, userId: 1 });
+      const readMethod = ["read", "get"];
 
-      const patchedItem = await service.patch(item.id, { test: false }, {
-        //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
-          can("patch", "tests");
-          can("read", "tests");
-        })
-      });
-
-      assert.deepStrictEqual(patchedItem, { id: item.id, test: false, userId: 1 }, "patched item correctly");
+      for (const read of readMethod) {
+        await service.remove(null);
+        const item = await service.create({ test: true, userId: 1 });
+        const patchedItem = await service.patch(item.id, { test: false }, {
+          //@ts-ignore
+          ability: defineAbility({ resolveAction }, can => {
+            can("patch", "tests");
+            can(read, "tests");
+          })
+        });
+  
+        assert.deepStrictEqual(patchedItem, { id: item.id, test: false, userId: 1 }, `patched item correctly for read: '${read}'`);
+      }
     });
 
     it("throws if patch with restricted fields leads to empty patch", async function () {
@@ -815,39 +840,44 @@ describe("authorize-hook - complete", function () {
     });
 
     it("can patch multiple items and returns result", async function () {
-      await service.create({ test: true, userId: 1 });
-      await service.create({ test: true, userId: 1 });
-      await service.create({ test: true, userId: 2 });
+      const readMethods = ["read", "find"];
 
-      const patchedItems = await service.patch(null, { test: false }, {
-        //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
-          can("patch", "tests");
-          can("read", "tests");
-        }),
-        query: {
-          userId: 1
-        }
-      });
-
-      const expectedResult = [
-        { id: 0, test: false, userId: 1 },
-        { id: 1, test: false, userId: 1 }
-      ];
-
-      assert.deepStrictEqual(patchedItems, expectedResult, "result is right array");
-
-      const realItems = await service.find({ paginate: false });
-      const expected = [
-        { id: 0, test: false, userId: 1 },
-        { id: 1, test: false, userId: 1 },
-        { id: 2, test: true, userId: 2 }
-      ];
-      assert.deepStrictEqual(
-        realItems,
-        expected,
-        "patched items correctly"
-      );
+      for (const read of readMethods) {
+        await service.remove(null, {});
+        const item1 = await service.create({ test: true, userId: 1 });
+        const item2 = await service.create({ test: true, userId: 1 });
+        const item3 = await service.create({ test: true, userId: 2 });
+  
+        const patchedItems = await service.patch(null, { test: false }, {
+          //@ts-ignore
+          ability: defineAbility({ resolveAction }, can => {
+            can("patch", "tests");
+            can(read, "tests");
+          }),
+          query: {
+            userId: 1
+          }
+        });
+  
+        const expectedResult = [
+          { id: item1.id, test: false, userId: 1 },
+          { id: item2.id, test: false, userId: 1 }
+        ];
+  
+        assert.deepStrictEqual(patchedItems, expectedResult, `result is right array for read: '${read}'`);
+  
+        const realItems = await service.find({ paginate: false });
+        const expected = [
+          { id: item1.id, test: false, userId: 1 },
+          { id: item2.id, test: false, userId: 1 },
+          { id: item3.id, test: true, userId: 2 }
+        ];
+        assert.deepStrictEqual(
+          realItems,
+          expected,
+          "patched items correctly"
+        );
+      }
     });
 
     it("patches only allowed items", async function () {
@@ -985,20 +1015,24 @@ describe("authorize-hook - complete", function () {
     });
 
     it("can remove one item and returns complete item", async function () {
-      const item = await service.create({ test: true, userId: 1 });
+      const readMethods = ["read", "get"];
 
-      const updatedItem = await service.remove(item.id, {
-        //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
-          can("remove", "tests");
-          can("read", "tests");
-        })
-      });
-
-      assert.deepStrictEqual(updatedItem, { id: item.id, test: true, userId: 1 }, "updated item correctly");
-
-      const realItems = await service.find({ paginate: false }) as unknown[];
-      assert(realItems.length === 0, "no existent items");
+      for (const read of readMethods) {
+        await service.remove(null);
+        const item = await service.create({ test: true, userId: 1 });
+        const removedItem = await service.remove(item.id, {
+          //@ts-ignore
+          ability: defineAbility({ resolveAction }, can => {
+            can("remove", "tests");
+            can(read, "tests");
+          })
+        });
+  
+        assert.deepStrictEqual(removedItem, { id: item.id, test: true, userId: 1 }, `removed item correctly for read: '${read}'`);
+  
+        const realItems = await service.find({ paginate: false }) as unknown[];
+        assert(realItems.length === 0, "no existent items");
+      }
     });
 
     it("throws if cannot remove item", async function () {
@@ -1065,37 +1099,44 @@ describe("authorize-hook - complete", function () {
     });
 
     it("can remove multiple items and returns result", async function () {
-      await service.create({ test: true, userId: 1 });
-      await service.create({ test: true, userId: 1 });
-      await service.create({ test: true, userId: 2 });
+      const readMethods = ["read", "find"];
 
-      const removedItems = await service.remove(null, {
-        //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
-          can("remove", "tests");
-          can("read", "tests");
-        }),
-        query: {
-          userId: 1
-        }
-      });
+      for (const read of readMethods) {
+        await service.remove(null);
+        const item1 = await service.create({ test: true, userId: 1 });
+        const item2 = await service.create({ test: true, userId: 1 });
+        const item3 = await service.create({ test: true, userId: 2 });
+      
+        const removedItems = await service.remove(null, {
+          //@ts-ignore
+          ability: defineAbility({ resolveAction }, can => {
+            can("remove", "tests");
+            can(read, "tests");
+          }),
+          query: {
+            userId: 1
+          }
+        });
+  
+        const expectedResult = [
+          { id: item1.id, test: true, userId: 1 },
+          { id: item2.id, test: true, userId: 1 }
+        ];
+  
+        assert.deepStrictEqual(removedItems, expectedResult, `result is right array for read: '${read}'`);
+  
+        const realItems = await service.find({ paginate: false });
+        const expected = [
+          { id: item3.id, test: true, userId: 2 }
+        ];
+        assert.deepStrictEqual(
+          realItems,
+          expected,
+          `removed items correctly for read: '${read}'`
+        );
+      }
 
-      const expectedResult = [
-        { id: 0, test: true, userId: 1 },
-        { id: 1, test: true, userId: 1 }
-      ];
 
-      assert.deepStrictEqual(removedItems, expectedResult, "result is right array");
-
-      const realItems = await service.find({ paginate: false });
-      const expected = [
-        { id: 2, test: true, userId: 2 }
-      ];
-      assert.deepStrictEqual(
-        realItems,
-        expected,
-        "removed items correctly"
-      );
     });
 
     it("removes only allowed items", async function () {
