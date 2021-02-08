@@ -31,7 +31,7 @@ describe("authorize.complete.test.ts", function () {
       new Service({
         multi: true,
         casl: {
-          availableFields: ["id", "hi", "test", "hallo"]
+          availableFields: ["id", "userId", "hi", "test", "published"]
         },
         paginate: {
           default: 10,
@@ -86,6 +86,25 @@ describe("authorize.complete.test.ts", function () {
         ability: defineAbility((can) => {
           can("read", "tests", ["id"], { userId: 1 });
         }, { resolveAction }),
+      });
+      assert.deepStrictEqual(
+        returnedItem,
+        { id: item.id },
+        "'get' returns only [id]"
+      );
+    });
+
+    it("returns restricted subset of fields with $select", async function () {
+      const item = await service.create({ test: true, userId: 1, published: true });
+      assert(item.id !== undefined, "item has id");
+      const returnedItem = await service.get(item.id, {
+        //@ts-ignore
+        ability: defineAbility((can) => {
+          can("read", "tests", ["id"], { userId: 1 });
+        }, { resolveAction }),
+        query: {
+          $select: ["id", "userId"]
+        }
       });
       assert.deepStrictEqual(
         returnedItem,
@@ -216,6 +235,33 @@ describe("authorize.complete.test.ts", function () {
         returnedItems,
         //@ts-ignore
         [{ id: items[0].id, test: true, userId: 1 }, { id: items[1].id }],
+        "just returned one item"
+      );
+    });
+
+    it("returns only allowed items with individual subset of fields with $select", async function () {
+      await service.create({ test: true, userId: 1 });
+      await service.create({ test: true, userId: 2 });
+      await service.create({ test: true, userId: 3 });
+      const items = (await service.find({ paginate: false })) as unknown[];
+      assert(items.length === 3, "has three items");
+
+      const returnedItems = await service.find({
+        //@ts-ignore
+        ability: defineAbility((can) => {
+          can("read", "tests", { userId: 1 }),
+          can("read", "tests", ["id"], { userId: 2 });
+        }, { resolveAction }),
+        query: {
+          $select: ["id", "test"]
+        },
+        paginate: false,
+      });
+
+      assert.deepStrictEqual(
+        returnedItems,
+        //@ts-ignore
+        [{ id: items[0].id, test: true }, { id: items[1].id }],
         "just returned one item"
       );
     });
@@ -810,7 +856,7 @@ describe("authorize.complete.test.ts", function () {
   });
 
   describe("beforeAndAfter - patch:multiple", function () {
-    it("can patch multiple items and returns [] for not allowed read", async function () {
+    it("patch:multi can patch multiple items and returns [] for not allowed read", async function () {
       await service.create({ test: true, userId: 1 });
       await service.create({ test: true, userId: 1 });
       await service.create({ test: true, userId: 2 });
@@ -840,7 +886,7 @@ describe("authorize.complete.test.ts", function () {
       );
     });
 
-    it("can patch multiple items and returns result", async function () {
+    it("patch:multi can patch multiple items and returns result", async function () {
       const readMethods = ["read", "find"];
 
       for (const read of readMethods) {
@@ -881,7 +927,30 @@ describe("authorize.complete.test.ts", function () {
       }
     });
 
-    it("patches only allowed items", async function () {
+    it("patch:multi assigns original data with patched data for restricted fields", async function () {
+      await service.remove(null);
+      const item1 = await service.create({ test: true, userId: 1 });
+      const item2 = await service.create({ test: "yes", userId: 5 });
+
+      const patchedItems = await service.patch(null, { test: false, userId: 2 }, {
+        //@ts-ignore
+        ability: defineAbility((can) => {
+          can("patch", "tests", ["test"], { userId: 1 });
+          can("read", "tests");
+        }, { resolveAction })
+      });
+
+      const realItems = await service.find({ paginate: false });
+      const expected = [
+        { id: item1.id, test: false, userId: 1 },
+        item2
+      ];
+
+      assert.deepStrictEqual(realItems, expected, "patched item correctly");
+      assert.deepStrictEqual(patchedItems, [realItems[0]], "result of patch is real item");
+    });
+
+    it("patch:multi patches only allowed items", async function () {
       await service.create({ test: true, userId: 1 });
       await service.create({ test: true, userId: 1 });
       await service.create({ test: true, userId: 2 });
@@ -915,7 +984,7 @@ describe("authorize.complete.test.ts", function () {
       );
     });
 
-    it("patches allowed items and returns subset for read", async function () {
+    it("patch:multi patches allowed items and returns subset for read", async function () {
       const items = [
         { id: 0, published: false, test: true, userId: 1 },
         { id: 1, published: true, test: true, userId: 1 },
@@ -955,7 +1024,7 @@ describe("authorize.complete.test.ts", function () {
       );
     });
 
-    it("patches allowed items and returns subset for read", async function () {
+    it("patch:multi patches allowed items and returns subset for read", async function () {
       const items = [
         { id: 0, published: false, test: true, userId: 1 },
         { id: 1, published: true, test: true, userId: 1 },

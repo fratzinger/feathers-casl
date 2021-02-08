@@ -72,20 +72,19 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       }
       
       let fields = hasRestrictingFields(ability, method, subject(modelName, item), hasRestrictingFieldsOptions);
-      if (fields === true) {
-        return {};
-      }
-      if (skipCheckFields || (!fields && !$select)) {
-        return item;
-      }
-      if (!fields) fields = [];
 
-      //
-      const intersect = (fields?.length && $select?.length)
-        ? "intersect"
-        : "intersectOrFull";
-      fields = mergeArrays(fields, $select, intersect) as string[];
-      //TODO: replace _pick with native
+      if (fields === true) {
+        // full restriction
+        return {};
+      } else if (skipCheckFields || (!fields && !$select)) {
+        // no restrictions
+        return item;
+      } else if (fields && $select) {
+        fields = mergeArrays(fields, $select, "intersect") as string[];
+      } else {
+        fields = (fields) ? fields : $select;
+      }
+
       return _pick(item, fields);
     };
 

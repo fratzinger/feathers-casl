@@ -113,7 +113,7 @@ export const hide$select = (context: HookContext): unknown => {
   return move(context, "params.query.$select", "params.casl.$select");
 };
 
-export const restore$select = (context: HookContext): unknown[]|undefined => {
+export const restore$select = (context: HookContext): string[]|undefined => {
   move(context, "params.casl.$select", "params.query.$select");
   return _get(context, "params.query.$select");
 };

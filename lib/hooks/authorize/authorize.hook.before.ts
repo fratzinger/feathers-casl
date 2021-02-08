@@ -155,11 +155,24 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       return context;
     } else if (method === "find" || (["patch", "remove"].includes(method) && id == null)) {
       // multi: find | patch | remove
+
+      if (method === "patch") {
+        const fields = hasRestrictingFields(ability, method, modelName, { availableFields });
+        if (fields === true) {
+          if (options.actionOnForbidden) { options.actionOnForbidden(); }
+          throw new Forbidden("You're not allowed to make this request");
+        }
+        if (fields && fields.length > 0) {
+          const data = _pick(context.data, fields);
+          context.data = data;
+        }
+      }
+      
       if (hasRestrictingConditions(ability, method, modelName)) {
         // TODO: if query and context.params.query differ -> separate calls
         
         const getQueryOptions: GetQueryOptions = {
-          skipFields: method === "find",
+          skipFields: true,
           availableFields
         };
         const query = getQueryFor(ability, method, modelName, getQueryOptions);
@@ -181,6 +194,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       return context;
     } else if (method === "create") {
       // create: single | multi
+      
       // we have all information we need (maybe we need populated data?)
       const data = (Array.isArray(context.data)) ? context.data : [context.data];
       for (let i = 0; i < data.length; i++) {

@@ -6,6 +6,9 @@
     "lib/**/*.js",
     "lib/**/*.ts"
   ],
+  "exclude": [
+    "lib/types.ts"
+  ],
   "sourceMap": true,
   "all": true,
   "instrument": true
