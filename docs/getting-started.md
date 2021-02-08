@@ -1,7 +1,9 @@
 ---
 title: Getting Started
-sidebarDepth: 3
+sidebarDepth: 2
 ---
+
+# Getting Started
 
 <p align="center">
   <img src="/img/logo.svg" width="150">

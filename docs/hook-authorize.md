@@ -1,9 +1,9 @@
 ---
 title: authorize hook
-sidebarDepth: 3
+sidebarDepth: 2
 ---
 
-## authorize
+# authorize hook
 
 Checks permission for the current request.
 
@@ -15,9 +15,10 @@ Checks permission for the current request.
 
 |       Property      |                Description                  |
 |---------------------|---------------------------------------------|
-| `actionOnForbidden` | The method to call, when an unauthorized request comes in<br><br>**Type:** `() => void`<br>**optional** - *Default:* `undefined`|
-| `checkMultiActions` | If your database adapters allow `multi: true` you probably want to authorize `single:create/patch/remove` but not `multi:create/patch/remove`. Especially for `remove` this could be crucial. `feathers-casl` has built in support for `multi` anyway. But by default it does it acts exactly the same for `single` and `multi` requests.<br><br>**Type:** `boolean`<br>*Default:* `false`|
 | `ability`        | You can define a custom ability. If it's not defined, `feathers-casl` looks for `context.params.ability` by default which exists, if you followed the [Getting Started](/getting-started) instructions. If both are undefined, the `authorize` hook will be skipped.<br>**ProTip:** You can use this asynchronously for dynamic abilities stored in your database!<br><br>**Type:** `Ability | ((context: HookContext) => Ability | Promise<Ability>)`<br>**optional** - *Default:* `undefined` |
+| `actionOnForbidden` | The method to call, when an unauthorized request comes in<br><br>**Type:** `() => void`<br>**optional** - *Default:* `undefined`|
+| `availableFields`   | **Caution!** This is needed for `@casl/ability` starting with `v5`!<br><br>If you have rules with restricted fields, you want to provide a full list of possibly occurring fields for this service. If it's `undefined` (*by default*) `feathers-casl` cannot distinguish wether an empty set of restricted fields comes from restrictions or from the missing declaration. For standard adapters, you'll find the according function in the [cookbook](cookbook.html#get-availablefields-for-adapters).<br><br>**Type:** `string[] | ((context: HookContext) => string[])`<br>*Default:* looks at `options.casl.availableFields` of the service, otherwise `undefined` |
+| `checkMultiActions)` | If your database adapters allow `multi: true` you probably want to authorize `single:create/patch/remove` but not `multi:create/patch/remove`. Especially for `remove` this could be crucial. `feathers-casl` has built in support for `multi` anyway. But by default it does it acts exactly the same for `single` and `multi` requests.<br><br>**Type:** `boolean`<br>*Default:* `false`|
 | `modelName`      | `feathers-casl` checks permissions per item. Because most items are plain javascript objects, it does not know which type the item is. Per default it looks for `context.path` (for example: `tasks`). You can change this behavior with the option `modelName` to use Class-like names (for example: `Task`)<br><br>**Type:** `string | ((context: HookContext) => string)`<br>**optional** - *Default:* `(context) => context.path` |
 
 ## Principles
