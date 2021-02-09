@@ -1,4 +1,4 @@
-import { Ability } from "@casl/ability";
+import { Ability, AnyAbility } from "@casl/ability";
 
 import { Application, HookContext } from "@feathersjs/feathers";
 import { RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
@@ -45,4 +45,20 @@ const getAppOptions = (app: Application): ChannelOptions | Record<string, never>
   return (caslOptions && caslOptions.channels)
     ? caslOptions.channels
     : {};
+};
+
+export const getAbility = (
+  app: Application, 
+  data: Record<string, unknown>,
+  connection: RealTimeConnection,
+  context: HookContext,
+  options: Partial<ChannelOptions>
+): undefined | AnyAbility => {
+  if (options.ability) {
+    return (typeof options.ability === "function") ?
+      options.ability(app, connection, data, context) :
+      options.ability;
+  } else {
+    return connection.ability;
+  }
 };

@@ -1,8 +1,9 @@
+import assert from "assert";
 import "@feathersjs/transport-commons";
 import { HookContext, Params } from "@feathersjs/feathers";
-import { Application } from "./declarations";
 
-import { getChannelsWithReadAbility, makeOptions } from "../lib/channels";
+import { getChannelsWithReadAbility, makeOptions } from "../../../lib/channels";
+import { Application } from "@feathersjs/express";
 
 export default function(app: Application): void {
   if(typeof app.channel !== "function") {
@@ -17,7 +18,6 @@ export default function(app: Application): void {
 
   app.on("login", (authResult: unknown, { connection }: Params): void => {
     if(connection) {
-      
       // The connection is no longer anonymous, remove it
       app.channel("anonymous").leave(connection);
 
@@ -27,6 +27,13 @@ export default function(app: Application): void {
   });
 
   const caslOptions = makeOptions(app);
+
+  //@ts-ignore
+  const fields = caslOptions.availableFields({
+    service: app.service("users")
+  });
+
+  assert.deepStrictEqual(fields, ["id", "email", "password"], "gets availableFields from service correctly");
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.publish((data: unknown, context: HookContext) => {

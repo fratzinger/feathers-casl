@@ -1,9 +1,12 @@
 import assert from "assert";
-import app from "../../src/app";
 import feathers, { Application } from "@feathersjs/feathers";
 import socketio from "@feathersjs/socketio-client";
 import { Server } from "http";
 import io from "socket.io-client";
+
+import mockServer from "../.mockServer";
+import channels1 from "./mockChannels.default";
+import services1 from "./mockServices.default";
 
 const promiseTimeout = function(ms, promise, rejectMessage?){
   // Create a promise that rejects in <ms> milliseconds
@@ -21,8 +24,9 @@ const promiseTimeout = function(ms, promise, rejectMessage?){
   ]);
 };
 
-describe("channels", function() {
+describe("channels.default.test.ts", function() {
   let server: Server;
+  let app: Application;
 
   let client1: Application;
   let client2: Application;
@@ -38,6 +42,13 @@ describe("channels", function() {
   ];
 
   before(async function() {
+    const mock = mockServer({
+      channels: channels1,
+      services: services1
+    });
+    // eslint-disable-next-line prefer-destructuring
+    app = mock.app;
+
     const port = app.get("port");
     server = app.listen(port);
     await new Promise((resolve) => {
@@ -72,6 +83,7 @@ describe("channels", function() {
         promises.push(promise);
       } else if (i === 2) {
         client3 = client;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         user3 = user;
         const promise = client3.service("authentication").create({
           strategy: "local",

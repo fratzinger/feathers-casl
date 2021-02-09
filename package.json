@@ -21,7 +21,7 @@
   "types": "dist/",
   "directories": {
     "test": "test",
-    "lib": "src"
+    "lib": "lib"
   },
   "scripts": {
     "preversion": "npm run lint && npm run test && npm run compile",
@@ -35,9 +35,7 @@
     "test": "nyc npm run mocha",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "docs": "vuepress dev docs",
-    "docs:build": "vuepress build docs",
-    "compile-src": "shx rm -rf src-dist/ && tsc -p tsconfig.src.json",
-    "start": "cross-env TS_NODE_PROJECT='tsconfig.src.json' npm run compile-src && node src-dist/src"
+    "docs:build": "vuepress build docs"
   },
   "dependencies": {
     "@casl/ability": "^5.2.2",

@@ -3,9 +3,12 @@ import _isEqual from "lodash/isEqual";
 import _pick from "lodash/pick";
 import _isEmpty from "lodash/isEmpty";
 import "@feathersjs/transport-commons";
-import { AnyAbility, subject } from "@casl/ability";
+import { subject } from "@casl/ability";
 
-import { makeOptions } from "./channels.utils";
+import { 
+  makeOptions, 
+  getAbility 
+} from "./channels.utils";
 
 import getModelName from "../utils/getModelName";
 import hasRestrictingFields from "../utils/hasRestrictingFields";
@@ -13,21 +16,10 @@ import hasRestrictingFields from "../utils/hasRestrictingFields";
 import { Channel, RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
 import { ChannelOptions } from "../types";
 
-const getAbility = (
-  app: Application, 
-  data: Record<string, unknown>,
-  connection: RealTimeConnection,
-  context: HookContext,
-  options: Partial<ChannelOptions>
-): undefined|AnyAbility => {
-  if (options.ability) {
-    return (typeof options.ability === "function") ?
-      options.ability(app, connection, data, context) :
-      options.ability;
-  } else {
-    return connection.ability;
-  }
-};
+interface ConnectionsPerField {
+  fields: false | string[], 
+  connections: RealTimeConnection[]
+}
 
 export default (app: Application, data: Record<string, unknown>, context: HookContext, options?: Partial<ChannelOptions>): Channel|Channel[] => {
   options = makeOptions(app, options);
@@ -49,17 +41,17 @@ export default (app: Application, data: Record<string, unknown>, context: HookCo
     let connections = allConnections
       .filter(connection => {
         const ability = getAbility(app, data, connection, context, options);
-        return ability && ability.can("read", dataToTest);
+        return ability && ability.can("get", dataToTest);
       });
     connections = [...new Set(connections)];
     return new Channel(connections, data);
   } else {
     // filter by restricted Fields
-    const connectionsPerFields: { fields: false | string[], connections: RealTimeConnection[]}[] = [];
+    const connectionsPerFields: ConnectionsPerField[] = [];
     for (let i = 0, n = allConnections.length; i < n; i++) {
       const connection = allConnections[i];
       const { ability } = connection;
-      if (!ability || !ability.can("read", dataToTest)) {
+      if (!ability || !ability.can("get", dataToTest)) {
         // connection cannot read item -> don't send data
         continue; 
       }
@@ -69,7 +61,8 @@ export default (app: Application, data: Record<string, unknown>, context: HookCo
           ? options.availableFields(context)
           : options.availableFields;
 
-      const fields = hasRestrictingFields(ability, "read", dataToTest, { availableFields });
+      const fields = hasRestrictingFields(ability, "get", dataToTest, { availableFields });
+      // if fields is true or fields is empty array -> full restriction
       if (fields && (fields === true || fields.length === 0)) {
         continue;
       }
@@ -90,8 +83,7 @@ export default (app: Application, data: Record<string, unknown>, context: HookCo
     const channels: Channel[] = [];
     for (let i = 0, n = connectionsPerFields.length; i < n; i++) {
       const { fields, connections } = connectionsPerFields[i];
-      const restrictedData = 
-      (fields) 
+      const restrictedData = (fields) 
         ? _pick(data, fields)
         : data;
       if (!_isEmpty(restrictedData)) {
