@@ -2,7 +2,7 @@
 home: true
 heroImage: /img/logo.svg
 heroText: feathers-casl
-tagLine: Add access control with CASL to your feathers application.
+tagLine: Add access control with CASL to your feathers application. Support for `@casl/ability^5` and `@feathersjs/feathers^4`
 actionText: Get Started
 actionLink: ./getting-started.md
 features:
@@ -12,5 +12,5 @@ features:
   details: Simple query syntax supports multiple, nested, and even recursive populates.
 - title: Built in channels support 💬
   details: Defining a relationship is as simple as specifying the primary and foreign keys.
-footer: MIT Licensed | Copyright © 2020 | Fratzinger
+footer: MIT Licensed | Copyright © 2020-present | Frederik Schmatz
 ---

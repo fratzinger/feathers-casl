@@ -19,7 +19,7 @@ sidebarDepth: 2
 Add access control with CASL to your feathers application.
 
 This project is built for [FeathersJS](http://feathersjs.com). An open source web framework for building modern real-time applications.
-It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CASL** in feathers.js.
+It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CASL** in your feathers.js-project. Supported versions: `@casl/ability^5` and `@feathersjs/feathers^4`.
 
 ## Features
 - Fully powered by Feathers & CASL
