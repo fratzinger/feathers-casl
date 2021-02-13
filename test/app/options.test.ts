@@ -68,7 +68,8 @@ describe("app-options / service-options", function() {
           modelName: (context: HookContext): string => {
             calledModelName = true;
             return "Test";
-          }
+          },
+          checkAbilityForInternal: true
         },
         channels: {
           activated: false,
@@ -147,6 +148,7 @@ describe("app-options / service-options", function() {
           actionOnForbidden: () => {
             appCalled.calledActionOnForbidden = true;
           },
+          checkAbilityForInternal: true,
           checkMultiActions: true,
           //@ts-ignore
           ability: (context: HookContext): Ability => {

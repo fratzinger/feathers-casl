@@ -47,9 +47,13 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     ) { return context; }
     const { service, method, id, params } = context;
 
-    options = makeOptions(context.app, options);
+    if (!options.modelName) {
+      return context;
+    }
+    const modelName = (typeof options.modelName === "string")
+      ? options.modelName
+      : options.modelName(context);
 
-    const modelName = getModelName(options.modelName, context);
     if (!modelName) { return context; }
 
     const ability = await getAbility(context, options);
@@ -59,7 +63,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     }
 
     if (options.checkMultiActions) {
-      checkMulti(context, ability, modelName, options.actionOnForbidden);
+      checkMulti(context, ability, modelName, options);
     }
 
     throwUnlessCan(

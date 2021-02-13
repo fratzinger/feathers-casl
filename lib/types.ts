@@ -9,22 +9,23 @@ export interface ServiceCaslOptions {
 }
 
 export interface AuthorizeHookOptions {
-  ability?: AnyAbility | ((context: HookContext) => AnyAbility | Promise<AnyAbility>)
-  actionOnForbidden?: (() => void)
-  availableFields?: string[] | ((context: HookContext) => string[])
-  checkMultiActions?: boolean
-  modelName?: GetModelName
+  ability: AnyAbility | ((context: HookContext) => AnyAbility | Promise<AnyAbility>)
+  actionOnForbidden: undefined | (() => void)
+  availableFields: string[] | ((context: HookContext) => string[])
+  checkAbilityForInternal: boolean
+  checkMultiActions: boolean
+  modelName: GetModelName
 }
 
 export type GetModelName = string | ((context: HookContext) => string)
 
 export interface ChannelOptions {
-  ability?: AnyAbility | ((app: Application, connection: RealTimeConnection, data: unknown, context: HookContext) => AnyAbility)
-  activated?: boolean
-  availableFields?: string[] | ((context: HookContext) => string[])
-  channelOnError?: string[]
-  modelName?: GetModelName
-  restrictFields?: boolean
+  ability: AnyAbility | ((app: Application, connection: RealTimeConnection, data: unknown, context: HookContext) => AnyAbility)
+  activated: boolean
+  availableFields: string[] | ((context: HookContext) => string[])
+  channelOnError: string[]
+  modelName: GetModelName
+  restrictFields: boolean
 }
 
 export interface GetConditionalQueryOptions {

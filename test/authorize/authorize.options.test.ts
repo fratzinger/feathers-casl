@@ -163,7 +163,8 @@ describe("authorize.options.test.ts", function () {
             ability: defineAbility((can) => {
               can("create", "Test");
             }, { resolveAction }),
-            modelName: "Test"
+            modelName: "Test",
+            checkAbilityForInternal: true
           })],
         }
       });
@@ -174,6 +175,7 @@ describe("authorize.options.test.ts", function () {
         return service.update(0, { test: false });
       }, err => err.name === "Forbidden", "update throws Forbidden");
     });
+
     it("use service.modelName with function", async function() {
       const app = feathers();
       app.use(
@@ -197,7 +199,8 @@ describe("authorize.options.test.ts", function () {
             ability: defineAbility((can) => {
               can("create", "Test");
             }, { resolveAction }),
-            modelName: (context) => context.service.modelName
+            modelName: (context) => context.service.modelName,
+            checkAbilityForInternal: true
           })],
         }
       });
@@ -254,7 +257,8 @@ describe("authorize.options.test.ts", function () {
           all: [authorize({
             //@ts-ignore
             // eslint-disable-next-line @typescript-eslint/no-empty-function
-            ability: defineAbility(() => {}, { resolveAction })
+            ability: defineAbility(() => {}, { resolveAction }),
+            checkAbilityForInternal: true
           })],
         }
       });
@@ -425,7 +429,8 @@ describe("authorize.options.test.ts", function () {
               availableFields: ["id", "userId", "test"],
               //@ts-ignore
               // eslint-disable-next-line @typescript-eslint/no-empty-function
-              ability: () => defineAbility(() => {}, { resolveAction })
+              ability: () => defineAbility(() => {}, { resolveAction }),
+              checkAbilityForInternal: true
             //@ts-ignore
             })(context),
             err => err.name === "Forbidden",
@@ -435,6 +440,104 @@ describe("authorize.options.test.ts", function () {
         });
       });
       await Promise.all(promises);
+    });
+  });
+
+  describe("checkAbilityForInternal", function() {
+    it("passes for internal call without params.ability and not allowed options.params by default", async function() {
+      const app = feathers();
+      app.use(
+        "test",
+        new Service({
+          multi: true,
+          paginate: {
+            default: 10,
+            max: 50
+          }
+        })
+      );
+      service = app.service("test");
+      //@ts-ignore
+      service.hooks({
+        before: {
+          all: [
+            authorize({
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
+              ability: defineAbility(() => {})
+            })
+          ],
+        }
+      });
+
+      await assert.doesNotReject(
+        service.create({ test: true }),
+        "does not throw Forbidden"
+      );
+    });
+
+    it("throws for external call without params.ability and not allowed options.params by default", async function() {
+      const app = feathers();
+      app.use(
+        "test",
+        new Service({
+          multi: true,
+          paginate: {
+            default: 10,
+            max: 50
+          }
+        })
+      );
+      service = app.service("test");
+      //@ts-ignore
+      service.hooks({
+        before: {
+          all: [
+            authorize({
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
+              ability: defineAbility(() => {})
+            })
+          ],
+        }
+      });
+
+      await assert.rejects(
+        service.create({ test: true }, { provider: "rest" }),
+        err => err.name === "Forbidden",
+        "request throws Forbidden"
+      );
+    });
+
+    it("throws for internal call without params.ability and not allowed options.params with checkAbilityForInternal: true", async function() {
+      const app = feathers();
+      app.use(
+        "test",
+        new Service({
+          multi: true,
+          paginate: {
+            default: 10,
+            max: 50
+          }
+        })
+      );
+      service = app.service("test");
+      //@ts-ignore
+      service.hooks({
+        before: {
+          all: [
+            authorize({
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
+              ability: defineAbility(() => {}),
+              checkAbilityForInternal: true
+            }),
+          ],
+        }
+      });
+
+      await assert.rejects(
+        service.create({ test: true }),
+        err => err.name === "Forbidden",
+        "request throws Forbidden"
+      );
     });
   });
 });

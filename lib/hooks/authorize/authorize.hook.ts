@@ -24,10 +24,10 @@ export default (options?: Partial<AuthorizeHookOptions>): ((context: HookContext
       return context;
     }
 
-    options = makeOptions(context.app, options);
+    const fullOptions = makeOptions(context.app, options);
     
     return (context.type === "before") 
-      ? await authorizeBefore(options)(context) 
-      : await authorizeAfter(options)(context);
+      ? await authorizeBefore(fullOptions)(context) 
+      : await authorizeAfter(fullOptions)(context);
   };
 };

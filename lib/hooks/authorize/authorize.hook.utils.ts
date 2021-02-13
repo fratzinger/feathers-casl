@@ -17,7 +17,10 @@ import {
   Path
 } from "../../types";
 
-export const makeOptions = (app: Application, options?: Partial<AuthorizeHookOptions>): AuthorizeHookOptions => {
+export const makeOptions = (
+  app: Application, 
+  options?: Partial<AuthorizeHookOptions>
+): AuthorizeHookOptions => {
   options = options || {};
   return Object.assign({}, defaultOptions, getAppOptions(app), options);
 };
@@ -32,10 +35,16 @@ const defaultOptions: AuthorizeHookOptions = {
       ? availableFields(context)
       : availableFields;
   },
-  checkMultiActions: false
+  checkMultiActions: false,
+  checkAbilityForInternal: false,
+  modelName: (context: Pick<HookContext, "path">): string => {
+    return context.path;
+  }
 };
 
-export const makeDefaultOptions = (options?: Partial<AuthorizeHookOptions>): AuthorizeHookOptions => {
+export const makeDefaultOptions = (
+  options?: Partial<AuthorizeHookOptions>
+): AuthorizeHookOptions => {
   return Object.assign({}, defaultOptions, options);
 };
 
@@ -46,9 +55,10 @@ const getAppOptions = (app: Application): AuthorizeHookOptions | Record<string, 
     : {};
 };
 
-export const getAbility = (context: HookContext, options?: AuthorizeHookOptions): Promise<AnyAbility|undefined> => {
-  options = options || {};
-
+export const getAbility = (
+  context: HookContext, 
+  options?: Pick<AuthorizeHookOptions, "ability" | "checkAbilityForInternal">
+): Promise<AnyAbility|undefined> => {
   // if params.ability is set, return it over options.ability
   if (context?.params?.ability) { 
     if (typeof context.params.ability === "function") {
@@ -57,6 +67,10 @@ export const getAbility = (context: HookContext, options?: AuthorizeHookOptions)
     } else {
       return Promise.resolve(context.params.ability);
     }
+  }
+
+  if (!options.checkAbilityForInternal && !context.params?.provider) {
+    return Promise.resolve(undefined);
   }
 
   if (options?.ability) {
@@ -94,7 +108,12 @@ export const throwUnlessCan = (
   }
 };
 
-export const checkMulti = (context: HookContext, ability: AnyAbility, modelName: string, actionOnForbidden: (() => void)): boolean => {
+export const checkMulti = (
+  context: HookContext, 
+  ability: AnyAbility, 
+  modelName: string,
+  options?: Pick<AuthorizeHookOptions, "actionOnForbidden">
+): boolean => {
   const { method } = context;
   const currentIsMulti = isMulti(context);
   if (!currentIsMulti) { return true; }
@@ -105,7 +124,7 @@ export const checkMulti = (context: HookContext, ability: AnyAbility, modelName:
     return true;
   }
 
-  if (actionOnForbidden) actionOnForbidden();
+  if (options?.actionOnForbidden) options.actionOnForbidden();
   throw new Forbidden(`You're not allowed to multi-${method} ${modelName}`);
 };
 
