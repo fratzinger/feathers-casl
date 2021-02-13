@@ -10,14 +10,12 @@ import {
   isMulti
 } from "feathers-utils";
 
-import getModelName from "../../utils/getModelName";
 import getQueryFor from "../../utils/getQueryFor";
 import hasRestrictingFields from "../../utils/hasRestrictingFields";
 import hasRestrictingConditions from "../../utils/hasRestrictingConditions";
 import couldHaveRestrictingFields from "../../utils/couldHaveRestrictingFields";
 
 import {
-  makeOptions,
   hide$select,
   setPersistedConfig,
   checkMulti,
