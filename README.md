@@ -6,6 +6,7 @@
 
 ![npm](https://img.shields.io/npm/v/feathers-casl)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/fratzinger/feathers-casl/Node.js%20CI)
+![David](https://img.shields.io/david/fratzinger/feathers-casl)
 ![npm](https://img.shields.io/npm/dm/feathers-casl)
 [![GitHub license](https://img.shields.io/github/license/fratzinger/feathers-casl)](https://github.com/fratzinger/feathers-casl/blob/master/LICENSE)
 
