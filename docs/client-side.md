@@ -1,7 +1,9 @@
 ---
 title: Client side
-sidebarDepth: 3
+sidebarDepth: 2
 ---
+
+# Client side
 
 ## General
 

@@ -2,7 +2,7 @@ import _isPlainObject from "lodash/isPlainObject";
 import { Forbidden } from "@feathersjs/errors";
 import { mergeQuery } from "feathers-utils";
 
-import { PureAbility, RawRuleFrom, AbilityTuple, Subject } from "@casl/ability";
+import { AnyAbility, RawRuleFrom, AbilityTuple, Subject } from "@casl/ability";
 import { Query } from "@feathersjs/feathers";
 
 import { GetConditionalQueryOptions } from "../types";
@@ -19,7 +19,12 @@ const invertedMap = {
   }
 };
 
-const invertedProp = (prop: Record<string, unknown>, name: string): Record<string, unknown>|string => {
+const supportedOperators = Object.keys(invertedMap);
+
+const invertedProp = (
+  prop: Record<string, unknown>, 
+  name: string): Record<string, unknown>|string => 
+{
   const map = invertedMap[name];
   if (typeof map === "string") {
     return { [map]: prop[name] };
@@ -28,7 +33,10 @@ const invertedProp = (prop: Record<string, unknown>, name: string): Record<strin
   }
 };
 
-const convertRuleToQuery = (rule: RawRuleFrom<AbilityTuple<string, Subject>, unknown>, options: GetConditionalQueryOptions): Query => {
+const convertRuleToQuery = (
+  rule: RawRuleFrom<AbilityTuple<string, Subject>, unknown>, 
+  options: GetConditionalQueryOptions): Query => 
+{
   const { conditions, inverted } = rule;
   if (!conditions) {
     if (inverted && options?.actionOnForbidden) {
@@ -42,15 +50,7 @@ const convertRuleToQuery = (rule: RawRuleFrom<AbilityTuple<string, Subject>, unk
       if (_isPlainObject(conditions[prop])) {
         const obj = conditions[prop];
         for (const name in obj) {
-          if (![
-            "$gt",
-            "$gte",
-            "$lt",
-            "$lte",
-            "$in",
-            "$nin",
-            "$ne"
-          ].includes(name)) {
+          if (!supportedOperators.includes(name)) {
             console.error(`CASL: not supported property: ${name}`);
             continue;
           }
@@ -67,13 +67,18 @@ const convertRuleToQuery = (rule: RawRuleFrom<AbilityTuple<string, Subject>, unk
   }
 };
 
-const getConditionalQueryFor = (ability: PureAbility, method: string, subject: Subject, options?: GetConditionalQueryOptions): Query => {
+const getConditionalQueryFor = (
+  ability: AnyAbility, 
+  method: string, 
+  subjectType: string, 
+  options?: GetConditionalQueryOptions
+): Query => {
   options = options || {};
   options.actionOnForbidden = options.actionOnForbidden || (() => {
     throw new Forbidden("You're not allowed to make this request");
   });
 
-  const rules = ability.rulesFor(method, subject);
+  const rules = ability.rulesFor(method, subjectType);
 
   let query = {};
 

@@ -1,4 +1,4 @@
-import { Ability } from "@casl/ability";
+import { Ability, AnyAbility } from "@casl/ability";
 
 import { Application, HookContext } from "@feathersjs/feathers";
 import { RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
@@ -15,9 +15,7 @@ export const makeOptions = (app: Application, options?: Partial<ChannelOptions>)
     throw new Error("feathers-casl: You need to provide an 'app' to the channels:makeOptions function");
   }
   options = options || {};
-  const caslOptions: InitOptions|undefined = app.get("casl");
-  const appOptions = caslOptions?.channels || makeDefaultOptions();
-  return Object.assign(appOptions, options);
+  return Object.assign({}, defaultOptions, getAppOptions(app), options);
 };
 
 const defaultOptions: ChannelOptions = {
@@ -28,9 +26,39 @@ const defaultOptions: ChannelOptions = {
     return connection.ability;
   }),
   modelName: getContextPath,
-  restrictFields: true
+  restrictFields: true,
+  availableFields: (context: HookContext): string[] => {
+    const availableFields: string[] | ((context: HookContext) => string[]) = context.service.options?.casl?.availableFields;
+    if (!availableFields) return undefined;
+    return (typeof availableFields === "function")
+      ? availableFields(context)
+      : availableFields;
+  }
 };
 
 export const makeDefaultOptions = (options?: Partial<ChannelOptions>): ChannelOptions => {
-  return Object.assign({}, defaultOptions, options || {});
+  return Object.assign({}, defaultOptions, options);
+};
+
+const getAppOptions = (app: Application): ChannelOptions | Record<string, never> => {
+  const caslOptions: InitOptions = app?.get("casl");
+  return (caslOptions && caslOptions.channels)
+    ? caslOptions.channels
+    : {};
+};
+
+export const getAbility = (
+  app: Application, 
+  data: Record<string, unknown>,
+  connection: RealTimeConnection,
+  context: HookContext,
+  options: Partial<ChannelOptions>
+): undefined | AnyAbility => {
+  if (options.ability) {
+    return (typeof options.ability === "function") ?
+      options.ability(app, connection, data, context) :
+      options.ability;
+  } else {
+    return connection.ability;
+  }
 };

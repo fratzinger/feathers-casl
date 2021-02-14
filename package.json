@@ -1,6 +1,6 @@
 {
   "name": "feathers-casl",
-  "version": "0.1.7",
+  "version": "0.1.8-1",
   "description": "Add access control with CASL to your feathers application.",
   "author": "fratzinger",
   "homepage": "https://feathers-casl.netlify.app/",
@@ -21,7 +21,7 @@
   "types": "dist/",
   "directories": {
     "test": "test",
-    "lib": "src"
+    "lib": "lib"
   },
   "scripts": {
     "preversion": "npm run lint && npm run test && npm run compile",
@@ -31,21 +31,20 @@
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
-    "test": "cross-env NODE_ENV=test TS_NODE_PROJECT='tsconfig.test.json' mocha --require ts-node/register 'test/**/*.test.ts' --timeout 5000",
+    "mocha": "cross-env NODE_ENV=test TS_NODE_PROJECT='tsconfig.test.json' mocha --timeout 5000",
+    "test": "npm run mocha",
     "coverage": "nyc npm run test",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "docs": "vuepress dev docs",
-    "docs:build": "vuepress build docs",
-    "compile-src": "shx rm -rf src-dist/ && tsc -p tsconfig.src.json",
-    "start": "cross-env TS_NODE_PROJECT='tsconfig.src.json' npm run compile-src && node src-dist/src"
+    "docs:build": "vuepress build docs"
   },
   "dependencies": {
-    "@casl/ability": "^4.1.6",
+    "@casl/ability": "^5.2.2",
     "@feathersjs/errors": "^4.5.11",
     "@feathersjs/feathers": "^4.5.11",
     "@feathersjs/transport-commons": "^4.5.11",
-    "feathers-hooks-common": "^5.0.4",
-    "feathers-utils": "^1.3.1",
+    "feathers-hooks-common": "^5.0.5",
+    "feathers-utils": "^1.4.0",
     "lodash": "^4.17.20"
   },
   "devDependencies": {
@@ -54,29 +53,30 @@
     "@feathersjs/authentication-oauth": "^4.5.11",
     "@feathersjs/configuration": "^4.5.11",
     "@feathersjs/express": "^4.5.11",
-    "@feathersjs/socketio": "github:feathersjs/socketio",
+    "@feathersjs/socketio": "^4.5.11",
     "@feathersjs/socketio-client": "^4.5.11",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
-    "@types/lodash": "^4.14.166",
+    "@types/lodash": "^4.14.168",
     "@types/mocha": "^8.2.0",
-    "@types/node": "^14.14.16",
-    "@typescript-eslint/eslint-plugin": "^4.11.0",
-    "@typescript-eslint/parser": "^4.11.0",
-    "@vuepress/plugin-active-header-links": "^1.8.0",
+    "@types/node": "^14.14.27",
+    "@typescript-eslint/eslint-plugin": "^4.15.0",
+    "@typescript-eslint/parser": "^4.15.0",
+    "@vuepress/plugin-active-header-links": "^1.8.1",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
-    "eslint": "^7.16.0",
+    "eslint": "^7.20.0",
     "eslint-plugin-security": "^1.4.0",
     "feathers-memory": "^4.1.0",
-    "helmet": "^4.3.1",
-    "mocha": "^8.2.1",
+    "helmet": "^4.4.1",
+    "mocha": "^8.3.0",
     "nyc": "^15.1.0",
     "shx": "^0.3.3",
-    "socket.io-client": "^2.3.1",
+    "socket.io-client": "^2.4.0",
+    "source-map-support": "^0.5.19",
     "ts-node": "^9.1.1",
     "type-fest": "^0.20.2",
-    "typescript": "^4.1.3",
-    "vuepress": "^1.8.0",
+    "typescript": "^4.1.5",
+    "vuepress": "^1.8.1",
     "vuepress-theme-default-prefers-color-scheme": "^2.0.0"
   }
 }

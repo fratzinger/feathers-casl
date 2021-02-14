@@ -12,8 +12,15 @@ const resolveAction = createAliasResolver({
 import { Application } from "@feathersjs/feathers";
 
 import authorize from "../../lib/hooks/authorize/authorize.hook";
+import { ServiceCaslOptions } from "../../lib/types";
 
-describe("authorize-hook - complete", function () {
+declare module "@feathersjs/adapter-commons" {
+  interface ServiceOptions {
+    casl: ServiceCaslOptions
+  }
+}
+
+describe("authorize.complete.test.ts", function () {
   let app: Application;
   let service: Service;
 
@@ -23,6 +30,9 @@ describe("authorize-hook - complete", function () {
       "tests",
       new Service({
         multi: true,
+        casl: {
+          availableFields: ["id", "userId", "hi", "test", "published"]
+        },
         paginate: {
           default: 10,
           max: 50
@@ -33,29 +43,39 @@ describe("authorize-hook - complete", function () {
     //@ts-ignore
     service.hooks({
       before: {
-        all: [authorize()],
+        all: [
+          authorize({ 
+            availableFields: ["id", "userId", "hi", "test", "published"] 
+          })
+        ],
       },
       after: {
-        all: [authorize()],
+        all: [authorize({
+          availableFields: ["id", "userId", "hi", "test", "published"]
+        })],
       },
     });
   });
 
   describe("beforeAndAfter - get", function () {
     it("returns full item", async function () {
-      const item = await service.create({ test: true, userId: 1 });
-      assert(item.id !== undefined, "item has id");
-      const returnedItem = await service.get(item.id, {
-        //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
-          can("read", "tests", { userId: 1 });
-        }),
-      });
-      assert.deepStrictEqual(
-        returnedItem,
-        item,
-        "'create' and 'get' item are the same"
-      );
+      const readMethods = ["read", "get"];
+      for (const read of readMethods) {
+        const item = await service.create({ test: true, userId: 1 });
+        assert(item.id !== undefined, `item has id for read: '${read}'`);
+        const returnedItem = await service.get(item.id, {
+          //@ts-ignore
+          ability: defineAbility((can) => {
+            can(read, "tests", { userId: 1 });
+          }, { resolveAction }),
+        });
+        assert.deepStrictEqual(
+          returnedItem,
+          item,
+          `'create' and 'get' item are the same for read: '${read}'`
+        );
+      }
+      
     });
 
     it("returns subset of fields", async function () {
@@ -63,9 +83,28 @@ describe("authorize-hook - complete", function () {
       assert(item.id !== undefined, "item has id");
       const returnedItem = await service.get(item.id, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
+        ability: defineAbility((can) => {
           can("read", "tests", ["id"], { userId: 1 });
-        }),
+        }, { resolveAction }),
+      });
+      assert.deepStrictEqual(
+        returnedItem,
+        { id: item.id },
+        "'get' returns only [id]"
+      );
+    });
+
+    it("returns restricted subset of fields with $select", async function () {
+      const item = await service.create({ test: true, userId: 1, published: true });
+      assert(item.id !== undefined, "item has id");
+      const returnedItem = await service.get(item.id, {
+        //@ts-ignore
+        ability: defineAbility((can) => {
+          can("read", "tests", ["id"], { userId: 1 });
+        }, { resolveAction }),
+        query: {
+          $select: ["id", "userId"]
+        }
       });
       assert.deepStrictEqual(
         returnedItem,
@@ -82,9 +121,9 @@ describe("authorize-hook - complete", function () {
       assert(item.id !== undefined, "item has id");
       const returnedItem = service.get(item.id, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
+        ability: defineAbility((can) => {
           can("read", "tests", { userId: 2 });
-        }),
+        }, { resolveAction }),
       });
       await assert.rejects(
         returnedItem,
@@ -98,9 +137,9 @@ describe("authorize-hook - complete", function () {
       assert(item.id !== undefined, "item has id");
       const returnedItem = service.get(item.id, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can, cannot) => {
+        ability: defineAbility((can, cannot) => {
           cannot("read", "tests", { userId: 1 });
-        }),
+        }, { resolveAction }),
       });
       await assert.rejects(
         returnedItem,
@@ -115,9 +154,9 @@ describe("authorize-hook - complete", function () {
       const promise = service.get(item.id, {
         query: { $select: ["id", "supersecret", "hidden"] },
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
+        ability: defineAbility((can) => {
           can("read", "tests", ["test", "userId"]);
-        }),
+        }, { resolveAction }),
       });
       await assert.rejects(
         promise,
@@ -129,21 +168,27 @@ describe("authorize-hook - complete", function () {
 
   describe("beforeAndAfter - find", function () {
     it("returns full items", async function () {
-      await service.create({ test: true, userId: 1 });
-      await service.create({ test: true, userId: 2 });
-      await service.create({ test: true, userId: 3 });
-      const items = (await service.find({ paginate: false })) as unknown[];
-      assert(items.length === 3, "has three items");
+      const readMethods = ["read", "find"];
 
-      const returnedItems = await service.find({
-        //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
-          can("read", "tests");
-        }),
-        paginate: false,
-      });
+      for (const read of readMethods) {
+        await service.remove(null);
 
-      assert.deepStrictEqual(returnedItems, items, "items are the same");
+        await service.create({ test: true, userId: 1 });
+        await service.create({ test: true, userId: 2 });
+        await service.create({ test: true, userId: 3 });
+        const items = (await service.find({ paginate: false })) as unknown[];
+        assert(items.length === 3, `has three items for read: '${read}'`);
+  
+        const returnedItems = await service.find({
+          //@ts-ignore
+          ability: defineAbility((can) => {
+            can(read, "tests");
+          }, { resolveAction }),
+          paginate: false,
+        });
+  
+        assert.deepStrictEqual(returnedItems, items, `items are the same for read: '${read}'`);
+      }
     });
 
     it("returns only allowed items", async function () {
@@ -156,9 +201,9 @@ describe("authorize-hook - complete", function () {
 
       const { data: returnedItems, total: returnedTotal } = await service.find({
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
+        ability: defineAbility((can) => {
           can("read", "tests", { userId: 1 });
-        })
+        }, { resolveAction })
       }) as Paginated<unknown>;
 
       assert.deepStrictEqual(
@@ -179,10 +224,10 @@ describe("authorize-hook - complete", function () {
 
       const returnedItems = await service.find({
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
+        ability: defineAbility((can) => {
           can("read", "tests", { userId: 1 }),
           can("read", "tests", ["id"], { userId: 2 });
-        }),
+        }, { resolveAction }),
         paginate: false,
       });
 
@@ -190,6 +235,33 @@ describe("authorize-hook - complete", function () {
         returnedItems,
         //@ts-ignore
         [{ id: items[0].id, test: true, userId: 1 }, { id: items[1].id }],
+        "just returned one item"
+      );
+    });
+
+    it("returns only allowed items with individual subset of fields with $select", async function () {
+      await service.create({ test: true, userId: 1 });
+      await service.create({ test: true, userId: 2 });
+      await service.create({ test: true, userId: 3 });
+      const items = (await service.find({ paginate: false })) as unknown[];
+      assert(items.length === 3, "has three items");
+
+      const returnedItems = await service.find({
+        //@ts-ignore
+        ability: defineAbility((can) => {
+          can("read", "tests", { userId: 1 }),
+          can("read", "tests", ["id"], { userId: 2 });
+        }, { resolveAction }),
+        query: {
+          $select: ["id", "test"]
+        },
+        paginate: false,
+      });
+
+      assert.deepStrictEqual(
+        returnedItems,
+        //@ts-ignore
+        [{ id: items[0].id, test: true }, { id: items[1].id }],
         "just returned one item"
       );
     });
@@ -203,10 +275,10 @@ describe("authorize-hook - complete", function () {
 
       const { data: returnedItems, total } = await service.find({
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can, cannot) => {
+        ability: defineAbility((can, cannot) => {
           can("read", "tests");
           cannot("read", "tests", { userId: 3 });
-        })
+        }, { resolveAction })
       }) as Paginated<unknown>;
 
       assert.deepStrictEqual(
@@ -232,9 +304,9 @@ describe("authorize-hook - complete", function () {
 
       const { data: returnedItems, total } = await service.find({
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
+        ability: defineAbility((can) => {
           can("read", "tests", { userId: 1 });
-        }),
+        }, { resolveAction }),
         query: {
           $or: [
             {
@@ -268,9 +340,9 @@ describe("authorize-hook - complete", function () {
 
       const { data: returnedItems, total } = await service.find({
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
+        ability: defineAbility((can) => {
           can("read", "tests", { userId: 1 });
-        }),
+        }, { resolveAction }),
         query: {
           userId: {
             $in: [1, 2]
@@ -299,9 +371,9 @@ describe("authorize-hook - complete", function () {
 
       const { data: returnedItems, total } = await service.find({
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
+        ability: defineAbility((can) => {
           can("read", "tests", { userId: 1 });
-        }),
+        }, { resolveAction }),
         query: {
           userId: {
             $nin: [1, 2]
@@ -329,8 +401,9 @@ describe("authorize-hook - complete", function () {
       assert(items.length === 3, "has three items");
 
       const returnedItems = service.find({
+        //@ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-empty-function
-        ability: defineAbility({ resolveAction }, () => {}),
+        ability: defineAbility(() => {}, { resolveAction }),
         paginate: false,
       });
 
@@ -350,9 +423,9 @@ describe("authorize-hook - complete", function () {
 
       const returnedItems = service.find({
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can, cannot) => {
+        ability: defineAbility((can, cannot) => {
           cannot("read", "tests");
-        }),
+        }, { resolveAction }),
         paginate: false,
       });
 
@@ -372,9 +445,9 @@ describe("authorize-hook - complete", function () {
         { test: true, userId: 1 },
         {
           //@ts-ignore
-          ability: defineAbility({ resolveAction }, (can) => {
+          ability: defineAbility((can) => {
             can("create", "tests", { userId: 1 });
-          }),
+          }, { resolveAction }),
         }
       );
 
@@ -395,9 +468,9 @@ describe("authorize-hook - complete", function () {
         { test: true, userId: 1 },
         {
           //@ts-ignore
-          ability: defineAbility({ resolveAction }, (can) => {
+          ability: defineAbility((can) => {
             can("create", "tests", { userId: 1 }), can("read", "tests");
-          }),
+          }, { resolveAction }),
         }
       );
 
@@ -413,9 +486,9 @@ describe("authorize-hook - complete", function () {
         { test: true, userId: 1 },
         {
           //@ts-ignore
-          ability: defineAbility({ resolveAction }, (can) => {
+          ability: defineAbility((can) => {
             can("create", "tests", { userId: 2 });
-          }),
+          }, { resolveAction }),
         }
       );
 
@@ -431,10 +504,10 @@ describe("authorize-hook - complete", function () {
         { test: true, userId: 1 },
         {
           //@ts-ignore
-          ability: defineAbility({ resolveAction }, (can) => {
+          ability: defineAbility((can) => {
             can("create", "tests", { userId: 1 }),
             can("read", "tests", ["id"], { userId: 1 });
-          }),
+          }, { resolveAction }),
         }
       );
 
@@ -444,10 +517,10 @@ describe("authorize-hook - complete", function () {
     it("throws if cannot create item", async function () {
       const promise = service.create({ test: true, userId: 2 }, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can, cannot) => {
+        ability: defineAbility((can, cannot) => {
           can("create", "tests");
           cannot("create", "tests", { userId: 1 });
-        })
+        }, { resolveAction })
       });
 
       assert.rejects(promise, err => err.name === "Forbidden", "cannot create item");
@@ -460,10 +533,10 @@ describe("authorize-hook - complete", function () {
         {
           query: { $select: ["id", "supersecret", "hidden"] },
           //@ts-ignore
-          ability: defineAbility({ resolveAction }, (can) => {
+          ability: defineAbility((can) => {
             can("read", "tests", ["test", "userId"]);
             can("create", "tests");
-          }),
+          }, { resolveAction }),
         }
       );
       assert.deepStrictEqual(result, {}, "returned item is empty because of $select and restricting fields");
@@ -483,30 +556,37 @@ describe("authorize-hook - complete", function () {
       ];
       const items = await service.create(itemsArr, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
+        ability: defineAbility((can) => {
           can("create", "tests", { userId: 1 });
-        }),
+        }, { resolveAction }),
       });
 
       assert(items.length === 0, "array is empty");
     });
 
     it("can create multiple items and returns all items", async function () {
-      const allItems = (await service.find({ paginate: false })) as unknown[];
-      assert(allItems.length === 0, "has no items before");
-      const itemsArr = [
-        { id: 0, test: true, hi: "1", userId: 1 },
-        { id: 1, test: true, hi: "2", userId: 1 },
-        { id: 2, test: true, hi: "3", userId: 1 },
-      ];
-      const items = await service.create(itemsArr, {
-        //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
-          can("create", "tests", { userId: 1 }), can("read", "tests");
-        }),
-      });
+      const readMethods = ["read", "find"];
+      for (const read of readMethods) {
+        await service.remove(null);
+        const allItems = (await service.find({ paginate: false })) as unknown[];
+        assert(allItems.length === 0, `has no items before for read: '${read}'`);
+        const itemsArr = [
+          { test: true, hi: "1", userId: 1 },
+          { test: true, hi: "2", userId: 1 },
+          { test: true, hi: "3", userId: 1 },
+        ];
+        const items = await service.create(itemsArr, {
+          //@ts-ignore
+          ability: defineAbility((can) => {
+            can("create", "tests", { userId: 1 });
+            can(read, "tests");
+          }, { resolveAction }),
+        });
 
-      assert.deepStrictEqual(items, itemsArr, "created items");
+        const expectedItems = (await service.find({ paginate: false })) as Record<string, unknown>[];
+  
+        assert.deepStrictEqual(items, expectedItems, `created items for read: '${read}'`);
+      }
     });
 
     it("rejects if one item can't be created", async function () {
@@ -517,9 +597,9 @@ describe("authorize-hook - complete", function () {
       ];
       const promise = service.create(itemsArr, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
+        ability: defineAbility((can) => {
           can("create", "tests", { userId: 1 });
-        }),
+        }, { resolveAction }),
       });
 
       await assert.rejects(
@@ -537,12 +617,12 @@ describe("authorize-hook - complete", function () {
       ];
       const items = await service.create(itemsArr, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
+        ability: defineAbility((can) => {
           can("create", "tests"),
           can("read", "tests"),
           can("read", "tests", ["id"], { userId: 2 }),
           can("read", "tests", ["id", "userId"], { hi: "3" });
-        }),
+        }, { resolveAction }),
       });
 
       const expected = [
@@ -561,9 +641,9 @@ describe("authorize-hook - complete", function () {
 
       const updatedItem = await service.update(item.id, { test: false, userId: 1 }, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
+        ability: defineAbility(can => {
           can("update", "tests");
-        })
+        }, { resolveAction })
       });
 
       assert.deepStrictEqual(updatedItem, undefined, "updated item is undefined");
@@ -579,15 +659,19 @@ describe("authorize-hook - complete", function () {
     it("can update one item and returns complete item", async function () {
       const item = await service.create({ test: true, userId: 1 });
 
-      const updatedItem = await service.update(item.id, { test: false, userId: 1 }, {
-        //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
-          can("update", "tests");
-          can("read", "tests");
-        })
-      });
+      const readMethod = ["read", "get"];
 
-      assert.deepStrictEqual(updatedItem, { id: item.id, test: false, userId: 1 }, "updated item correctly");
+      for (const read of readMethod) {
+        const updatedItem = await service.update(item.id, { test: false, userId: 1 }, {
+          //@ts-ignore
+          ability: defineAbility(can => {
+            can("update", "tests");
+            can(read, "tests");
+          }, { resolveAction })
+        });
+  
+        assert.deepStrictEqual(updatedItem, { id: item.id, test: false, userId: 1 }, `updated item correctly for read: '${read}'`);
+      }
     });
 
     it("tests against original data, not updated data", async function () {
@@ -595,10 +679,10 @@ describe("authorize-hook - complete", function () {
 
       const promise = service.update(item.id, { test: false, userId: 1 }, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can, cannot) => {
+        ability: defineAbility((can, cannot) => {
           can("update", "tests");
           cannot("update", "tests", { userId: 1 });
-        })
+        }, { resolveAction })
       });
 
       assert.rejects(promise, err => err.name === "Forbidden", "cannot update item");
@@ -609,10 +693,10 @@ describe("authorize-hook - complete", function () {
 
       const promise = service.update(item.id, { test: false, userId: 1 }, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can, cannot) => {
+        ability: defineAbility((can, cannot) => {
           can("update", "tests");
           cannot("update", "tests", ["test"]);
-        })
+        }, { resolveAction })
       });
 
       assert.rejects(promise, err => err.name === "Forbidden", "rejects request");
@@ -623,10 +707,10 @@ describe("authorize-hook - complete", function () {
 
       const updatedItem = await service.update(item.id, { test: false, userId: 2 }, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
+        ability: defineAbility((can) => {
           can("update", "tests", ["test"], { userId: 1 });
           can("read", "tests");
-        })
+        }, { resolveAction })
       });
 
       const realItem = await service.get(item.id);
@@ -641,10 +725,10 @@ describe("authorize-hook - complete", function () {
 
       const promise = service.update(item.id, { test: false, userId: 2 }, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can, cannot) => {
+        ability: defineAbility((can, cannot) => {
           can("update", "tests");
           cannot("update", "tests", { userId: 1 });
-        })
+        }, { resolveAction })
       });
 
       assert.rejects(promise, err => err.name === "Forbidden", "cannot update item");
@@ -657,10 +741,10 @@ describe("authorize-hook - complete", function () {
       const result = await service.update(item.id, updatedItem, {
         query: { $select: ["id", "supersecret", "hidden"] },
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
+        ability: defineAbility((can) => {
           can("read", "tests", ["test", "userId"]);
           can(["create", "update"], "tests");
-        }),
+        }, { resolveAction }),
       });
       assert.deepStrictEqual(result, {}, "returned item is empty because of $select and restricting fields");
       const itemInDb = await service.get(item.id);
@@ -674,9 +758,9 @@ describe("authorize-hook - complete", function () {
 
       const patchedItem = await service.patch(item.id, { test: false }, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
+        ability: defineAbility(can => {
           can("patch", "tests");
-        })
+        }, { resolveAction })
       });
 
       assert.deepStrictEqual(patchedItem, undefined, "patched item is undefined");
@@ -690,17 +774,21 @@ describe("authorize-hook - complete", function () {
     });
 
     it("can patch one item and returns complete item", async function () {
-      const item = await service.create({ test: true, userId: 1 });
+      const readMethod = ["read", "get"];
 
-      const patchedItem = await service.patch(item.id, { test: false }, {
-        //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
-          can("patch", "tests");
-          can("read", "tests");
-        })
-      });
-
-      assert.deepStrictEqual(patchedItem, { id: item.id, test: false, userId: 1 }, "patched item correctly");
+      for (const read of readMethod) {
+        await service.remove(null);
+        const item = await service.create({ test: true, userId: 1 });
+        const patchedItem = await service.patch(item.id, { test: false }, {
+          //@ts-ignore
+          ability: defineAbility(can => {
+            can("patch", "tests");
+            can(read, "tests");
+          }, { resolveAction })
+        });
+  
+        assert.deepStrictEqual(patchedItem, { id: item.id, test: false, userId: 1 }, `patched item correctly for read: '${read}'`);
+      }
     });
 
     it("throws if patch with restricted fields leads to empty patch", async function () {
@@ -708,10 +796,10 @@ describe("authorize-hook - complete", function () {
 
       const promise = service.patch(item.id, { test: false }, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can, cannot) => {
+        ability: defineAbility((can, cannot) => {
           can("patch", "tests");
           cannot("patch", "tests", ["test"]);
-        })
+        }, { resolveAction })
       });
 
       assert.rejects(promise, err => err.name === "Forbidden", "rejects request");
@@ -722,10 +810,10 @@ describe("authorize-hook - complete", function () {
 
       const patchedItem = await service.patch(item.id, { test: false, userId: 2 }, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
+        ability: defineAbility((can) => {
           can("patch", "tests", ["test"], { userId: 1 });
           can("read", "tests");
-        })
+        }, { resolveAction })
       });
 
       const realItem = await service.get(item.id);
@@ -740,10 +828,10 @@ describe("authorize-hook - complete", function () {
 
       const promise = service.patch(item.id, { test: false }, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can, cannot) => {
+        ability: defineAbility((can, cannot) => {
           can("patch", "tests");
           cannot("patch", "tests", { userId: 1 });
-        })
+        }, { resolveAction })
       });
 
       assert.rejects(promise, err => err.name === "Forbidden", "cannot patch item");
@@ -756,10 +844,10 @@ describe("authorize-hook - complete", function () {
       const result = await service.patch(item.id, { test: false }, {
         query: { $select: ["id", "supersecret", "hidden"] },
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
+        ability: defineAbility((can) => {
           can("read", "tests", ["test", "userId"]);
           can(["create", "update"], "tests");
-        }),
+        }, { resolveAction }),
       });
       assert.deepStrictEqual(result, {}, "returned item is empty because of $select and restricting fields");
       const itemInDb = await service.get(item.id);
@@ -768,16 +856,16 @@ describe("authorize-hook - complete", function () {
   });
 
   describe("beforeAndAfter - patch:multiple", function () {
-    it("can patch multiple items and returns [] for not allowed read", async function () {
+    it("patch:multi can patch multiple items and returns [] for not allowed read", async function () {
       await service.create({ test: true, userId: 1 });
       await service.create({ test: true, userId: 1 });
       await service.create({ test: true, userId: 2 });
 
       const patchedItems = await service.patch(null, { test: false }, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
+        ability: defineAbility(can => {
           can("patch", "tests");
-        }),
+        }, { resolveAction }),
         query: {
           userId: 1
         }
@@ -798,53 +886,81 @@ describe("authorize-hook - complete", function () {
       );
     });
 
-    it("can patch multiple items and returns result", async function () {
-      await service.create({ test: true, userId: 1 });
-      await service.create({ test: true, userId: 1 });
-      await service.create({ test: true, userId: 2 });
+    it("patch:multi can patch multiple items and returns result", async function () {
+      const readMethods = ["read", "find"];
 
-      const patchedItems = await service.patch(null, { test: false }, {
+      for (const read of readMethods) {
+        await service.remove(null, {});
+        const item1 = await service.create({ test: true, userId: 1 });
+        const item2 = await service.create({ test: true, userId: 1 });
+        const item3 = await service.create({ test: true, userId: 2 });
+  
+        const patchedItems = await service.patch(null, { test: false }, {
+          //@ts-ignore
+          ability: defineAbility(can => {
+            can("patch", "tests");
+            can(read, "tests");
+          }, { resolveAction }),
+          query: {
+            userId: 1
+          }
+        });
+  
+        const expectedResult = [
+          { id: item1.id, test: false, userId: 1 },
+          { id: item2.id, test: false, userId: 1 }
+        ];
+  
+        assert.deepStrictEqual(patchedItems, expectedResult, `result is right array for read: '${read}'`);
+  
+        const realItems = await service.find({ paginate: false });
+        const expected = [
+          { id: item1.id, test: false, userId: 1 },
+          { id: item2.id, test: false, userId: 1 },
+          { id: item3.id, test: true, userId: 2 }
+        ];
+        assert.deepStrictEqual(
+          realItems,
+          expected,
+          "patched items correctly"
+        );
+      }
+    });
+
+    it("patch:multi assigns original data with patched data for restricted fields", async function () {
+      await service.remove(null);
+      const item1 = await service.create({ test: true, userId: 1 });
+      const item2 = await service.create({ test: "yes", userId: 5 });
+
+      const patchedItems = await service.patch(null, { test: false, userId: 2 }, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
-          can("patch", "tests");
+        ability: defineAbility((can) => {
+          can("patch", "tests", ["test"], { userId: 1 });
           can("read", "tests");
-        }),
-        query: {
-          userId: 1
-        }
+        }, { resolveAction })
       });
-
-      const expectedResult = [
-        { id: 0, test: false, userId: 1 },
-        { id: 1, test: false, userId: 1 }
-      ];
-
-      assert.deepStrictEqual(patchedItems, expectedResult, "result is right array");
 
       const realItems = await service.find({ paginate: false });
       const expected = [
-        { id: 0, test: false, userId: 1 },
-        { id: 1, test: false, userId: 1 },
-        { id: 2, test: true, userId: 2 }
+        { id: item1.id, test: false, userId: 1 },
+        item2
       ];
-      assert.deepStrictEqual(
-        realItems,
-        expected,
-        "patched items correctly"
-      );
+
+      assert.deepStrictEqual(realItems, expected, "patched item correctly");
+      assert.deepStrictEqual(patchedItems, [realItems[0]], "result of patch is real item");
     });
 
-    it("patches only allowed items", async function () {
+    it("patch:multi patches only allowed items", async function () {
       await service.create({ test: true, userId: 1 });
       await service.create({ test: true, userId: 1 });
       await service.create({ test: true, userId: 2 });
 
       const patchedItems = await service.patch(null, { test: false }, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
+        ability: defineAbility(can => {
           can("patch", "tests", { userId: 1 });
           can("read", "tests");
-        }),
+        }, { resolveAction }),
         query: {}
       });
 
@@ -868,7 +984,7 @@ describe("authorize-hook - complete", function () {
       );
     });
 
-    it("patches allowed items and returns subset for read", async function () {
+    it("patch:multi patches allowed items and returns subset for read", async function () {
       const items = [
         { id: 0, published: false, test: true, userId: 1 },
         { id: 1, published: true, test: true, userId: 1 },
@@ -880,10 +996,10 @@ describe("authorize-hook - complete", function () {
 
       const patchedItems = await service.patch(null, { test: false }, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
+        ability: defineAbility(can => {
           can("patch", "tests", { userId: 1 });
           can("read", "tests", { published: true });
-        }),
+        }, { resolveAction }),
         query: {}
       });
 
@@ -908,7 +1024,7 @@ describe("authorize-hook - complete", function () {
       );
     });
 
-    it("patches allowed items and returns subset for read", async function () {
+    it("patch:multi patches allowed items and returns subset for read", async function () {
       const items = [
         { id: 0, published: false, test: true, userId: 1 },
         { id: 1, published: true, test: true, userId: 1 },
@@ -920,11 +1036,11 @@ describe("authorize-hook - complete", function () {
 
       const patchedItems = await service.patch(null, { test: false }, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
+        ability: defineAbility(can => {
           can("patch", "tests", { userId: 1 });
           can("read", "tests", ["id"], { published: false });
           can("read", "tests", { published: true });
-        }),
+        }, { resolveAction }),
         query: {}
       });
 
@@ -957,9 +1073,9 @@ describe("authorize-hook - complete", function () {
 
       const updatedItem = await service.remove(item.id, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
+        ability: defineAbility(can => {
           can("remove", "tests");
-        })
+        }, { resolveAction })
       });
 
       assert.deepStrictEqual(updatedItem, undefined, "removed item is undefined");
@@ -969,20 +1085,24 @@ describe("authorize-hook - complete", function () {
     });
 
     it("can remove one item and returns complete item", async function () {
-      const item = await service.create({ test: true, userId: 1 });
+      const readMethods = ["read", "get"];
 
-      const updatedItem = await service.remove(item.id, {
-        //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
-          can("remove", "tests");
-          can("read", "tests");
-        })
-      });
-
-      assert.deepStrictEqual(updatedItem, { id: item.id, test: true, userId: 1 }, "updated item correctly");
-
-      const realItems = await service.find({ paginate: false }) as unknown[];
-      assert(realItems.length === 0, "no existent items");
+      for (const read of readMethods) {
+        await service.remove(null);
+        const item = await service.create({ test: true, userId: 1 });
+        const removedItem = await service.remove(item.id, {
+          //@ts-ignore
+          ability: defineAbility(can => {
+            can("remove", "tests");
+            can(read, "tests");
+          }, { resolveAction })
+        });
+  
+        assert.deepStrictEqual(removedItem, { id: item.id, test: true, userId: 1 }, `removed item correctly for read: '${read}'`);
+  
+        const realItems = await service.find({ paginate: false }) as unknown[];
+        assert(realItems.length === 0, "no existent items");
+      }
     });
 
     it("throws if cannot remove item", async function () {
@@ -990,10 +1110,10 @@ describe("authorize-hook - complete", function () {
 
       const promise = service.remove(item.id, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can, cannot) => {
+        ability: defineAbility((can, cannot) => {
           can("remove", "tests");
           cannot("remove", "tests", { userId: 1 });
-        })
+        }, { resolveAction })
       });
 
       assert.rejects(promise, err => err.name === "Forbidden", "cannot remove item");
@@ -1005,10 +1125,10 @@ describe("authorize-hook - complete", function () {
       const result = await service.remove(item.id, {
         query: { $select: ["id", "supersecret", "hidden"] },
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, (can) => {
+        ability: defineAbility((can) => {
           can("read", "tests", ["test", "userId"]);
           can(["create", "remove"], "tests");
-        }),
+        }, { resolveAction }),
       });
       assert.deepStrictEqual(result, {}, "returned item is empty because of $select and restricting fields");
       await assert.rejects(
@@ -1027,9 +1147,9 @@ describe("authorize-hook - complete", function () {
 
       const removedItems = await service.remove(null, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
+        ability: defineAbility(can => {
           can("remove", "tests");
-        }),
+        }, { resolveAction }),
         query: {
           userId: 1
         }
@@ -1049,37 +1169,42 @@ describe("authorize-hook - complete", function () {
     });
 
     it("can remove multiple items and returns result", async function () {
-      await service.create({ test: true, userId: 1 });
-      await service.create({ test: true, userId: 1 });
-      await service.create({ test: true, userId: 2 });
+      const readMethods = ["read", "find"];
 
-      const removedItems = await service.remove(null, {
-        //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
-          can("remove", "tests");
-          can("read", "tests");
-        }),
-        query: {
-          userId: 1
-        }
-      });
-
-      const expectedResult = [
-        { id: 0, test: true, userId: 1 },
-        { id: 1, test: true, userId: 1 }
-      ];
-
-      assert.deepStrictEqual(removedItems, expectedResult, "result is right array");
-
-      const realItems = await service.find({ paginate: false });
-      const expected = [
-        { id: 2, test: true, userId: 2 }
-      ];
-      assert.deepStrictEqual(
-        realItems,
-        expected,
-        "removed items correctly"
-      );
+      for (const read of readMethods) {
+        await service.remove(null);
+        const item1 = await service.create({ test: true, userId: 1 });
+        const item2 = await service.create({ test: true, userId: 1 });
+        const item3 = await service.create({ test: true, userId: 2 });
+      
+        const removedItems = await service.remove(null, {
+          //@ts-ignore
+          ability: defineAbility(can => {
+            can("remove", "tests");
+            can(read, "tests");
+          }, { resolveAction }),
+          query: {
+            userId: 1
+          }
+        });
+  
+        const expectedResult = [
+          { id: item1.id, test: true, userId: 1 },
+          { id: item2.id, test: true, userId: 1 }
+        ];
+  
+        assert.deepStrictEqual(removedItems, expectedResult, `result is right array for read: '${read}'`);
+  
+        const realItems = await service.find({ paginate: false });
+        const expected = [
+          { id: item3.id, test: true, userId: 2 }
+        ];
+        assert.deepStrictEqual(
+          realItems,
+          expected,
+          `removed items correctly for read: '${read}'`
+        );
+      }
     });
 
     it("removes only allowed items", async function () {
@@ -1089,10 +1214,10 @@ describe("authorize-hook - complete", function () {
 
       const removedItems = await service.remove(null, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
+        ability: defineAbility(can => {
           can("remove", "tests", { userId: 1 });
           can("read", "tests");
-        }),
+        }, { resolveAction }),
         query: {}
       });
 
@@ -1126,10 +1251,10 @@ describe("authorize-hook - complete", function () {
 
       const removedItems = await service.remove(null, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
+        ability: defineAbility(can => {
           can("remove", "tests", { userId: 1 });
           can("read", "tests", { published: true });
-        }),
+        }, { resolveAction }),
         query: {}
       });
 
@@ -1164,11 +1289,11 @@ describe("authorize-hook - complete", function () {
 
       const removedItems = await service.remove(null, {
         //@ts-ignore
-        ability: defineAbility({ resolveAction }, can => {
+        ability: defineAbility(can => {
           can("remove", "tests", { userId: 1 });
           can("read", "tests", ["id"], { published: false });
           can("read", "tests", { published: true });
-        })
+        }, { resolveAction })
       });
 
       const expectedResult = [

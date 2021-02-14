@@ -13,7 +13,7 @@ import { Application } from "@feathersjs/feathers";
 
 import authorize from "../../lib/hooks/authorize/authorize.hook";
 
-describe("authorize-hook options", function () {
+describe("authorize.options.test.ts", function () {
   let app: Application;
   let service: Service;
 
@@ -49,9 +49,10 @@ describe("authorize-hook options", function () {
           params: [
             [{ id: 0 }, { id: 1 }],
             {
-              ability: defineAbility({ resolveAction }, (can) => {
+              //@ts-ignore
+              ability: defineAbility((can) => {
                 can(["create-multi", "read-multi", "update-multi", "delete-multi"], "Test");
-              }),
+              }, { resolveAction }),
             },
           ],
         },
@@ -62,9 +63,10 @@ describe("authorize-hook options", function () {
             { test: true },
             {
               query: { userId: 1 },
-              ability: defineAbility({ resolveAction }, (can) => {
+              //@ts-ignore
+              ability: defineAbility((can) => {
                 can(["create-multi", "read-multi", "update-multi", "delete-multi"], "Test");
-              }),
+              }, { resolveAction }),
             },
           ],
         },
@@ -74,9 +76,10 @@ describe("authorize-hook options", function () {
             null,
             {
               query: { userId: 1 },
-              ability: defineAbility({ resolveAction }, (can) => {
+              //@ts-ignore
+              ability: defineAbility((can) => {
                 can(["create-multi", "read-multi", "update-multi", "delete-multi"], "Test");
-              }),
+              }, { resolveAction }),
             },
           ],
         },
@@ -94,9 +97,10 @@ describe("authorize-hook options", function () {
           params: [
             [{ id: 0 }, { id: 1 }],
             {
-              ability: defineAbility({ resolveAction }, (can) => {
+              //@ts-ignore
+              ability: defineAbility((can) => {
                 can(["create", "read", "update", "delete"], "Test");
-              }),
+              }, { resolveAction }),
             },
           ],
         },
@@ -107,9 +111,10 @@ describe("authorize-hook options", function () {
             { test: true },
             {
               query: { userId: 1 },
-              ability: defineAbility({ resolveAction }, (can) => {
+              //@ts-ignore
+              ability: defineAbility((can) => {
                 can(["create", "read", "update", "delete"], "Test");
-              }),
+              }, { resolveAction }),
             },
           ],
         },
@@ -119,9 +124,10 @@ describe("authorize-hook options", function () {
             null,
             {
               query: { userId: 1 },
-              ability: defineAbility({ resolveAction }, (can) => {
+              //@ts-ignore
+              ability: defineAbility((can) => {
                 can(["create", "read", "update", "delete"], "Test");
-              }),
+              }, { resolveAction }),
             },
           ],
         },
@@ -154,10 +160,11 @@ describe("authorize-hook options", function () {
         before: {
           all: [authorize({
             //@ts-ignore
-            ability: defineAbility({ resolveAction }, (can) => {
+            ability: defineAbility((can) => {
               can("create", "Test");
-            }),
-            modelName: "Test"
+            }, { resolveAction }),
+            modelName: "Test",
+            checkAbilityForInternal: true
           })],
         }
       });
@@ -168,6 +175,7 @@ describe("authorize-hook options", function () {
         return service.update(0, { test: false });
       }, err => err.name === "Forbidden", "update throws Forbidden");
     });
+
     it("use service.modelName with function", async function() {
       const app = feathers();
       app.use(
@@ -188,10 +196,11 @@ describe("authorize-hook options", function () {
         before: {
           all: [authorize({
             //@ts-ignore
-            ability: defineAbility({ resolveAction }, (can) => {
+            ability: defineAbility((can) => {
               can("create", "Test");
-            }),
-            modelName: (context) => context.service.modelName
+            }, { resolveAction }),
+            modelName: (context) => context.service.modelName,
+            checkAbilityForInternal: true
           })],
         }
       });
@@ -205,7 +214,31 @@ describe("authorize-hook options", function () {
   });
 
   describe("ability", function() {
-    it("uses ability in options over params.ability", async function() {
+    it("works if no ability is set at all", async function() {
+      const app = feathers();
+      app.use(
+        "test",
+        new Service({
+          multi: true,
+          paginate: {
+            default: 10,
+            max: 50
+          }
+        })
+      );
+      service = app.service("test");
+      //@ts-ignore
+      service.hooks({
+        before: {
+          all: [authorize()],
+        }
+      });
+
+      const item = await service.create({ test: true });
+      assert.ok(item.test, "item was created");
+    });
+
+    it("uses ability in options", async function() {
       const app = feathers();
       app.use(
         "test",
@@ -223,21 +256,53 @@ describe("authorize-hook options", function () {
         before: {
           all: [authorize({
             //@ts-ignore
-            ability: defineAbility({ resolveAction }, (can) => {
-              can("manage", "all");
-            }),
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            ability: defineAbility(() => {}, { resolveAction }),
+            checkAbilityForInternal: true
+          })],
+        }
+      });
+
+      await assert.rejects(
+        service.create({ test: true }),
+        err => err.name === "Forbidden",
+        "throws even if no ability is set in params"
+      );
+    });
+
+    it("uses params.ability over options.ability", async function() {
+      const app = feathers();
+      app.use(
+        "test",
+        new Service({
+          multi: true,
+          paginate: {
+            default: 10,
+            max: 50
+          }
+        })
+      );
+      service = app.service("test");
+      //@ts-ignore
+      service.hooks({
+        before: {
+          all: [authorize({
+            //@ts-ignore
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            ability: defineAbility(() => {}, { resolveAction }),
           })],
         }
       });
 
       const params = {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        ability: defineAbility({ resolveAction }, () => {}),
+        //@ts-ignore
+        ability: defineAbility((can) => {
+          can("manage", "all");
+        }, { resolveAction }),
       };
 
       const result = await service.create({ test: true }, params);
       assert.ok(result);
-
     });
 
     it("uses ability as Promise", async function() {
@@ -258,19 +323,14 @@ describe("authorize-hook options", function () {
         before: {
           all: [authorize({
             //@ts-ignore
-            ability: Promise.resolve(defineAbility({ resolveAction }, (can) => {
+            ability: Promise.resolve(defineAbility((can) => {
               can("manage", "all");
-            }))
+            }, { resolveAction }))
           })],
         }
       });
 
-      const params = {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        ability: defineAbility({ resolveAction }, () => {}),
-      };
-
-      const result = await service.create({ test: true }, params);
+      const result = await service.create({ test: true });
       assert.ok(result);
     });
 
@@ -292,19 +352,14 @@ describe("authorize-hook options", function () {
         before: {
           all: [authorize({
             //@ts-ignore
-            ability: () => defineAbility({ resolveAction }, (can) => {
+            ability: () => defineAbility((can) => {
               can("manage", "all");
-            }),
+            }, { resolveAction }),
           })],
         }
       });
 
-      const params = {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        ability: defineAbility({ resolveAction }, () => {}),
-      };
-
-      const result = await service.create({ test: true }, params);
+      const result = await service.create({ test: true });
       assert.ok(result);
     });
 
@@ -326,24 +381,163 @@ describe("authorize-hook options", function () {
         before: {
           all: [
             authorize({
-            //@ts-ignore
+              //@ts-ignore
               ability: () => {
-                return Promise.resolve(defineAbility({ resolveAction }, (can) => {
+                //@ts-ignore
+                return Promise.resolve(defineAbility((can) => {
                   can("manage", "all");
-                }));
+                }, { resolveAction }));
               }
             })
           ],
         }
       });
 
-      const params = {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        ability: defineAbility({ resolveAction }, () => {}),
-      };
-
-      const result = await service.create({ test: true }, params);
+      const result = await service.create({ test: true });
       assert.ok(result);
+    });
+
+    it("fails for empty ability in options", async function() {
+      const makeContext = (method, type) => {
+        return {
+          service: {
+            modelName: "Test",
+          },
+          path: "tests",
+          method,
+          type,
+          data: {
+            id: 1,
+            userId: 1,
+            test: true
+          },
+          params: {
+            query: {},
+          }
+        };
+      };
+  
+      const types = ["before"];
+      const methods = ["find", "get", "create", "update", "patch", "remove"];
+      const promises = [];
+      types.forEach(type => {
+        methods.forEach(method => {
+          const context = makeContext(method, type);
+          
+          const promise = assert.rejects(
+            authorize({ 
+              availableFields: ["id", "userId", "test"],
+              //@ts-ignore
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
+              ability: () => defineAbility(() => {}, { resolveAction }),
+              checkAbilityForInternal: true
+            //@ts-ignore
+            })(context),
+            err => err.name === "Forbidden",
+            `'${type}:${method}' throws Forbidden`
+          );
+          promises.push(promise);
+        });
+      });
+      await Promise.all(promises);
+    });
+  });
+
+  describe("checkAbilityForInternal", function() {
+    it("passes for internal call without params.ability and not allowed options.params by default", async function() {
+      const app = feathers();
+      app.use(
+        "test",
+        new Service({
+          multi: true,
+          paginate: {
+            default: 10,
+            max: 50
+          }
+        })
+      );
+      service = app.service("test");
+      //@ts-ignore
+      service.hooks({
+        before: {
+          all: [
+            authorize({
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
+              ability: defineAbility(() => {})
+            })
+          ],
+        }
+      });
+
+      await assert.doesNotReject(
+        service.create({ test: true }),
+        "does not throw Forbidden"
+      );
+    });
+
+    it("throws for external call without params.ability and not allowed options.params by default", async function() {
+      const app = feathers();
+      app.use(
+        "test",
+        new Service({
+          multi: true,
+          paginate: {
+            default: 10,
+            max: 50
+          }
+        })
+      );
+      service = app.service("test");
+      //@ts-ignore
+      service.hooks({
+        before: {
+          all: [
+            authorize({
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
+              ability: defineAbility(() => {})
+            })
+          ],
+        }
+      });
+
+      await assert.rejects(
+        service.create({ test: true }, { provider: "rest" }),
+        err => err.name === "Forbidden",
+        "request throws Forbidden"
+      );
+    });
+
+    it("throws for internal call without params.ability and not allowed options.params with checkAbilityForInternal: true", async function() {
+      const app = feathers();
+      app.use(
+        "test",
+        new Service({
+          multi: true,
+          paginate: {
+            default: 10,
+            max: 50
+          }
+        })
+      );
+      service = app.service("test");
+      //@ts-ignore
+      service.hooks({
+        before: {
+          all: [
+            authorize({
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
+              ability: defineAbility(() => {}),
+              checkAbilityForInternal: true
+            }),
+          ],
+        }
+      });
+
+      await assert.rejects(
+        service.create({ test: true }),
+        err => err.name === "Forbidden",
+        "request throws Forbidden"
+      );
     });
   });
 });

@@ -1,10 +1,19 @@
 {
   "extends": "@istanbuljs/nyc-config-typescript",
   "cache": false,
-  "check-coverage": false,
+  "check-coverage": true,
   "include": [
     "lib/**/*.js",
     "lib/**/*.ts"
+  ],
+  "exclude": [
+    "lib/types.ts"
+  ],
+  "reporter": [
+    "html",
+    "text",
+    "text-summary",
+    "lcov"
   ],
   "sourceMap": true,
   "all": true,

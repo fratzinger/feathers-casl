@@ -10,13 +10,12 @@ import {
   isMulti
 } from "feathers-utils";
 
-import getModelName from "../../utils/getModelName";
 import getQueryFor from "../../utils/getQueryFor";
 import hasRestrictingFields from "../../utils/hasRestrictingFields";
 import hasRestrictingConditions from "../../utils/hasRestrictingConditions";
+import couldHaveRestrictingFields from "../../utils/couldHaveRestrictingFields";
 
 import {
-  makeOptions,
   hide$select,
   setPersistedConfig,
   checkMulti,
@@ -30,7 +29,8 @@ import {
 
 import {
   AuthorizeHookOptions,
-  GetQueryOptions
+  GetQueryOptions,
+  HasRestrictingFieldsOptions
 } from "../../types";
 
 const HOOKNAME = "authorize";
@@ -45,9 +45,13 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     ) { return context; }
     const { service, method, id, params } = context;
 
-    options = makeOptions(context.app, options);
+    if (!options.modelName) {
+      return context;
+    }
+    const modelName = (typeof options.modelName === "string")
+      ? options.modelName
+      : options.modelName(context);
 
-    const modelName = getModelName(options.modelName, context);
     if (!modelName) { return context; }
 
     const ability = await getAbility(context, options);
@@ -57,7 +61,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     }
 
     if (options.checkMultiActions) {
-      checkMulti(context, ability, modelName, options.actionOnForbidden);
+      checkMulti(context, ability, modelName, options);
     }
 
     throwUnlessCan(
@@ -67,21 +71,31 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       modelName,
       options.actionOnForbidden
     );
-
+    
     // if context is with multiple items, there's a change that we need to handle each item separately
     if (isMulti(context)) {
       // if has conditions -> hide $select for after-hook, because
-      if (hasRestrictingConditions(ability, "read", modelName)) {
+      if (hasRestrictingConditions(ability, "find", modelName)) {
         hide$select(context);
       } else {
         setPersistedConfig(context, "skipRestrictingRead.conditions", true);
       }
 
       // if has no restricting fields at all -> can skip _pick() in after-hook
-      if (!hasRestrictingFields(ability, "read", modelName)) {
+      if (!couldHaveRestrictingFields(ability, "find", modelName)) {
         setPersistedConfig(context, "skipRestrictingRead.fields", true);
       }
     }
+
+    const availableFields = (!options?.availableFields)
+      ? undefined
+      : (typeof options.availableFields === "function")
+        ? options.availableFields(context)
+        : options.availableFields;
+
+    const hasRestrictingFieldsOptions: HasRestrictingFieldsOptions = {
+      availableFields: availableFields
+    };
 
     if (["get", "patch", "update", "remove"].includes(method) && id != null) {
       // single: get | patch | update | remove
@@ -114,9 +128,13 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
 
       // ensure that only allowed data gets changed
       if (["update", "patch"].includes(method)) {
-        const fields = hasRestrictingFields(ability, method, subject(modelName, item));
+        const fields = hasRestrictingFields(ability, method, subject(modelName, item), hasRestrictingFieldsOptions);
         if (!fields) { return context; }
-
+        if (fields === true || fields.length === 0) {
+          if (options.actionOnForbidden) { options.actionOnForbidden(); }
+          throw new Forbidden("You're not allowed to make this request");
+        }
+        
         const data = _pick(context.data, fields);
 
         // if fields are not overlapping -> throw
@@ -139,12 +157,27 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       return context;
     } else if (method === "find" || (["patch", "remove"].includes(method) && id == null)) {
       // multi: find | patch | remove
+
+      if (method === "patch") {
+        const fields = hasRestrictingFields(ability, method, modelName, { availableFields });
+        if (fields === true) {
+          if (options.actionOnForbidden) { options.actionOnForbidden(); }
+          throw new Forbidden("You're not allowed to make this request");
+        }
+        if (fields && fields.length > 0) {
+          const data = _pick(context.data, fields);
+          context.data = data;
+        }
+      }
+      
       if (hasRestrictingConditions(ability, method, modelName)) {
         // TODO: if query and context.params.query differ -> separate calls
-        const options: GetQueryOptions = {
-          skipFields: method === "find"
+        
+        const getQueryOptions: GetQueryOptions = {
+          skipFields: true,
+          availableFields
         };
-        const query = getQueryFor(ability, method, modelName, options);
+        const query = getQueryFor(ability, method, modelName, getQueryOptions);
 
         if (!_isEmpty(query)) {
           if (!context.params.query) {
@@ -163,6 +196,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       return context;
     } else if (method === "create") {
       // create: single | multi
+      
       // we have all information we need (maybe we need populated data?)
       const data = (Array.isArray(context.data)) ? context.data : [context.data];
       for (let i = 0; i < data.length; i++) {

@@ -1,7 +1,9 @@
 ---
 title: Getting Started
-sidebarDepth: 3
+sidebarDepth: 2
 ---
+
+# Getting Started
 
 <p align="center">
   <img src="/img/logo.svg" width="150">
@@ -9,6 +11,9 @@ sidebarDepth: 3
 
 ![npm](https://img.shields.io/npm/v/feathers-casl)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/fratzinger/feathers-casl/Node.js%20CI)
+[![Maintainability](https://api.codeclimate.com/v1/badges/466ea8007a5ab4cc8a63/maintainability)](https://codeclimate.com/github/fratzinger/feathers-casl/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/466ea8007a5ab4cc8a63/test_coverage)](https://codeclimate.com/github/fratzinger/feathers-casl/test_coverage)
+![David](https://img.shields.io/david/fratzinger/feathers-casl)
 ![npm](https://img.shields.io/npm/dm/feathers-casl)
 [![GitHub license](https://img.shields.io/github/license/fratzinger/feathers-casl)](https://github.com/fratzinger/feathers-casl/blob/master/LICENSE)
 
@@ -17,7 +22,7 @@ sidebarDepth: 3
 Add access control with CASL to your feathers application.
 
 This project is built for [FeathersJS](http://feathersjs.com). An open source web framework for building modern real-time applications.
-It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CASL** in feathers.js.
+It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CASL** in your feathers.js-project. Supported versions: `@casl/ability^5` and `@feathersjs/feathers^4`.
 
 ## Features
 - Fully powered by Feathers & CASL

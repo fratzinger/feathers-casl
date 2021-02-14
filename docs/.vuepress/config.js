@@ -13,7 +13,9 @@ module.exports = {
         '/getting-started.md',
         '/hook-authorize.md',
         '/channels.md',
-        '/client-side.md'
+        '/cookbook.md',
+        '/client-side.md',
+        '/gotchas.md'
       ],
       serviceWorker: {
         updatePopup: true

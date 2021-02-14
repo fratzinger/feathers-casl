@@ -3,11 +3,19 @@ import {
   RawRuleFrom, 
   AbilityOptions, 
   AbilityTuple,
-  Subject
+  Subject,
+  MongoQueryOperators
 } from "@casl/ability";
 
-
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export default (rules?: RawRuleFrom<AbilityTuple<string, Subject>, unknown>[], options?: AbilityOptions<AbilityTuple<string, Subject>, unknown>) => {
+function makeAbilityFromRules(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  rules?: RawRuleFrom<AbilityTuple<string, Subject>, Record<string | number | symbol, string | number | boolean | Record<string | number | symbol, any> | MongoQueryOperators>>[], 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  options?: AbilityOptions<AbilityTuple<string, Subject>, Record<string | number | symbol, string | number | boolean | Record<string | number | symbol, any> | MongoQueryOperators>>
+): Ability {
+  rules = rules || [];
+  options = options || {};
   return new Ability(rules, options);
-};
+}
+
+export default makeAbilityFromRules;
