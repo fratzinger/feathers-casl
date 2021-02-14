@@ -9,6 +9,12 @@
   "exclude": [
     "lib/types.ts"
   ],
+  "reporter": [
+    "html",
+    "text",
+    "text-summary",
+    "lcov"
+  ],
   "sourceMap": true,
   "all": true,
   "instrument": true
