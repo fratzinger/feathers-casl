@@ -32,7 +32,8 @@
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
     "mocha": "cross-env NODE_ENV=test TS_NODE_PROJECT='tsconfig.test.json' mocha --timeout 5000",
-    "test": "nyc npm run mocha",
+    "test": "npm run mocha",
+    "coverage": "nyc npm run test",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "docs": "vuepress dev docs",
     "docs:build": "vuepress build docs"
