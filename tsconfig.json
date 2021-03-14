@@ -5,6 +5,7 @@
       "outDir": "dist",
       "moduleResolution": "node",
       "target": "es2015",
+      "module": "commonjs",
       "downlevelIteration": true,
       "sourceMap": false,
       "declaration": true
