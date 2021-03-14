@@ -513,6 +513,52 @@ describe("authorize.general.test.ts", function() {
       await Promise.all(promises);
     });
 
+    it.skip("after - passes single primitive value with 'find' rule", async function() {
+      const promises = [];
+      ["test", true, 123].forEach(val => {
+        const methods = ["find"];
+        const service = {
+          path: "tests",
+        };
+        methods.forEach(method => {
+          service[method] = () => {
+            return val;
+          };
+        });
+        const makeContext = (method, type) => {
+          return {
+            service,
+            path: "tests",
+            method,
+            type,
+            result: val,
+            params: {
+              //@ts-ignore
+              ability: defineAbility((can) => {
+                can(["get", "create", "update", "patch", "remove"], "all");
+              }, { resolveAction }),
+              query: {},
+            }
+          };
+        };
+    
+        const types = ["after"];
+        types.forEach(type => {
+          methods.forEach(method => {
+            const context = makeContext(method, type);
+            //@ts-ignore
+            const promise = authorize({ availableFields: undefined })(context).then(({ result }) => {
+              assert.deepStrictEqual(result, val, `returns complete object for '${type}:${method}'`);
+            });
+            promises.push(promise);
+          });
+        });
+      });
+      
+      
+      await Promise.all(promises);
+    });
+
     it("after - passes multi with 'find' rule", async function() {
       const expectedResult = [{ id: 1, userId: 1, test: true }];
       const makeContext = (method, type) => {
