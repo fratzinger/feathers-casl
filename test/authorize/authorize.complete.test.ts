@@ -435,6 +435,56 @@ describe("authorize.complete.test.ts", function () {
         "throws on find"
       );
     });
+
+    it("should combine rules by logical OR", async function() {
+      await service.create({ test: true, userId: 1, published: false });
+      await service.create({ test: true, userId: 2, published: true });
+
+      const items = (await service.find({ paginate: false })) as unknown[];
+      assert(items.length === 2, "has two items");
+
+      const returnedItems = await service.find({
+        //@ts-ignore
+        ability: defineAbility(
+          (can) => {
+            can("read", "tests", { published: true });
+            can("read", "tests", { userId: { $in: [1] } });
+          },
+          { resolveAction }
+        ),
+        paginate: false,
+      });
+
+      // @ts-ignore
+      assert.strictEqual(returnedItems.length, 2);
+    });
+
+    it("should not work with logical OR in rules", async function() {
+      await service.create({ test: true, userId: 1, published: false });
+      await service.create({ test: true, userId: 2, published: true });
+
+      const items = (await service.find({ paginate: false })) as unknown[];
+      assert(items.length === 2, "has two items");
+
+      const returnedItems = await service.find({
+        //@ts-ignore
+        ability: defineAbility(
+          (can) => {
+            can("read", "tests", {
+              $or: [
+                { published: true },
+                { userId: { $in: [1] } },
+              ]
+            });
+          },
+          { resolveAction }
+        ),
+        paginate: false,
+      });
+
+      // @ts-ignore
+      assert.strictEqual(returnedItems.length, 0);
+    });
   });
 
   describe("beforeAndAfter - create:single", function () {
