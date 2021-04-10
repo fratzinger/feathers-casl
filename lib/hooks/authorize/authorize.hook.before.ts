@@ -149,7 +149,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
           context.data = data;
         } else {
           // merge with initial data
-          const itemPlain = await service._get(id);
+          const itemPlain = await service._get(id, {});
           context.data = Object.assign({}, itemPlain, data);
         }
       }
