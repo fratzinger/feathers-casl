@@ -182,8 +182,8 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
           query = rulesToQuery(ability, method, modelName, (rule) => {
             return rule.inverted ? { $not: rule.conditions } : rule.conditions;
           });
-        } /*else if (
-          ["feathers-mongodb", "feathers-mongoose"]
+        } else if (
+          ["feathers-mongoose"]
             .includes(options.adapter)
         ) {
           query = rulesToQuery(ability, method, modelName, (rule) => {
@@ -191,7 +191,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
             const conditions = rule.conditions!;
             return rule.inverted ? { $nor: [conditions] } : conditions;
           });
-        }*/ else {
+        } else {
           const getQueryOptions: GetQueryOptions = {
             skipFields: true,
             availableFields

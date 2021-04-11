@@ -2,6 +2,7 @@ import assert from "assert";
 import feathers, { Paginated } from "@feathersjs/feathers";
 import { createAliasResolver, defineAbility } from "@casl/ability";
 import _sortBy from "lodash/sortBy";
+import _isEqual from "lodash/isEqual";
 
 const resolveAction = createAliasResolver({
   update: "patch",
@@ -155,7 +156,7 @@ export default (
     });
       
     it("throws if $select and restricted fields don't overlap", async function() {
-      const item = await service.create({ [id]: 0, test: true, userId: 1, supersecret: true, hidden: true });
+      const item = await service.create({ test: true, userId: 1, supersecret: true, hidden: true });
       assert(item[id] !== undefined, "item has id");
       const promise = service.get(item[id], {
         query: { $select: [id, "supersecret", "hidden"] },
@@ -183,7 +184,7 @@ export default (
         await service.create({ test: true, userId: 2 });
         await service.create({ test: true, userId: 3 });
         const items = (await service.find({ paginate: false })) as unknown[];
-        assert(items.length === 3, `has three items for read: '${read}'`);
+        assert.strictEqual(items.length, 3, `has three items for read: '${read}'`);
         
         const returnedItems = await service.find({
           //@ts-ignore
@@ -202,7 +203,7 @@ export default (
       await service.create({ test: true, userId: 2 });
       await service.create({ test: true, userId: 3 });
       const items = await service.find({ paginate: false });
-      assert(items.length === 3, "has three items");
+      assert.strictEqual(items.length, 3, "has three items");
       
       const returnedItems = await service.find({
         //@ts-ignore
@@ -225,7 +226,7 @@ export default (
       const item2 = await service.create({ test: true, userId: 2 });
       await service.create({ test: true, userId: 3 });
       const items = (await service.find({ paginate: false })) as unknown[];
-      assert(items.length === 3, "has three items");
+      assert.strictEqual(items.length, 3, "has three items");
       
       const returnedItems = await service.find({
         //@ts-ignore
@@ -252,7 +253,7 @@ export default (
       const item2 = await service.create({ test: true, userId: 2 });
       await service.create({ test: true, userId: 3 });
       const items = (await service.find({ paginate: false })) as unknown[];
-      assert(items.length === 3, "has three items");
+      assert.strictEqual(items.length, 3, "has three items");
       
       const returnedItems = await service.find({
         //@ts-ignore
@@ -283,7 +284,7 @@ export default (
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const item3 = await await service.create({ test: true, userId: 3 });
       const items = (await service.find({ paginate: false })) as unknown[];
-      assert(items.length === 3, "has three items");
+      assert.strictEqual(items.length, 3, "has three items");
       
       const returnedItems = await service.find({
         //@ts-ignore
@@ -311,7 +312,7 @@ export default (
       await service.create({ test: true, userId: 2 });
       await service.create({ test: true, userId: 3 });
       const items = (await service.find({ paginate: false })) as unknown[];
-      assert(items.length === 3, "has three items");
+      assert.strictEqual(items.length, 3, "has three items");
       
       const returnedItems = await service.find({
         //@ts-ignore
@@ -348,7 +349,7 @@ export default (
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const item3 = await service.create({ test: true, userId: 3 });
       const items = (await service.find({ paginate: false })) as unknown[];
-      assert(items.length === 3, "has three items");
+      assert.strictEqual(items.length, 3, "has three items");
       
       const returnedItems = await service.find({
         //@ts-ignore
@@ -378,7 +379,7 @@ export default (
       await service.create({ test: true, userId: 2 });
       await service.create({ test: true, userId: 3 });
       const items = (await service.find({ paginate: false })) as unknown[];
-      assert(items.length === 3, "has three items");
+      assert.strictEqual(items.length, 3, "has three items");
       
       const returnedItems = await service.find({
         //@ts-ignore
@@ -408,7 +409,7 @@ export default (
       await service.create({ test: true, userId: 2 });
       await service.create({ test: true, userId: 3 });
       const items = (await service.find({ paginate: false })) as unknown[];
-      assert(items.length === 3, "has three items");
+      assert.strictEqual(items.length, 3, "has three items");
       
       const returnedItems = service.find({
         //@ts-ignore
@@ -429,7 +430,7 @@ export default (
       await service.create({ test: true, userId: 2 });
       await service.create({ test: true, userId: 3 });
       const items = (await service.find({ paginate: false })) as unknown[];
-      assert(items.length === 3, "has three items");
+      assert.strictEqual(items.length, 3, "has three items");
       
       const returnedItems = service.find({
         //@ts-ignore
@@ -451,7 +452,7 @@ export default (
       await service.create({ test: true, userId: 2 });
       await service.create({ test: true, userId: 3 });
       const items = (await service.find({ paginate: false })) as unknown[];
-      assert(items.length === 3, "has three items");
+      assert.strictEqual(items.length, 3, "has three items");
       
       const { data: returnedItems, total } = await service.find({
         //@ts-ignore
@@ -479,7 +480,7 @@ export default (
   describe(`${adapterName}: beforeAndAfter - create:single`, function () {
     it("can create one item and return 'undefined' for not allowed read", async function () {
       const allItems = (await service.find({ paginate: false })) as unknown[];
-      assert(allItems.length === 0, "has no items before");
+      assert.strictEqual(allItems.length, 0, "has no items before");
       const item = await service.create(
         { test: true, userId: 1 },
         {
@@ -502,7 +503,7 @@ export default (
       
     it("can create one item and return all properties", async function () {
       const allItems = (await service.find({ paginate: false })) as unknown[];
-      assert(allItems.length === 0, "has no items before");
+      assert.strictEqual(allItems.length, 0, "has no items before");
       const item = await service.create(
         { test: true, userId: 1 },
         {
@@ -589,11 +590,12 @@ export default (
   describe(`${adapterName}: beforeAndAfter - create:multi`, function () {
     it("can create multiple items and returns empty array", async function () {
       const allItems = (await service.find({ paginate: false })) as unknown[];
-      assert(allItems.length === 0, "has no items before");
+      assert.strictEqual(allItems.length, 0, "has no items before");
+
       const itemsArr = [
-        { [id]: 0, test: true, hi: "1", userId: 1 },
-        { [id]: 1, test: true, hi: "2", userId: 1 },
-        { [id]: 2, test: true, hi: "3", userId: 1 },
+        { test: true, hi: "1", userId: 1 },
+        { test: true, hi: "2", userId: 1 },
+        { test: true, hi: "3", userId: 1 },
       ];
       const items = await service.create(itemsArr, {
         //@ts-ignore
@@ -602,7 +604,7 @@ export default (
         }, { resolveAction }),
       });
       
-      assert(items.length === 0, "array is empty");
+      assert.strictEqual(items.length, 0, "array is empty");
     });
       
     it("can create multiple items and returns all items", async function () {
@@ -610,7 +612,7 @@ export default (
       for (const read of readMethods) {
         await clean(app, service);
         const allItems = (await service.find({ paginate: false })) as unknown[];
-        assert(allItems.length === 0, `has no items before for read: '${read}'`);
+        assert.strictEqual(allItems.length, 0, `has no items before for read: '${read}'`);
         const itemsArr = [
           { test: true, hi: "1", userId: 1 },
           { test: true, hi: "2", userId: 1 },
@@ -636,9 +638,9 @@ export default (
       
     it("rejects if one item can't be created", async function () {
       const itemsArr = [
-        { [id]: 0, test: true, hi: "1", userId: 1 },
-        { [id]: 1, test: true, hi: "2", userId: 2 },
-        { [id]: 2, test: true, hi: "3", userId: 1 },
+        { test: true, hi: "1", userId: 1 },
+        { test: true, hi: "2", userId: 2 },
+        { test: true, hi: "3", userId: 1 },
       ];
       const promise = service.create(itemsArr, {
         //@ts-ignore
@@ -656,9 +658,9 @@ export default (
       
     it("picks properties for fields for multiple created data", async function () {
       const itemsArr = [
-        { [id]: 0, test: true, hi: "1", userId: 1 },
-        { [id]: 1, test: true, hi: "2", userId: 2 },
-        { [id]: 2, test: true, hi: "3", userId: 1 },
+        { test: true, hi: "1", userId: 1 },
+        { test: true, hi: "2", userId: 2 },
+        { test: true, hi: "3", userId: 1 },
       ];
       const items = await service.create(itemsArr, {
         //@ts-ignore
@@ -671,9 +673,9 @@ export default (
       });
       
       const expected = [
-        { [id]: 0, test: true, hi: "1", userId: 1 },
-        { [id]: 1 },
-        { [id]: 2, userId: 1 },
+        { [id]: items[0][id], test: true, hi: "1", userId: 1 },
+        { [id]: items[1][id] },
+        { [id]: items[2][id], userId: 1 },
       ];
       
       assert.deepStrictEqual(items, expected, "filtered properties");
@@ -1014,7 +1016,7 @@ export default (
 
       assert.deepStrictEqual(
         _sortBy(patchedItems, id), 
-        realItems.filter(x => x[id] === item1[id]), 
+        realItems.filter(x => _isEqual(x[id], item1[id])), 
         "result of patch is real item"
       );
     });
@@ -1058,14 +1060,14 @@ export default (
     });
       
     it("patch:multi patches allowed items and returns subset for read", async function () {
-      const items = [
-        { [id]: 0, published: false, test: true, userId: 1 },
-        { [id]: 1, published: true, test: true, userId: 1 },
-        { [id]: 2, published: true, test: true, userId: 2 },
-        { [id]: 3, published: true, test: true, userId: 2 },
-        { [id]: 4, published: false, test: true, userId: 2 }
+      let items = [
+        { published: false, test: true, userId: 1 },
+        { published: true, test: true, userId: 1 },
+        { published: true, test: true, userId: 2 },
+        { published: true, test: true, userId: 2 },
+        { published: false, test: true, userId: 2 }
       ];
-      await service.create(items);
+      items = await service.create(items);
       
       const patchedItems = await service.patch(null, { test: false }, {
         //@ts-ignore
@@ -1077,35 +1079,35 @@ export default (
       });
       
       const expectedResult = [
-        { [id]: 1, published: true, test: false, userId: 1 }
+        { [id]: items[1][id], published: true, test: false, userId: 1 }
       ];
       
       assert.deepStrictEqual(patchedItems, expectedResult, "result is right array");
       
       const realItems = await service.find({ paginate: false });
       const expected = [
-        { [id]: 0, published: false, test: false, userId: 1 },
-        { [id]: 1, published: true, test: false, userId: 1 },
-        { [id]: 2, published: true, test: true, userId: 2 },
-        { [id]: 3, published: true, test: true, userId: 2 },
-        { [id]: 4, published: false, test: true, userId: 2 }
+        { [id]: items[0][id], published: false, test: false, userId: 1 },
+        { [id]: items[1][id], published: true, test: false, userId: 1 },
+        { [id]: items[2][id], published: true, test: true, userId: 2 },
+        { [id]: items[3][id], published: true, test: true, userId: 2 },
+        { [id]: items[4][id], published: false, test: true, userId: 2 }
       ];
       assert.deepStrictEqual(
-        realItems,
-        expected,
+        _sortBy(realItems, id),
+        _sortBy(expected, id),
         "patched items correctly"
       );
     });
       
     it("patch:multi patches allowed items and returns subset for read", async function () {
-      const items = [
-        { [id]: 0, published: false, test: true, userId: 1 },
-        { [id]: 1, published: true, test: true, userId: 1 },
-        { [id]: 2, published: true, test: true, userId: 2 },
-        { [id]: 3, published: true, test: true, userId: 2 },
-        { [id]: 4, published: false, test: true, userId: 2 }
+      let items = [
+        { published: false, test: true, userId: 1 },
+        { published: true, test: true, userId: 1 },
+        { published: true, test: true, userId: 2 },
+        { published: true, test: true, userId: 2 },
+        { published: false, test: true, userId: 2 }
       ];
-      await service.create(items);
+      items = await service.create(items);
       
       const patchedItems = await service.patch(null, { test: false }, {
         //@ts-ignore
@@ -1118,23 +1120,27 @@ export default (
       });
       
       const expectedResult = [
-        { [id]: 0 },
-        { [id]: 1, published: true, test: false, userId: 1 }
+        { [id]: items[0][id] },
+        { [id]: items[1][id], published: true, test: false, userId: 1 }
       ];
       
-      assert.deepStrictEqual(patchedItems, expectedResult, "result is right array");
+      assert.deepStrictEqual(
+        _sortBy(patchedItems, id),
+        _sortBy(expectedResult, id),
+        "result is right array"
+      );
       
       const realItems = await service.find({ paginate: false });
       const expected = [
-        { [id]: 0, published: false, test: false, userId: 1 },
-        { [id]: 1, published: true, test: false, userId: 1 },
-        { [id]: 2, published: true, test: true, userId: 2 },
-        { [id]: 3, published: true, test: true, userId: 2 },
-        { [id]: 4, published: false, test: true, userId: 2 }
+        { [id]: items[0][id], published: false, test: false, userId: 1 },
+        { [id]: items[1][id], published: true, test: false, userId: 1 },
+        { [id]: items[2][id], published: true, test: true, userId: 2 },
+        { [id]: items[3][id], published: true, test: true, userId: 2 },
+        { [id]: items[4][id], published: false, test: true, userId: 2 }
       ];
       assert.deepStrictEqual(
-        realItems,
-        expected,
+        _sortBy(realItems, id),
+        _sortBy(expected, id),
         "patched items correctly"
       );
     });
@@ -1154,7 +1160,7 @@ export default (
       assert.deepStrictEqual(updatedItem, undefined, "removed item is undefined");
       
       const realItems = await service.find({ paginate: false }) as unknown[];
-      assert(realItems.length === 0, "no existent items");
+      assert.strictEqual(realItems.length, 0, "no existent items");
     });
       
     it("can remove one item and returns complete item", async function () {
@@ -1174,7 +1180,7 @@ export default (
         assert.deepStrictEqual(removedItem, { [id]: item[id], test: true, userId: 1 }, `removed item correctly for read: '${read}'`);
         
         const realItems = await service.find({ paginate: false }) as unknown[];
-        assert(realItems.length === 0, "no existent items");
+        assert.strictEqual(realItems.length, 0, "no existent items");
       }
     });
       
@@ -1360,14 +1366,14 @@ export default (
     });
       
     it("removes allowed items and returns subset for read with restricted fields", async function () {
-      const items = [
-        { [id]: 0, published: false, test: true, userId: 1 },
-        { [id]: 1, published: true, test: true, userId: 1 },
-        { [id]: 2, published: true, test: true, userId: 2 },
-        { [id]: 3, published: true, test: true, userId: 2 },
-        { [id]: 4, published: false, test: true, userId: 2 }
+      let items = [
+        { published: false, test: true, userId: 1 },
+        { published: true, test: true, userId: 1 },
+        { published: true, test: true, userId: 2 },
+        { published: true, test: true, userId: 2 },
+        { published: false, test: true, userId: 2 }
       ];
-      await service.create(items);
+      items = await service.create(items);
       
       const removedItems = await service.remove(null, {
         //@ts-ignore
@@ -1379,21 +1385,25 @@ export default (
       });
       
       const expectedResult = [
-        { [id]: 0 },
-        { [id]: 1, published: true, test: true, userId: 1 }
+        { [id]: items[0][id] },
+        { [id]: items[1][id], published: true, test: true, userId: 1 }
       ];
       
-      assert.deepStrictEqual(removedItems, expectedResult, "result is right array");
+      assert.deepStrictEqual(
+        _sortBy(removedItems, id), 
+        _sortBy(expectedResult, id), 
+        "result is right array"
+      );
       
       const realItems = await service.find({ paginate: false });
       const expected = [
-        { [id]: 2, published: true, test: true, userId: 2 },
-        { [id]: 3, published: true, test: true, userId: 2 },
-        { [id]: 4, published: false, test: true, userId: 2 }
+        { [id]: items[2][id], published: true, test: true, userId: 2 },
+        { [id]: items[3][id], published: true, test: true, userId: 2 },
+        { [id]: items[4][id], published: false, test: true, userId: 2 }
       ];
       assert.deepStrictEqual(
-        realItems,
-        expected,
+        _sortBy(realItems, id),
+        _sortBy(expected, id),
         "removed items correctly"
       );
     });
