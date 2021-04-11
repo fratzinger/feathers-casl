@@ -1,4 +1,4 @@
-import { Sequelize, DataTypes } from "sequelize";
+import { Sequelize, DataTypes, Op } from "sequelize";
 import makeTests from "./_makeTests";
 import { Service } from "feathers-sequelize";
 import { getItems } from "feathers-hooks-common";
@@ -32,10 +32,20 @@ const Model = sequelize.define("tests", {
   timestamps: false
 });
 
+declare module "feathers-sequelize" {
+  interface SequelizeServiceOptions {
+    operators: Record<string, unknown>
+  }
+}
+
 const makeService = () => {
   return new Service({
     Model,
     multi: true,
+    operators: {
+      $not: Op.not
+    },
+    whitelist: ["$not"],
     casl: {
       availableFields: [
         "id", 
@@ -85,6 +95,7 @@ describe("authorize-hook sequelize", function() {
     async () => { 
       await Model.sync({ force: true });
     },
+    { adapter: "feathers-sequelize" },
     afterHooks
   );
 });

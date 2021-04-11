@@ -105,6 +105,7 @@ describe("authorize-hook objection", function() {
         table.boolean("hidden");
       });
     },
+    { adapter: "feathers-objection" },
     afterHooks
   );
 });

@@ -37,5 +37,6 @@ describe("authorize-hook nedb", function() {
     async (app, service) => { 
       await service.remove(null);
     },
+    { adapter: "feathers-nedb" }
   );
 });

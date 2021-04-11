@@ -24,8 +24,8 @@ export default (
   adapterName: string,
   makeService: () => unknown,
   clean: (app, service) => Promise<void>,
-  afterHooks?: unknown[],
-  authorizeHookOptions?: Partial<AuthorizeHookOptions>
+  authorizeHookOptions: Partial<AuthorizeHookOptions>,
+  afterHooks?: unknown[]
 ): void => {
   let app: Application;
   let service;
@@ -39,6 +39,7 @@ export default (
     );
     service = app.service("tests");
 
+    // eslint-disable-next-line prefer-destructuring
     id = service.options.id;
 
     const options = Object.assign({
@@ -198,8 +199,8 @@ export default (
       
     it("returns only allowed items", async function () {
       const item1 = await service.create({ test: true, userId: 1 });
-      const item2 = await service.create({ test: true, userId: 2 });
-      const item3 = await service.create({ test: true, userId: 3 });
+      await service.create({ test: true, userId: 2 });
+      await service.create({ test: true, userId: 3 });
       const items = await service.find({ paginate: false });
       assert(items.length === 3, "has three items");
       
@@ -222,7 +223,7 @@ export default (
     it("returns only allowed items with individual subset of fields", async function () {
       const item1 = await service.create({ test: true, userId: 1 });
       const item2 = await service.create({ test: true, userId: 2 });
-      const item3 = await service.create({ test: true, userId: 3 });
+      await service.create({ test: true, userId: 3 });
       const items = (await service.find({ paginate: false })) as unknown[];
       assert(items.length === 3, "has three items");
       
@@ -249,7 +250,7 @@ export default (
     it("returns only allowed items with individual subset of fields with $select", async function () {
       const item1 = await service.create({ test: true, userId: 1 });
       const item2 = await service.create({ test: true, userId: 2 });
-      const item3 = await service.create({ test: true, userId: 3 });
+      await service.create({ test: true, userId: 3 });
       const items = (await service.find({ paginate: false })) as unknown[];
       assert(items.length === 3, "has three items");
       
@@ -307,8 +308,8 @@ export default (
       
     it("returns only allowed items with '$or' query", async function () {
       const item1 = await service.create({ test: true, userId: 1 });
-      const item2 = await service.create({ test: true, userId: 2 });
-      const item3 = await service.create({ test: true, userId: 3 });
+      await service.create({ test: true, userId: 2 });
+      await service.create({ test: true, userId: 3 });
       const items = (await service.find({ paginate: false })) as unknown[];
       assert(items.length === 3, "has three items");
       
@@ -374,8 +375,8 @@ export default (
       
     it("returns only allowed items with '$nin' query", async function () {
       const item1 = await service.create({ test: true, userId: 1 });
-      const item2 = await service.create({ test: true, userId: 2 });
-      const item3 = await service.create({ test: true, userId: 3 });
+      await service.create({ test: true, userId: 2 });
+      await service.create({ test: true, userId: 3 });
       const items = (await service.find({ paginate: false })) as unknown[];
       assert(items.length === 3, "has three items");
       
@@ -386,7 +387,7 @@ export default (
         }, { resolveAction }),
         query: {
           userId: {
-            $nin: [1, 2]
+            $nin: [3]
           }
         },
         paginate: false
@@ -1324,14 +1325,11 @@ export default (
     });
       
     it("removes allowed items and returns subset for read", async function () {
-      const items = [
-        { [id]: 0, published: false, test: true, userId: 1 },
-        { [id]: 1, published: true, test: true, userId: 1 },
-        { [id]: 2, published: true, test: true, userId: 2 },
-        { [id]: 3, published: true, test: true, userId: 2 },
-        { [id]: 4, published: false, test: true, userId: 2 }
-      ];
-      await service.create(items);
+      await service.create({ published: false, test: true, userId: 1 });
+      const item2 = await service.create({ published: true, test: true, userId: 1 });
+      const item3 = await service.create({ published: true, test: true, userId: 2 });
+      const item4 = await service.create({ published: true, test: true, userId: 2 });
+      const item5 = await service.create({ published: false, test: true, userId: 2 });
       
       const removedItems = await service.remove(null, {
         //@ts-ignore
@@ -1343,25 +1341,25 @@ export default (
       });
       
       const expectedResult = [
-        { [id]: 1, published: true, test: true, userId: 1 }
+        { [id]: item2[id], published: true, test: true, userId: 1 }
       ];
       
       assert.deepStrictEqual(removedItems, expectedResult, "result is right array");
       
       const realItems = await service.find({ paginate: false });
       const expected = [
-        { [id]: 2, published: true, test: true, userId: 2 },
-        { [id]: 3, published: true, test: true, userId: 2 },
-        { [id]: 4, published: false, test: true, userId: 2 }
+        { [id]: item3[id], published: true, test: true, userId: 2 },
+        { [id]: item4[id], published: true, test: true, userId: 2 },
+        { [id]: item5[id], published: false, test: true, userId: 2 }
       ];
       assert.deepStrictEqual(
-        realItems,
-        expected,
+        _sortBy(realItems, id),
+        _sortBy(expected, id),
         "removed items correctly"
       );
     });
       
-    it("removes allowed items and returns subset for read", async function () {
+    it("removes allowed items and returns subset for read with restricted fields", async function () {
       const items = [
         { [id]: 0, published: false, test: true, userId: 1 },
         { [id]: 1, published: true, test: true, userId: 1 },

@@ -28,6 +28,7 @@ describe("authorize-hook feathers-memory", function() {
     makeService,
     async (app, service) => {
       await service.remove(null);
-    }
+    },
+    { adapter: "feathers-memory" }
   );
 });

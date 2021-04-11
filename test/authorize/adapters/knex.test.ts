@@ -23,6 +23,7 @@ const makeService = () => {
     Model: db,
     name: "tests",
     multi: true,
+    whitelist: ["$not"],
     casl: {
       availableFields: [
         "id", 
@@ -91,6 +92,7 @@ describe("authorize-hook knex", function() {
         table.boolean("hidden");
       });
     },
+    { adapter: "feathers-knex" },
     afterHooks
   );
 });
