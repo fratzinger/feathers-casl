@@ -1,10 +1,11 @@
 import NeDB from "nedb";
 import { Service } from "feathers-nedb";
 import makeTests from "./_makeTests";
+import path from "path";
 
 // Create a NeDB instance
 const Model = new NeDB({
-  filename: "../../.data/tests.db",
+  filename: path.join(__dirname, "../../.data/tests.db"),
   autoload: true
 });
 

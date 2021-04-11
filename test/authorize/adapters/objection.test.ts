@@ -3,12 +3,13 @@ import makeTests from "./_makeTests";
 import { Service } from "feathers-objection";
 import { getItems } from "feathers-hooks-common";
 import knex from "knex";
+import path from "path";
 
 const db  = knex({
   client: "sqlite3",
   debug: false,
   connection: {
-    filename: "../../.data/db.sqlite"
+    filename: path.join(__dirname, "../../.data/db.sqlite")
   },
   useNullAsDefault: true
 });

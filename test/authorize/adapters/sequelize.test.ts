@@ -2,10 +2,11 @@ import { Sequelize, DataTypes, Op } from "sequelize";
 import makeTests from "./_makeTests";
 import { Service } from "feathers-sequelize";
 import { getItems } from "feathers-hooks-common";
+import path from "path";
 
 const sequelize = new Sequelize("sequelize", "", "", {
   dialect: "sqlite",
-  storage: "../.data/db.sqlite",
+  storage: path.join(__dirname, "../../.data/db.sqlite"),
   logging: false
 });
 
