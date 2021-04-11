@@ -4,6 +4,16 @@ import { Application } from "@feathersjs/feathers";
 import "@feathersjs/transport-commons";
 import { RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
 
+
+export type Adapter = 
+"feathers-knex" |
+"feathers-memory" |
+"feathers-mongodb" |
+"feathers-mongoose" |
+"feathers-nedb" |
+"feathers-objection" |
+"feathers-sequelize";
+
 export interface ServiceCaslOptions {
   availableFields: string[]
 }
@@ -11,6 +21,7 @@ export interface ServiceCaslOptions {
 export interface AuthorizeHookOptions {
   ability: AnyAbility | ((context: HookContext) => AnyAbility | Promise<AnyAbility>)
   actionOnForbidden: undefined | (() => void)
+  adapter: Adapter
   availableFields: string[] | ((context: HookContext) => string[])
   checkAbilityForInternal: boolean
   checkMultiActions: boolean

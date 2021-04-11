@@ -28,6 +28,7 @@ export const makeOptions = (
 const defaultOptions: AuthorizeHookOptions = {
   ability: undefined,
   actionOnForbidden: undefined,
+  adapter: "feathers-memory",
   availableFields: (context: HookContext): string[] => {
     const availableFields: string[] | ((context: HookContext) => string[]) = context.service.options?.casl?.availableFields;
     if (!availableFields) return undefined;

@@ -32,6 +32,7 @@ import {
   GetQueryOptions,
   HasRestrictingFieldsOptions
 } from "../../types";
+import { rulesToQuery } from "@casl/ability/extra";
 
 const HOOKNAME = "authorize";
 
@@ -172,12 +173,31 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       
       if (hasRestrictingConditions(ability, method, modelName)) {
         // TODO: if query and context.params.query differ -> separate calls
-        
-        const getQueryOptions: GetQueryOptions = {
-          skipFields: true,
-          availableFields
-        };
-        const query = getQueryFor(ability, method, modelName, getQueryOptions);
+
+        let query;
+        if (
+          ["feathers-objection", "feathers-sequelize"]
+            .includes(options.adapter)
+        ) {
+          query = rulesToQuery(ability, method, modelName, (rule) => {
+            return rule.inverted ? { $not: rule.conditions } : rule.conditions;
+          });
+        } /*else if (
+          ["feathers-mongodb", "feathers-mongoose"]
+            .includes(options.adapter)
+        ) {
+          query = rulesToQuery(ability, method, modelName, (rule) => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const conditions = rule.conditions!;
+            return rule.inverted ? { $nor: [conditions] } : conditions;
+          });
+        }*/ else {
+          const getQueryOptions: GetQueryOptions = {
+            skipFields: true,
+            availableFields
+          };
+          query = getQueryFor(ability, method, modelName, getQueryOptions);
+        }
 
         if (!_isEmpty(query)) {
           if (!context.params.query) {
@@ -187,7 +207,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
               context.params.query, 
               query, { 
                 defaultHandle: "intersect",
-                service
+                operators: service.operators
               });
           }
         }
