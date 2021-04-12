@@ -207,11 +207,20 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
           }
         }
 
+        if (
+          query?.$or?.length === 1 && 
+          Object.keys(query).length === 1 &&
+          _isEmpty(query.$or[0])
+        ) {
+          query = {};
+        }
+
         if (!_isEmpty(query)) {
           if (!context.params.query) {
             context.params.query = query;
           } else {
             context.params.query = Object.assign(
+              {},
               context.params.query,
               query
             );
