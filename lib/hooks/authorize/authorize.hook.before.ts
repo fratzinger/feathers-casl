@@ -219,9 +219,33 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
           if (!context.params.query) {
             context.params.query = query;
           } else {
+            const oldQuery = Object.assign({}, context.params.query);
+            if (
+              query?.$or && 
+              context.params?.query?.$or
+            ) {
+              const or1 = query?.$or;
+              const or2 = oldQuery.$or;
+              delete query.$or;
+              delete oldQuery.$or;
+              query.$and = query.$and || [];
+              query.$and.push(
+                { $or: or1 },
+                { $or: or2 }
+              );
+            }
+
+            if (
+              query.$and &&
+              oldQuery.$and
+            ) {
+              query.$and.push(...oldQuery.$and);
+              delete oldQuery.$and;
+            }
+
             context.params.query = Object.assign(
               {},
-              context.params.query,
+              oldQuery,
               query
             );
           }

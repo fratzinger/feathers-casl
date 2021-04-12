@@ -13,7 +13,7 @@ const resolveAction = createAliasResolver({
 import { Application } from "@feathersjs/feathers";
 
 import authorize from "../../../lib/hooks/authorize/authorize.hook";
-import { AuthorizeHookOptions, ServiceCaslOptions } from "../../../lib/types";
+import { Adapter, AuthorizeHookOptions, ServiceCaslOptions } from "../../../lib/types";
 
 declare module "@feathersjs/adapter-commons" {
   interface ServiceOptions {
@@ -21,8 +21,10 @@ declare module "@feathersjs/adapter-commons" {
   }
 }
 
+
+
 export default (
-  adapterName: string,
+  adapterName: Adapter,
   makeService: () => unknown,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
@@ -31,6 +33,17 @@ export default (
   let app: Application;
   let service;
   let id;
+
+  const itSkip = (
+    adapterToTest: Adapter | Adapter[]
+  ): Mocha.TestFunction | Mocha.PendingTestFunction => {
+    const condition = (typeof adapterToTest === "string")
+      ? adapterName === adapterToTest
+      : adapterToTest.includes(adapterName);
+    return (condition)
+      ? it.skip
+      : it;
+  };
       
   beforeEach(async function () {
     app = feathers();
@@ -481,17 +494,22 @@ export default (
         );
       });
 
-      it("returns only allowed items with '$or' query", async function () {
+      const itSkipForMemoryNeDb = itSkip(["feathers-memory", "feathers-nedb"]);
+
+      itSkipForMemoryNeDb("returns only allowed items with '$or' query", async function () {
         const item1 = await service.create({ test: true, userId: 1 });
         await service.create({ test: true, userId: 2 });
         await service.create({ test: true, userId: 3 });
+        await service.create({ test: true, userId: 4 });
         const items = (await service.find({ paginate: false })) as unknown[];
-        assert.strictEqual(items.length, 3, "has three items");
-        
+        assert.strictEqual(items.length, 4, "has four items");
+          
         const returnedItems = await service.find({
           //@ts-ignore
-          ability: defineAbility((can) => {
+          ability: defineAbility((can, cannot) => {
             can("read", "tests", { userId: 1 });
+            can("read", "tests", { userId: 2 });
+            cannot("read", "tests", { userId: 4 });
           }, { resolveAction }),
           query: {
             $or: [
@@ -499,13 +517,16 @@ export default (
                 userId: 1
               },
               {
-                userId: 2
+                userId: 3
+              },
+              {
+                userId: 4
               }
             ]
           },
           paginate: false
         }) as Paginated<unknown>;
-        
+          
         assert.deepStrictEqual(
           returnedItems,
           [
@@ -513,6 +534,41 @@ export default (
             { [id]: item1[id], test: true, userId: 1 },
           ],
           "just returned one item"
+        );
+      });
+
+      itSkipForMemoryNeDb("returns only allowed items with '$and' query", async function() {
+        const item1 = await service.create({ test: true, userId: 1 });
+        const item2 = await service.create({ test: true, userId: 2 });
+        await service.create({ test: false, userId: 1 });
+        await service.create({ test: true, userId: 4 });
+        const items = (await service.find({ paginate: false })) as unknown[];
+        assert.strictEqual(items.length, 4, "has four items");
+          
+        const returnedItems = await service.find({
+          //@ts-ignore
+          ability: defineAbility((can, cannot) => {
+            can("read", "tests", { userId: 1 });
+            can("read", "tests", { userId: 2 });
+            cannot("read", "tests", { userId: 4 });
+          }, { resolveAction }),
+          query: {
+            $and: [
+              {
+                test: true
+              }
+            ]
+          },
+          paginate: false
+        }) as Paginated<unknown>;
+          
+        assert.deepStrictEqual(
+          _sortBy(returnedItems, id),
+          _sortBy([
+            item1,
+            item2
+          ], id),
+          "just returned two items"
         );
       });
         
@@ -883,10 +939,9 @@ export default (
       
       assert.rejects(promise, err => err.name === "Forbidden", "cannot update item");
     });
-      
-    it("updates item and returns empty object for not overlapping '$select' and 'restricting fields'", async function() {
-      //TODO: skip weird feathers-knex bug
-      if (adapterName === "feathers-knex") { return; }
+
+    //TODO: skip weird feathers-knex bug
+    itSkip("feathers-knex")("updates item and returns empty object for not overlapping '$select' and 'restricting fields'", async function() {
       let item = { test: true, userId: 1, supersecret: true, hidden: true };
       
       item = await service.create(item);
