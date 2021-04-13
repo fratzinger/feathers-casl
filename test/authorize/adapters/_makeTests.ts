@@ -494,9 +494,7 @@ export default (
         );
       });
 
-      const itSkipForMemoryNeDb = itSkip(["feathers-memory", "feathers-nedb"]);
-
-      itSkipForMemoryNeDb("returns only allowed items with '$or' query", async function () {
+      it("returns only allowed items with '$or' query", async function () {
         const item1 = await service.create({ test: true, userId: 1 });
         await service.create({ test: true, userId: 2 });
         await service.create({ test: true, userId: 3 });
@@ -537,7 +535,7 @@ export default (
         );
       });
 
-      itSkipForMemoryNeDb("returns only allowed items with '$and' query", async function() {
+      it("returns only allowed items with '$and' query", async function() {
         const item1 = await service.create({ test: true, userId: 1 });
         const item2 = await service.create({ test: true, userId: 2 });
         await service.create({ test: false, userId: 1 });

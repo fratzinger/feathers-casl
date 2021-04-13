@@ -13,6 +13,7 @@ const makeService = () => {
   return new Service({
     Model,
     multi: true,
+    whitelist: ["$not", "$and"],
     casl: {
       availableFields: [
         "id", 

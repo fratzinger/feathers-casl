@@ -4,6 +4,7 @@ import makeTests from "./_makeTests";
 const makeService = () => {
   return new Service({
     multi: true,
+    whitelist: ["$not", "$and"],
     casl: {
       availableFields: [
         "id", 

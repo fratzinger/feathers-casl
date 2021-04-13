@@ -175,7 +175,12 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
 
         let query;
         if (
-          ["feathers-objection", "feathers-sequelize"]
+          [
+            "feathers-memory",
+            "feathers-nedb",
+            "feathers-objection", 
+            "feathers-sequelize"
+          ]
             .includes(options.adapter)
         ) {
           query = rulesToQuery(ability, method, modelName, (rule) => {

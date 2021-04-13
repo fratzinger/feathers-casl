@@ -398,28 +398,28 @@ describe("authorize.general.test.ts", function() {
         const pairs = [
           {
             condition: { userId: 1 },
-            inverted: { userId: { $ne: 1 } }
+            inverted: { $and: [ { $not: { userId: 1 } } ] }
           }, {
             condition: { userId: { $ne: 1 } },
-            inverted: { userId: 1 }
+            inverted: { $and: [ { $not: { userId: { $ne: 1 } } }] }
           }, {
             condition: { userId: { $gt: 1 } },
-            inverted: { userId: { $lte: 1 } }
+            inverted: { $and: [ { $not: { userId: { $gt: 1 } } } ] }
           }, {
             condition: { userId: { $gte: 1 } },
-            inverted: { userId: { $lt: 1 } }
+            inverted: { $and: [ { $not: { userId: { $gte: 1 } } } ] }
           }, {
             condition: { userId: { $lt: 1 } },
-            inverted: { userId: { $gte: 1 } }
+            inverted: { $and: [ { $not: { userId: { $lt: 1 } } } ] }
           }, {
             condition: { userId: { $lte: 1 } },
-            inverted: { userId: { $gt: 1 } }
+            inverted: { $and: [ { $not: { userId: { $lte: 1 } } } ] }
           }, {
             condition: { userId: { $in: [1] } },
-            inverted: { userId: { $nin: [1] } }
+            inverted: { $and: [ { $not: { userId: { $in: [1] } } } ] }
           }, {
             condition: { userId: { $nin: [1] } },
-            inverted: { userId: { $in: [1] } }
+            inverted: { $and: [ { $not: { userId: { $nin: [1] } } } ] }
           }
         ];
         const promises = [];
