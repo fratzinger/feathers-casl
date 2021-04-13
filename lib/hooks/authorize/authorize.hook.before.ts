@@ -213,11 +213,10 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
         }
 
         if (
-          query?.$or?.length === 1 && 
-          Object.keys(query).length === 1 &&
-          _isEmpty(query.$or[0])
+          query?.$or &&
+          query.$or.every(q => _isEmpty(q))
         ) {
-          query = {};
+          delete query.$or;
         }
 
         if (!_isEmpty(query)) {
