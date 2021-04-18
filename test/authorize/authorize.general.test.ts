@@ -429,6 +429,9 @@ describe("authorize.general.test.ts", function() {
             return {
               service: {
                 modelName: "Test",
+                options: {
+                  whitelist: ["$and", "$not"]
+                },
                 get() {
                   return {
                     id: 1,
