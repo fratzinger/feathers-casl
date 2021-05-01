@@ -35,8 +35,8 @@
     "test": "npm run mocha",
     "coverage": "nyc npm run test",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "docs": "vuepress dev docs",
-    "docs:build": "vuepress build docs"
+    "docs": "vitepress dev docs",
+    "docs:build": "vitepress build docs"
   },
   "dependencies": {
     "@casl/ability": "^5.2.2",
@@ -61,7 +61,6 @@
     "@types/node": "^15.0.1",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
-    "@vuepress/plugin-active-header-links": "^1.8.2",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "eslint": "^7.25.0",
@@ -90,7 +89,6 @@
     "ts-node": "^9.1.1",
     "type-fest": "^0.21.3",
     "typescript": "^4.2.4",
-    "vuepress": "^1.8.2",
-    "vuepress-theme-default-prefers-color-scheme": "^2.0.0"
+    "vitepress": "^0.13.2"
   }
 }
