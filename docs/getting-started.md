@@ -37,6 +37,7 @@ It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CA
 - Disallow/allow `multi` methods (`create`, `patch`, `remove`) dynamically with: `can('remove-multi', 'Task', { userId: user.id })`
 - Support for dynamic rules stored in your database
 - Support to define abilities for anything (providers, users, roles, 3rd party apps, ...)
+- Fully supported adapters: `feathers-knex`, `feathers-memory`, `feathers-mongodb`, `feathers-mongoose`, `feathers-nedb`, `feathers-objection`, `feathers-sequelize`
 - Baked in support for `@casl/angular`, `@casl/react`, `@casl/vue` and `@casl/aurelia`
 
 ## Installation
@@ -168,37 +169,39 @@ module.exports = {
 
 The `authorize`-hook can be used for all methods and has support for `multi: true`. You should use it as a `before` **AND** a `after` hook at the same time. Please make sure to define `before` at last position and `after` at first position. So you don't want to use it in `app.hooks` nor in `all`. For more information, see: [#authorize-hook](/hook-authorize.html)
 
-```js{9,12,15,18,21,24,30}
+```js{5,11,14,17,20,23,26,32}
 // src/services/tasks/tasks.hooks.js
 const { authenticate } = require('@feathersjs/authentication').hooks;
 const { authorize } = require('feathers-casl').hooks;
+
+// CAUTION! Make sure the adapter name fits your adapter (e.g. feathers-mongodb, feathers-sequelize, feathers-objection, feathers-knex, ...)!
 
 module.exports = {
   before: {
     all: [authenticate('jwt')],
     find: [
-      authorize() // make sure this hook runs always last
+      authorize({ adapter: 'feathers-mongoose' }) // make sure this hook runs always last
     ],
     get: [
-      authorize() // make sure this hook runs always last
+      authorize({ adapter: 'feathers-mongoose' }) // make sure this hook runs always last
     ],
     create: [
-      authorize() // make sure this hook runs always last
+      authorize({ adapter: 'feathers-mongoose' }) // make sure this hook runs always last
     ],
     update: [
-      authorize() // make sure this hook runs always last
+      authorize({ adapter: 'feathers-mongoose' }) // make sure this hook runs always last
     ],
     patch: [
-      authorize() // make sure this hook runs always last
+      authorize({ adapter: 'feathers-mongoose' }) // make sure this hook runs always last
     ],
     remove: [
-      authorize() // make sure this hook runs always last
+      authorize({ adapter: 'feathers-mongoose' }) // make sure this hook runs always last
     ]
   },
 
   after: {
     all: [
-      authorize() // make sure this hook runs always first
+      authorize({ adapter: 'feathers-mongoose' }) // make sure this hook runs always first
     ],
     find: [],
     get: [],
@@ -218,6 +221,34 @@ module.exports = {
     remove: []
   }
 };
+
+```
+
+### Whitelist operators
+
+For `feathers-casl` to work properly, you have to whitelist some operators in your service options.
+Also make sure to set the adapter option in your `authorize` hook like: `authorize({ adapter: 'feathers-mongoose' })`
+
+- **feathers-memory**: `app.use('...', new Service({ whitelist: ['$not', '$and'] }))`
+- **feathers-nedb**: `app.use'...', new Service({ whitelist: ['$not', '$and'] }))`
+- **feathers-mongodb**: `app.use("...', new Service({ whitelist: ["$and", "$nor"] }))`
+- **feathers-mongoose**: `app.use("...", new Service({ whitelist: ["$nor"] }))`
+- **feathers-knex**: `app.use("...", new Service({ whitelist: ["$not"] }))`
+- **feathers-objection**: *nothing to do* :)
+- **feathers-sequelize**: This one is a little bit different than the others. See the following:
+```js{2,8-11}
+const { Service } = require("feathers-sequelize");
+const { Op } = require("sequelize");
+
+// ...
+
+app.use('...', new Service({
+  Model,
+  operators: {
+    $not: Op.not
+  },
+  whitelist: ["$not"]
+}))
 
 ```
 
