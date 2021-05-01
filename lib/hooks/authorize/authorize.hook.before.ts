@@ -206,7 +206,8 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
             $and.forEach(q => {
               query = mergeQuery(query, q, {
                 defaultHandle: "intersect",
-                operators: service.operators
+                operators: service.operators,
+                useLogicalConjunction: true
               });
             });
           }
@@ -221,7 +222,8 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
               context.params.query, 
               query, { 
                 defaultHandle: "intersect",
-                operators
+                operators,
+                useLogicalConjunction: true
               }
             );
           }
