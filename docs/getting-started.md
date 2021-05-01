@@ -64,8 +64,12 @@ The `casl()` function can be configured, to provide app wide options to `feather
 
 For most cases we want to define rules per user (or per user-role). So we first add a function which returns an `ability` from `@casl/ability` with these rules:
 
+:::: tabs :options="{ useUrlFragment: false }"
+
+::: tab "JavaScript"
+Update `src/services/authentication/authentication.abilities.js` as follows:
+
 ```js
-// src/services/authentication/authentication.abilities.js
 const { AbilityBuilder, createAliasResolver, makeAbilityFromRules } = require('feathers-casl');
 
 // don't forget this, as `read` is used internally
@@ -95,7 +99,7 @@ const defineRulesFor = (user) => {
   cannot('delete', 'users', { id: user.id });
 
   can('manage', 'tasks', { userId: user.id });
-  can('create-multi', 'posts', { userId: user.id })
+  can('create-multi', 'posts', { userId: user.id });
 
   return rules;
 };
@@ -110,8 +114,64 @@ module.exports = {
   defineRulesFor,
   defineAbilitiesFor
 };
-
 ```
+::: 
+
+::: tab "TypeScript"
+Update `src/services/authentication/authentication.abilities.ts` as follows:
+
+```ts
+import { AbilityBuilder, Ability, createAliasResolver, makeAbilityFromRules } from 'feathers-casl';
+
+// example structure
+interface User {
+  id: string,
+  role: {
+    name: string
+  }
+}
+
+// don't forget this, as `read` is used internally
+const resolveAction = createAliasResolver({
+  update: 'patch',       // define the same rules for update & patch
+  read: ['get', 'find'], // use 'read' as a equivalent for 'get' & 'find'
+  delete: 'remove'       // use 'delete' or 'remove'
+});
+
+export const defineRulesFor = (user: User) => {
+  // also see https://casl.js.org/v5/en/guide/define-rules
+  const { can, cannot, rules } = new AbilityBuilder(Ability);
+
+  if (user.role && user.role.name === 'SuperAdmin') {
+    // SuperAdmin can do evil
+    can('manage', 'all');
+    return rules;
+  }
+
+  if (user.role && user.role.name === 'Admin') {
+    can('create', 'users');
+  }
+
+  can('read', 'users');
+  can('update', 'users', { id: user.id });
+  cannot('update', 'users', ['roleId'], { id: user.id });
+  cannot('delete', 'users', { id: user.id });
+
+  can('manage', 'tasks', { userId: user.id });
+  can('create-multi', 'posts', { userId: user.id });
+
+  return rules;
+};
+
+export const defineAbilitiesFor = (user: User) => {
+  const rules = defineRulesFor(user);
+
+  return makeAbilityFromRules(rules, { resolveAction });
+};
+```
+:::
+
+::::
 
 ### Add abilities to hooks context
 

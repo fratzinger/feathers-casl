@@ -22,6 +22,7 @@ module.exports = {
       }
     },
     plugins: [
+        'tabs',
         '@vuepress/active-header-links', {
         sidebarLinkSelector: '.sidebar-link',
         headerAnchorSelector: '.header-anchor'
