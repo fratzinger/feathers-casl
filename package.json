@@ -1,6 +1,6 @@
 {
   "name": "feathers-casl",
-  "version": "0.4.0",
+  "version": "0.4.1-8",
   "description": "Add access control with CASL to your feathers application.",
   "author": "fratzinger",
   "homepage": "https://feathers-casl.netlify.app/",
@@ -35,8 +35,8 @@
     "test": "npm run mocha",
     "coverage": "nyc npm run test",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "docs": "vuepress dev docs",
-    "docs:build": "vuepress build docs"
+    "docs": "vitepress dev docs",
+    "docs:build": "vitepress build docs"
   },
   "dependencies": {
     "@casl/ability": "^5.2.2",
@@ -44,7 +44,7 @@
     "@feathersjs/feathers": "^4.5.11",
     "@feathersjs/transport-commons": "^4.5.11",
     "feathers-hooks-common": "^5.0.5",
-    "feathers-utils": "^1.5.2",
+    "feathers-utils": "^1.5.8",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
@@ -57,28 +57,27 @@
     "@feathersjs/socketio-client": "^4.5.11",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/lodash": "^4.14.168",
-    "@types/mocha": "^8.2.1",
-    "@types/node": "^14.14.34",
-    "@typescript-eslint/eslint-plugin": "^4.17.0",
-    "@typescript-eslint/parser": "^4.17.0",
-    "@vuepress/plugin-active-header-links": "^1.8.2",
+    "@types/mocha": "^8.2.2",
+    "@types/node": "^15.0.1",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
-    "eslint": "^7.22.0",
+    "eslint": "^7.25.0",
     "eslint-plugin-security": "^1.4.0",
     "feathers-knex": "^7.1.1",
     "feathers-memory": "^4.1.0",
     "feathers-mongodb": "^6.3.0",
     "feathers-mongoose": "^8.3.3",
     "feathers-nedb": "^5.1.0",
-    "feathers-objection": "^7.1.3",
+    "feathers-objection": "^7.1.4",
     "feathers-sequelize": "^6.2.0",
-    "helmet": "^4.4.1",
+    "helmet": "^4.5.0",
     "knex": "^0.95.4",
     "mocha": "^8.3.2",
     "mongodb": "^3.6.6",
     "mongodb-memory-server": "^6.9.6",
-    "mongoose": "^5.12.3",
+    "mongoose": "^5.12.7",
     "nedb": "^1.8.0",
     "nyc": "^15.1.0",
     "objection": "^2.2.15",
@@ -89,8 +88,7 @@
     "sqlite3": "^5.0.2",
     "ts-node": "^9.1.1",
     "type-fest": "^0.21.3",
-    "typescript": "^4.2.3",
-    "vuepress": "^1.8.2",
-    "vuepress-theme-default-prefers-color-scheme": "^2.0.0"
+    "typescript": "^4.2.4",
+    "vitepress": "^0.13.2"
   }
 }

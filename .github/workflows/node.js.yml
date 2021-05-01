@@ -35,7 +35,7 @@ jobs:
     - uses: actions/setup-node@master
       with:
         node-version: '12'
-    - run: npm i
+    - run: npm ci
     - uses: paambaati/codeclimate-action@v2.7.5
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}

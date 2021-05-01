@@ -33,16 +33,16 @@ const invertedProp = (
   }
 };
 
-const convertRuleToQuery = (
+export const convertRuleToQuery = (
   rule: RawRuleFrom<AbilityTuple<string, Subject>, unknown>, 
-  options: GetConditionalQueryOptions): Query => 
+  options?: GetConditionalQueryOptions): Query => 
 {
   const { conditions, inverted } = rule;
   if (!conditions) {
     if (inverted && options?.actionOnForbidden) {
       options.actionOnForbidden();
     }
-    return {} as Query;
+    return undefined;
   }
   if (inverted) {
     const newConditions = {} as Query;
@@ -78,7 +78,7 @@ const getConditionalQueryFor = (
     throw new Forbidden("You're not allowed to make this request");
   });
 
-  const rules = ability.rulesFor(method, subjectType);
+  const rules = ability.rulesFor(method, subjectType).reverse();
 
   let query = {};
 
@@ -86,11 +86,15 @@ const getConditionalQueryFor = (
     const rule = rules[i];
 
     const currentQuery = convertRuleToQuery(rule, options);
-    query = mergeQuery(
-      query, 
-      currentQuery, { 
-        defaultHandle: "combine"
-      });
+    if (currentQuery === undefined) {
+      query = {};
+    } else {
+      query = mergeQuery(
+        query, 
+        currentQuery, { 
+          defaultHandle: "combine"
+        });
+    }
   }
 
   return query;

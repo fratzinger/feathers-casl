@@ -10,10 +10,10 @@ import {
   isMulti
 } from "feathers-utils";
 
-import getQueryFor from "../../utils/getQueryFor";
 import hasRestrictingFields from "../../utils/hasRestrictingFields";
 import hasRestrictingConditions from "../../utils/hasRestrictingConditions";
 import couldHaveRestrictingFields from "../../utils/couldHaveRestrictingFields";
+import { convertRuleToQuery } from "../../utils/getConditionalQueryFor";
 
 import {
   hide$select,
@@ -29,7 +29,6 @@ import {
 
 import {
   AuthorizeHookOptions,
-  GetQueryOptions,
   HasRestrictingFieldsOptions
 } from "../../types";
 import { rulesToQuery } from "@casl/ability/extra";
@@ -176,39 +175,57 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
 
         let query;
         if (
-          ["feathers-objection", "feathers-sequelize"]
+          [
+            "feathers-memory",
+            "feathers-nedb",
+            "feathers-objection", 
+            "feathers-sequelize"
+          ]
             .includes(options.adapter)
         ) {
           query = rulesToQuery(ability, method, modelName, (rule) => {
-            return rule.inverted ? { $not: rule.conditions } : rule.conditions;
+            const { conditions } = rule;
+            return (rule.inverted) ? { $not: conditions } : conditions;
           });
         } else if (
           ["feathers-mongoose"]
             .includes(options.adapter)
         ) {
           query = rulesToQuery(ability, method, modelName, (rule) => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const conditions = rule.conditions!;
-            return rule.inverted ? { $nor: [conditions] } : conditions;
+            const { conditions } = rule;
+            return (rule.inverted) ? { $nor: [conditions] } : conditions;
           });
         } else {
-          const getQueryOptions: GetQueryOptions = {
-            skipFields: true,
-            availableFields
-          };
-          query = getQueryFor(ability, method, modelName, getQueryOptions);
+          query = rulesToQuery(ability, method, modelName, (rule) => {
+            const { conditions } = rule;
+            return (rule.inverted) ? convertRuleToQuery(rule) : conditions;
+          });
+          if (query.$and) {
+            const { $and } = query;
+            delete query.$and;
+            $and.forEach(q => {
+              query = mergeQuery(query, q, {
+                defaultHandle: "intersect",
+                operators: service.operators,
+                useLogicalConjunction: true
+              });
+            });
+          }
         }
 
         if (!_isEmpty(query)) {
           if (!context.params.query) {
             context.params.query = query;
           } else {
+            const operators = service.options?.whitelist;
             context.params.query = mergeQuery(
               context.params.query, 
               query, { 
                 defaultHandle: "intersect",
-                operators: service.operators
-              });
+                operators,
+                useLogicalConjunction: true
+              }
+            );
           }
         }
       }

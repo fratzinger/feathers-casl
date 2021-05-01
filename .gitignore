@@ -119,5 +119,4 @@ $RECYCLE.BIN/
 /dist
 
 .temp
-
-src-dist
+docs/.vitepress/dist
