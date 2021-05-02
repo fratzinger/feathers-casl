@@ -16,6 +16,7 @@ import {
   InitOptions,
   Path
 } from "../../types";
+import getFieldsForConditions from "../../utils/getFieldsForConditions";
 
 export const makeOptions = (
   app: Application, 
@@ -40,7 +41,8 @@ const defaultOptions: AuthorizeHookOptions = {
   checkAbilityForInternal: false,
   modelName: (context: Pick<HookContext, "path">): string => {
     return context.path;
-  }
+  },
+  notSkippable: false
 };
 
 export const makeDefaultOptions = (
@@ -82,6 +84,15 @@ export const getAbility = (
       return Promise.resolve(options.ability);
     }
   }
+
+  if (getPersistedConfig(context, "ability")) {
+    if (typeof options.ability === "function") {
+      const ability = options.ability(context);
+      return Promise.resolve(ability);
+    } else {
+      return Promise.resolve(options.ability);
+    }
+  }
   
   return Promise.resolve(undefined);
 };
@@ -107,6 +118,22 @@ export const throwUnlessCan = (
     if (actionOnForbidden) actionOnForbidden();
     throw new Forbidden(`You are not allowed to ${method} ${modelName}`);
   }
+};
+
+export const handleConditionalSelect = (
+  context: HookContext, 
+  ability: AnyAbility, 
+  method: string, 
+  modelName: string
+): boolean => {
+  if (!context.params?.query || !context.params?.query?.$select) { return false; }
+  const { $select } = context.params.query;
+  const fields = getFieldsForConditions(ability, method, modelName);
+  const fieldsToAdd = fields.filter(field => !$select.includes(field));
+  if (!fieldsToAdd.length) { return false; }
+  hide$select(context);
+  context.params.query.$select = [...$select, ...fieldsToAdd];
+  return true;
 };
 
 export const checkMulti = (

@@ -16,11 +16,11 @@ import couldHaveRestrictingFields from "../../utils/couldHaveRestrictingFields";
 import { convertRuleToQuery } from "../../utils/getConditionalQueryFor";
 
 import {
-  hide$select,
   setPersistedConfig,
-  checkMulti,
   getAbility,
-  throwUnlessCan
+  throwUnlessCan,
+  getPersistedConfig,
+  handleConditionalSelect
 } from "./authorize.hook.utils";
 
 import {
@@ -32,17 +32,33 @@ import {
   HasRestrictingFieldsOptions
 } from "../../types";
 import { rulesToQuery } from "@casl/ability/extra";
+import checkBasicPermission from "./checkBasicPermission.hook";
 
 const HOOKNAME = "authorize";
 
 export default (options: AuthorizeHookOptions): ((context: HookContext) => Promise<HookContext>) => {
   return async (context: HookContext): Promise<HookContext> => {
-    //TODO: make as isomorphic hook -> for vue-client
     if (
-      shouldSkip(HOOKNAME, context) ||
-      context.type !== "before" ||
-      !context.params
+      !options?.notSkippable && (
+        shouldSkip(HOOKNAME, context) ||
+        context.type !== "before" ||
+        !context.params
+      )
     ) { return context; }
+
+    if (getPersistedConfig(context, "madeBasicCheck")) {
+      const basicCheck = checkBasicPermission({
+        notSkippable: true,
+        ability: options.ability,
+        actionOnForbidden: options.actionOnForbidden,
+        checkAbilityForInternal: options.checkAbilityForInternal,
+        checkMultiActions: options.checkMultiActions,
+        modelName: options.modelName,
+        storeAbilityForAuthorize: true
+      });
+      await basicCheck(context);
+    }
+
     const { service, method, id, params } = context;
 
     if (!options.modelName) {
@@ -59,26 +75,12 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       // Ignore internal or not authenticated requests
       return context;
     }
-
-    if (options.checkMultiActions) {
-      checkMulti(context, ability, modelName, options);
-    }
-
-    throwUnlessCan(
-      ability,
-      method,
-      modelName,
-      modelName,
-      options.actionOnForbidden
-    );
     
     // if context is with multiple items, there's a change that we need to handle each item separately
     if (isMulti(context)) {
-      // if has conditions -> hide $select for after-hook, because
-      if (hasRestrictingConditions(ability, "find", modelName)) {
-        hide$select(context);
-      } else {
-        setPersistedConfig(context, "skipRestrictingRead.conditions", true);
+      const isSelectHandled = handleConditionalSelect(context, ability, "find", modelName);
+      if (!isSelectHandled) {
+        //setPersistedConfig(context, "skipRestrictingRead.conditions", true);
       }
 
       // if has no restricting fields at all -> can skip _pick() in after-hook

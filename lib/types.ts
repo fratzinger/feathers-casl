@@ -18,14 +18,22 @@ export interface ServiceCaslOptions {
   availableFields: string[]
 }
 
-export interface AuthorizeHookOptions {
+export interface HookBaseOptions {
   ability: AnyAbility | ((context: HookContext) => AnyAbility | Promise<AnyAbility>)
   actionOnForbidden: undefined | (() => void)
-  adapter: Adapter
-  availableFields: string[] | ((context: HookContext) => string[])
   checkAbilityForInternal: boolean
   checkMultiActions: boolean
   modelName: GetModelName
+  notSkippable: boolean
+}
+
+export interface CheckBasicPermissionHookOptions extends HookBaseOptions {
+  storeAbilityForAuthorize: boolean
+}
+
+export interface AuthorizeHookOptions extends HookBaseOptions {
+  adapter: Adapter
+  availableFields: string[] | ((context: HookContext) => string[])
 }
 
 export type GetModelName = string | ((context: HookContext) => string)

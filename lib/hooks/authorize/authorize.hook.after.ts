@@ -28,9 +28,11 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     const $select = restore$select(context);
 
     if (
-      shouldSkip(HOOKNAME, context) ||
-      context.type !== "after" ||
-      !context.params
+      !options?.notSkippable && (
+        shouldSkip(HOOKNAME, context) ||
+        context.type !== "after" ||
+        !context.params
+      )
     ) { return context; }
 
     options = makeOptions(context.app, options);
