@@ -13,7 +13,7 @@ module.exports = {
     sidebar: {
       '/': [
         { text: 'Getting Started', link: '/getting-started' },
-        { text: 'Hooks', link: '/hook-authorize'},
+        { text: 'Hooks', link: '/hooks'},
         { text: 'Channels', link: '/channels'},
         { text: 'Cookbook', link: '/cookbook'},
         { text: 'Client side', link: '/client-side'},

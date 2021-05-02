@@ -1,7 +1,7 @@
 # feathers-casl
 
 <p align="center">
-    <img src="https://feathers-casl.netlify.app/img/logo.svg" width="200">
+  <img src="https://feathers-casl.netlify.app/img/logo.svg" width="200">
 </p>
 
 ![npm](https://img.shields.io/npm/v/feathers-casl)
@@ -19,20 +19,22 @@ Add access control with CASL to your feathers application.
 This project is built for [FeathersJS](http://feathersjs.com). An open source web framework for building modern real-time applications.
 It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CASL** in feathers.js.
 
-### Features
-- Fully powered by Feathers & CASL
+## Features
+- Fully powered by Feathers 4 & CASL 5
 - Written in TypeScript
 - Allows permissions for all methods `create`, `find`, `get`, `update`, `patch`, `remove`, or `create`, `read`, `update`, `delete`
-- Define permissions not based on methods: `can('view', 'Settings')`
+- Define permissions not based on methods: `can('view', 'Settings')` (Bring your custom logic)
 - Restrict by conditions: `can('create', 'Task', { userId: user.id })`
 - Restrict by individual fields: `cannot('update', 'User', ['roleId'])`
 - Native support for restrictive `$select`: `can('read', 'User', ['id', 'username'])` -> `$select: ['id', 'username']`
 - Supports `channels` right away (every connection only gets updates based on `can('read' ...)`)
 - `channels`-support also regards restrictive fields
 - Disallow/allow `multi` methods (`create`, `patch`, `remove`) dynamically with: `can('remove-multi', 'Task', { userId: user.id })`
-- Support for dynamic rules stored in your database
+- Support for dynamic rules stored in your database (Bring your own implementation ;) )
 - Support to define abilities for anything (providers, users, roles, 3rd party apps, ...)
+- Fully supported adapters: `feathers-knex`, `feathers-memory`, `feathers-mongodb`, `feathers-mongoose`, `feathers-nedb`, `feathers-objection`, `feathers-sequelize`
 - Baked in support for `@casl/angular`, `@casl/react`, `@casl/vue` and `@casl/aurelia`
+- `checkBasicPermission` hook for client side usage as a before-hook
 
 ## Documentation
 You need more information? Please have a look:
@@ -46,13 +48,11 @@ npm i feathers-casl
 
 ## Testing
 
-Simply run `npm test` and all your tests in the `test/` directory will be run.
-
+Simply run `npm test` and all your tests in the `test/` directory will be run. It has full support for *Visual Studio Code*. You can use the debugger to set breakpoints.
 
 ## Help
 
-For more information on all the things you can do, visit [the generator](https://generator.feathers-plus.com/), [FeathersJS](http://docs.feathersjs.com) and [CASL](https://casl.js.org/v5/en/).
-
+For more information on all the things you can do, visit [FeathersJS](http://docs.feathersjs.com) and [CASL](https://casl.js.org/v5/en/).
 
 ## License
 
