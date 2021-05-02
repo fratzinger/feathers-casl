@@ -12,16 +12,8 @@ const resolveAction = createAliasResolver({
 
 import { Application } from "@feathersjs/feathers";
 
-import authorize from "../../../lib/hooks/authorize/authorize.hook";
-import { Adapter, AuthorizeHookOptions, ServiceCaslOptions } from "../../../lib/types";
-
-declare module "@feathersjs/adapter-commons" {
-  interface ServiceOptions {
-    casl: ServiceCaslOptions
-  }
-}
-
-
+import authorize from "../../../../lib/hooks/authorize/authorize.hook";
+import { Adapter, AuthorizeHookOptions } from "../../../../lib/types";
 
 export default (
   adapterName: Adapter,

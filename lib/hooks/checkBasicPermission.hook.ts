@@ -9,19 +9,31 @@ import {
   checkMulti,
   getAbility,
   throwUnlessCan
-} from "./authorize.hook.utils";
+} from "./authorize/authorize.hook.utils";
 
 import {
   HookContext
 } from "@feathersjs/feathers";
 
 import {
-  CheckBasicPermissionHookOptions
-} from "../../types";
+  CheckBasicPermissionHookOptions, CheckBasicPermissionHookOptionsExclusive
+} from "../types";
+import { makeDefaultBaseOptions } from "./common";
 
 export const HOOKNAME = "checkBasicPermission";
 
-export default (options: CheckBasicPermissionHookOptions): ((context: HookContext) => Promise<HookContext>) => {
+const defaultOptions: CheckBasicPermissionHookOptionsExclusive = {
+  storeAbilityForAuthorize: false
+};
+
+const makeOptions = (options?: Partial<CheckBasicPermissionHookOptions>): CheckBasicPermissionHookOptions => {
+  options = options || {};
+  return Object.assign(makeDefaultBaseOptions(), defaultOptions, options);
+}; 
+
+export default (
+  options: CheckBasicPermissionHookOptions
+): ((context: HookContext) => Promise<HookContext>) => {
   return async (context: HookContext): Promise<HookContext> => {
     if (
       !options?.notSkippable && (
@@ -30,6 +42,9 @@ export default (options: CheckBasicPermissionHookOptions): ((context: HookContex
         !context.params
       )
     ) { return context; }
+
+    options = makeOptions(options);
+
     const { method } = context;
 
     if (!options.modelName) {

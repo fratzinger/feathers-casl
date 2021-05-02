@@ -32,7 +32,7 @@ import {
   HasRestrictingFieldsOptions
 } from "../../types";
 import { rulesToQuery } from "@casl/ability/extra";
-import checkBasicPermission from "./checkBasicPermission.hook";
+import checkBasicPermission from "../checkBasicPermission.hook";
 
 const HOOKNAME = "authorize";
 
@@ -46,7 +46,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       )
     ) { return context; }
 
-    if (getPersistedConfig(context, "madeBasicCheck")) {
+    if (!getPersistedConfig(context, "madeBasicCheck")) {
       const basicCheck = checkBasicPermission({
         notSkippable: true,
         ability: options.ability,
@@ -78,9 +78,10 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     
     // if context is with multiple items, there's a change that we need to handle each item separately
     if (isMulti(context)) {
-      const isSelectHandled = handleConditionalSelect(context, ability, "find", modelName);
-      if (!isSelectHandled) {
-        //setPersistedConfig(context, "skipRestrictingRead.conditions", true);
+      handleConditionalSelect(context, ability, "find", modelName);
+      
+      if (!hasRestrictingConditions(ability, "find", modelName)) {
+        setPersistedConfig(context, "skipRestrictingRead.conditions", true);
       }
 
       // if has no restricting fields at all -> can skip _pick() in after-hook

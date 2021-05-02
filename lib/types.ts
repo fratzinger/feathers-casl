@@ -31,10 +31,15 @@ export interface CheckBasicPermissionHookOptions extends HookBaseOptions {
   storeAbilityForAuthorize: boolean
 }
 
+export type CheckBasicPermissionHookOptionsExclusive = Pick<CheckBasicPermissionHookOptions, Exclude<keyof CheckBasicPermissionHookOptions, keyof HookBaseOptions>>
+
 export interface AuthorizeHookOptions extends HookBaseOptions {
   adapter: Adapter
   availableFields: string[] | ((context: HookContext) => string[])
 }
+
+export type AuthorizeHookOptionsExclusive = Pick<AuthorizeHookOptions, Exclude<keyof AuthorizeHookOptions, keyof HookBaseOptions>>
+
 
 export type GetModelName = string | ((context: HookContext) => string)
 

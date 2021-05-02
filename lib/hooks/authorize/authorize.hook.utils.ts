@@ -13,22 +13,22 @@ import {
 
 import { 
   AuthorizeHookOptions,
+  AuthorizeHookOptionsExclusive,
   InitOptions,
   Path
 } from "../../types";
 import getFieldsForConditions from "../../utils/getFieldsForConditions";
+import { makeDefaultBaseOptions } from "../common";
 
 export const makeOptions = (
   app: Application, 
   options?: Partial<AuthorizeHookOptions>
 ): AuthorizeHookOptions => {
   options = options || {};
-  return Object.assign({}, defaultOptions, getAppOptions(app), options);
+  return Object.assign(makeDefaultBaseOptions(), defaultOptions, getAppOptions(app), options);
 };
 
-const defaultOptions: AuthorizeHookOptions = {
-  ability: undefined,
-  actionOnForbidden: undefined,
+const defaultOptions: AuthorizeHookOptionsExclusive = {
   adapter: "feathers-memory",
   availableFields: (context: HookContext): string[] => {
     const availableFields: string[] | ((context: HookContext) => string[]) = context.service.options?.casl?.availableFields;
@@ -36,19 +36,13 @@ const defaultOptions: AuthorizeHookOptions = {
     return (typeof availableFields === "function")
       ? availableFields(context)
       : availableFields;
-  },
-  checkMultiActions: false,
-  checkAbilityForInternal: false,
-  modelName: (context: Pick<HookContext, "path">): string => {
-    return context.path;
-  },
-  notSkippable: false
+  }
 };
 
 export const makeDefaultOptions = (
   options?: Partial<AuthorizeHookOptions>
 ): AuthorizeHookOptions => {
-  return Object.assign({}, defaultOptions, options);
+  return Object.assign(makeDefaultBaseOptions(), defaultOptions, options);
 };
 
 const getAppOptions = (app: Application): AuthorizeHookOptions | Record<string, never> => {
@@ -129,10 +123,15 @@ export const handleConditionalSelect = (
   if (!context.params?.query || !context.params?.query?.$select) { return false; }
   const { $select } = context.params.query;
   const fields = getFieldsForConditions(ability, method, modelName);
+  if (!fields.length) { 
+    return false; 
+  }
+
   const fieldsToAdd = fields.filter(field => !$select.includes(field));
   if (!fieldsToAdd.length) { return false; }
   hide$select(context);
   context.params.query.$select = [...$select, ...fieldsToAdd];
+  
   return true;
 };
 

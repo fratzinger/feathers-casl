@@ -1,10 +1,12 @@
 import assert from "assert";
-import authorize from "../../lib/hooks/authorize/authorize.hook";
+import authorize from "../../../lib/hooks/authorize/authorize.hook";
 import {
   createAliasResolver,
   defineAbility
 } from "@casl/ability";
 import _cloneDeep from "lodash/cloneDeep";
+import { markHookForSkip } from "feathers-utils/dist";
+import { HOOKNAME as HOOKNAME_CHECKBASICPERMISSION } from "../../../lib/hooks/checkBasicPermission.hook";
 
 const resolveAction = createAliasResolver({
   update: "patch",
@@ -40,6 +42,8 @@ describe("authorize.general.test.ts", function() {
       types.forEach(type => {
         methods.forEach(method => {
           const context = makeContext(method, type);
+          // @ts-ignore
+          markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
           const query = Object.assign({}, context.params.query);
           //@ts-ignore
           const promise = authorize()(context).then(result => {
@@ -81,6 +85,8 @@ describe("authorize.general.test.ts", function() {
       types.forEach(type => {
         methods.forEach(method => {
           const context = makeContext(method, type);
+          // @ts-ignore
+          markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
           const query = Object.assign({}, context.params.query);
           //@ts-ignore
           const promise = authorize()(context).then(result => {
@@ -125,6 +131,8 @@ describe("authorize.general.test.ts", function() {
       types.forEach(type => {
         methods.forEach(method => {
           const context = makeContext(method, type);
+          // @ts-ignore
+          markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
           const promise = assert.rejects(
             //@ts-ignore
             authorize()(context),
@@ -167,6 +175,8 @@ describe("authorize.general.test.ts", function() {
       types.forEach(type => {
         methods.forEach(method => {
           const context = makeContext(method, type);
+          // @ts-ignore
+          markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
           const query = Object.assign({}, context.params.query);
           //@ts-ignore
           const promise = authorize({ availableFields: ["id", "userId", "test"] })(context).then(result => {
@@ -208,6 +218,8 @@ describe("authorize.general.test.ts", function() {
       types.forEach(type => {
         methods.forEach(method => {
           const context = makeContext(method, type);
+          // @ts-ignore
+          markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
           const query = Object.assign({}, context.params.query);
           //@ts-ignore
           const promise = authorize({ availableFields: undefined })(context).then(result => {
@@ -241,6 +253,10 @@ describe("authorize.general.test.ts", function() {
             query: {}
           }
         };
+
+        // @ts-ignore
+        markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
+
         //@ts-ignore
         await assert.doesNotReject(authorize()(context), "passes authorize hook");
       });
@@ -277,6 +293,9 @@ describe("authorize.general.test.ts", function() {
             query: {}
           }
         };
+
+        // @ts-ignore
+        markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
   
         //@ts-ignore
         await assert.doesNotReject(authorize({ availableFields: ["id", "userId", "test"] })(context), "passes authorize hook");
@@ -303,6 +322,9 @@ describe("authorize.general.test.ts", function() {
             query: {}
           }
         };
+
+        // @ts-ignore
+        markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
   
         await assert.rejects(
           //@ts-ignore
@@ -343,6 +365,9 @@ describe("authorize.general.test.ts", function() {
             query: {}
           }
         };
+
+        // @ts-ignore
+        markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
   
         await assert.rejects(
           //@ts-ignore
@@ -351,48 +376,6 @@ describe("authorize.general.test.ts", function() {
           "rejects with 'Forbidden' error"
         );
       });
-  
-      /*it("sets query for own things", async function() {
-        const makeContext = (method, type) => {
-          return {
-            service: {
-              modelName: "tests",
-            },
-            path: "tests",
-            method,
-            type,
-            data: {
-              id: 1,
-              userId: 1,
-              test: true
-            },
-            params: {
-              ability: defineAbility({ resolveAction }, (can) => {
-                can("read", "tests", { userId: 1 });
-                can("update", "tests", { userId: 1 });
-                can("remove", "tests", { userId: 1 });
-              }),
-              query: {},
-            }
-          };
-        };
-  
-        const types = ["before"];
-        const methods = ["find", "get", "update", "patch", "remove"];
-        const promises = [];
-        types.forEach(type => {
-          methods.forEach(method => {
-            const context = makeContext(method, type);
-            const query = Object.assign({}, context.params.query);
-            assert.deepStrictEqual(query, {}, "query is empty");
-            const promise = authorize()(context).then(result => {
-              assert.deepStrictEqual(result.params.query, { userId: 1 }, "queries for user");
-            });
-            promises.push(promise);
-          });
-        });
-        await Promise.all(promises);
-      });*/
   
       it("makes right query for inverted rules", async function() {
         const pairs = [

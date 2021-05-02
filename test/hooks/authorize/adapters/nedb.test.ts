@@ -5,7 +5,7 @@ import path from "path";
 
 // Create a NeDB instance
 const Model = new NeDB({
-  filename: path.join(__dirname, "../../.data/tests.db"),
+  filename: path.join(__dirname, "../../../.data/tests.db"),
   autoload: true
 });
 
