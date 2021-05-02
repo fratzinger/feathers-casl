@@ -12,7 +12,10 @@ import initialize from "./initialize";
 export default initialize;
 
 export { hooks };
+export { authorize, checkBasicPermission } from "./hooks";
+
 export { channels };
+export { getChannelsWithReadAbility } from "./channels";
 
 export { default as makeAbilityFromRules } from "./makeAbilityFromRules";
 
