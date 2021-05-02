@@ -15,6 +15,7 @@ import hasRestrictingFields from "../utils/hasRestrictingFields";
 
 import { Channel, RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
 import { ChannelOptions } from "../types";
+import getAvailableFields from "../utils/getAvailableFields";
 
 interface ConnectionsPerField {
   fields: false | string[], 
@@ -55,11 +56,7 @@ export default (app: Application, data: Record<string, unknown>, context: HookCo
         // connection cannot read item -> don't send data
         continue; 
       }
-      const availableFields = (!options?.availableFields)
-        ? undefined
-        : (typeof options.availableFields === "function")
-          ? options.availableFields(context)
-          : options.availableFields;
+      const availableFields = getAvailableFields(context, options);
 
       const fields = hasRestrictingFields(ability, "get", dataToTest, { availableFields });
       // if fields is true or fields is empty array -> full restriction

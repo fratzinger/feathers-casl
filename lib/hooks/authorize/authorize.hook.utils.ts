@@ -11,7 +11,7 @@ import {
   isMulti
 } from "feathers-utils";
 
-import { 
+import {
   AuthorizeHookOptions,
   AuthorizeHookOptionsExclusive,
   HookBaseOptions,
@@ -20,6 +20,7 @@ import {
 } from "../../types";
 import getFieldsForConditions from "../../utils/getFieldsForConditions";
 import { makeDefaultBaseOptions } from "../common";
+import getAvailableFields from "../../utils/getAvailableFields";
 
 export const makeOptions = (
   app: Application, 
@@ -33,10 +34,7 @@ const defaultOptions: AuthorizeHookOptionsExclusive = {
   adapter: "feathers-memory",
   availableFields: (context: HookContext): string[] => {
     const availableFields: string[] | ((context: HookContext) => string[]) = context.service.options?.casl?.availableFields;
-    if (!availableFields) return undefined;
-    return (typeof availableFields === "function")
-      ? availableFields(context)
-      : availableFields;
+    return getAvailableFields(context, { availableFields });
   }
 };
 

@@ -34,9 +34,15 @@ export interface CheckBasicPermissionHookOptions extends HookBaseOptions {
 
 export type CheckBasicPermissionHookOptionsExclusive = Pick<CheckBasicPermissionHookOptions, Exclude<keyof CheckBasicPermissionHookOptions, keyof HookBaseOptions>>
 
-export interface AuthorizeHookOptions extends HookBaseOptions {
+export type AvailableFieldsOption = string[] | ((context: HookContext) => string[]);
+
+export interface AuthorizeChannelCommonsOptions {
+  availableFields: AvailableFieldsOption
+}
+
+export interface AuthorizeHookOptions extends HookBaseOptions, AuthorizeChannelCommonsOptions {
   adapter: Adapter
-  availableFields: string[] | ((context: HookContext) => string[])
+  
 }
 
 export type AuthorizeHookOptionsExclusive = Pick<AuthorizeHookOptions, Exclude<keyof AuthorizeHookOptions, keyof HookBaseOptions>>
@@ -44,10 +50,9 @@ export type AuthorizeHookOptionsExclusive = Pick<AuthorizeHookOptions, Exclude<k
 
 export type GetModelName = string | ((context: HookContext) => string)
 
-export interface ChannelOptions {
+export interface ChannelOptions extends AuthorizeChannelCommonsOptions {
   ability: AnyAbility | ((app: Application, connection: RealTimeConnection, data: unknown, context: HookContext) => AnyAbility)
   activated: boolean
-  availableFields: string[] | ((context: HookContext) => string[])
   channelOnError: string[]
   modelName: GetModelName
   restrictFields: boolean

@@ -33,6 +33,7 @@ import {
 } from "../../types";
 import { rulesToQuery } from "@casl/ability/extra";
 import checkBasicPermission from "../checkBasicPermission.hook";
+import getAvailableFields from "../../utils/getAvailableFields";
 
 const HOOKNAME = "authorize";
 
@@ -91,11 +92,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       }
     }
 
-    const availableFields = (!options?.availableFields)
-      ? undefined
-      : (typeof options.availableFields === "function")
-        ? options.availableFields(context)
-        : options.availableFields;
+    const availableFields = getAvailableFields(context, options);
 
     const hasRestrictingFieldsOptions: HasRestrictingFieldsOptions = {
       availableFields: availableFields

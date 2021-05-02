@@ -7,6 +7,7 @@ import {
   ChannelOptions,
   InitOptions
 } from "../types";
+import getAvailableFields from "../utils/getAvailableFields";
 
 import { getContextPath } from "../utils/getDefaultModelName";
 
@@ -29,10 +30,7 @@ const defaultOptions: ChannelOptions = {
   restrictFields: true,
   availableFields: (context: HookContext): string[] => {
     const availableFields: string[] | ((context: HookContext) => string[]) = context.service.options?.casl?.availableFields;
-    if (!availableFields) return undefined;
-    return (typeof availableFields === "function")
-      ? availableFields(context)
-      : availableFields;
+    return getAvailableFields(context, { availableFields });
   }
 };
 

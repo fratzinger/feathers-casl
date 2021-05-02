@@ -20,6 +20,7 @@ import {
   AuthorizeHookOptions, HasRestrictingFieldsOptions
 } from "../../types";
 import { Forbidden } from "@feathersjs/errors";
+import getAvailableFields from "../../utils/getAvailableFields";
 
 const HOOKNAME = "authorize";
 
@@ -58,11 +59,8 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     const { ability } = params;
     const items = getItems(context);
 
-    const availableFields = (!options?.availableFields)
-      ? undefined
-      : (typeof options.availableFields === "function")
-        ? options.availableFields(context)
-        : options.availableFields;
+    const availableFields = getAvailableFields(context, options);
+        
     const hasRestrictingFieldsOptions: HasRestrictingFieldsOptions = {
       availableFields: availableFields
     };
