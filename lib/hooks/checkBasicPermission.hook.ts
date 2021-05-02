@@ -1,4 +1,4 @@
-import { subject } from "@casl/ability";
+import { AnyAbility, subject } from "@casl/ability";
 
 import {
   shouldSkip,
@@ -19,10 +19,12 @@ import {
   CheckBasicPermissionHookOptions, CheckBasicPermissionHookOptionsExclusive
 } from "../types";
 import { makeDefaultBaseOptions } from "./common";
+import { getItems } from "feathers-hooks-common";
 
 export const HOOKNAME = "checkBasicPermission";
 
 const defaultOptions: CheckBasicPermissionHookOptionsExclusive = {
+  checkCreateForData: false,
   storeAbilityForAuthorize: false
 };
 
@@ -32,18 +34,18 @@ const makeOptions = (options?: Partial<CheckBasicPermissionHookOptions>): CheckB
 }; 
 
 export default (
-  options: CheckBasicPermissionHookOptions
+  providedOptions?: Partial<CheckBasicPermissionHookOptions>
 ): ((context: HookContext) => Promise<HookContext>) => {
   return async (context: HookContext): Promise<HookContext> => {
     if (
-      !options?.notSkippable && (
+      !providedOptions?.notSkippable && (
         shouldSkip(HOOKNAME, context) ||
         context.type !== "before" ||
         !context.params
       )
     ) { return context; }
 
-    options = makeOptions(options);
+    const options = makeOptions(providedOptions);
 
     const { method } = context;
 
@@ -74,19 +76,7 @@ export default (
       options.actionOnForbidden
     );
 
-    if (method === "create") {
-      // we have all information we need (maybe we need populated data?)
-      const data = (Array.isArray(context.data)) ? context.data : [context.data];
-      for (let i = 0; i < data.length; i++) {
-        throwUnlessCan(
-          ability,
-          method,
-          subject(modelName, data[i]),
-          modelName,
-          options.actionOnForbidden
-        );
-      }
-    }
+    handleCreate(context, ability, modelName, options);
 
     if (options.storeAbilityForAuthorize) {
       setPersistedConfig(context, "ability", ability);
@@ -96,4 +86,37 @@ export default (
 
     return context;
   };
+};
+
+const handleCreate = (
+  context: HookContext,
+  ability: AnyAbility,
+  modelName: string,
+  options: Pick<CheckBasicPermissionHookOptions, "actionOnForbidden" | "checkCreateForData">
+): void => {
+  const { method } = context;
+  if (method !== "create" || !options.checkCreateForData) {
+    return; 
+  }
+  
+  const checkCreateForData = (typeof options.checkCreateForData === "function") 
+    ? options.checkCreateForData(context)
+    : true;
+
+  if (!checkCreateForData) { return; }
+
+  // we have all information we need (maybe we need populated data?)
+  let items = getItems(context);
+  items = (Array.isArray(items)) ? items : [items];
+
+  for (let i = 0, n = items.length; i < n; i++) {
+    throwUnlessCan(
+      ability,
+      method,
+      subject(modelName, items[i]),
+      modelName,
+      options.actionOnForbidden
+    );
+  }
+    
 };

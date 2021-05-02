@@ -28,6 +28,7 @@ export interface HookBaseOptions {
 }
 
 export interface CheckBasicPermissionHookOptions extends HookBaseOptions {
+  checkCreateForData: boolean | ((context: HookContext) => boolean)
   storeAbilityForAuthorize: boolean
 }
 

@@ -14,6 +14,7 @@ import {
 import { 
   AuthorizeHookOptions,
   AuthorizeHookOptionsExclusive,
+  HookBaseOptions,
   InitOptions,
   Path
 } from "../../types";
@@ -54,7 +55,7 @@ const getAppOptions = (app: Application): AuthorizeHookOptions | Record<string, 
 
 export const getAbility = (
   context: HookContext, 
-  options?: Pick<AuthorizeHookOptions, "ability" | "checkAbilityForInternal">
+  options?: Pick<HookBaseOptions, "ability" | "checkAbilityForInternal">
 ): Promise<AnyAbility|undefined> => {
   // if params.ability is set, return it over options.ability
   if (context?.params?.ability) { 

@@ -52,6 +52,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
         ability: options.ability,
         actionOnForbidden: options.actionOnForbidden,
         checkAbilityForInternal: options.checkAbilityForInternal,
+        checkCreateForData: true,
         checkMultiActions: options.checkMultiActions,
         modelName: options.modelName,
         storeAbilityForAuthorize: true
