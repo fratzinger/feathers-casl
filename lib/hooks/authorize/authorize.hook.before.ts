@@ -1,7 +1,7 @@
 import { Forbidden } from "@feathersjs/errors";
 import _isEmpty from "lodash/isEmpty";
 import _pick from "lodash/pick";
-import { subject } from "@casl/ability";
+import { AnyAbility, subject } from "@casl/ability";
 
 import {
   mergeQuery,
@@ -28,12 +28,12 @@ import {
 } from "@feathersjs/feathers";
 
 import {
-  AuthorizeHookOptions,
-  HasRestrictingFieldsOptions
+  AuthorizeHookOptions
 } from "../../types";
 import { rulesToQuery } from "@casl/ability/extra";
 import checkBasicPermission from "../checkBasicPermission.hook";
 import getAvailableFields from "../../utils/getAvailableFields";
+import { checkCreatePerItem } from "../common";
 
 const HOOKNAME = "authorize";
 
@@ -60,8 +60,6 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       });
       await basicCheck(context);
     }
-
-    const { service, method, id, params } = context;
 
     if (!options.modelName) {
       return context;
@@ -92,163 +90,175 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       }
     }
 
+    const { method, id } = context;
     const availableFields = getAvailableFields(context, options);
-
-    const hasRestrictingFieldsOptions: HasRestrictingFieldsOptions = {
-      availableFields: availableFields
-    };
 
     if (["get", "patch", "update", "remove"].includes(method) && id != null) {
       // single: get | patch | update | remove
-
-      // get complete item for `throwUnlessCan`-check to be trustworthy
-      // -> initial 'get' and 'remove' have no data at all
-      // -> initial 'patch' maybe has just partial data
-      // -> initial 'update' maybe has completely changed data, for what the check could pass but not for initial data
-      const queryGet = Object.assign({}, params.query || {});
-      delete queryGet.$select;
-      const paramsGet = Object.assign({}, params, { query: queryGet });
-      paramsGet.skipHooks = (params.skipHooks?.slice()) || [];
-      pushSet(paramsGet, "skipHooks", `${HOOKNAME}`, { unique: true });
-
-      const item = await service.get(id, paramsGet);
-
-      throwUnlessCan(
-        ability,
-        method,
-        subject(modelName, item),
-        modelName,
-        options.actionOnForbidden
-      );
-
-      if (method === "get") {
-        context.result = item;
-        //pushSet(context, "params.skipHooks", "after");
-        return context;
-      }
-
-      // ensure that only allowed data gets changed
-      if (["update", "patch"].includes(method)) {
-        const fields = hasRestrictingFields(ability, method, subject(modelName, item), hasRestrictingFieldsOptions);
-        if (!fields) { return context; }
-        if (fields === true || fields.length === 0) {
-          if (options.actionOnForbidden) { options.actionOnForbidden(); }
-          throw new Forbidden("You're not allowed to make this request");
-        }
-        
-        const data = _pick(context.data, fields);
-
-        // if fields are not overlapping -> throw
-        if (_isEmpty(data)) {
-          if (options.actionOnForbidden) { options.actionOnForbidden(); }
-          throw new Forbidden("You're not allowed to make this request");
-        }
-
-        //TODO: if some fields not match -> `actionOnForbiddenUpdate`
-
-        if (method === "patch") {
-          context.data = data;
-        } else {
-          // merge with initial data
-          const itemPlain = await service._get(id, {});
-          context.data = Object.assign({}, itemPlain, data);
-        }
-      }
-
-      return context;
+      await handleSingle(context, ability, modelName, availableFields, options);
     } else if (method === "find" || (["patch", "remove"].includes(method) && id == null)) {
       // multi: find | patch | remove
-
-      if (method === "patch") {
-        const fields = hasRestrictingFields(ability, method, modelName, { availableFields });
-        if (fields === true) {
-          if (options.actionOnForbidden) { options.actionOnForbidden(); }
-          throw new Forbidden("You're not allowed to make this request");
-        }
-        if (fields && fields.length > 0) {
-          const data = _pick(context.data, fields);
-          context.data = data;
-        }
-      }
-      
-      if (hasRestrictingConditions(ability, method, modelName)) {
-        // TODO: if query and context.params.query differ -> separate calls
-
-        let query;
-        if (
-          [
-            "feathers-memory",
-            "feathers-nedb",
-            "feathers-objection", 
-            "feathers-sequelize"
-          ]
-            .includes(options.adapter)
-        ) {
-          query = rulesToQuery(ability, method, modelName, (rule) => {
-            const { conditions } = rule;
-            return (rule.inverted) ? { $not: conditions } : conditions;
-          });
-        } else if (
-          ["feathers-mongoose"]
-            .includes(options.adapter)
-        ) {
-          query = rulesToQuery(ability, method, modelName, (rule) => {
-            const { conditions } = rule;
-            return (rule.inverted) ? { $nor: [conditions] } : conditions;
-          });
-        } else {
-          query = rulesToQuery(ability, method, modelName, (rule) => {
-            const { conditions } = rule;
-            return (rule.inverted) ? convertRuleToQuery(rule) : conditions;
-          });
-          if (query.$and) {
-            const { $and } = query;
-            delete query.$and;
-            $and.forEach(q => {
-              query = mergeQuery(query, q, {
-                defaultHandle: "intersect",
-                operators: service.operators,
-                useLogicalConjunction: true
-              });
-            });
-          }
-        }
-
-        if (!_isEmpty(query)) {
-          if (!context.params.query) {
-            context.params.query = query;
-          } else {
-            const operators = service.options?.whitelist;
-            context.params.query = mergeQuery(
-              context.params.query, 
-              query, { 
-                defaultHandle: "intersect",
-                operators,
-                useLogicalConjunction: true
-              }
-            );
-          }
-        }
-      }
-
-      return context;
+      await handleMulti(context, ability, modelName, availableFields, options);
     } else if (method === "create") {
       // create: single | multi
-      
-      // we have all information we need (maybe we need populated data?)
-      const data = (Array.isArray(context.data)) ? context.data : [context.data];
-      for (let i = 0; i < data.length; i++) {
-        throwUnlessCan(
-          ability,
-          method,
-          subject(modelName, data[i]),
-          modelName,
-          options.actionOnForbidden
-        );
-      }
-      return context;
+      checkCreatePerItem(context, ability, modelName, { 
+        actionOnForbidden: options.actionOnForbidden, 
+        checkCreateForData: true 
+      });
     }
 
     return context;
   };
+};
+
+const handleSingle = async (
+  context: HookContext,
+  ability: AnyAbility,
+  modelName: string,
+  availableFields: string[] | undefined,
+  options: AuthorizeHookOptions
+): Promise<HookContext> => {
+  const { params, method, service, id } = context;
+  // single: get | patch | update | remove
+
+  // get complete item for `throwUnlessCan`-check to be trustworthy
+  // -> initial 'get' and 'remove' have no data at all
+  // -> initial 'patch' maybe has just partial data
+  // -> initial 'update' maybe has completely changed data, for what the check could pass but not for initial data
+  const queryGet = Object.assign({}, params.query || {});
+  delete queryGet.$select;
+  const paramsGet = Object.assign({}, params, { query: queryGet });
+  paramsGet.skipHooks = (params.skipHooks?.slice()) || [];
+  pushSet(paramsGet, "skipHooks", `${HOOKNAME}`, { unique: true });
+
+  const item = await service.get(id, paramsGet);
+
+  throwUnlessCan(
+    ability,
+    method,
+    subject(modelName, item),
+    modelName,
+    options.actionOnForbidden
+  );
+
+  if (method === "get") {
+    context.result = item;
+    //pushSet(context, "params.skipHooks", "after");
+    return context;
+  }
+
+  // ensure that only allowed data gets changed
+  if (["update", "patch"].includes(method)) {
+    const fields = hasRestrictingFields(ability, method, subject(modelName, item), { availableFields });
+    if (!fields) { return context; }
+    if (fields === true || fields.length === 0) {
+      if (options.actionOnForbidden) { options.actionOnForbidden(); }
+      throw new Forbidden("You're not allowed to make this request");
+    }
+        
+    const data = _pick(context.data, fields);
+
+    // if fields are not overlapping -> throw
+    if (_isEmpty(data)) {
+      if (options.actionOnForbidden) { options.actionOnForbidden(); }
+      throw new Forbidden("You're not allowed to make this request");
+    }
+
+    //TODO: if some fields not match -> `actionOnForbiddenUpdate`
+
+    if (method === "patch") {
+      context.data = data;
+    } else {
+      // merge with initial data
+      const itemPlain = await service._get(id, {});
+      context.data = Object.assign({}, itemPlain, data);
+    }
+  }
+
+  return context;
+};
+
+const handleMulti = async (
+  context: HookContext,
+  ability: AnyAbility,
+  modelName: string,
+  availableFields: string[] | undefined,
+  options: AuthorizeHookOptions
+): Promise<HookContext> => {
+  const { method, service } = context;
+  // multi: find | patch | remove
+
+  if (method === "patch") {
+    const fields = hasRestrictingFields(ability, method, modelName, { availableFields });
+    if (fields === true) {
+      if (options.actionOnForbidden) { options.actionOnForbidden(); }
+      throw new Forbidden("You're not allowed to make this request");
+    }
+    if (fields && fields.length > 0) {
+      const data = _pick(context.data, fields);
+      context.data = data;
+    }
+  }
+      
+  if (hasRestrictingConditions(ability, method, modelName)) {
+    // TODO: if query and context.params.query differ -> separate calls
+
+    let query;
+    if (
+      [
+        "feathers-memory",
+        "feathers-nedb",
+        "feathers-objection", 
+        "feathers-sequelize"
+      ]
+        .includes(options.adapter)
+    ) {
+      query = rulesToQuery(ability, method, modelName, (rule) => {
+        const { conditions } = rule;
+        return (rule.inverted) ? { $not: conditions } : conditions;
+      });
+    } else if (
+      ["feathers-mongoose"]
+        .includes(options.adapter)
+    ) {
+      query = rulesToQuery(ability, method, modelName, (rule) => {
+        const { conditions } = rule;
+        return (rule.inverted) ? { $nor: [conditions] } : conditions;
+      });
+    } else {
+      query = rulesToQuery(ability, method, modelName, (rule) => {
+        const { conditions } = rule;
+        return (rule.inverted) ? convertRuleToQuery(rule) : conditions;
+      });
+      if (query.$and) {
+        const { $and } = query;
+        delete query.$and;
+        $and.forEach(q => {
+          query = mergeQuery(query, q, {
+            defaultHandle: "intersect",
+            operators: service.operators,
+            useLogicalConjunction: true
+          });
+        });
+      }
+    }
+
+    if (!_isEmpty(query)) {
+      if (!context.params.query) {
+        context.params.query = query;
+      } else {
+        const operators = service.options?.whitelist;
+        context.params.query = mergeQuery(
+          context.params.query, 
+          query, { 
+            defaultHandle: "intersect",
+            operators,
+            useLogicalConjunction: true
+          }
+        );
+      }
+    }
+  }
+
+  return context;
 };
