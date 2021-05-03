@@ -168,7 +168,7 @@ module.exports = {
 
 ### Add the authorize-hook to the services
 
-The `authorize`-hook can be used for all methods and has support for `multi: true`. You should use it as a `before` **AND** a `after` hook at the same time. Please make sure to define `before` at last position and `after` at first position. So you don't want to use it in `app.hooks` nor in `all`. For more information, see: [#authorize-hook](/hooks.html#authorize)
+The `authorize`-hook can be used for all methods and has support for `multi: true`. You should use it as a `before` **AND** a `after` hook at the same time. Please make sure to define `before` at last position and `after` at first position. So you don't want to use it in `app.hooks` nor in `all`. For more information, see: [authorize hook](/hooks.html#authorize)
 
 ```js{5,11,14,17,20,23,26,32}
 // src/services/tasks/tasks.hooks.js
