@@ -70,7 +70,7 @@ export default (
       method,
       modelName,
       modelName,
-      options.actionOnForbidden
+      options
     );
 
     checkCreatePerItem(context, ability, modelName, options);

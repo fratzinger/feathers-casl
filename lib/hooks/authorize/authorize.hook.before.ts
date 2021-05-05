@@ -138,7 +138,7 @@ const handleSingle = async (
     method,
     subject(modelName, item),
     modelName,
-    options.actionOnForbidden
+    options
   );
 
   if (method === "get") {

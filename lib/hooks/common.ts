@@ -46,7 +46,7 @@ export const checkCreatePerItem = (
       method,
       subject(modelName, items[i]),
       modelName,
-      options.actionOnForbidden
+      options
     );
   }
 

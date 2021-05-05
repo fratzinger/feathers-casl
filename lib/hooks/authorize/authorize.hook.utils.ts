@@ -105,10 +105,10 @@ export const throwUnlessCan = (
   method: string, 
   resource: string|Record<string, unknown>, 
   modelName: string,
-  actionOnForbidden: () => void
+  options: Pick<HookBaseOptions, "actionOnForbidden">
 ): void => {
   if (ability.cannot(method, resource)) {
-    if (actionOnForbidden) actionOnForbidden();
+    if (options.actionOnForbidden) options.actionOnForbidden();
     throw new Forbidden(`You are not allowed to ${method} ${modelName}`);
   }
 };
