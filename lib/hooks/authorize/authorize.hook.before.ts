@@ -21,7 +21,8 @@ import {
   getAbility,
   throwUnlessCan,
   getPersistedConfig,
-  handleConditionalSelect
+  handleConditionalSelect,
+  getAdapter
 } from "./authorize.hook.utils";
 
 import {
@@ -227,6 +228,8 @@ const handleMulti = async (
   if (hasRestrictingConditions(ability, method, modelName)) {
     // TODO: if query and context.params.query differ -> separate calls
 
+    const adapter = getAdapter(context, options);
+
     let query;
     if (
       [
@@ -235,7 +238,7 @@ const handleMulti = async (
         "feathers-objection", 
         "feathers-sequelize"
       ]
-        .includes(options.adapter)
+        .includes(adapter)
     ) {
       query = rulesToQuery(ability, method, modelName, (rule) => {
         const { conditions } = rule;
@@ -243,7 +246,7 @@ const handleMulti = async (
       });
     } else if (
       ["feathers-mongoose"]
-        .includes(options.adapter)
+        .includes(adapter)
     ) {
       query = rulesToQuery(ability, method, modelName, (rule) => {
         const { conditions } = rule;

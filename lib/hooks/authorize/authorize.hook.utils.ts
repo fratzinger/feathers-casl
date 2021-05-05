@@ -12,6 +12,7 @@ import {
 } from "feathers-utils";
 
 import {
+  Adapter,
   AuthorizeHookOptions,
   AuthorizeHookOptionsExclusive,
   HookBaseOptions,
@@ -31,7 +32,7 @@ export const makeOptions = (
 };
 
 const defaultOptions: AuthorizeHookOptionsExclusive = {
-  adapter: "feathers-memory",
+  adapter: undefined,
   availableFields: (context: HookContext): string[] => {
     const availableFields: string[] | ((context: HookContext) => string[]) = context.service.options?.casl?.availableFields;
     return getAvailableFields(context, { availableFields });
@@ -49,6 +50,16 @@ const getAppOptions = (app: Application): AuthorizeHookOptions | Record<string, 
   return (caslOptions && caslOptions.authorizeHook)
     ? caslOptions.authorizeHook
     : {};
+};
+
+export const getAdapter = (
+  context: HookContext,
+  options: Pick<AuthorizeHookOptions, "adapter">
+): Adapter => {
+  if (options.adapter) { return options.adapter; }
+  const caslAppOptions = context?.app?.get("casl") as InitOptions;
+  if (caslAppOptions?.defaultAdapter) { return caslAppOptions.defaultAdapter; }
+  return "feathers-memory";
 };
 
 export const getAbility = (

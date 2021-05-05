@@ -78,6 +78,7 @@ export interface HasRestrictingFieldsOptions {
 }
 
 export interface InitOptions {
+  defaultAdapter: Adapter
   authorizeHook: AuthorizeHookOptions
   channels: ChannelOptions
 }
