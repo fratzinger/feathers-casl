@@ -39,13 +39,11 @@ const makeService = () => {
   });
 };
   
-describe("authorize-hook nedb", function() {
-  makeTests(
-    "feathers-nedb", 
-    makeService, 
-    async (app, service) => { 
-      await service.remove(null);
-    },
-    { adapter: "feathers-nedb" }
-  );
-});
+makeTests(
+  "feathers-nedb", 
+  makeService, 
+  async (app, service) => { 
+    await service.remove(null);
+  },
+  { adapter: "feathers-nedb" }
+);

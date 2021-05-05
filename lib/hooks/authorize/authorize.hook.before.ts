@@ -1,6 +1,7 @@
 import { Forbidden } from "@feathersjs/errors";
 import _isEmpty from "lodash/isEmpty";
 import _pick from "lodash/pick";
+import _isEqual from "lodash/isEqual";
 import { AnyAbility, subject } from "@casl/ability";
 
 import {
@@ -28,7 +29,7 @@ import {
 } from "@feathersjs/feathers";
 
 import {
-  AuthorizeHookOptions
+  AuthorizeHookOptions, HookBaseOptions
 } from "../../types";
 import { rulesToQuery } from "@casl/ability/extra";
 import checkBasicPermission from "../checkBasicPermission.hook";
@@ -164,6 +165,8 @@ const handleSingle = async (
       throw new Forbidden("You're not allowed to make this request");
     }
 
+    checkData(context, ability, modelName, data, options);
+
     //TODO: if some fields not match -> `actionOnForbiddenUpdate`
 
     if (method === "patch") {
@@ -176,6 +179,27 @@ const handleSingle = async (
   }
 
   return context;
+};
+
+const checkData = async (
+  context: HookContext,
+  ability: AnyAbility,
+  modelName: string,
+  data: Record<string, unknown>,
+  options: Pick<HookBaseOptions, "actionOnForbidden">
+) => {
+  if (!["patch", "update"].includes(context.method)) { return; }
+  const rules = ability.rulesFor(`${context.method}-data`, modelName);
+  rules.forEach(rule => {
+    if (!rule.conditions) { return; }
+    for (const key in rule.conditions) {
+      const { inverted } = rule;
+      if (_isEqual(data[key], rule.conditions[key]) === !inverted) {
+        options.actionOnForbidden();
+        throw new Forbidden("You're not allowed to make this request"); 
+      }
+    }
+  });
 };
 
 const handleMulti = async (

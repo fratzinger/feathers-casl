@@ -13,13 +13,13 @@ import { Application } from "@feathersjs/feathers";
 import authorize from "../../../../../lib/hooks/authorize/authorize.hook";
 import { Adapter, AuthorizeHookOptions } from "../../../../../lib/types";
 
-export default async function(
+export default (
   adapterName: Adapter,
   makeService: () => unknown,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
   afterHooks?: unknown[]
-): Promise<void> {
+): void => {
   let app: Application;
   let service;
   let id;
@@ -174,5 +174,70 @@ export default async function(
       const updatedItem = { [id]: item[id], test: false, userId: 1, supersecret: true, hidden: true };
       assert.deepStrictEqual(itemInDb, updatedItem, "item in db is complete");
     });
+
+    it("basic cannot 'patch-data'", async function() {
+      const readMethod = ["read", "get"];
+      
+      for (const read of readMethod) {
+        await clean(app, service);
+        const item = await service.create({ test: true, userId: 1 });
+        try {
+          await service.patch(item[id], { test: false }, {
+            //@ts-ignore
+            ability: defineAbility((can, cannot) => {
+              can("patch", "tests");
+              cannot("patch-data", "tests", { test: false });
+              can(read, "tests");
+            }, { resolveAction })
+          });
+          assert.fail("should not get here");
+              
+        } catch (err) {
+          assert.ok(err, "should get here");
+        }
+      }
+    });
+
+    it("basic can 'patch-data' with fail", async function() {
+      const readMethod = ["read", "get"];
+      
+      for (const read of readMethod) {
+        await clean(app, service);
+        const item = await service.create({ test: true, userId: 1 });
+        try {
+          await service.patch(item[id], { test: false }, {
+            //@ts-ignore
+            ability: defineAbility((can) => {
+              can("patch", "tests");
+              can("patch-data", "tests", { test: true });
+              can(read, "tests");
+            }, { resolveAction })
+          });
+          assert.fail("should not get here");
+              
+        } catch (err) {
+          assert.ok(err, "should get here");
+        }
+      }
+    });
+
+    it("basic can 'patch-data'", async function () {
+      const readMethod = ["read", "get"];
+      
+      for (const read of readMethod) {
+        await clean(app, service);
+        const item = await service.create({ test: true, userId: 1 });
+        const patchedItem = await service.patch(item[id], { test: false }, {
+          //@ts-ignore
+          ability: defineAbility(can => {
+            can("patch", "tests");
+            can("patch-data", "tests", { test: false });
+            can(read, "tests");
+          }, { resolveAction })
+        });
+        
+        assert.deepStrictEqual(patchedItem, { [id]: item[id], test: false, userId: 1 }, `patched item correctly for read: '${read}'`);
+      }
+    });
   });
-}
+};

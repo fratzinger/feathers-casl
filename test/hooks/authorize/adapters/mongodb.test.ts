@@ -36,21 +36,19 @@ const makeService = () => {
   });
 };
 
-describe("authorize-hook mongodb", function() {
-  before(async function() {
-    const server = new MongoMemoryServer();
-    const uri = await server.getUri();
+before(async function() {
+  const server = new MongoMemoryServer();
+  const uri = await server.getUri();
 
-    const client = await MongoClient.connect(uri);
-    Model = client.db("tests").collection("tests");
-  });
-
-  makeTests(
-    "feathers-mongodb", 
-    makeService, 
-    async (app, service) => { 
-      await service.remove(null);
-    },
-    { adapter: "feathers-mongodb" },
-  );
+  const client = await MongoClient.connect(uri);
+  Model = client.db("tests").collection("tests");
 });
+
+makeTests(
+  "feathers-mongodb", 
+  makeService, 
+  async (app, service) => { 
+    await service.remove(null);
+  },
+  { adapter: "feathers-mongodb" },
+);

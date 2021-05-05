@@ -97,14 +97,12 @@ const afterHooks = [
   }
 ];
 
-describe("authorize-hook sequelize", function() {
-  makeTests(
-    "feathers-sequelize", 
-    makeService, 
-    async () => { 
-      await Model.sync({ force: true });
-    },
-    { adapter: "feathers-sequelize" },
-    afterHooks
-  );
-});
+makeTests(
+  "feathers-sequelize", 
+  makeService, 
+  async () => { 
+    await Model.sync({ force: true });
+  },
+  { adapter: "feathers-sequelize" },
+  afterHooks
+);

@@ -85,23 +85,21 @@ const afterHooks = [
   }
 ];
 
-describe("authorize-hook knex", function() {
-  makeTests(
-    "feathers-knex", 
-    makeService, 
-    async () => {
-      await db.schema.dropTableIfExists("tests");
-      await db.schema.createTable("tests", table => {
-        table.increments("id");
-        table.integer("userId");
-        table.string("hi");
-        table.boolean("test");
-        table.boolean("published");
-        table.boolean("supersecret");
-        table.boolean("hidden");
-      });
-    },
-    { adapter: "feathers-knex" },
-    afterHooks
-  );
-});
+makeTests(
+  "feathers-knex", 
+  makeService, 
+  async () => {
+    await db.schema.dropTableIfExists("tests");
+    await db.schema.createTable("tests", table => {
+      table.increments("id");
+      table.integer("userId");
+      table.string("hi");
+      table.boolean("test");
+      table.boolean("published");
+      table.boolean("supersecret");
+      table.boolean("hidden");
+    });
+  },
+  { adapter: "feathers-knex" },
+  afterHooks
+);

@@ -51,8 +51,15 @@ const afterHooks = [
   }
 ];
 
-describe("authorize-hook mongoose", function() {
-  before(async function() {
+makeTests(
+  "feathers-mongoose", 
+  makeService,
+  async (app, service) => { 
+    await service.remove(null);
+  },
+  { adapter: "feathers-mongoose" },
+  afterHooks,
+  async () => {
     const server = new MongoMemoryServer();
     const uri = await server.getUri();
 
@@ -75,15 +82,5 @@ describe("authorize-hook mongoose", function() {
       client.deleteModel("tests");
     }
     Model = client.model("tests", schema);
-  });
-
-  makeTests(
-    "feathers-mongoose", 
-    makeService, 
-    async (app, service) => { 
-      await service.remove(null);
-    },
-    { adapter: "feathers-mongoose" },
-    afterHooks
-  );
-});
+  }
+);

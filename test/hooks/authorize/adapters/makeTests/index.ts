@@ -14,15 +14,20 @@ export default async function(
   makeService: () => unknown,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
-  afterHooks?: unknown[]
+  afterHooks?: unknown[],
+  actionBefore?: () => Promise<void>
 ): Promise<void> {
-  await makeFindTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
-  await makeGetTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
-  await makeCreateTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
-  await makeCreateMultiTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
-  await makeUpdateTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
-  await makePatchTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
-  await makePatchMultiTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
-  await makeRemoveTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
-  await makeRemoveMultiTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
+  describe(`authorize-hook '${adapterName}'`, function() {
+    if (actionBefore) { before(actionBefore); }
+    makeFindTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
+    makeGetTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
+    makeCreateTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
+    makeCreateMultiTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
+    makeUpdateTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
+    makePatchTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
+    makePatchMultiTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
+    makeRemoveTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
+    makeRemoveMultiTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
+  });
+  
 }

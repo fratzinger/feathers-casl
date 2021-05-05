@@ -13,13 +13,13 @@ import { Application } from "@feathersjs/feathers";
 import authorize from "../../../../../lib/hooks/authorize/authorize.hook";
 import { Adapter, AuthorizeHookOptions } from "../../../../../lib/types";
 
-export default async function (
+export default (
   adapterName: Adapter,
   makeService: () => unknown,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
   afterHooks?: unknown[]
-): Promise<void> {
+): void => {
   let app: Application;
   let service;
   let id;
@@ -141,4 +141,4 @@ export default async function (
       );
     });
   });
-}
+};
