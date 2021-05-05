@@ -1,8 +1,10 @@
 import knex from "knex";
-import makeTests from "./_makeTests";
+import makeTests from "./makeTests";
 import { Service } from "feathers-knex";
 import { getItems } from "feathers-hooks-common";
 import path from "path";
+import { ServiceCaslOptions } from "../../../../lib/types";
+import { HookContext } from "@feathersjs/feathers";
 
 const db  = knex({
   client: "sqlite3",
@@ -18,6 +20,12 @@ db.schema.createTable("messages", table => {
   table.increments("id");
   table.string("text");
 });
+
+declare module "@feathersjs/adapter-commons" {
+  interface ServiceOptions {
+    casl: ServiceCaslOptions
+  }
+}
 
 const makeService = () => {
   return new Service({
@@ -51,7 +59,7 @@ const boolFields = [
 ];
 
 const afterHooks = [
-  context => {
+  (context: HookContext) => {
     let items = getItems(context);
     const isArray = Array.isArray(items);
     items = (isArray) ? items : [items];

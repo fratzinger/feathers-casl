@@ -3,10 +3,18 @@ import mongoose from "mongoose";
 import { Service } from "feathers-mongoose";
 mongoose.Promise = global.Promise;
 
-import makeTests from "./_makeTests";
+import makeTests from "./makeTests";
 import { getItems } from "feathers-hooks-common";
+import { ServiceCaslOptions } from "../../../../lib/types";
+import { HookContext } from "@feathersjs/feathers";
 
 let Model;
+
+declare module "@feathersjs/adapter-commons" {
+  interface ServiceOptions {
+    casl: ServiceCaslOptions
+  }
+}
 
 const makeService = () => {
   return new Service({
@@ -33,7 +41,7 @@ const makeService = () => {
 };
 
 const afterHooks = [
-  context => {
+  (context: HookContext) => {
     let items = getItems(context);
     items = (Array.isArray(items)) ? items : [items];
   
