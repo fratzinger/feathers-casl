@@ -50,12 +50,16 @@ export type AuthorizeHookOptionsExclusive = Pick<AuthorizeHookOptions, Exclude<k
 
 export type GetModelName = string | ((context: HookContext) => string)
 
+export type EventName = "created" | "updated" | "patched" | "removed";
+
+
 export interface ChannelOptions extends AuthorizeChannelCommonsOptions {
   ability: AnyAbility | ((app: Application, connection: RealTimeConnection, data: unknown, context: HookContext) => AnyAbility)
   activated: boolean
   channelOnError: string[]
   modelName: GetModelName
   restrictFields: boolean
+  useReceiveActions: boolean | { [e in EventName]?: boolean }
 }
 
 export interface GetConditionalQueryOptions {

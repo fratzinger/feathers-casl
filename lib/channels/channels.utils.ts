@@ -5,6 +5,7 @@ import { RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/c
 
 import {
   ChannelOptions,
+  EventName,
   InitOptions
 } from "../types";
 import getAvailableFields from "../utils/getAvailableFields";
@@ -31,7 +32,8 @@ const defaultOptions: ChannelOptions = {
   availableFields: (context: HookContext): string[] => {
     const availableFields: string[] | ((context: HookContext) => string[]) = context.service.options?.casl?.availableFields;
     return getAvailableFields(context, { availableFields });
-  }
+  },
+  useReceiveActions: false
 };
 
 export const makeDefaultOptions = (options?: Partial<ChannelOptions>): ChannelOptions => {
@@ -59,4 +61,14 @@ export const getAbility = (
   } else {
     return connection.ability;
   }
+};
+
+export const getEventName = (
+  method: "find" | "get" | "create" | "update" | "patch" | "remove"
+): EventName => {
+  if (method === "create") { return "created"; }
+  else if (method === "update") { return "updated"; }
+  else if (method === "patch") { return "patched"; }
+  else if (method === "remove") { return "removed"; }
+  return undefined;
 };

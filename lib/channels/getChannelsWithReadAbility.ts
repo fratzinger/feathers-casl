@@ -7,7 +7,8 @@ import { subject } from "@casl/ability";
 
 import { 
   makeOptions, 
-  getAbility 
+  getAbility, 
+  getEventName
 } from "./channels.utils";
 
 import getModelName from "../utils/getModelName";
@@ -37,12 +38,24 @@ export default (app: Application, data: Record<string, unknown>, context: HookCo
 
   const dataToTest = subject(modelName, data);
 
+  let method = "get";
+  if (options.useReceiveActions) {
+    if (options.useReceiveActions === true) {
+      method = "receive";
+    } else {
+      const eventName = getEventName(context.method);
+      if (eventName && options.useReceiveActions[eventName] === true) {
+        method === `receive-${method}`;
+      }
+    }
+  }
+
   if (!options.restrictFields) {
     // return all fields for allowed 
     let connections = allConnections
       .filter(connection => {
         const ability = getAbility(app, data, connection, context, options);
-        return ability && ability.can("get", dataToTest);
+        return ability && ability.can(method, dataToTest);
       });
     connections = [...new Set(connections)];
     return new Channel(connections, data);
@@ -52,13 +65,13 @@ export default (app: Application, data: Record<string, unknown>, context: HookCo
     for (let i = 0, n = allConnections.length; i < n; i++) {
       const connection = allConnections[i];
       const { ability } = connection;
-      if (!ability || !ability.can("get", dataToTest)) {
+      if (!ability || !ability.can(method, dataToTest)) {
         // connection cannot read item -> don't send data
         continue; 
       }
       const availableFields = getAvailableFields(context, options);
 
-      const fields = hasRestrictingFields(ability, "get", dataToTest, { availableFields });
+      const fields = hasRestrictingFields(ability, method, dataToTest, { availableFields });
       // if fields is true or fields is empty array -> full restriction
       if (fields && (fields === true || fields.length === 0)) {
         continue;
