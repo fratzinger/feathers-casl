@@ -2,7 +2,7 @@ import makeFindTests from "./find";
 import makeGetTests from "./get";
 import makeCreateTests from "./create";
 import makeCreateMultiTests from "./create-multi";
-import makeUpdateTests from "./create";
+import makeUpdateTests from "./update";
 import makePatchTests from "./patch";
 import makePatchMultiTests from "./patch-multi";
 import makeRemoveTests from "./remove";
