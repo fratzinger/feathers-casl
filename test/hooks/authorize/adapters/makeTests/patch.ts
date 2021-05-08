@@ -181,6 +181,7 @@ export default (
       for (const read of readMethod) {
         await clean(app, service);
         const item = await service.create({ test: true, userId: 1 });
+        let rejected = false;
         try {
           await service.patch(item[id], { test: false }, {
             //@ts-ignore
@@ -189,12 +190,11 @@ export default (
               cannot("patch-data", "tests", { test: false });
               can(read, "tests");
             }, { resolveAction })
-          });
-          assert.fail("should not get here");
-              
+          });              
         } catch (err) {
-          assert.ok(err, "should get here");
+          rejected = true;
         }
+        assert.ok(rejected, "rejected");
       }
     });
 

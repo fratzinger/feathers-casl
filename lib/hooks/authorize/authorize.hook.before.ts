@@ -152,21 +152,22 @@ const handleSingle = async (
   // ensure that only allowed data gets changed
   if (["update", "patch"].includes(method)) {
     const fields = hasRestrictingFields(ability, method, subject(modelName, item), { availableFields });
-    if (!fields) { return context; }
-    if (fields === true || fields.length === 0) {
+    if (fields && (fields === true || fields.length === 0)) {
       if (options.actionOnForbidden) { options.actionOnForbidden(); }
       throw new Forbidden("You're not allowed to make this request");
     }
         
-    const data = _pick(context.data, fields);
+    const data = (!fields) ? context.data : _pick(context.data, fields as string[]);
+
+    checkData(context, ability, modelName, data, options);
+
+    if (!fields) { return context; }
 
     // if fields are not overlapping -> throw
     if (_isEmpty(data)) {
       if (options.actionOnForbidden) { options.actionOnForbidden(); }
       throw new Forbidden("You're not allowed to make this request");
     }
-
-    checkData(context, ability, modelName, data, options);
 
     //TODO: if some fields not match -> `actionOnForbiddenUpdate`
 
@@ -182,21 +183,21 @@ const handleSingle = async (
   return context;
 };
 
-const checkData = async (
+const checkData = (
   context: HookContext,
   ability: AnyAbility,
   modelName: string,
   data: Record<string, unknown>,
   options: Pick<HookBaseOptions, "actionOnForbidden">
-) => {
+): void => {
   if (!["patch", "update"].includes(context.method)) { return; }
   const rules = ability.rulesFor(`${context.method}-data`, modelName);
   rules.forEach(rule => {
     if (!rule.conditions) { return; }
     for (const key in rule.conditions) {
       const { inverted } = rule;
-      if (_isEqual(data[key], rule.conditions[key]) === !inverted) {
-        options.actionOnForbidden();
+      if (_isEqual(data[key], rule.conditions[key]) === inverted) {
+        if (options.actionOnForbidden) { options.actionOnForbidden(); }
         throw new Forbidden("You're not allowed to make this request"); 
       }
     }
