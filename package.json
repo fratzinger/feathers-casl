@@ -6,7 +6,7 @@
   "homepage": "https://feathers-casl.netlify.app/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fratzinger/feathers-utils"
+    "url": "https://github.com/fratzinger/feathers-casl"
   },
   "keywords": [
     "feathers",
