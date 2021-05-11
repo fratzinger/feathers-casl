@@ -57,7 +57,7 @@ describe("channels.receive.test.ts", function() {
 
     users = await app.service("users").create(users);
 
-    const promises = users.map(async (user, i) => {
+    const promises = users.map(async (user) => {
       const socket = io(`http://localhost:${port}`);
       const client = feathers();
       client.configure(socketio(socket));
@@ -181,9 +181,7 @@ describe("channels.receive.test.ts", function() {
         
         service[methodName](...params);
 
-        await Promise.all(promises).catch(err => {
-          const hallo = "";
-        });
+        await Promise.all(promises);
       }
     }
   });
