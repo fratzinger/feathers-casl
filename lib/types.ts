@@ -71,12 +71,6 @@ export interface GetFieldsQueryOptions extends HasRestrictingFieldsOptions {
   
 }
 
-export interface GetQueryOptions 
-  extends GetConditionalQueryOptions, GetFieldsQueryOptions {
-  skipConditional?: boolean
-  skipFields?: boolean
-}
-
 export interface HasRestrictingFieldsOptions {
   availableFields: string[]
 }
@@ -93,3 +87,8 @@ export interface GetMinimalFieldsOptions {
 }
 
 export type Path = string|Array<string|number>;
+
+export interface UtilCheckCanOptions extends Pick<HookBaseOptions, "actionOnForbidden"> {
+  checkGeneral?: boolean,
+  useConditionalSelect?: boolean
+}

@@ -29,5 +29,4 @@ export default async function(
     makeRemoveTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
     makeRemoveMultiTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
   });
-  
 }

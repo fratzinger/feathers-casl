@@ -320,7 +320,7 @@ export default (
     });
 
     describe("with additional query", function() {
-      it("returns only allowed items with getQueryFor", async function () {
+      it("returns only allowed items", async function () {
         await service.create({ test: false, userId: 1 });
         await service.create({ test: true, userId: 2 });
         await service.create({ test: true, userId: 3 });

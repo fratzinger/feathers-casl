@@ -128,7 +128,7 @@ export default (
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     it.skip("returns subset of fields with inverted fields", async function () {});
       
-    it("throws forbidden for not 'can'", async function () {
+    it("throws 'NotFound' for not 'can'", async function () {
       const item = await service.create({ test: true, userId: 1 });
       assert(item[id] !== undefined, "item has id");
       const returnedItem = service.get(item[id], {
@@ -137,25 +137,32 @@ export default (
           can("read", "tests", { userId: 2 });
         }, { resolveAction }),
       });
+      // rejects with 'NotFound' because it's handled by feathers itself
+      // the rejection comes not from `feathers-casl` before/after-hook but from the adapter call
+      // the requesting user should not have the knowledge, that the item exist at all
       await assert.rejects(
         returnedItem,
-        (err) => err.name === "Forbidden",
+        (err) => err.name === "NotFound",
         "rejects for id not allowed"
       );
     });
       
-    it("throws forbidden for explicit 'cannot'", async function () {
+    it("throws 'NotFound' for explicit 'cannot'", async function () {
       const item = await service.create({ test: true, userId: 1 });
       assert(item[id] !== undefined, "item has id");
       const returnedItem = service.get(item[id], {
         //@ts-ignore
         ability: defineAbility((can, cannot) => {
+          can("read", "tests");
           cannot("read", "tests", { userId: 1 });
         }, { resolveAction }),
       });
+      // rejects with 'NotFound' because it's handled by feathers itself
+      // the rejection comes not from `feathers-casl` before/after-hook but from the adapter call
+      // the requesting user should not have the knowledge, that the item exist at all
       await assert.rejects(
         returnedItem,
-        (err) => err.name === "Forbidden",
+        (err) => err.name === "NotFound",
         "rejects for id not allowed"
       );
     });
@@ -163,6 +170,7 @@ export default (
     it("throws if $select and restricted fields don't overlap", async function() {
       const item = await service.create({ test: true, userId: 1, supersecret: true, hidden: true });
       assert(item[id] !== undefined, "item has id");
+
       const promise = service.get(item[id], {
         query: { $select: [id, "supersecret", "hidden"] },
         //@ts-ignore
@@ -170,6 +178,10 @@ export default (
           can("read", "tests", ["test", "userId"]);
         }, { resolveAction }),
       });
+      // rejects with 'Forbidden' which is handled by the after-hook
+      // the requesting user potentially can get the item, but he cannot get these fields
+      // maybe it should not throw, because that is an indication for hackers, that the data exists
+      // default behavior with `$select: ['nonExistent']` is: `{[id]: ${id} }`
       await assert.rejects(
         promise,
         (err) => err.name === "Forbidden",

@@ -1,4 +1,5 @@
 import _get from "lodash/get";
+import _isEmpty from "lodash/isEmpty";
 import _set from "lodash/set";
 import _unset from "lodash/unset";
 
@@ -8,7 +9,7 @@ import { AnyAbility } from "@casl/ability";
 import { Application, HookContext } from "@feathersjs/feathers";
 
 import {
-  isMulti
+  isMulti, mergeQuery
 } from "feathers-utils";
 
 import {
@@ -22,6 +23,9 @@ import {
 import getFieldsForConditions from "../../utils/getFieldsForConditions";
 import { makeDefaultBaseOptions } from "../common";
 import getAvailableFields from "../../utils/getAvailableFields";
+import hasRestrictingConditions from "../../utils/hasRestrictingConditions";
+import { rulesToQuery } from "@casl/ability/extra";
+import convertRuleToQuery from "../../utils/convertRuleToQuery";
 
 export const makeOptions = (
   app: Application, 
@@ -130,19 +134,33 @@ export const handleConditionalSelect = (
   method: string, 
   modelName: string
 ): boolean => {
-  if (!context.params?.query || !context.params?.query?.$select) { return false; }
+  if (!context.params?.query?.$select) { return false; }
   const { $select } = context.params.query;
+  const $newSelect = getConditionalSelect($select, ability, method, modelName);
+  if ($newSelect) {
+    hide$select(context);
+    context.params.query.$select = $newSelect;
+    return true;
+  } else {
+    return false;
+  }
+};
+
+export const getConditionalSelect = (
+  $select: string[], 
+  ability: AnyAbility, 
+  method: string, 
+  modelName: string
+): undefined | string[] => {
+  if (!$select?.length) { return undefined; }
   const fields = getFieldsForConditions(ability, method, modelName);
   if (!fields.length) { 
-    return false; 
+    return undefined; 
   }
 
   const fieldsToAdd = fields.filter(field => !$select.includes(field));
-  if (!fieldsToAdd.length) { return false; }
-  hide$select(context);
-  context.params.query.$select = [...$select, ...fieldsToAdd];
-  
-  return true;
+  if (!fieldsToAdd.length) { return undefined; }
+  return [...$select, ...fieldsToAdd];
 };
 
 export const checkMulti = (
@@ -163,6 +181,74 @@ export const checkMulti = (
 
   if (options?.actionOnForbidden) options.actionOnForbidden();
   throw new Forbidden(`You're not allowed to multi-${method} ${modelName}`);
+};
+
+const adaptersFor$not = [
+  "feathers-memory",
+  "feathers-nedb",
+  "feathers-objection", 
+  "feathers-sequelize"
+];
+
+const adaptersFor$nor = ["feathers-mongoose"];
+
+export const mergeQueryFromAbility = (
+  context: HookContext,
+  ability: AnyAbility,
+  method: string,
+  modelName: string,
+  options: Pick<AuthorizeHookOptions, "adapter">
+): void => {
+  if (hasRestrictingConditions(ability, method, modelName)) {
+    // TODO: if query and context.params.query differ -> separate calls
+
+    const adapter = getAdapter(context, options);
+
+    let query;
+    if (adaptersFor$not.includes(adapter)) {
+      query = rulesToQuery(ability, method, modelName, (rule) => {
+        const { conditions } = rule;
+        return (rule.inverted) ? { $not: conditions } : conditions;
+      });
+    } else if (adaptersFor$nor.includes(adapter)) {
+      query = rulesToQuery(ability, method, modelName, (rule) => {
+        const { conditions } = rule;
+        return (rule.inverted) ? { $nor: [conditions] } : conditions;
+      });
+    } else {
+      query = rulesToQuery(ability, method, modelName, (rule) => {
+        const { conditions } = rule;
+        return (rule.inverted) ? convertRuleToQuery(rule) : conditions;
+      });
+      if (query.$and) {
+        const { $and } = query;
+        delete query.$and;
+        $and.forEach(q => {
+          query = mergeQuery(query, q, {
+            defaultHandle: "intersect",
+            operators: context.service.operators,
+            useLogicalConjunction: true
+          });
+        });
+      }
+    }
+
+    if (!_isEmpty(query)) {
+      if (!context.params.query) {
+        context.params.query = query;
+      } else {
+        const operators = context.service.options?.whitelist;
+        context.params.query = mergeQuery(
+          context.params.query, 
+          query, { 
+            defaultHandle: "intersect",
+            operators,
+            useLogicalConjunction: true
+          }
+        );
+      }
+    }
+  }
 };
 
 export const hide$select = (context: HookContext): unknown => {

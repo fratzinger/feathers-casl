@@ -5,24 +5,21 @@ import _isEqual from "lodash/isEqual";
 import { AnyAbility, subject } from "@casl/ability";
 
 import {
-  mergeQuery,
   shouldSkip,
-  pushSet,
   isMulti
 } from "feathers-utils";
 
 import hasRestrictingFields from "../../utils/hasRestrictingFields";
 import hasRestrictingConditions from "../../utils/hasRestrictingConditions";
 import couldHaveRestrictingFields from "../../utils/couldHaveRestrictingFields";
-import { convertRuleToQuery } from "../../utils/getConditionalQueryFor";
 
 import {
   setPersistedConfig,
   getAbility,
-  throwUnlessCan,
   getPersistedConfig,
   handleConditionalSelect,
-  getAdapter
+  mergeQueryFromAbility,
+  getConditionalSelect
 } from "./authorize.hook.utils";
 
 import {
@@ -32,7 +29,6 @@ import {
 import {
   AuthorizeHookOptions, HookBaseOptions
 } from "../../types";
-import { rulesToQuery } from "@casl/ability/extra";
 import checkBasicPermission from "../checkBasicPermission.hook";
 import getAvailableFields from "../../utils/getAvailableFields";
 import { checkCreatePerItem } from "../common";
@@ -120,48 +116,53 @@ const handleSingle = async (
   availableFields: string[] | undefined,
   options: AuthorizeHookOptions
 ): Promise<HookContext> => {
-  const { params, method, service, id } = context;
   // single: get | patch | update | remove
 
   // get complete item for `throwUnlessCan`-check to be trustworthy
   // -> initial 'get' and 'remove' have no data at all
   // -> initial 'patch' maybe has just partial data
   // -> initial 'update' maybe has completely changed data, for what the check could pass but not for initial data
-  const queryGet = Object.assign({}, params.query || {});
-  delete queryGet.$select;
-  const paramsGet = Object.assign({}, params, { query: queryGet });
-  paramsGet.skipHooks = (params.skipHooks?.slice()) || [];
-  pushSet(paramsGet, "skipHooks", `${HOOKNAME}`, { unique: true });
+  const { params, method, service, id } = context;
 
-  const item = await service.get(id, paramsGet);
-
-  throwUnlessCan(
+  mergeQueryFromAbility(
+    context,
     ability,
     method,
-    subject(modelName, item),
     modelName,
     options
   );
 
   if (method === "get") {
-    context.result = item;
-    //pushSet(context, "params.skipHooks", "after");
-    return context;
+    handleConditionalSelect(context, ability, method, modelName);
+    return;
   }
 
   // ensure that only allowed data gets changed
   if (["update", "patch"].includes(method)) {
-    const fields = hasRestrictingFields(ability, method, subject(modelName, item), { availableFields });
-    if (fields && (fields === true || fields.length === 0)) {
+    const queryGet = Object.assign({}, params.query || {});
+    if (queryGet.$select) {
+      const $select = getConditionalSelect(queryGet.$select, ability, method, modelName);
+      if ($select) {
+        queryGet.$select = $select;
+      }
+    }
+    const paramsGet = Object.assign({}, params, { query: queryGet });
+
+    // TODO: If not allowed to .get() and to .[method](), then throw "NotFound" (maybe optional)
+
+    const item = await service._get(id, paramsGet);
+  
+    const restrictingFields = hasRestrictingFields(ability, method, subject(modelName, item), { availableFields });
+    if (restrictingFields && (restrictingFields === true || restrictingFields.length === 0)) {
       if (options.actionOnForbidden) { options.actionOnForbidden(); }
       throw new Forbidden("You're not allowed to make this request");
     }
         
-    const data = (!fields) ? context.data : _pick(context.data, fields as string[]);
+    const data = (!restrictingFields) ? context.data : _pick(context.data, restrictingFields as string[]);
 
     checkData(context, ability, modelName, data, options);
 
-    if (!fields) { return context; }
+    if (!restrictingFields) { return context; }
 
     // if fields are not overlapping -> throw
     if (_isEmpty(data)) {
@@ -211,7 +212,7 @@ const handleMulti = async (
   availableFields: string[] | undefined,
   options: AuthorizeHookOptions
 ): Promise<HookContext> => {
-  const { method, service } = context;
+  const { method } = context;
   // multi: find | patch | remove
 
   if (method === "patch") {
@@ -225,68 +226,14 @@ const handleMulti = async (
       context.data = data;
     }
   }
-      
-  if (hasRestrictingConditions(ability, method, modelName)) {
-    // TODO: if query and context.params.query differ -> separate calls
-
-    const adapter = getAdapter(context, options);
-
-    let query;
-    if (
-      [
-        "feathers-memory",
-        "feathers-nedb",
-        "feathers-objection", 
-        "feathers-sequelize"
-      ]
-        .includes(adapter)
-    ) {
-      query = rulesToQuery(ability, method, modelName, (rule) => {
-        const { conditions } = rule;
-        return (rule.inverted) ? { $not: conditions } : conditions;
-      });
-    } else if (
-      ["feathers-mongoose"]
-        .includes(adapter)
-    ) {
-      query = rulesToQuery(ability, method, modelName, (rule) => {
-        const { conditions } = rule;
-        return (rule.inverted) ? { $nor: [conditions] } : conditions;
-      });
-    } else {
-      query = rulesToQuery(ability, method, modelName, (rule) => {
-        const { conditions } = rule;
-        return (rule.inverted) ? convertRuleToQuery(rule) : conditions;
-      });
-      if (query.$and) {
-        const { $and } = query;
-        delete query.$and;
-        $and.forEach(q => {
-          query = mergeQuery(query, q, {
-            defaultHandle: "intersect",
-            operators: service.operators,
-            useLogicalConjunction: true
-          });
-        });
-      }
-    }
-
-    if (!_isEmpty(query)) {
-      if (!context.params.query) {
-        context.params.query = query;
-      } else {
-        const operators = service.options?.whitelist;
-        context.params.query = mergeQuery(
-          context.params.query, 
-          query, { 
-            defaultHandle: "intersect",
-            operators,
-            useLogicalConjunction: true
-          }
-        );
-      }
-    }
-  }
+  
+  mergeQueryFromAbility(
+    context,
+    ability,
+    method,
+    modelName,
+    options
+  );
 
   return context;
 };

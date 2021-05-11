@@ -6,7 +6,7 @@ import {
   getModelName
 } from "../../lib/utils/getDefaultModelName";
 
-describe("getDefaultModelName", function() {
+describe("utils - getDefaultModelName", function() {
   it("getContextPath", function() {
     const path = "tests";
     assert.strictEqual(

@@ -3,7 +3,7 @@ import assert from "assert";
 
 import getModelName from "../../lib/utils/getModelName";
 
-describe("getModelName", function() {
+describe("utils - getModelName", function() {
   it("as undefined", function() {
     const modelName = undefined;
     const context = { path: "Test2" } as unknown as HookContext;
