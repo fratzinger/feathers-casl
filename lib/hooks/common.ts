@@ -1,7 +1,7 @@
 import { AnyAbility, subject } from "@casl/ability";
 import { HookContext } from "@feathersjs/feathers";
 import { getItems } from "feathers-hooks-common";
-import { CheckBasicPermissionHookOptions, HookBaseOptions } from "../types";
+import { CheckBasicPermissionHookOptions, HookBaseOptions, ThrowUnlessCanOptions } from "../types";
 import { throwUnlessCan } from "./authorize/authorize.hook.utils";
 
 const defaultOptions: HookBaseOptions = {
@@ -23,7 +23,7 @@ export const checkCreatePerItem = (
   context: HookContext,
   ability: AnyAbility,
   modelName: string,
-  options: Pick<HookBaseOptions, "actionOnForbidden"> & Partial<Pick<CheckBasicPermissionHookOptions, "checkCreateForData">>
+  options: Partial<Pick<ThrowUnlessCanOptions, "actionOnForbidden" | "skipThrow">> & Partial<Pick<CheckBasicPermissionHookOptions, "checkCreateForData">>
 ): HookContext => {
   const { method } = context;
   if (method !== "create" || !options.checkCreateForData) {

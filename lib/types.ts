@@ -88,7 +88,11 @@ export interface GetMinimalFieldsOptions {
 
 export type Path = string|Array<string|number>;
 
-export interface UtilCheckCanOptions extends Pick<HookBaseOptions, "actionOnForbidden"> {
+export interface ThrowUnlessCanOptions extends Pick<HookBaseOptions, "actionOnForbidden"> {
+  skipThrow: boolean
+}
+
+export interface UtilCheckCanOptions extends ThrowUnlessCanOptions {
   checkGeneral?: boolean,
   useConditionalSelect?: boolean
 }

@@ -18,7 +18,8 @@ import {
   AuthorizeHookOptionsExclusive,
   HookBaseOptions,
   InitOptions,
-  Path
+  Path,
+  ThrowUnlessCanOptions
 } from "../../types";
 import getFieldsForConditions from "../../utils/getFieldsForConditions";
 import { makeDefaultBaseOptions } from "../common";
@@ -120,12 +121,16 @@ export const throwUnlessCan = (
   method: string, 
   resource: string|Record<string, unknown>, 
   modelName: string,
-  options: Pick<HookBaseOptions, "actionOnForbidden">
-): void => {
+  options: Partial<ThrowUnlessCanOptions>
+): boolean => {
   if (ability.cannot(method, resource)) {
     if (options.actionOnForbidden) options.actionOnForbidden();
-    throw new Forbidden(`You are not allowed to ${method} ${modelName}`);
+    if (!options.skipThrow) {
+      throw new Forbidden(`You are not allowed to ${method} ${modelName}`);
+    }
+    return false;
   }
+  return true;
 };
 
 export const handleConditionalSelect = (

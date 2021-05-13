@@ -11,6 +11,7 @@ const makeOptions = (
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     actionOnForbidden: () => {},
     checkGeneral: true,
+    skipThrow: false,
     useConditionalSelect: true
   };
   return Object.assign(defaultOptions, providedOptions || {});
@@ -23,17 +24,19 @@ const checkCan = async <S>(
   modelName: string,
   service: Service<S>,
   providedOptions?: Partial<UtilCheckCanOptions>
-): Promise<void> => {
+): Promise<boolean> => {
   const options = makeOptions(providedOptions);
   if (options.checkGeneral) {
-    throwUnlessCan(
+    const can = throwUnlessCan(
       ability,
       method,
       modelName,
       modelName,
       options
     );
+    if (!can) { return false; }
   }
+  
   let params;
   if (options.useConditionalSelect) {
     const $select = getFieldsForConditions(ability, method, modelName);
@@ -44,13 +47,14 @@ const checkCan = async <S>(
   
   const item = await service._get(id, params);
     
-  throwUnlessCan(
+  const can = throwUnlessCan(
     ability,
     method,
     subject(modelName, item),
     modelName,
     options
   );
+  return can;
 };
 
 export default checkCan;
