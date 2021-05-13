@@ -33,7 +33,7 @@ const defaultOptions: ChannelOptions = {
     const availableFields: string[] | ((context: HookContext) => string[]) = context.service.options?.casl?.availableFields;
     return getAvailableFields(context, { availableFields });
   },
-  useReceiveActions: false
+  useActionName: "get"
 };
 
 export const makeDefaultOptions = (options?: Partial<ChannelOptions>): ChannelOptions => {

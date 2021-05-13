@@ -39,13 +39,16 @@ export default (app: Application, data: Record<string, unknown>, context: HookCo
   const dataToTest = subject(modelName, data);
 
   let method = "get";
-  if (options.useReceiveActions) {
-    if (options.useReceiveActions === true) {
-      method = "receive";
+  if (options.useActionName && (
+    typeof options.useActionName === "string" ||
+    typeof options.useActionName === "object"
+  )) {
+    if (typeof options.useActionName === "string") {
+      method = options.useActionName;
     } else {
       const eventName = getEventName(context.method);
-      if (eventName && options.useReceiveActions[eventName] === true) {
-        method === `receive-${method}`;
+      if (eventName && options.useActionName[eventName]) {
+        method = options.useActionName[eventName];
       }
     }
   }

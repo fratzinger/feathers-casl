@@ -59,7 +59,7 @@ export interface ChannelOptions extends AuthorizeChannelCommonsOptions {
   channelOnError: string[]
   modelName: GetModelName
   restrictFields: boolean
-  useReceiveActions: boolean | { [e in EventName]?: boolean }
+  useActionName: string | { [e in EventName]?: string }
 }
 
 export interface GetConditionalQueryOptions {

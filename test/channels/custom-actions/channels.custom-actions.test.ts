@@ -5,8 +5,8 @@ import { Server } from "http";
 import io from "socket.io-client";
 
 import mockServer from "../.mockServer";
-import channels1 from "./mockChannels.receive";
-import services1 from "./mockServices.receive";
+import channels1 from "./mockChannels.custom-actions";
+import services1 from "./mockServices.custom-actions";
 
 const promiseTimeout = function(
   ms: number, 
@@ -28,7 +28,7 @@ const promiseTimeout = function(
   ]);
 };
 
-describe("channels.receive.test.ts", function() {
+describe("channels.custom-actions.test.ts", function() {
   let server: Server;
   let app: Application;
 
@@ -126,13 +126,13 @@ describe("channels.receive.test.ts", function() {
 
       const methods = {
         create: {
-          params: [{ id: 0, test: true, userId: 4 }],
+          params: [{ id: 0, published: true, test: true, userId: 4 }],
           event: "created",
           expectedPerClient: {
-            0: { id: 0, test: true, userId: 4 },
-            1: false,
+            0: { id: 0, published: true, test: true, userId: 4 },
+            1: (servicePath === "articles") ? { id: 0, published: true, test: true, userId: 4 } : false,
             2: false,
-            3: { id: 0, test: true, userId: 4 },
+            3: { id: 0, published: true, test: true, userId: 4 },
             4: (servicePath === "articles") ? false : { id: 0 },
             5: false
           } 
@@ -142,10 +142,10 @@ describe("channels.receive.test.ts", function() {
           event: "updated",
           expectedPerClient: {
             0: { id: 0, test: false, userId: 4 },
-            1: false,
+            1: (servicePath === "comments") ? { test: false } : false,
             2: false,
             3: { id: 0, test: false, userId: 4 },
-            4: (servicePath === "articles") ? false : { id: 0 },
+            4: false,
             5: false
           }
         },
@@ -154,7 +154,7 @@ describe("channels.receive.test.ts", function() {
           event: "patched",
           expectedPerClient: {
             0: { id: 0, test: true, userId: 1, title: "test" },
-            1: false,
+            1: (servicePath === "comments") ? { id: 0, test: true, userId: 1, title: "test" } : false,
             2: false,
             3: { id: 0, test: true, userId: 1, title: "test" },
             4: false,
@@ -166,7 +166,9 @@ describe("channels.receive.test.ts", function() {
           event: "removed",
           expectedPerClient: {
             0: { id: 0, test: true, userId: 1, title: "test" },
-            1: false,
+            1: (servicePath === "articles") 
+              ? { id: 0, test: true, userId: 1, title: "test" }
+              : { id: 0 },
             2: false,
             3: { id: 0, test: true, userId: 1, title: "test" },
             4: false,

@@ -27,7 +27,12 @@ export default function(app: Application): void {
   });
 
   const caslOptions = makeOptions(app, {
-    useActionName: "receive"
+    useActionName: {
+      created: "receive-created",
+      patched: "receive-patched",
+      removed: "receive-removed",
+      updated: "receive-updated" 
+    }
   });
 
   //@ts-ignore

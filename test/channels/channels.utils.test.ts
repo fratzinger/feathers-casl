@@ -8,7 +8,7 @@ describe("channels.utils.test.ts", function() {
     assert.strictEqual(options.activated, true, "is activated by default");
     assert.deepStrictEqual(options.channelOnError, ["authenticated"], "returns 'authenticated' by default");
     assert.strictEqual(options.restrictFields, true, "restrict Fields by default");
-    assert.strictEqual(options.useReceiveActions, false, "use native eventNames by default");
+    assert.strictEqual(options.useActionName, "get", "use native eventName by default");
   });
 
   it("getEventName", function() {
