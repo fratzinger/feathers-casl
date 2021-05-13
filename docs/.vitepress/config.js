@@ -15,6 +15,7 @@ module.exports = {
         { text: 'Getting Started', link: '/getting-started' },
         { text: 'Hooks', link: '/hooks'},
         { text: 'Channels', link: '/channels'},
+        { text: 'Utils', link: '/utils' },
         { text: 'Cookbook', link: '/cookbook'},
         { text: 'Client side', link: '/client-side'},
         { text: 'Gotchas', link: '/gotchas'}

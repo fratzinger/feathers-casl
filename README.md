@@ -27,14 +27,20 @@ It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CA
 - Restrict by conditions: `can('create', 'Task', { userId: user.id })`
 - Restrict by individual fields: `cannot('update', 'User', ['roleId'])`
 - Native support for restrictive `$select`: `can('read', 'User', ['id', 'username'])` -> `$select: ['id', 'username']`
-- Supports `channels` right away (every connection only gets updates based on `can('read' ...)`)
-- `channels`-support also regards restrictive fields
-- Disallow/allow `multi` methods (`create`, `patch`, `remove`) dynamically with: `can('remove-multi', 'Task', { userId: user.id })`
-- Support for dynamic rules stored in your database (Bring your own implementation ;) )
 - Support to define abilities for anything (providers, users, roles, 3rd party apps, ...)
 - Fully supported adapters: `feathers-knex`, `feathers-memory`, `feathers-mongodb`, `feathers-mongoose`, `feathers-nedb`, `feathers-objection`, `feathers-sequelize`
+- Support for dynamic rules stored in your database (Bring your own implementation ;) )
+- hooks:
+  - `checkBasicPermission` hook for client side usage as a before-hook
+  - `authorize` hook for complex rules
+  - Disallow/allow `multi` methods (`create`, `patch`, `remove`) dynamically with: `can('remove-multi', 'Task', { userId: user.id })`
+- channels:
+  - every connection only receives updates based on rules
+  - `channels`-support also regards restrictive fields
+  - rules can be defined individually for events
+- utils:
+  - `checkCan` to be used in hooks to check authorization before operations
 - Baked in support for `@casl/angular`, `@casl/react`, `@casl/vue` and `@casl/aurelia`
-- `checkBasicPermission` hook for client side usage as a before-hook
 
 ## Documentation
 You need more information? Please have a look:
