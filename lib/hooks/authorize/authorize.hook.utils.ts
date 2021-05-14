@@ -41,7 +41,9 @@ const defaultOptions: AuthorizeHookOptionsExclusive = {
   availableFields: (context: HookContext): string[] => {
     const availableFields: string[] | ((context: HookContext) => string[]) = context.service.options?.casl?.availableFields;
     return getAvailableFields(context, { availableFields });
-  }
+  },
+  usePatchData: false,
+  useUpdateData: false
 };
 
 export const makeDefaultOptions = (

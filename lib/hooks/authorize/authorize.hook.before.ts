@@ -1,7 +1,6 @@
 import { Forbidden } from "@feathersjs/errors";
 import _isEmpty from "lodash/isEmpty";
 import _pick from "lodash/pick";
-import _isEqual from "lodash/isEqual";
 import { AnyAbility, subject } from "@casl/ability";
 
 import {
@@ -19,7 +18,8 @@ import {
   getPersistedConfig,
   handleConditionalSelect,
   mergeQueryFromAbility,
-  getConditionalSelect
+  getConditionalSelect,
+  throwUnlessCan
 } from "./authorize.hook.utils";
 
 import {
@@ -27,7 +27,7 @@ import {
 } from "@feathersjs/feathers";
 
 import {
-  AuthorizeHookOptions, HookBaseOptions
+  AuthorizeHookOptions
 } from "../../types";
 import checkBasicPermission from "../checkBasicPermission.hook";
 import getAvailableFields from "../../utils/getAvailableFields";
@@ -35,7 +35,9 @@ import { checkCreatePerItem } from "../common";
 
 const HOOKNAME = "authorize";
 
-export default (options: AuthorizeHookOptions): ((context: HookContext) => Promise<HookContext>) => {
+export default (
+  options: AuthorizeHookOptions
+): ((context: HookContext) => Promise<HookContext>) => {
   return async (context: HookContext): Promise<HookContext> => {
     if (
       !options?.notSkippable && (
@@ -189,20 +191,19 @@ const checkData = (
   ability: AnyAbility,
   modelName: string,
   data: Record<string, unknown>,
-  options: Pick<HookBaseOptions, "actionOnForbidden">
+  options: Pick<AuthorizeHookOptions, "actionOnForbidden" | "usePatchData" | "useUpdateData">
 ): void => {
-  if (!["patch", "update"].includes(context.method)) { return; }
-  const rules = ability.rulesFor(`${context.method}-data`, modelName);
-  rules.forEach(rule => {
-    if (!rule.conditions) { return; }
-    for (const key in rule.conditions) {
-      const { inverted } = rule;
-      if (_isEqual(data[key], rule.conditions[key]) === inverted) {
-        if (options.actionOnForbidden) { options.actionOnForbidden(); }
-        throw new Forbidden("You're not allowed to make this request"); 
-      }
-    }
-  });
+  if (
+    (context.method === "patch" && !options.usePatchData) ||
+    (context.method === "update" && !options.useUpdateData)
+  ) { return; }
+  throwUnlessCan(
+    ability,
+    `${context.method}-data`,
+    subject(modelName, data),
+    modelName,
+    options
+  );
 };
 
 const handleMulti = async (

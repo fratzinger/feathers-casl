@@ -42,7 +42,8 @@ export interface AuthorizeChannelCommonsOptions {
 
 export interface AuthorizeHookOptions extends HookBaseOptions, AuthorizeChannelCommonsOptions {
   adapter: Adapter
-  
+  useUpdateData: boolean
+  usePatchData: boolean
 }
 
 export type AuthorizeHookOptionsExclusive = Pick<AuthorizeHookOptions, Exclude<keyof AuthorizeHookOptions, keyof HookBaseOptions>>

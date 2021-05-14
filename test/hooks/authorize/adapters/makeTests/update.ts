@@ -34,7 +34,7 @@ export default (
       ? it.skip
       : it;
   };
-      
+
   describe(`${adapterName}: beforeAndAfter - update`, function () {
     
     beforeEach(async function () {
@@ -188,71 +188,6 @@ export default (
       const itemInDb = await service.get(item[id]);
       
       assert.deepStrictEqual(itemInDb, updatedItem, "item in db is complete");
-    });
-
-    it("basic cannot 'update-data'", async function() {
-      const readMethod = ["read", "get"];
-      
-      for (const read of readMethod) {
-        await clean(app, service);
-        const item = await service.create({ test: true, userId: 1 });
-        let rejected = false;
-        try {
-          await service.update(item[id], { test: false, userId: 1 }, {
-            //@ts-ignore
-            ability: defineAbility((can, cannot) => {
-              can("update", "tests");
-              cannot("update-data", "tests", { test: false });
-              can(read, "tests");
-            }, { resolveAction })
-          });              
-        } catch (err) {
-          rejected = true;
-        }
-        assert.ok(rejected, "rejected");
-      }
-    });
-
-    it("basic can 'update-data' with fail", async function() {
-      const readMethod = ["read", "get"];
-      
-      for (const read of readMethod) {
-        await clean(app, service);
-        const item = await service.create({ test: true, userId: 1 });
-        try {
-          await service.update(item[id], { test: false, userId: 1 }, {
-            //@ts-ignore
-            ability: defineAbility((can) => {
-              can("update", "tests");
-              can("update-data", "tests", { test: true });
-              can(read, "tests");
-            }, { resolveAction })
-          });
-          assert.fail("should not get here");
-              
-        } catch (err) {
-          assert.ok(err, "should get here");
-        }
-      }
-    });
-
-    it("basic can 'update-data'", async function () {
-      const readMethod = ["read", "get"];
-      
-      for (const read of readMethod) {
-        await clean(app, service);
-        const item = await service.create({ test: true, userId: 1 });
-        const UpdatedItem = await service.update(item[id], { test: false, userId: 1 }, {
-          //@ts-ignore
-          ability: defineAbility(can => {
-            can("update", "tests");
-            can("update-data", "tests", { test: false });
-            can(read, "tests");
-          }, { resolveAction })
-        });
-        
-        assert.deepStrictEqual(UpdatedItem, { [id]: item[id], test: false, userId: 1 }, `updated item correctly for read: '${read}'`);
-      }
     });
   });
 };
