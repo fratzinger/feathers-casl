@@ -11,7 +11,7 @@ const resolveAction = createAliasResolver({
 
 import { Application } from "@feathersjs/feathers";
 
-import authorize from "../../lib/hooks/authorize/authorize.hook";
+import authorize from "../../../lib/hooks/authorize/authorize.hook";
 
 describe("authorize.options.test.ts", function () {
   let app: Application;

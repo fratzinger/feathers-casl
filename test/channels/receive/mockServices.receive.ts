@@ -32,6 +32,10 @@ const defineAbilitiesFor = (user): Ability => {
       can("read", "comments", ["id", "title"], { userId: user.id });
     } else if (user.id === 2) {
       can("read", "comments", { userId: user.id });
+    } else if (user.id === 3) {
+      can("receive", "all");
+    } else if (user.id === 4) {
+      can("receive", "comments", ["id"], { userId: user.id });
     }
   }, { resolveAction });
 };

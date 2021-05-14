@@ -1,14 +1,16 @@
 import knex from "knex";
-import makeTests from "./_makeTests";
+import makeTests from "./makeTests";
 import { Service } from "feathers-knex";
 import { getItems } from "feathers-hooks-common";
 import path from "path";
+import { ServiceCaslOptions } from "../../../../lib/types";
+import { HookContext } from "@feathersjs/feathers";
 
 const db  = knex({
   client: "sqlite3",
   debug: false,
   connection: {
-    filename: path.join(__dirname, "../../.data/db.sqlite")
+    filename: path.join(__dirname, "../../../.data/db.sqlite")
   },
   useNullAsDefault: true
 });
@@ -18,6 +20,12 @@ db.schema.createTable("messages", table => {
   table.increments("id");
   table.string("text");
 });
+
+declare module "@feathersjs/adapter-commons" {
+  interface ServiceOptions {
+    casl: ServiceCaslOptions
+  }
+}
 
 const makeService = () => {
   return new Service({
@@ -51,7 +59,7 @@ const boolFields = [
 ];
 
 const afterHooks = [
-  context => {
+  (context: HookContext) => {
     let items = getItems(context);
     const isArray = Array.isArray(items);
     items = (isArray) ? items : [items];
@@ -77,23 +85,21 @@ const afterHooks = [
   }
 ];
 
-describe("authorize-hook knex", function() {
-  makeTests(
-    "feathers-knex", 
-    makeService, 
-    async () => {
-      await db.schema.dropTableIfExists("tests");
-      await db.schema.createTable("tests", table => {
-        table.increments("id");
-        table.integer("userId");
-        table.string("hi");
-        table.boolean("test");
-        table.boolean("published");
-        table.boolean("supersecret");
-        table.boolean("hidden");
-      });
-    },
-    { adapter: "feathers-knex" },
-    afterHooks
-  );
-});
+makeTests(
+  "feathers-knex", 
+  makeService, 
+  async () => {
+    await db.schema.dropTableIfExists("tests");
+    await db.schema.createTable("tests", table => {
+      table.increments("id");
+      table.integer("userId");
+      table.string("hi");
+      table.boolean("test");
+      table.boolean("published");
+      table.boolean("supersecret");
+      table.boolean("hidden");
+    });
+  },
+  { adapter: "feathers-knex" },
+  afterHooks
+);

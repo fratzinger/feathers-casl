@@ -19,6 +19,7 @@ export default (options?: PartialDeep<InitOptions>): ((app: Application) => void
     throw new Error("You passed 'feathers-casl' to app.configure() without a function. You probably wanted to call app.configure(casl({}))!");
   }
   options = {
+    defaultAdapter: options?.defaultAdapter || "feathers-memory",
     authorizeHook: makeDefaultAuthorizeHookOptions(options?.authorizeHook as undefined|Partial<AuthorizeHookOptions>),
     channels: makeDefaultChannelsOptions(options?.channels as undefined|Partial<ChannelOptions>)
   };

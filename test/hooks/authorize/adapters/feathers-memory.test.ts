@@ -1,5 +1,12 @@
 import { Service } from "feathers-memory";
-import makeTests from "./_makeTests";
+import { ServiceCaslOptions } from "../../../../lib/types";
+import makeTests from "./makeTests";
+
+declare module "@feathersjs/adapter-commons" {
+  interface ServiceOptions {
+    casl: ServiceCaslOptions
+  }
+}
 
 const makeService = () => {
   return new Service({
@@ -23,13 +30,11 @@ const makeService = () => {
   });
 };
 
-describe("authorize-hook feathers-memory", function() {
-  makeTests(
-    "feathers-memory", 
-    makeService,
-    async (app, service) => {
-      await service.remove(null);
-    },
-    { adapter: "feathers-memory" }
-  );
-});
+makeTests(
+  "feathers-memory", 
+  makeService,
+  async (app, service) => {
+    await service.remove(null);
+  },
+  { adapter: "feathers-memory" }
+);

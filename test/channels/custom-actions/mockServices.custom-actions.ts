@@ -28,10 +28,20 @@ const defineAbilitiesFor = (user): Ability => {
     if (user.id === 0) {
       can("manage", "all");
     } else if (user.id === 1) {
-      can("read", "articles", { published: true });
+      can("receive-created", "articles", { published: true });
+      can("receive-updated", "comments", ["test"]);
+      can("receive-patched", "articles", { test: false });
+      can("receive-patched", "comments");
+      can("receive-removed", "articles", { userId: 1 });
+      can("receive-removed", "comments", ["id"], { userId: 1 });
       can("read", "comments", ["id", "title"], { userId: user.id });
     } else if (user.id === 2) {
-      can("read", "comments", { userId: user.id });
+      can("receive", "all");
+      can("receive-created", "comments", { userId: user.id });
+    } else if (user.id === 3) {
+      can(["receive-created", "receive-updated", "receive-patched", "receive-removed"], "all");
+    } else if (user.id === 4) {
+      can("receive-created", "comments", ["id"], { userId: user.id });
     }
   }, { resolveAction });
 };

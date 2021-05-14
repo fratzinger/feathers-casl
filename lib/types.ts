@@ -18,25 +18,49 @@ export interface ServiceCaslOptions {
   availableFields: string[]
 }
 
-export interface AuthorizeHookOptions {
+export interface HookBaseOptions {
   ability: AnyAbility | ((context: HookContext) => AnyAbility | Promise<AnyAbility>)
   actionOnForbidden: undefined | (() => void)
-  adapter: Adapter
-  availableFields: string[] | ((context: HookContext) => string[])
   checkAbilityForInternal: boolean
   checkMultiActions: boolean
   modelName: GetModelName
+  notSkippable: boolean
 }
+
+export interface CheckBasicPermissionHookOptions extends HookBaseOptions {
+  checkCreateForData: boolean | ((context: HookContext) => boolean)
+  storeAbilityForAuthorize: boolean
+}
+
+export type CheckBasicPermissionHookOptionsExclusive = Pick<CheckBasicPermissionHookOptions, Exclude<keyof CheckBasicPermissionHookOptions, keyof HookBaseOptions>>
+
+export type AvailableFieldsOption = string[] | ((context: HookContext) => string[]);
+
+export interface AuthorizeChannelCommonsOptions {
+  availableFields: AvailableFieldsOption
+}
+
+export interface AuthorizeHookOptions extends HookBaseOptions, AuthorizeChannelCommonsOptions {
+  adapter: Adapter
+  useUpdateData: boolean
+  usePatchData: boolean
+}
+
+export type AuthorizeHookOptionsExclusive = Pick<AuthorizeHookOptions, Exclude<keyof AuthorizeHookOptions, keyof HookBaseOptions>>
+
 
 export type GetModelName = string | ((context: HookContext) => string)
 
-export interface ChannelOptions {
+export type EventName = "created" | "updated" | "patched" | "removed";
+
+
+export interface ChannelOptions extends AuthorizeChannelCommonsOptions {
   ability: AnyAbility | ((app: Application, connection: RealTimeConnection, data: unknown, context: HookContext) => AnyAbility)
   activated: boolean
-  availableFields: string[] | ((context: HookContext) => string[])
   channelOnError: string[]
   modelName: GetModelName
   restrictFields: boolean
+  useActionName: string | { [e in EventName]?: string }
 }
 
 export interface GetConditionalQueryOptions {
@@ -48,17 +72,12 @@ export interface GetFieldsQueryOptions extends HasRestrictingFieldsOptions {
   
 }
 
-export interface GetQueryOptions 
-  extends GetConditionalQueryOptions, GetFieldsQueryOptions {
-  skipConditional?: boolean
-  skipFields?: boolean
-}
-
 export interface HasRestrictingFieldsOptions {
   availableFields: string[]
 }
 
 export interface InitOptions {
+  defaultAdapter: Adapter
   authorizeHook: AuthorizeHookOptions
   channels: ChannelOptions
 }
@@ -69,3 +88,12 @@ export interface GetMinimalFieldsOptions {
 }
 
 export type Path = string|Array<string|number>;
+
+export interface ThrowUnlessCanOptions extends Pick<HookBaseOptions, "actionOnForbidden"> {
+  skipThrow: boolean
+}
+
+export interface UtilCheckCanOptions extends ThrowUnlessCanOptions {
+  checkGeneral?: boolean,
+  useConditionalSelect?: boolean
+}
