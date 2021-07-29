@@ -1,9 +1,11 @@
 import * as hooks from "./hooks";
 import * as channels from "./channels";
 
+// utils
+import checkCan from "./utils/checkCan";
 import hasRestrictingConditions from "./utils/hasRestrictingConditions";
 import hasRestrictingFields from "./utils/hasRestrictingFields";
-import checkCan from "./utils/checkCan";
+import mergeQueryFromAbility from "./utils/mergeQueryFromAbility";
 
 import initialize from "./initialize";
 
@@ -27,9 +29,10 @@ export {
 export { checkCan };
 
 export const utils = {
+  checkCan,
   hasRestrictingConditions,
   hasRestrictingFields,
-  checkCan
+  mergeQueryFromAbility
 };
 
 if (typeof module !== "undefined") {

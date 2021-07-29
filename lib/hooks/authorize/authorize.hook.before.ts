@@ -1,6 +1,7 @@
 import { Forbidden } from "@feathersjs/errors";
 import _isEmpty from "lodash/isEmpty";
 import _pick from "lodash/pick";
+import _set from "lodash/set";
 import { AnyAbility, subject } from "@casl/ability";
 
 import {
@@ -17,7 +18,6 @@ import {
   getAbility,
   getPersistedConfig,
   handleConditionalSelect,
-  mergeQueryFromAbility,
   getConditionalSelect,
   throwUnlessCan
 } from "./authorize.hook.utils";
@@ -32,6 +32,7 @@ import {
 import checkBasicPermission from "../checkBasicPermission.hook";
 import getAvailableFields from "../../utils/getAvailableFields";
 import { checkCreatePerItem } from "../common";
+import mergeQueryFromAbility from "../../utils/mergeQueryFromAbility";
 
 const HOOKNAME = "authorize";
 
@@ -126,13 +127,17 @@ const handleSingle = async (
   // -> initial 'update' maybe has completely changed data, for what the check could pass but not for initial data
   const { params, method, service, id } = context;
 
-  mergeQueryFromAbility(
-    context,
+  const query = mergeQueryFromAbility(
+    context.app,
     ability,
     method,
     modelName,
+    context.params?.query,
+    context.service,
     options
   );
+
+  _set(context, "params.query", query);
 
   if (method === "get") {
     handleConditionalSelect(context, ability, method, modelName);
@@ -228,13 +233,17 @@ const handleMulti = async (
     }
   }
   
-  mergeQueryFromAbility(
-    context,
+  const query = mergeQueryFromAbility(
+    context.app,
     ability,
     method,
     modelName,
+    context.params?.query,
+    context.service,
     options
   );
+
+  _set(context, "params.query", query);
 
   return context;
 };

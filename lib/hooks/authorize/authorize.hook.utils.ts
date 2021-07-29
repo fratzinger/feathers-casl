@@ -60,11 +60,11 @@ const getAppOptions = (app: Application): AuthorizeHookOptions | Record<string, 
 };
 
 export const getAdapter = (
-  context: HookContext,
+  app: Application,
   options: Pick<AuthorizeHookOptions, "adapter">
 ): Adapter => {
   if (options.adapter) { return options.adapter; }
-  const caslAppOptions = context?.app?.get("casl") as InitOptions;
+  const caslAppOptions = app?.get("casl") as InitOptions;
   if (caslAppOptions?.defaultAdapter) { return caslAppOptions.defaultAdapter; }
   return "feathers-memory";
 };
@@ -188,74 +188,6 @@ export const checkMulti = (
 
   if (options?.actionOnForbidden) options.actionOnForbidden();
   throw new Forbidden(`You're not allowed to multi-${method} ${modelName}`);
-};
-
-const adaptersFor$not = [
-  "feathers-memory",
-  "feathers-nedb",
-  "feathers-objection", 
-  "feathers-sequelize"
-];
-
-const adaptersFor$nor = ["feathers-mongoose"];
-
-export const mergeQueryFromAbility = (
-  context: HookContext,
-  ability: AnyAbility,
-  method: string,
-  modelName: string,
-  options: Pick<AuthorizeHookOptions, "adapter">
-): void => {
-  if (hasRestrictingConditions(ability, method, modelName)) {
-    // TODO: if query and context.params.query differ -> separate calls
-
-    const adapter = getAdapter(context, options);
-
-    let query;
-    if (adaptersFor$not.includes(adapter)) {
-      query = rulesToQuery(ability, method, modelName, (rule) => {
-        const { conditions } = rule;
-        return (rule.inverted) ? { $not: conditions } : conditions;
-      });
-    } else if (adaptersFor$nor.includes(adapter)) {
-      query = rulesToQuery(ability, method, modelName, (rule) => {
-        const { conditions } = rule;
-        return (rule.inverted) ? { $nor: [conditions] } : conditions;
-      });
-    } else {
-      query = rulesToQuery(ability, method, modelName, (rule) => {
-        const { conditions } = rule;
-        return (rule.inverted) ? convertRuleToQuery(rule) : conditions;
-      });
-      if (query.$and) {
-        const { $and } = query;
-        delete query.$and;
-        $and.forEach(q => {
-          query = mergeQuery(query, q, {
-            defaultHandle: "intersect",
-            operators: context.service.operators,
-            useLogicalConjunction: true
-          });
-        });
-      }
-    }
-
-    if (!_isEmpty(query)) {
-      if (!context.params.query) {
-        context.params.query = query;
-      } else {
-        const operators = context.service.options?.whitelist;
-        context.params.query = mergeQuery(
-          context.params.query, 
-          query, { 
-            defaultHandle: "intersect",
-            operators,
-            useLogicalConjunction: true
-          }
-        );
-      }
-    }
-  }
 };
 
 export const hide$select = (context: HookContext): unknown => {
