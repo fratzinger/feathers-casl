@@ -22,17 +22,18 @@ import {
   throwUnlessCan
 } from "./authorize.hook.utils";
 
-import {
-  HookContext
-} from "@feathersjs/feathers";
-
-import {
-  AuthorizeHookOptions
-} from "../../types";
 import checkBasicPermission from "../checkBasicPermission.hook";
 import getAvailableFields from "../../utils/getAvailableFields";
 import { checkCreatePerItem } from "../common";
 import mergeQueryFromAbility from "../../utils/mergeQueryFromAbility";
+
+import type {
+  HookContext
+} from "@feathersjs/feathers";
+
+import type {
+  AuthorizeHookOptions
+} from "../../types";
 
 const HOOKNAME = "authorize";
 

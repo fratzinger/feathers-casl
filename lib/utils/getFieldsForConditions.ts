@@ -1,4 +1,4 @@
-import { AnyAbility } from "@casl/ability";
+import type { AnyAbility } from "@casl/ability";
 
 const getFieldsForConditions = (
   ability: AnyAbility, 

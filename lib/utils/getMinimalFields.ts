@@ -1,6 +1,8 @@
-import { AnyAbility, detectSubjectType } from "@casl/ability";
+import { detectSubjectType } from "@casl/ability";
 import { mergeArrays } from "feathers-utils";
-import { GetMinimalFieldsOptions } from "../types";
+
+import type { AnyAbility } from "@casl/ability";
+import type { GetMinimalFieldsOptions } from "../types";
 
 const getMinimalFields = (
   ability: AnyAbility, 

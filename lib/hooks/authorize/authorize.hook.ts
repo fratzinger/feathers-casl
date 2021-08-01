@@ -4,11 +4,11 @@ import { makeOptions } from "./authorize.hook.utils";
 import authorizeAfter from "./authorize.hook.after";
 import authorizeBefore from "./authorize.hook.before";
 
-import {
+import type {
   HookContext
 } from "@feathersjs/feathers";
 
-import {
+import type {
   AuthorizeHookOptions
 } from "../../types";
 

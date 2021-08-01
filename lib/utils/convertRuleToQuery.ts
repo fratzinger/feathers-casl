@@ -1,10 +1,9 @@
 import _isPlainObject from "lodash/isPlainObject";
 
-import { SubjectRawRule, MongoQuery, ClaimRawRule } from "@casl/ability";
-import { Query } from "@feathersjs/feathers";
-
-import { GetConditionalQueryOptions } from "../types";
-import { AnyObject } from "@casl/ability/dist/types/types";
+import type { SubjectRawRule, MongoQuery, ClaimRawRule } from "@casl/ability";
+import type { Query } from "@feathersjs/feathers";
+import type { GetConditionalQueryOptions } from "../types";
+import type { AnyObject } from "@casl/ability/dist/types/types";
 
 const invertedMap = {
   "$gt": "$lte",

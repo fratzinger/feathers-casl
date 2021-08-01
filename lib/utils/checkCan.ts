@@ -1,8 +1,11 @@
-import { AnyAbility, subject } from "@casl/ability";
-import { Id, Service } from "@feathersjs/feathers";
+import { subject } from "@casl/ability";
 import { throwUnlessCan } from "../hooks/authorize/authorize.hook.utils";
-import { UtilCheckCanOptions } from "../types";
+
 import getFieldsForConditions from "./getFieldsForConditions";
+
+import type { AnyAbility } from "@casl/ability";
+import type { Id, Service } from "@feathersjs/feathers";
+import type { UtilCheckCanOptions } from "../types";
 
 const makeOptions = (
   providedOptions: Partial<UtilCheckCanOptions>

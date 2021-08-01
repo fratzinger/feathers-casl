@@ -1,9 +1,10 @@
-import { HookContext, Application } from "@feathersjs/feathers";
 import _isEqual from "lodash/isEqual";
 import _pick from "lodash/pick";
 import _isEmpty from "lodash/isEmpty";
 import "@feathersjs/transport-commons";
 import { subject } from "@casl/ability";
+
+import { Channel } from "@feathersjs/transport-commons/lib/channels/channel/base";
 
 import { 
   makeOptions, 
@@ -14,9 +15,11 @@ import {
 import getModelName from "../utils/getModelName";
 import hasRestrictingFields from "../utils/hasRestrictingFields";
 
-import { Channel, RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
-import { ChannelOptions } from "../types";
 import getAvailableFields from "../utils/getAvailableFields";
+
+import type { HookContext, Application } from "@feathersjs/feathers";
+import type { RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
+import type { ChannelOptions } from "../types";
 
 interface ConnectionsPerField {
   fields: false | string[], 

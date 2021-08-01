@@ -9,14 +9,16 @@ import {
   throwUnlessCan
 } from "./authorize/authorize.hook.utils";
 
-import {
+import { checkCreatePerItem, makeDefaultBaseOptions } from "./common";
+
+import type {
   HookContext
 } from "@feathersjs/feathers";
 
-import {
-  CheckBasicPermissionHookOptions, CheckBasicPermissionHookOptionsExclusive
+import type {
+  CheckBasicPermissionHookOptions, 
+  CheckBasicPermissionHookOptionsExclusive
 } from "../types";
-import { checkCreatePerItem, makeDefaultBaseOptions } from "./common";
 
 export const HOOKNAME = "checkBasicPermission";
 

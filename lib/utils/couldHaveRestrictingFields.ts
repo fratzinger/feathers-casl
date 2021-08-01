@@ -1,4 +1,4 @@
-import { AnyAbility } from "@casl/ability";
+import type { AnyAbility } from "@casl/ability";
 
 function couldHaveRestrictingFields(ability: AnyAbility, action: string, subjectType: string): boolean {
   return ability.possibleRulesFor(action, subjectType).some(rule => {

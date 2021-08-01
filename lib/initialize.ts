@@ -1,6 +1,3 @@
-import { Application } from "@feathersjs/feathers";
-import { PartialDeep } from "type-fest";
-
 import { 
   makeDefaultOptions as makeDefaultAuthorizeHookOptions
 } from "./hooks/authorize/authorize.hook.utils";
@@ -9,7 +6,9 @@ import {
   makeDefaultOptions as makeDefaultChannelsOptions
 } from "./channels/channels.utils";
 
-import { AuthorizeHookOptions, ChannelOptions, InitOptions } from "./types";
+import type { Application } from "@feathersjs/feathers";
+import type { PartialDeep } from "type-fest";
+import type { AuthorizeHookOptions, ChannelOptions, InitOptions } from "./types";
 
 export default (options?: PartialDeep<InitOptions>): ((app: Application) => void) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment

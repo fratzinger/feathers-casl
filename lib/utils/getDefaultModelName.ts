@@ -1,4 +1,4 @@
-import { HookContext } from "@feathersjs/feathers";
+import type { HookContext } from "@feathersjs/feathers";
 
 export const getContextPath = (context: Pick<HookContext, "path">): string => {
   return context.path;

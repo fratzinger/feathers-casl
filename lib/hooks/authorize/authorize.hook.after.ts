@@ -2,8 +2,6 @@ import { getItems, replaceItems } from "feathers-hooks-common";
 import { subject } from "@casl/ability";
 import _pick from "lodash/pick";
 import _isEmpty from "lodash/isEmpty";
-import { HookContext } from "@feathersjs/feathers";
-import hasRestrictingFields from "../../utils/hasRestrictingFields";
 
 import { shouldSkip, mergeArrays } from "feathers-utils";
 
@@ -14,13 +12,18 @@ import {
   makeOptions
 } from "./authorize.hook.utils";
 
+import hasRestrictingFields from "../../utils/hasRestrictingFields";
+
 import getModelName from "../../utils/getModelName";
 
-import {
-  AuthorizeHookOptions, HasRestrictingFieldsOptions
-} from "../../types";
 import { Forbidden } from "@feathersjs/errors";
 import getAvailableFields from "../../utils/getAvailableFields";
+
+import type { HookContext } from "@feathersjs/feathers";
+import type {
+  AuthorizeHookOptions, 
+  HasRestrictingFieldsOptions
+} from "../../types";
 
 const HOOKNAME = "authorize";
 

@@ -1,12 +1,14 @@
-import { AnyAbility } from "@casl/ability";
 import { rulesToQuery } from "@casl/ability/extra";
-import { Application, Query, Service } from "@feathersjs/feathers";
 import { mergeQuery } from "feathers-utils";
 import _isEmpty from "lodash/isEmpty";
 import { getAdapter } from "../hooks/authorize/authorize.hook.utils";
-import { AuthorizeHookOptions } from "../types";
 import convertRuleToQuery from "./convertRuleToQuery";
 import hasRestrictingConditions from "./hasRestrictingConditions";
+import simplifyQuery from "./simplifyQuery";
+
+import type { AnyAbility } from "@casl/ability";
+import type { Application, Query, Service } from "@feathersjs/feathers";
+import type { AuthorizeHookOptions } from "../types";
 
 const adaptersFor$not = [
   "feathers-memory",
@@ -35,16 +37,19 @@ export default function mergeQueryFromAbility<T>(
         const { conditions } = rule;
         return (rule.inverted) ? { $not: conditions } : conditions;
       });
+      query = simplifyQuery(query);
     } else if (adaptersFor$nor.includes(adapter)) {
       query = rulesToQuery(ability, method, modelName, (rule) => {
         const { conditions } = rule;
         return (rule.inverted) ? { $nor: [conditions] } : conditions;
       });
+      query = simplifyQuery(query);
     } else {
       query = rulesToQuery(ability, method, modelName, (rule) => {
         const { conditions } = rule;
         return (rule.inverted) ? convertRuleToQuery(rule) : conditions;
       });
+      query = simplifyQuery(query);
       if (query.$and) {
         const { $and } = query;
         delete query.$and;

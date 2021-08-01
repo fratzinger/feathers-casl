@@ -1,18 +1,21 @@
 import _get from "lodash/get";
-import _isEmpty from "lodash/isEmpty";
 import _set from "lodash/set";
 import _unset from "lodash/unset";
 
 import { Forbidden } from "@feathersjs/errors";
 
-import { AnyAbility } from "@casl/ability";
-import { Application, HookContext } from "@feathersjs/feathers";
+import getFieldsForConditions from "../../utils/getFieldsForConditions";
+import { makeDefaultBaseOptions } from "../common";
+import getAvailableFields from "../../utils/getAvailableFields";
 
 import {
-  isMulti, mergeQuery
+  isMulti
 } from "feathers-utils";
 
-import {
+import type { AnyAbility } from "@casl/ability";
+import type { Application, HookContext } from "@feathersjs/feathers";
+
+import type {
   Adapter,
   AuthorizeHookOptions,
   AuthorizeHookOptionsExclusive,
@@ -21,12 +24,6 @@ import {
   Path,
   ThrowUnlessCanOptions
 } from "../../types";
-import getFieldsForConditions from "../../utils/getFieldsForConditions";
-import { makeDefaultBaseOptions } from "../common";
-import getAvailableFields from "../../utils/getAvailableFields";
-import hasRestrictingConditions from "../../utils/hasRestrictingConditions";
-import { rulesToQuery } from "@casl/ability/extra";
-import convertRuleToQuery from "../../utils/convertRuleToQuery";
 
 export const makeOptions = (
   app: Application, 

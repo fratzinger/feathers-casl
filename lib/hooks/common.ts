@@ -1,8 +1,15 @@
-import { AnyAbility, subject } from "@casl/ability";
-import { HookContext } from "@feathersjs/feathers";
+import { subject } from "@casl/ability";
 import { getItems } from "feathers-hooks-common";
-import { CheckBasicPermissionHookOptions, HookBaseOptions, ThrowUnlessCanOptions } from "../types";
+
 import { throwUnlessCan } from "./authorize/authorize.hook.utils";
+
+import type { AnyAbility } from "@casl/ability";
+import type { HookContext } from "@feathersjs/feathers";
+import type { 
+  CheckBasicPermissionHookOptions, 
+  HookBaseOptions, 
+  ThrowUnlessCanOptions 
+} from "../types";
 
 const defaultOptions: HookBaseOptions = {
   ability: undefined,

@@ -268,6 +268,37 @@ describe("authorize.general.test.ts", function() {
       await Promise.all(promises);
     });
 
+    it("makes clean query with multiple rules", async function() {
+      const expectedResult = { id: 1, userId: 1, test: true };
+      const makeContext = (method, type) => {
+        return {
+          service: {
+            modelName: "Test",
+          },
+          path: "tests",
+          method,
+          type,
+          result: Object.assign({}, expectedResult),
+          id: 1,
+          params: {
+            ability: defineAbility((can) => {
+              can(["find"], "tests", { userId: 1 });
+              can(["find"], "tests", { userId: 1 });
+              can(["find"], "tests", { userId: 1 });
+              can(["find"], "tests", { userId: 1 });
+            }, { resolveAction }),
+            query: {
+              test: true
+            },
+          }
+        } as unknown as HookContext;
+      };
+
+      const context = makeContext("find", "before");
+      await authorize({ availableFields: undefined })(context);
+      assert.deepStrictEqual(context.params.query, { $and: [{ userId: 1 }], test: true });
+    });
+
     describe("create", function() {
       it("'create:single' passes", async function() {
         const context = {
@@ -452,28 +483,28 @@ describe("authorize.general.test.ts", function() {
         const pairs = [
           {
             condition: { userId: 1 },
-            inverted: { $and: [ { $not: { userId: 1 } } ] }
+            inverted: { $not: { userId: 1 } }
           }, {
             condition: { userId: { $ne: 1 } },
-            inverted: { $and: [ { $not: { userId: { $ne: 1 } } }] }
+            inverted: { $not: { userId: { $ne: 1 } } }
           }, {
             condition: { userId: { $gt: 1 } },
-            inverted: { $and: [ { $not: { userId: { $gt: 1 } } } ] }
+            inverted: { $not: { userId: { $gt: 1 } } }
           }, {
             condition: { userId: { $gte: 1 } },
-            inverted: { $and: [ { $not: { userId: { $gte: 1 } } } ] }
+            inverted: { $not: { userId: { $gte: 1 } } }
           }, {
             condition: { userId: { $lt: 1 } },
-            inverted: { $and: [ { $not: { userId: { $lt: 1 } } } ] }
+            inverted: { $not: { userId: { $lt: 1 } } }
           }, {
             condition: { userId: { $lte: 1 } },
-            inverted: { $and: [ { $not: { userId: { $lte: 1 } } } ] }
+            inverted: { $not: { userId: { $lte: 1 } } }
           }, {
             condition: { userId: { $in: [1] } },
-            inverted: { $and: [ { $not: { userId: { $in: [1] } } } ] }
+            inverted: { $not: { userId: { $in: [1] } } }
           }, {
             condition: { userId: { $nin: [1] } },
-            inverted: { $and: [ { $not: { userId: { $nin: [1] } } } ] }
+            inverted: { $not: { userId: { $nin: [1] } } }
           }
         ];
         const promises = [];

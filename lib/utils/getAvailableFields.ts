@@ -1,5 +1,5 @@
-import { HookContext } from "@feathersjs/feathers";
-import { AuthorizeChannelCommonsOptions } from "../types";
+import type { HookContext } from "@feathersjs/feathers";
+import type { AuthorizeChannelCommonsOptions } from "../types";
 
 const getAvailableFields = (
   context: HookContext, 
