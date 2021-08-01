@@ -32,3 +32,33 @@ checkCan(
 | `checkGeneral`         | `checkCan` specifically checks for your item. It can do a general check before, so it  |
 | `skipThrow`            | `checkCan` throws by default if the permission check fails. You can change this with the `skipThrow` option, so a boolean will be returned<br><br>**Type:** `boolean`<br>**optional** - *Default:* `false` |
 | `useConditionalSelect` | `checkCan` does a slim `.get()` request by default to get only the fields of the item to check against. You can set `useConditionalSelect: false` to get the full item instead.<br><br>**Type:** `boolean`<br>**optional** - *Default:* `true` |
+
+## mergeQueryFromAbility
+
+This util can be used to compose a query from a provided ability
+
+```typescript
+import { mergeQueryFromAbility } from 'feathers-casl';
+
+const query = mergeQueryFromAbility(
+  app,
+  ability,
+  method,
+  modelName,
+  query,
+  service,
+  options
+);
+```
+
+### Options
+
+| Property    | Description                                 |
+|-------------|---------------------------------------------|
+| `app`       | Your `feathers` app. |
+| `ability`   | The `ability` from `casl` |
+| `method `   | The method to merge rules for. Mostly one of: `'find'`, `'get'`, `'create'`, `'update'`, `'patch'`, `'remove'` <br><br>**Type:** `string` |
+| `modelName` | The modelName to merge rules for. Mostly the service path. <br><br>**Type:** `string` |
+| `query`     | Your query you want to merge rules with. <br><br>**Type:** `object` |
+| `service`   | |
+| `options`   | |

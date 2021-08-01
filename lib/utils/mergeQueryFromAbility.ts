@@ -1,7 +1,7 @@
 import { AnyAbility } from "@casl/ability";
 import { rulesToQuery } from "@casl/ability/extra";
 import { Application, Query, Service } from "@feathersjs/feathers";
-import { mergeQuery } from "feathers-utils/dist";
+import { mergeQuery } from "feathers-utils";
 import _isEmpty from "lodash/isEmpty";
 import { getAdapter } from "../hooks/authorize/authorize.hook.utils";
 import { AuthorizeHookOptions } from "../types";

@@ -26,7 +26,10 @@ export {
   defineAbility
 } from "@casl/ability";
 
-export { checkCan };
+export { 
+  checkCan,
+  mergeQueryFromAbility
+};
 
 export const utils = {
   checkCan,
