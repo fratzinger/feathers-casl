@@ -36,9 +36,7 @@ export default (
       ? it.skip
       : it;
   };
-      
-  
-      
+
   describe(`${adapterName}: beforeAndAfter - create:multi`, function () {
 
     beforeEach(async function () {

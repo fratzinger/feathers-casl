@@ -77,19 +77,21 @@ export default (
       // Ignore internal or not authenticated requests
       return context;
     }
+
+    const multi = isMulti(context);
     
     // if context is with multiple items, there's a change that we need to handle each item separately
-    if (isMulti(context)) {
+    if (multi) {
       handleConditionalSelect(context, ability, "find", modelName);
-      
-      if (!hasRestrictingConditions(ability, "find", modelName)) {
-        setPersistedConfig(context, "skipRestrictingRead.conditions", true);
-      }
 
-      // if has no restricting fields at all -> can skip _pick() in after-hook
       if (!couldHaveRestrictingFields(ability, "find", modelName)) {
+        // if has no restricting fields at all -> can skip _pick() in after-hook
         setPersistedConfig(context, "skipRestrictingRead.fields", true);
       }
+    }
+
+    if (["find", "get"].includes(context.method) || (isMulti && !hasRestrictingConditions(ability, "find", modelName))) {
+      setPersistedConfig(context, "skipRestrictingRead.conditions", true);
     }
 
     const { method, id } = context;
