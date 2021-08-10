@@ -1,6 +1,7 @@
-import type { Query } from "@feathersjs/feathers";
 import _isEqual from "lodash/isEqual";
 import _cloneDeep from "lodash/cloneDeep";
+
+import type { Query } from "@feathersjs/feathers";
 
 const simplifyQuery = (
   query: Query,
