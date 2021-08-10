@@ -56,7 +56,7 @@ export default (
         allAfterHooks.push(...afterHooks);
       }
       allAfterHooks.push(authorize(options));
-      //@ts-ignore
+
       service.hooks({
         before: {
           all: [ authorize(options) ],
@@ -73,7 +73,6 @@ export default (
       const item = await service.create({ test: true, userId: 1 });
       
       const updatedItem = await service.update(item[id], { test: false, userId: 1 }, {
-        //@ts-ignore
         ability: defineAbility(can => {
           can("update", "tests");
         }, { resolveAction })
@@ -96,7 +95,6 @@ export default (
       
       for (const read of readMethod) {
         const updatedItem = await service.update(item[id], { test: false, userId: 1 }, {
-          //@ts-ignore
           ability: defineAbility(can => {
             can("update", "tests");
             can(read, "tests");
@@ -107,39 +105,51 @@ export default (
       }
     });
       
-    it("tests against original data, not updated data", async function () {
-      const item = await service.create({ test: true, userId: 2 });
+    it("tests against original data, not updated data and rejects", async function () {
+      const item = await service.create({ test: true, userId: 1 });
       
-      const promise = service.update(item[id], { test: false, userId: 1 }, {
-        //@ts-ignore
+      const promise = service.update(item[id], { test: false, userId: 2 }, {
         ability: defineAbility((can, cannot) => {
           can("update", "tests");
           cannot("update", "tests", { userId: 1 });
         }, { resolveAction })
       });
       
-      assert.rejects(promise, err => err.name === "Forbidden", "cannot update item");
+      await assert.rejects(promise, err => err.name === "NotFound", "cannot update item");
     });
+
+    it.skip("tests against original data, not updated data and does not reject", async function () {
+      const item = await service.create({ test: true, userId: 2 });
       
-    it("throws if update with restricted fields leads to empty update", async function () {
+      const promise = service.update(item[id], { test: false, userId: 1 }, {
+        ability: defineAbility((can, cannot) => {
+          can("read", "tests");
+          can("update", "tests");
+          cannot("update", "tests", { userId: 1 });
+        }, { resolveAction })
+      });
+      
+      await assert.doesNotReject(promise, "can update item");
+    });
+    
+    //TODO!
+    it.skip("throws if update with restricted fields leads to empty update", async function () {
       const item = await service.create({ test: true, userId: 1 });
       
       const promise = service.update(item[id], { test: false, userId: 1 }, {
-        //@ts-ignore
         ability: defineAbility((can, cannot) => {
           can("update", "tests");
           cannot("update", "tests", ["test"]);
         }, { resolveAction })
       });
       
-      assert.rejects(promise, err => err.name === "Forbidden", "rejects request");
+      await assert.rejects(promise, err => err.name === "Forbidden", "rejects request");
     });
       
     it("assigns original data with updated data for restricted fields", async function () {
       const item = await service.create({ test: true, userId: 1 });
       
       const updatedItem = await service.update(item[id], { test: false, userId: 2 }, {
-        //@ts-ignore
         ability: defineAbility((can) => {
           can("update", "tests", ["test"], { userId: 1 });
           can("read", "tests");
@@ -153,18 +163,29 @@ export default (
       assert.deepStrictEqual(updatedItem, realItem, "result of update is real item");
     });
       
-    it("throws if cannot update item", async function () {
-      const item = await service.create({ test: true, userId: 1 });
-      
-      const promise = service.update(item[id], { test: false, userId: 2 }, {
-        //@ts-ignore
+    itSkip(["feathers-memory", "feathers-knex", "feathers-mongodb", "feathers-nedb"])("throws if cannot update item but passes with other item", async function () {
+      const item1 = await service.create({ test: true, userId: 1 });
+      const item2 = await service.create({ test: true, userId: 2 });
+
+      const promise = service.update(item1[id], { test: false, userId: 2 }, {
         ability: defineAbility((can, cannot) => {
+          can("read", "tests");
           can("update", "tests");
           cannot("update", "tests", { userId: 1 });
         }, { resolveAction })
       });
-      
-      assert.rejects(promise, err => err.name === "Forbidden", "cannot update item");
+
+      await assert.rejects(promise, err => err.name === "NotFound", "cannot update item");
+
+      const updatedItem2 = await service.update(item2[id], { test: false, userId: 1 } , {
+        ability: defineAbility((can, cannot) => {
+          can("read", "tests");
+          can("update", "tests");
+          cannot("update", "tests", { userId: 1 });
+        }, { resolveAction })
+      });
+
+      assert.deepStrictEqual(updatedItem2, { [id]: item2[id], test: false, userId: 1 }, "updated item correctly");
     });
 
     //TODO: skip weird feathers-knex bug
@@ -172,19 +193,18 @@ export default (
       let item = { test: true, userId: 1, supersecret: true, hidden: true };
       
       item = await service.create(item);
-      //@ts-ignore
+
       const updatedItem = { [id]: item[id], test: false, userId: 1, supersecret: true, hidden: true };
-      //@ts-ignore
+
       const result = await service.update(item[id], updatedItem, {
         query: { $select: [id, "supersecret", "hidden"] },
-        //@ts-ignore
         ability: defineAbility((can) => {
           can("read", "tests", ["test", "userId"]);
           can(["create", "update"], "tests");
         }, { resolveAction }),
       });
       assert.deepStrictEqual(result, {}, "returned item is empty because of $select and restricting fields");
-      //@ts-ignore
+
       const itemInDb = await service.get(item[id]);
       
       assert.deepStrictEqual(itemInDb, updatedItem, "item in db is complete");

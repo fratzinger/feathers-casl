@@ -11,13 +11,19 @@ import type { Application, Query, Service } from "@feathersjs/feathers";
 import type { AuthorizeHookOptions } from "../types";
 
 const adaptersFor$not = [
-  "feathers-memory",
   "feathers-nedb",
+];
+
+const adaptersFor$notAsArray = [
   "feathers-objection", 
   "feathers-sequelize"
 ];
   
-const adaptersFor$nor = ["feathers-mongoose"];
+const adaptersFor$nor = [
+  "feathers-memory",
+  "feathers-mongoose",
+  "feathers-mongodb"
+];
 
 export default function mergeQueryFromAbility<T>(
   app: Application,
@@ -36,6 +42,12 @@ export default function mergeQueryFromAbility<T>(
       query = rulesToQuery(ability, method, modelName, (rule) => {
         const { conditions } = rule;
         return (rule.inverted) ? { $not: conditions } : conditions;
+      });
+      query = simplifyQuery(query);
+    } else if (adaptersFor$notAsArray.includes(adapter)) {
+      query = rulesToQuery(ability, method, modelName, (rule) => {
+        const { conditions } = rule;
+        return (rule.inverted) ? { $not: [conditions] } : conditions;
       });
       query = simplifyQuery(query);
     } else if (adaptersFor$nor.includes(adapter)) {

@@ -11,7 +11,7 @@ declare module "@feathersjs/adapter-commons" {
 const makeService = () => {
   return new Service({
     multi: true,
-    whitelist: ["$not", "$and"],
+    whitelist: ["$nor", "$not", "$and"],
     casl: {
       availableFields: [
         "id", 
