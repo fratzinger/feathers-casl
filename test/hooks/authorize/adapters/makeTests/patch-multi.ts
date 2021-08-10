@@ -59,7 +59,6 @@ export default (
         allAfterHooks.push(...afterHooks);
       }
       allAfterHooks.push(authorize(options));
-      //@ts-ignore
       service.hooks({
         before: {
           all: [ authorize(options) ],
@@ -78,7 +77,6 @@ export default (
       const item3 = await service.create({ test: true, userId: 2 });
       
       const patchedItems = await service.patch(null, { test: false }, {
-        //@ts-ignore
         ability: defineAbility(can => {
           can("patch", "tests");
         }, { resolveAction }),
@@ -112,7 +110,6 @@ export default (
         const item3 = await service.create({ test: true, userId: 2 });
         
         const patchedItems = await service.patch(null, { test: false }, {
-          //@ts-ignore
           ability: defineAbility(can => {
             can("patch", "tests");
             can(read, "tests");
@@ -153,7 +150,6 @@ export default (
       const item2 = await service.create({ test: false, userId: 5 });
       
       const patchedItems = await service.patch(null, { test: false, userId: 2 }, {
-        //@ts-ignore
         ability: defineAbility((can) => {
           can("patch", "tests", ["test"], { userId: 1 });
           can("read", "tests");
@@ -185,7 +181,6 @@ export default (
       const item3 = await service.create({ test: true, userId: 2 });
       
       const patchedItems = await service.patch(null, { test: false }, {
-        //@ts-ignore
         ability: defineAbility(can => {
           can("patch", "tests", { userId: 1 });
           can("read", "tests");
@@ -228,7 +223,6 @@ export default (
       items = await service.create(items);
       
       const patchedItems = await service.patch(null, { test: false }, {
-        //@ts-ignore
         ability: defineAbility(can => {
           can("patch", "tests", { userId: 1 });
           can("read", "tests", { published: true });
@@ -268,7 +262,6 @@ export default (
       items = await service.create(items);
       
       const patchedItems = await service.patch(null, { test: false }, {
-        //@ts-ignore
         ability: defineAbility(can => {
           can("patch", "tests", { userId: 1 });
           can("read", "tests", [id], { published: false });

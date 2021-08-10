@@ -57,7 +57,7 @@ export default (
         allAfterHooks.push(...afterHooks);
       }
       allAfterHooks.push(authorize(options));
-      //@ts-ignore
+
       service.hooks({
         before: {
           all: [ authorize(options) ],
@@ -76,7 +76,6 @@ export default (
         const item = await service.create({ test: true, userId: 1 });
         assert(item[id] !== undefined, `item has id for read: '${read}'`);
         const returnedItem = await service.get(item[id], {
-          //@ts-ignore
           ability: defineAbility((can) => {
             can(read, "tests", { userId: 1 });
           }, { resolveAction }),
@@ -94,7 +93,6 @@ export default (
       const item = await service.create({ test: true, userId: 1 });
       assert(item[id] !== undefined, "item has id");
       const returnedItem = await service.get(item[id], {
-        //@ts-ignore
         ability: defineAbility((can) => {
           can("read", "tests", [id], { userId: 1 });
         }, { resolveAction }),
@@ -110,7 +108,6 @@ export default (
       const item = await service.create({ test: true, userId: 1, published: true });
       assert(item[id] !== undefined, "item has id");
       const returnedItem = await service.get(item[id], {
-        //@ts-ignore
         ability: defineAbility((can) => {
           can("read", "tests", [id], { userId: 1 });
         }, { resolveAction }),
@@ -132,7 +129,6 @@ export default (
       const item = await service.create({ test: true, userId: 1 });
       assert(item[id] !== undefined, "item has id");
       const returnedItem = service.get(item[id], {
-        //@ts-ignore
         ability: defineAbility((can) => {
           can("read", "tests", { userId: 2 });
         }, { resolveAction }),
@@ -151,7 +147,6 @@ export default (
       const item = await service.create({ test: true, userId: 1 });
       assert(item[id] !== undefined, "item has id");
       const returnedItem = service.get(item[id], {
-        //@ts-ignore
         ability: defineAbility((can, cannot) => {
           can("read", "tests");
           cannot("read", "tests", { userId: 1 });
@@ -173,7 +168,6 @@ export default (
 
       const promise = service.get(item[id], {
         query: { $select: [id, "supersecret", "hidden"] },
-        //@ts-ignore
         ability: defineAbility((can) => {
           can("read", "tests", ["test", "userId"]);
         }, { resolveAction }),

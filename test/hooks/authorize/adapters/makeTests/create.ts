@@ -57,7 +57,7 @@ export default (
         allAfterHooks.push(...afterHooks);
       }
       allAfterHooks.push(authorize(options));
-      //@ts-ignore
+
       service.hooks({
         before: {
           all: [ authorize(options) ],
@@ -76,7 +76,6 @@ export default (
       const item = await service.create(
         { test: true, userId: 1 },
         {
-          //@ts-ignore
           ability: defineAbility((can) => {
             can("create", "tests", { userId: 1 });
           }, { resolveAction }),
@@ -99,7 +98,6 @@ export default (
       const item = await service.create(
         { test: true, userId: 1 },
         {
-          //@ts-ignore
           ability: defineAbility((can) => {
             can("create", "tests", { userId: 1 }), can("read", "tests");
           }, { resolveAction }),
@@ -117,7 +115,6 @@ export default (
       const promise = service.create(
         { test: true, userId: 1 },
         {
-          //@ts-ignore
           ability: defineAbility((can) => {
             can("create", "tests", { userId: 2 });
           }, { resolveAction }),
@@ -135,7 +132,6 @@ export default (
       const item = await service.create(
         { test: true, userId: 1 },
         {
-          //@ts-ignore
           ability: defineAbility((can) => {
             can("create", "tests", { userId: 1 }),
             can("read", "tests", [id], { userId: 1 });
@@ -146,16 +142,27 @@ export default (
       assert.deepStrictEqual(item, { [id]: item[id] }, "just returns with id");
     });
       
-    it("throws if cannot create item", async function () {
-      const promise = service.create({ test: true, userId: 2 }, {
-        //@ts-ignore
-        ability: defineAbility((can, cannot) => {
-          can("create", "tests");
-          cannot("create", "tests", { userId: 1 });
-        }, { resolveAction })
-      });
-      
-      assert.rejects(promise, err => err.name === "Forbidden", "cannot create item");
+    it("throws if cannot create item but passes with other item", async function () {
+      await assert.rejects(
+        service.create({ test: true, userId: 1 }, {
+          ability: defineAbility((can, cannot) => {
+            can("create", "tests");
+            cannot("create", "tests", { userId: 1 });
+          }, { resolveAction })
+        }), 
+        err => err.name === "Forbidden", 
+        "cannot create item"
+      );
+
+      await assert.doesNotReject(
+        service.create({ test: true, userId: 2 }, {
+          ability: defineAbility((can, cannot) => {
+            can("create", "tests");
+            cannot("create", "tests", { userId: 1 });
+          }, { resolveAction })
+        }),
+        "can create 'userId:2'"
+      );
     });
       
     it("creates item and returns empty object for not overlapping '$select' and 'restricting fields'", async function() {
@@ -164,7 +171,6 @@ export default (
         item,
         {
           query: { $select: [id, "supersecret", "hidden"] },
-          //@ts-ignore
           ability: defineAbility((can) => {
             can("read", "tests", ["test", "userId"]);
             can("create", "tests");

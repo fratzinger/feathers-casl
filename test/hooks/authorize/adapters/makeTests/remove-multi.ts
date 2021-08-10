@@ -58,7 +58,7 @@ export default (
         allAfterHooks.push(...afterHooks);
       }
       allAfterHooks.push(authorize(options));
-      //@ts-ignore
+
       service.hooks({
         before: {
           all: [ authorize(options) ],
@@ -79,7 +79,6 @@ export default (
       const item3 = await service.create({ test: true, userId: 2 });
       
       const removedItems = await service.remove(null, {
-        //@ts-ignore
         ability: defineAbility(can => {
           can("remove", "tests");
         }, { resolveAction }),
@@ -111,7 +110,6 @@ export default (
         const item3 = await service.create({ test: true, userId: 2 });
             
         const removedItems = await service.remove(null, {
-          //@ts-ignore
           ability: defineAbility(can => {
             can("remove", "tests");
             can(read, "tests");
@@ -150,7 +148,6 @@ export default (
       const item3 = await service.create({ test: true, userId: 2 });
       
       const removedItems = await service.remove(null, {
-        //@ts-ignore
         ability: defineAbility(can => {
           can("remove", "tests", { userId: 1 });
           can("read", "tests");
@@ -188,7 +185,6 @@ export default (
       const item5 = await service.create({ published: false, test: true, userId: 2 });
       
       const removedItems = await service.remove(null, {
-        //@ts-ignore
         ability: defineAbility(can => {
           can("remove", "tests", { userId: 1 });
           can("read", "tests", { published: true });
@@ -226,7 +222,6 @@ export default (
       items = await service.create(items);
       
       const removedItems = await service.remove(null, {
-        //@ts-ignore
         ability: defineAbility(can => {
           can("remove", "tests", { userId: 1 });
           can("read", "tests", [id], { published: false });

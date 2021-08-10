@@ -58,7 +58,7 @@ export default (
         allAfterHooks.push(...afterHooks);
       }
       allAfterHooks.push(authorize(options));
-      //@ts-ignore
+
       service.hooks({
         before: {
           all: [ authorize(options) ],
@@ -81,7 +81,6 @@ export default (
         { test: true, hi: "3", userId: 1 },
       ];
       const items = await service.create(itemsArr, {
-        //@ts-ignore
         ability: defineAbility((can) => {
           can("create", "tests", { userId: 1 });
         }, { resolveAction }),
@@ -102,7 +101,6 @@ export default (
           { test: true, hi: "3", userId: 1 },
         ];
         const items = await service.create(itemsArr, {
-          //@ts-ignore
           ability: defineAbility((can) => {
             can("create", "tests", { userId: 1 });
             can(read, "tests");
@@ -126,7 +124,6 @@ export default (
         { test: true, hi: "3", userId: 1 },
       ];
       const promise = service.create(itemsArr, {
-        //@ts-ignore
         ability: defineAbility((can) => {
           can("create", "tests", { userId: 1 });
         }, { resolveAction }),
@@ -146,7 +143,6 @@ export default (
         { test: true, hi: "3", userId: 1 },
       ];
       const items = await service.create(itemsArr, {
-        //@ts-ignore
         ability: defineAbility((can) => {
           can("create", "tests"),
           can("read", "tests"),

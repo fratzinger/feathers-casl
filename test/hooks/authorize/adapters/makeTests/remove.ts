@@ -56,7 +56,7 @@ export default (
         allAfterHooks.push(...afterHooks);
       }
       allAfterHooks.push(authorize(options));
-      //@ts-ignore
+
       service.hooks({
         before: {
           all: [ authorize(options) ],
@@ -73,7 +73,6 @@ export default (
       const item = await service.create({ test: true, userId: 1 });
       
       const updatedItem = await service.remove(item[id], {
-        //@ts-ignore
         ability: defineAbility(can => {
           can("remove", "tests");
         }, { resolveAction })
@@ -92,7 +91,6 @@ export default (
         await clean(app, service);
         const item = await service.create({ test: true, userId: 1 });
         const removedItem = await service.remove(item[id], {
-          //@ts-ignore
           ability: defineAbility(can => {
             can("remove", "tests");
             can(read, "tests");
@@ -110,23 +108,21 @@ export default (
       const item = await service.create({ test: true, userId: 1 });
       
       const promise = service.remove(item[id], {
-        //@ts-ignore
         ability: defineAbility((can, cannot) => {
           can("remove", "tests");
           cannot("remove", "tests", { userId: 1 });
         }, { resolveAction })
       });
       
-      assert.rejects(promise, err => err.name === "Forbidden", "cannot remove item");
+      await assert.rejects(promise, err => err.name === "NotFound", "cannot remove item");
     });
       
     it("removes item and returns empty object for not overlapping '$select' and 'restricting fields'", async function() {
       let item = { test: true, userId: 1, supersecret: true, hidden: true };
       item = await service.create(item);
-      //@ts-ignore
+
       const result = await service.remove(item[id], {
         query: { $select: [id, "supersecret", "hidden"] },
-        //@ts-ignore
         ability: defineAbility((can) => {
           can("read", "tests", ["test", "userId"]);
           can(["create", "remove"], "tests");
@@ -134,7 +130,6 @@ export default (
       });
       assert.deepStrictEqual(result, {}, "returned item is empty because of $select and restricting fields");
       await assert.rejects(
-        //@ts-ignore
         service.get(item[id]),
         err => err.name === "NotFound",
         "item was deleted"

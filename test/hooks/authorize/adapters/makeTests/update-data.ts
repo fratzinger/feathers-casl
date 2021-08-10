@@ -45,7 +45,7 @@ export default (
         allAfterHooks.push(...afterHooks);
       }
       allAfterHooks.push(authorize(options));
-      //@ts-ignore
+
       service.hooks({
         before: {
           all: [ authorize(options) ],
@@ -65,7 +65,6 @@ export default (
         await clean(app, service);
         const item = await service.create({ test: true, userId: 1 });
         const result = await service.update(item[id], { [id]: item[id], test: false, userId: 1 }, {
-          //@ts-ignore
           ability: defineAbility((can) => {
             can("update", "tests");
             can("update-data", "tests");
@@ -85,7 +84,6 @@ export default (
         let rejected = false;
         try {
           await service.update(item[id], { [id]: item[id], test: false, userId: 1 }, {
-            //@ts-ignore
             ability: defineAbility((can) => {
               can("update", "tests");
               can(read, "tests");
@@ -107,7 +105,6 @@ export default (
         let rejected = false;
         try {
           await service.update(item[id], { test: false, userId: 1 }, {
-            //@ts-ignore
             ability: defineAbility((can, cannot) => {
               can("update", "tests");
               can("update-data", "tests");
@@ -130,7 +127,6 @@ export default (
         const item = await service.create({ test: true, userId: 1 });
         try {
           await service.update(item[id], { test: false, userId: 1 }, {
-            //@ts-ignore
             ability: defineAbility((can) => {
               can("update", "tests");
               can("update-data", "tests");
@@ -153,7 +149,6 @@ export default (
         await clean(app, service);
         const item = await service.create({ test: true, userId: 1 });
         const UpdatedItem = await service.update(item[id], { test: false, userId: 1 }, {
-          //@ts-ignore
           ability: defineAbility(can => {
             can("update", "tests");
             can("update-data", "tests");

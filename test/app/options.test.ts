@@ -60,7 +60,6 @@ describe("app-options / service-options", function() {
             calledActionOnForbidden = true;
           },
           checkMultiActions: true,
-          //@ts-ignore
           ability: (context: HookContext): Ability => {
             calledAbility = true;
             return defineAbility(() => {});
@@ -74,7 +73,6 @@ describe("app-options / service-options", function() {
         channels: {
           activated: false,
           channelOnError: ["Test"],
-          //@ts-ignore
           ability: (app: Application, connection: RealTimeConnection, data: unknown, context: HookContext): Ability => {
             calledChannelAbility = true;
             return defineAbility(() => {});
@@ -129,7 +127,6 @@ describe("app-options / service-options", function() {
                 serviceCalled.calledActionOnForbidden = true;
               },
               checkMultiActions: true,
-              //@ts-ignore
               ability: (context: HookContext): Ability => {
                 serviceCalled.calledAbility = true;
                 return defineAbility(() => {});
@@ -150,7 +147,6 @@ describe("app-options / service-options", function() {
           },
           checkAbilityForInternal: true,
           checkMultiActions: true,
-          //@ts-ignore
           ability: (context: HookContext): Ability => {
             appCalled.calledAbility = true;
             return defineAbility(() => {});

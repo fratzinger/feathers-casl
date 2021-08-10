@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import assert from "assert";
 import { createAliasResolver, defineAbility } from "@casl/ability";
 import feathers from "@feathersjs/feathers";
@@ -101,7 +102,7 @@ describe("authorize.relations", function() {
   };
 
   it("basic example without ability", async function() {
-    const { app, serviceAlbums, serviceArtists } = mock();
+    const { serviceAlbums, serviceArtists } = mock();
     const blink182 = await serviceArtists.create({ name: "Blink182" });
     const sum41 = await serviceArtists.create({ name: "Sum 41" });
     const justinBieber = await serviceArtists.create({ name: "Justin Bieber" });

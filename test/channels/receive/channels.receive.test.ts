@@ -107,7 +107,7 @@ describe("channels.receive.test.ts", function() {
         `'client${i}:${servicePath}:${methodName}': receives message`
       );
     } else {
-      assert.rejects(
+      await assert.rejects(
         promiseTimeout(80, fulFill, `'client${i}:${servicePath}:${methodName}': timeout`)
           .finally(() => {
             clients[i].service(servicePath).removeAllListeners(event);

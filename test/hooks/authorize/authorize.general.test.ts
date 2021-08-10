@@ -483,28 +483,28 @@ describe("authorize.general.test.ts", function() {
         const pairs = [
           {
             condition: { userId: 1 },
-            inverted: { $not: { userId: 1 } }
+            inverted: { $nor: [{ userId: 1 }] }
           }, {
             condition: { userId: { $ne: 1 } },
-            inverted: { $not: { userId: { $ne: 1 } } }
+            inverted: { $nor: [{ userId: { $ne: 1 } }] }
           }, {
             condition: { userId: { $gt: 1 } },
-            inverted: { $not: { userId: { $gt: 1 } } }
+            inverted: { $nor: [{ userId: { $gt: 1 } }] }
           }, {
             condition: { userId: { $gte: 1 } },
-            inverted: { $not: { userId: { $gte: 1 } } }
+            inverted: { $nor: [{ userId: { $gte: 1 } }] }
           }, {
             condition: { userId: { $lt: 1 } },
-            inverted: { $not: { userId: { $lt: 1 } } }
+            inverted: { $nor: [{ userId: { $lt: 1 } }] }
           }, {
             condition: { userId: { $lte: 1 } },
-            inverted: { $not: { userId: { $lte: 1 } } }
+            inverted: { $nor: [{ userId: { $lte: 1 } }] }
           }, {
             condition: { userId: { $in: [1] } },
-            inverted: { $not: { userId: { $in: [1] } } }
+            inverted: { $nor: [{ userId: { $in: [1] } }] }
           }, {
             condition: { userId: { $nin: [1] } },
-            inverted: { $not: { userId: { $nin: [1] } } }
+            inverted: { $nor: [{ userId: { $nin: [1] } }] }
           }
         ];
         const promises = [];
@@ -515,7 +515,7 @@ describe("authorize.general.test.ts", function() {
               service: {
                 modelName: "Test",
                 options: {
-                  whitelist: ["$and", "$not"]
+                  whitelist: ["$and", "$not", "$nor"]
                 },
                 get() {
                   return {

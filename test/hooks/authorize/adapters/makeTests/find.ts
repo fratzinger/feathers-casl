@@ -58,7 +58,7 @@ export default (
         allAfterHooks.push(...afterHooks);
       }
       allAfterHooks.push(authorize(options));
-      //@ts-ignore
+
       service.hooks({
         before: {
           all: [ authorize(options) ],
@@ -85,7 +85,6 @@ export default (
           assert.strictEqual(items.length, 3, `has three items for read: '${read}'`);
           
           const returnedItems = await service.find({
-            //@ts-ignore
             ability: defineAbility((can) => {
               can(read, "tests");
             }, { resolveAction }),
@@ -104,7 +103,6 @@ export default (
         assert.strictEqual(items.length, 3, "has three items");
         
         const returnedItems = await service.find({
-          //@ts-ignore
           ability: defineAbility((can) => {
             can("read", "tests", { userId: 1 });
           }, { resolveAction }),
@@ -113,7 +111,6 @@ export default (
         
         assert.deepStrictEqual(
           returnedItems,
-          //@ts-ignore
           [{ [id]: item1[id], test: true, userId: 1 }],
           "just returned one item"
         );
@@ -127,7 +124,6 @@ export default (
         assert.strictEqual(items.length, 3, "has three items");
         
         const returnedItems = await service.find({
-          //@ts-ignore
           ability: defineAbility((can) => {
             can("read", "tests", { userId: 1 }),
             can("read", "tests", [id], { userId: 2 });
@@ -137,7 +133,6 @@ export default (
         
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
-          //@ts-ignore
           _sortBy([
             { [id]: item1[id], test: true, userId: 1 }, 
             { [id]: item2[id] }
@@ -154,7 +149,6 @@ export default (
         assert.strictEqual(items.length, 3, "has three items");
         
         const returnedItems = await service.find({
-          //@ts-ignore
           ability: defineAbility((can, cannot) => {
             can("read", "tests");
             cannot("read", "tests", { userId: 3 });
@@ -165,9 +159,7 @@ export default (
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
           _sortBy([
-            //@ts-ignore
             { [id]: item1[id], test: true, userId: 1 },
-            //@ts-ignore
             { [id]: item2[id], test: true, userId: 2 },
           ], id),
           "just returned two items without userId: 3"
@@ -182,13 +174,12 @@ export default (
         assert.strictEqual(items.length, 3, "has three items");
         
         const returnedItems = service.find({
-          //@ts-ignore
           // eslint-disable-next-line @typescript-eslint/no-empty-function
           ability: defineAbility(() => {}, { resolveAction }),
           paginate: false,
         });
         
-        assert.rejects(
+        await assert.rejects(
           returnedItems,
           (err) => err.name === "Forbidden",
           "throws on find"
@@ -203,14 +194,13 @@ export default (
         assert.strictEqual(items.length, 3, "has three items");
         
         const returnedItems = service.find({
-          //@ts-ignore
           ability: defineAbility((can, cannot) => {
             cannot("read", "tests");
           }, { resolveAction }),
           paginate: false,
         });
         
-        assert.rejects(
+        await assert.rejects(
           returnedItems,
           (err) => err.name === "Forbidden",
           "throws on find"
@@ -225,7 +215,6 @@ export default (
         assert.strictEqual(items.length, 3, "has three items");
         
         const returnedItems = await service.find({
-          //@ts-ignore
           ability: defineAbility((can) => {
             can("read", "tests", { userId: 1 });
             can("manage", "all");
@@ -248,7 +237,6 @@ export default (
         assert.strictEqual(items.length, 3, "has three items");
         
         const returnedItems = await service.find({
-          //@ts-ignore
           ability: defineAbility((can) => {
             can("manage", "all");
             can("read", "tests", { userId: 1 });
@@ -271,7 +259,6 @@ export default (
         assert.strictEqual(items.length, 3, "has three items");
         
         const returnedItems = await service.find({
-          //@ts-ignore
           ability: defineAbility((can, cannot) => {
             can("manage", "all");
             cannot("read", "tests", { userId: 1 });
@@ -299,7 +286,6 @@ export default (
         assert(items.length === 3, "has two items");
   
         const returnedItems = await service.find({
-          //@ts-ignore
           ability: defineAbility(
             (can) => {
               can("read", "tests", { published: true });
@@ -310,7 +296,6 @@ export default (
           paginate: false,
         });
   
-        // @ts-ignore
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
           _sortBy([item1, item2], id),
@@ -330,7 +315,6 @@ export default (
         assert.strictEqual(items.length, 5, "has five items");
         
         const returnedItems = await service.find({
-          //@ts-ignore
           ability: defineAbility((can) => {
             can("read", "tests", { userId: 3 });
           }, { resolveAction }),
@@ -342,7 +326,6 @@ export default (
         
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
-          //@ts-ignore
           _sortBy([item4], id),
           "just returned one item"
         );
@@ -356,7 +339,6 @@ export default (
         assert.strictEqual(items.length, 3, "has three items");
         
         const returnedItems = await service.find({
-          //@ts-ignore
           ability: defineAbility((can) => {
             can("read", "tests", { userId: 1 }),
             can("read", "tests", [id], { userId: 2 });
@@ -369,7 +351,6 @@ export default (
         
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
-          //@ts-ignore
           _sortBy([
             { [id]: item1[id], test: true }, 
             { [id]: item2[id] }
@@ -387,7 +368,6 @@ export default (
         assert.strictEqual(items.length, 4, "has four items");
           
         const returnedItems = await service.find({
-          //@ts-ignore
           ability: defineAbility((can, cannot) => {
             can("read", "tests", { userId: 1 });
             can("read", "tests", { userId: 2 });
@@ -412,7 +392,6 @@ export default (
         assert.deepStrictEqual(
           returnedItems,
           [
-            //@ts-ignore
             { [id]: item1[id], test: true, userId: 1 },
           ],
           "just returned one item"
@@ -428,7 +407,6 @@ export default (
         assert.strictEqual(items.length, 4, "has four items");
           
         const returnedItems = await service.find({
-          //@ts-ignore
           ability: defineAbility((can, cannot) => {
             can("read", "tests", { userId: 1 });
             can("read", "tests", { userId: 2 });
@@ -464,7 +442,6 @@ export default (
         assert.strictEqual(items.length, 3, "has three items");
         
         const returnedItems = await service.find({
-          //@ts-ignore
           ability: defineAbility((can) => {
             can("read", "tests", { userId: 1 });
           }, { resolveAction }),
@@ -479,7 +456,6 @@ export default (
         assert.deepStrictEqual(
           returnedItems,
           [
-            //@ts-ignore
             { [id]: item1[id], test: true, userId: 1 },
           ],
           "just returned one item"
@@ -494,7 +470,6 @@ export default (
         assert.strictEqual(items.length, 3, "has three items");
         
         const returnedItems = await service.find({
-          //@ts-ignore
           ability: defineAbility((can) => {
             can("read", "tests", { userId: 1 });
           }, { resolveAction }),
@@ -509,7 +484,6 @@ export default (
         assert.deepStrictEqual(
           returnedItems,
           [
-            //@ts-ignore
             { [id]: item1[id], test: true, userId: 1 },
           ],
           "just returned one item"
