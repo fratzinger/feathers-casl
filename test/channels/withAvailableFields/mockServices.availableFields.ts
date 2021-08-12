@@ -7,12 +7,19 @@ import { Ability, createAliasResolver, defineAbility } from "../../../lib";
 import { Service } from "feathers-memory";
 import hashPassword from "@feathersjs/authentication-local/lib/hooks/hash-password";
 import protect from "@feathersjs/authentication-local/lib/hooks/protect";
+import { ServiceCaslOptions } from "../../../lib/types";
 
 const resolveAction = createAliasResolver({
   update: "patch",
   read: ["get", "find"],
   delete: "remove",
 });
+
+declare module "@feathersjs/adapter-commons" {
+  interface ServiceOptions {
+    casl: ServiceCaslOptions
+  }
+}
   
 const defineAbilitiesFor = (user): Ability => {
   //@ts-ignore

@@ -3,10 +3,18 @@ import mongoose from "mongoose";
 import { Service } from "feathers-mongoose";
 mongoose.Promise = global.Promise;
 
-import makeTests from "./_makeTests";
+import makeTests from "./makeTests";
 import { getItems } from "feathers-hooks-common";
+import { ServiceCaslOptions } from "../../../../lib/types";
+import { HookContext } from "@feathersjs/feathers";
 
 let Model;
+
+declare module "@feathersjs/adapter-commons" {
+  interface ServiceOptions {
+    casl: ServiceCaslOptions
+  }
+}
 
 const makeService = () => {
   return new Service({
@@ -33,7 +41,7 @@ const makeService = () => {
 };
 
 const afterHooks = [
-  context => {
+  (context: HookContext) => {
     let items = getItems(context);
     items = (Array.isArray(items)) ? items : [items];
   
@@ -43,8 +51,15 @@ const afterHooks = [
   }
 ];
 
-describe("authorize-hook mongoose", function() {
-  before(async function() {
+makeTests(
+  "feathers-mongoose", 
+  makeService,
+  async (app, service) => { 
+    await service.remove(null);
+  },
+  { adapter: "feathers-mongoose" },
+  afterHooks,
+  async () => {
     const server = new MongoMemoryServer();
     const uri = await server.getUri();
 
@@ -67,15 +82,5 @@ describe("authorize-hook mongoose", function() {
       client.deleteModel("tests");
     }
     Model = client.model("tests", schema);
-  });
-
-  makeTests(
-    "feathers-mongoose", 
-    makeService, 
-    async (app, service) => { 
-      await service.remove(null);
-    },
-    { adapter: "feathers-mongoose" },
-    afterHooks
-  );
-});
+  }
+);

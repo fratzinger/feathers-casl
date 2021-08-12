@@ -1,20 +1,28 @@
 import { Model } from "objection";
-import makeTests from "./_makeTests";
+import makeTests from "./makeTests";
 import { Service } from "feathers-objection";
 import { getItems } from "feathers-hooks-common";
 import knex from "knex";
 import path from "path";
+import { ServiceCaslOptions } from "../../../../lib/types";
+import { HookContext } from "@feathersjs/feathers";
 
 const db  = knex({
   client: "sqlite3",
   debug: false,
   connection: {
-    filename: path.join(__dirname, "../../.data/db.sqlite")
+    filename: path.join(__dirname, "../../../.data/db.sqlite")
   },
   useNullAsDefault: true
 });
 
 Model.knex(db);
+
+declare module "@feathersjs/adapter-commons" {
+  interface ServiceOptions {
+    casl: ServiceCaslOptions
+  }
+}
 
 class TestModel extends Model {
   static get tableName() {
@@ -64,7 +72,7 @@ const boolFields = [
 ];
 
 const afterHooks = [
-  context => {
+  (context: HookContext) => {
     let items = getItems(context);
     const isArray = Array.isArray(items);
     items = (isArray) ? items : [items];
@@ -90,23 +98,21 @@ const afterHooks = [
   }
 ];
 
-describe("authorize-hook objection", function() {
-  makeTests(
-    "feathers-objection", 
-    makeService, 
-    async () => {
-      await db.schema.dropTableIfExists("tests");
-      await db.schema.createTable("tests", table => {
-        table.increments("id");
-        table.integer("userId");
-        table.string("hi");
-        table.boolean("test");
-        table.boolean("published");
-        table.boolean("supersecret");
-        table.boolean("hidden");
-      });
-    },
-    { adapter: "feathers-objection" },
-    afterHooks
-  );
-});
+makeTests(
+  "feathers-objection", 
+  makeService, 
+  async () => {
+    await db.schema.dropTableIfExists("tests");
+    await db.schema.createTable("tests", table => {
+      table.increments("id");
+      table.integer("userId");
+      table.string("hi");
+      table.boolean("test");
+      table.boolean("published");
+      table.boolean("supersecret");
+      table.boolean("hidden");
+    });
+  },
+  { adapter: "feathers-objection" },
+  afterHooks
+);

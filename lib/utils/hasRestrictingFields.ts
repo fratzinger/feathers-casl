@@ -1,7 +1,9 @@
-import { AnyAbility, Subject } from "@casl/ability";
-import { permittedFieldsOf, PermittedFieldsOptions } from "@casl/ability/extra";
-import { HasRestrictingFieldsOptions } from "../types";
+import { permittedFieldsOf } from "@casl/ability/extra";
 import getMinimalFields from "./getMinimalFields";
+
+import type { AnyAbility, Subject } from "@casl/ability";
+import type { PermittedFieldsOptions } from "@casl/ability/extra";
+import type { HasRestrictingFieldsOptions } from "../types";
 
 function areSameArray<T>(arr1: T[], arr2: T[]): boolean {
   if (arr1.length != arr2.length) { return false; }

@@ -1,5 +1,5 @@
-import { AnyAbility, Abilities } from "@casl/ability";
-import { Rule } from "@casl/ability/dist/types/Rule";
+import type { AnyAbility, Abilities } from "@casl/ability";
+import type { Rule } from "@casl/ability/dist/types/Rule";
 
 const hasRestrictingConditions = (ability: AnyAbility, action: string, modelName: string): Rule<Abilities, unknown>[]|false => {
   const rules = ability.possibleRulesFor(action, modelName);

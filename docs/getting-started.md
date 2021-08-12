@@ -25,19 +25,26 @@ This project is built for [FeathersJS](http://feathersjs.com). An open source we
 It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CASL** in your feathers.js-project. Supported versions: `@casl/ability^5` and `@feathersjs/feathers^4`.
 
 ## Features
-- Fully powered by Feathers & CASL
+- Fully powered by Feathers 4 & CASL 5
 - Written in TypeScript
 - Allows permissions for all methods `create`, `find`, `get`, `update`, `patch`, `remove`, or `create`, `read`, `update`, `delete`
-- Define permissions not based on methods: `can('view', 'Settings')`
+- Define permissions not based on methods: `can('view', 'Settings')` (Bring your custom logic)
 - Restrict by conditions: `can('create', 'Task', { userId: user.id })`
 - Restrict by individual fields: `cannot('update', 'User', ['roleId'])`
 - Native support for restrictive `$select`: `can('read', 'User', ['id', 'username'])` -> `$select: ['id', 'username']`
-- Supports `channels` right away (every connection only gets updates based on `can('read' ...)`)
-- `channels`-support also regards restrictive fields
-- Disallow/allow `multi` methods (`create`, `patch`, `remove`) dynamically with: `can('remove-multi', 'Task', { userId: user.id })`
-- Support for dynamic rules stored in your database
 - Support to define abilities for anything (providers, users, roles, 3rd party apps, ...)
 - Fully supported adapters: `feathers-knex`, `feathers-memory`, `feathers-mongodb`, `feathers-mongoose`, `feathers-nedb`, `feathers-objection`, `feathers-sequelize`
+- Support for dynamic rules stored in your database (Bring your own implementation ;) )
+- hooks:
+  - `checkBasicPermission` hook for client side usage as a before-hook
+  - `authorize` hook for complex rules
+  - Disallow/allow `multi` methods (`create`, `patch`, `remove`) dynamically with: `can('remove-multi', 'Task', { userId: user.id })`
+- channels:
+  - every connection only receives updates based on rules
+  - `channels`-support also regards restrictive fields
+  - rules can be defined individually for events
+- utils:
+  - `checkCan` to be used in hooks to check authorization before operations
 - Baked in support for `@casl/angular`, `@casl/react`, `@casl/vue` and `@casl/aurelia`
 
 ## Installation
@@ -167,7 +174,7 @@ module.exports = {
 
 ### Add the authorize-hook to the services
 
-The `authorize`-hook can be used for all methods and has support for `multi: true`. You should use it as a `before` **AND** a `after` hook at the same time. Please make sure to define `before` at last position and `after` at first position. So you don't want to use it in `app.hooks` nor in `all`. For more information, see: [#authorize-hook](/hook-authorize.html)
+The `authorize`-hook can be used for all methods and has support for `multi: true`. You should use it as a `before` **AND** a `after` hook at the same time. Please make sure to define `before` at last position and `after` at first position. So you don't want to use it in `app.hooks` nor in `all`. For more information, see: [authorize hook](/hooks.html#authorize)
 
 ```js{5,11,14,17,20,23,26,32}
 // src/services/tasks/tasks.hooks.js
@@ -229,10 +236,10 @@ module.exports = {
 For `feathers-casl` to work properly, you have to whitelist some operators in your service options.
 Also make sure to set the adapter option in your `authorize` hook like: `authorize({ adapter: 'feathers-mongoose' })`
 
-- **feathers-memory**: `app.use('...', new Service({ whitelist: ['$not', '$and'] }))`
+- **feathers-memory**: `app.use('...', new Service({ whitelist: ['$nor', '$and'] }))`
 - **feathers-nedb**: `app.use'...', new Service({ whitelist: ['$not', '$and'] }))`
-- **feathers-mongodb**: `app.use("...', new Service({ whitelist: ["$and", "$nor"] }))`
-- **feathers-mongoose**: `app.use("...", new Service({ whitelist: ["$nor"] }))`
+- **feathers-mongodb**: `app.use("...', new Service({ whitelist: ['$nor', $and'] }))`
+- **feathers-mongoose**: `app.use("...", new Service({ whitelist: ['$nor', '$and'] }))`
 - **feathers-knex**: `app.use("...", new Service({ whitelist: ["$not"] }))`
 - **feathers-objection**: *nothing to do* :)
 - **feathers-sequelize**: This one is a little bit different than the others. See the following:
@@ -276,3 +283,11 @@ module.exports = function (app) {
   });
 };
 ```
+
+## Testing
+
+Simply run `npm test` and all your tests in the `test/` directory will be run. The project has full support for *Visual Studio Code*. You can use the debugger to set breakpoints.
+
+## Help
+
+For more information on all the things you can do, visit [FeathersJS](http://docs.feathersjs.com) and [CASL](https://casl.js.org/v5/en/).

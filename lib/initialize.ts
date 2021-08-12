@@ -1,6 +1,3 @@
-import { Application } from "@feathersjs/feathers";
-import { PartialDeep } from "type-fest";
-
 import { 
   makeDefaultOptions as makeDefaultAuthorizeHookOptions
 } from "./hooks/authorize/authorize.hook.utils";
@@ -9,7 +6,9 @@ import {
   makeDefaultOptions as makeDefaultChannelsOptions
 } from "./channels/channels.utils";
 
-import { AuthorizeHookOptions, ChannelOptions, InitOptions } from "./types";
+import type { Application } from "@feathersjs/feathers";
+import type { PartialDeep } from "type-fest";
+import type { AuthorizeHookOptions, ChannelOptions, InitOptions } from "./types";
 
 export default (options?: PartialDeep<InitOptions>): ((app: Application) => void) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -19,6 +18,7 @@ export default (options?: PartialDeep<InitOptions>): ((app: Application) => void
     throw new Error("You passed 'feathers-casl' to app.configure() without a function. You probably wanted to call app.configure(casl({}))!");
   }
   options = {
+    defaultAdapter: options?.defaultAdapter || "feathers-memory",
     authorizeHook: makeDefaultAuthorizeHookOptions(options?.authorizeHook as undefined|Partial<AuthorizeHookOptions>),
     channels: makeDefaultChannelsOptions(options?.channels as undefined|Partial<ChannelOptions>)
   };

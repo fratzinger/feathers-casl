@@ -1,4 +1,4 @@
-import { HookContext } from "@feathersjs/feathers";
+import type { HookContext } from "@feathersjs/feathers";
 
 const getModelName = (modelName: string | ((context: HookContext) => string), context: HookContext): string => {
   if (modelName === undefined) { return context.path; }

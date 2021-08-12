@@ -1,12 +1,12 @@
 {
   "name": "feathers-casl",
-  "version": "0.5.0",
+  "version": "0.5.1-10",
   "description": "Add access control with CASL to your feathers application.",
   "author": "fratzinger",
   "homepage": "https://feathers-casl.netlify.app/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fratzinger/feathers-utils"
+    "url": "https://github.com/fratzinger/feathers-casl"
   },
   "keywords": [
     "feathers",
@@ -39,11 +39,11 @@
     "docs:build": "vitepress build docs"
   },
   "dependencies": {
-    "@casl/ability": "^5.2.2",
+    "@casl/ability": "^5.4.0",
     "@feathersjs/errors": "^4.5.11",
     "@feathersjs/feathers": "^4.5.11",
     "@feathersjs/transport-commons": "^4.5.11",
-    "feathers-hooks-common": "^5.0.5",
+    "feathers-hooks-common": "^5.0.6",
     "feathers-utils": "^1.5.8",
     "lodash": "^4.17.21"
   },
@@ -56,28 +56,29 @@
     "@feathersjs/socketio": "^4.5.11",
     "@feathersjs/socketio-client": "^4.5.11",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
-    "@types/lodash": "^4.14.168",
-    "@types/mocha": "^8.2.2",
-    "@types/node": "^15.0.1",
-    "@typescript-eslint/eslint-plugin": "^4.22.0",
-    "@typescript-eslint/parser": "^4.22.0",
+    "@types/lodash": "^4.14.172",
+    "@types/mocha": "^8.2.3",
+    "@types/node": "^15.14.7",
+    "@typescript-eslint/eslint-plugin": "^4.29.1",
+    "@typescript-eslint/parser": "^4.29.1",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
-    "eslint": "^7.25.0",
+    "eslint": "^7.31.0",
     "eslint-plugin-security": "^1.4.0",
+    "feathers-fletching": "^1.12.2",
     "feathers-knex": "^7.1.1",
     "feathers-memory": "^4.1.0",
     "feathers-mongodb": "^6.3.0",
     "feathers-mongoose": "^8.3.3",
     "feathers-nedb": "^5.1.0",
-    "feathers-objection": "^7.1.4",
+    "feathers-objection": "^7.5.0",
     "feathers-sequelize": "^6.2.0",
-    "helmet": "^4.5.0",
-    "knex": "^0.95.4",
-    "mocha": "^8.3.2",
-    "mongodb": "^3.6.6",
+    "helmet": "^4.6.0",
+    "knex": "^0.95.8",
+    "mocha": "^8.4.0",
+    "mongodb": "^3.6.11",
     "mongodb-memory-server": "^6.9.6",
-    "mongoose": "^5.12.7",
+    "mongoose": "^5.13.7",
     "nedb": "^1.8.0",
     "nyc": "^15.1.0",
     "objection": "^2.2.15",
@@ -88,7 +89,7 @@
     "sqlite3": "^5.0.2",
     "ts-node": "^9.1.1",
     "type-fest": "^0.21.3",
-    "typescript": "^4.2.4",
-    "vitepress": "^0.13.2"
+    "typescript": "^4.3.5",
+    "vitepress": "^0.16.1"
   }
 }

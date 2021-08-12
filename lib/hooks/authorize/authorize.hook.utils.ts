@@ -4,17 +4,25 @@ import _unset from "lodash/unset";
 
 import { Forbidden } from "@feathersjs/errors";
 
-import { AnyAbility } from "@casl/ability";
-import { Application, HookContext } from "@feathersjs/feathers";
+import getFieldsForConditions from "../../utils/getFieldsForConditions";
+import { makeDefaultBaseOptions } from "../common";
+import getAvailableFields from "../../utils/getAvailableFields";
 
 import {
   isMulti
 } from "feathers-utils";
 
-import { 
+import type { AnyAbility } from "@casl/ability";
+import type { Application, HookContext } from "@feathersjs/feathers";
+
+import type {
+  Adapter,
   AuthorizeHookOptions,
+  AuthorizeHookOptionsExclusive,
+  HookBaseOptions,
   InitOptions,
-  Path
+  Path,
+  ThrowUnlessCanOptions
 } from "../../types";
 
 export const makeOptions = (
@@ -22,31 +30,23 @@ export const makeOptions = (
   options?: Partial<AuthorizeHookOptions>
 ): AuthorizeHookOptions => {
   options = options || {};
-  return Object.assign({}, defaultOptions, getAppOptions(app), options);
+  return Object.assign(makeDefaultBaseOptions(), defaultOptions, getAppOptions(app), options);
 };
 
-const defaultOptions: AuthorizeHookOptions = {
-  ability: undefined,
-  actionOnForbidden: undefined,
-  adapter: "feathers-memory",
+const defaultOptions: AuthorizeHookOptionsExclusive = {
+  adapter: undefined,
   availableFields: (context: HookContext): string[] => {
     const availableFields: string[] | ((context: HookContext) => string[]) = context.service.options?.casl?.availableFields;
-    if (!availableFields) return undefined;
-    return (typeof availableFields === "function")
-      ? availableFields(context)
-      : availableFields;
+    return getAvailableFields(context, { availableFields });
   },
-  checkMultiActions: false,
-  checkAbilityForInternal: false,
-  modelName: (context: Pick<HookContext, "path">): string => {
-    return context.path;
-  }
+  usePatchData: false,
+  useUpdateData: false
 };
 
 export const makeDefaultOptions = (
   options?: Partial<AuthorizeHookOptions>
 ): AuthorizeHookOptions => {
-  return Object.assign({}, defaultOptions, options);
+  return Object.assign(makeDefaultBaseOptions(), defaultOptions, options);
 };
 
 const getAppOptions = (app: Application): AuthorizeHookOptions | Record<string, never> => {
@@ -56,9 +56,19 @@ const getAppOptions = (app: Application): AuthorizeHookOptions | Record<string, 
     : {};
 };
 
+export const getAdapter = (
+  app: Application,
+  options: Pick<AuthorizeHookOptions, "adapter">
+): Adapter => {
+  if (options.adapter) { return options.adapter; }
+  const caslAppOptions = app?.get("casl") as InitOptions;
+  if (caslAppOptions?.defaultAdapter) { return caslAppOptions.defaultAdapter; }
+  return "feathers-memory";
+};
+
 export const getAbility = (
   context: HookContext, 
-  options?: Pick<AuthorizeHookOptions, "ability" | "checkAbilityForInternal">
+  options?: Pick<HookBaseOptions, "ability" | "checkAbilityForInternal">
 ): Promise<AnyAbility|undefined> => {
   // if params.ability is set, return it over options.ability
   if (context?.params?.ability) { 
@@ -75,6 +85,15 @@ export const getAbility = (
   }
 
   if (options?.ability) {
+    if (typeof options.ability === "function") {
+      const ability = options.ability(context);
+      return Promise.resolve(ability);
+    } else {
+      return Promise.resolve(options.ability);
+    }
+  }
+
+  if (getPersistedConfig(context, "ability")) {
     if (typeof options.ability === "function") {
       const ability = options.ability(context);
       return Promise.resolve(ability);
@@ -101,12 +120,51 @@ export const throwUnlessCan = (
   method: string, 
   resource: string|Record<string, unknown>, 
   modelName: string,
-  actionOnForbidden: () => void
-): void => {
+  options: Partial<ThrowUnlessCanOptions>
+): boolean => {
   if (ability.cannot(method, resource)) {
-    if (actionOnForbidden) actionOnForbidden();
-    throw new Forbidden(`You are not allowed to ${method} ${modelName}`);
+    if (options.actionOnForbidden) options.actionOnForbidden();
+    if (!options.skipThrow) {
+      throw new Forbidden(`You are not allowed to ${method} ${modelName}`);
+    }
+    return false;
   }
+  return true;
+};
+
+export const handleConditionalSelect = (
+  context: HookContext, 
+  ability: AnyAbility, 
+  method: string, 
+  modelName: string
+): boolean => {
+  if (!context.params?.query?.$select) { return false; }
+  const { $select } = context.params.query;
+  const $newSelect = getConditionalSelect($select, ability, method, modelName);
+  if ($newSelect) {
+    hide$select(context);
+    context.params.query.$select = $newSelect;
+    return true;
+  } else {
+    return false;
+  }
+};
+
+export const getConditionalSelect = (
+  $select: string[], 
+  ability: AnyAbility, 
+  method: string, 
+  modelName: string
+): undefined | string[] => {
+  if (!$select?.length) { return undefined; }
+  const fields = getFieldsForConditions(ability, method, modelName);
+  if (!fields.length) { 
+    return undefined; 
+  }
+
+  const fieldsToAdd = fields.filter(field => !$select.includes(field));
+  if (!fieldsToAdd.length) { return undefined; }
+  return [...$select, ...fieldsToAdd];
 };
 
 export const checkMulti = (

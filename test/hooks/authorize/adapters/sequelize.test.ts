@@ -1,14 +1,22 @@
 import { Sequelize, DataTypes, Op } from "sequelize";
-import makeTests from "./_makeTests";
+import makeTests from "./makeTests";
 import { Service } from "feathers-sequelize";
 import { getItems } from "feathers-hooks-common";
 import path from "path";
+import { ServiceCaslOptions } from "../../../../lib/types";
+import { HookContext } from "@feathersjs/feathers";
 
 const sequelize = new Sequelize("sequelize", "", "", {
   dialect: "sqlite",
-  storage: path.join(__dirname, "../../.data/db.sqlite"),
+  storage: path.join(__dirname, "../../../.data/db.sqlite"),
   logging: false
 });
+
+declare module "@feathersjs/adapter-commons" {
+  interface ServiceOptions {
+    casl: ServiceCaslOptions
+  }
+}
 
 const Model = sequelize.define("tests", {
   userId: {
@@ -66,7 +74,7 @@ const makeService = () => {
 };
 
 const afterHooks = [
-  context => {
+  (context: HookContext) => {
     const { Model } = context.service;
     const fields = Model.fieldRawAttributesMap;
     let items = getItems(context);
@@ -89,14 +97,12 @@ const afterHooks = [
   }
 ];
 
-describe("authorize-hook sequelize", function() {
-  makeTests(
-    "feathers-sequelize", 
-    makeService, 
-    async () => { 
-      await Model.sync({ force: true });
-    },
-    { adapter: "feathers-sequelize" },
-    afterHooks
-  );
-});
+makeTests(
+  "feathers-sequelize", 
+  makeService, 
+  async () => { 
+    await Model.sync({ force: true });
+  },
+  { adapter: "feathers-sequelize" },
+  afterHooks
+);

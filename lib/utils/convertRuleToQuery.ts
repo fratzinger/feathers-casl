@@ -1,11 +1,9 @@
 import _isPlainObject from "lodash/isPlainObject";
-import { Forbidden } from "@feathersjs/errors";
-import { mergeQuery } from "feathers-utils";
 
-import { AnyAbility, RawRuleFrom, AbilityTuple, Subject } from "@casl/ability";
-import { Query } from "@feathersjs/feathers";
-
-import { GetConditionalQueryOptions } from "../types";
+import type { SubjectRawRule, MongoQuery, ClaimRawRule } from "@casl/ability";
+import type { Query } from "@feathersjs/feathers";
+import type { GetConditionalQueryOptions } from "../types";
+import type { AnyObject } from "@casl/ability/dist/types/types";
 
 const invertedMap = {
   "$gt": "$lte",
@@ -33,8 +31,9 @@ const invertedProp = (
   }
 };
 
-export const convertRuleToQuery = (
-  rule: RawRuleFrom<AbilityTuple<string, Subject>, unknown>, 
+const convertRuleToQuery = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  rule: SubjectRawRule<any, any, MongoQuery<AnyObject>> | ClaimRawRule<any>, 
   options?: GetConditionalQueryOptions): Query => 
 {
   const { conditions, inverted } = rule;
@@ -48,7 +47,8 @@ export const convertRuleToQuery = (
     const newConditions = {} as Query;
     for (const prop in (conditions as Record<string, unknown>)) {
       if (_isPlainObject(conditions[prop])) {
-        const obj = conditions[prop];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const obj: any = conditions[prop];
         for (const name in obj) {
           if (!supportedOperators.includes(name)) {
             console.error(`CASL: not supported property: ${name}`);
@@ -67,37 +67,4 @@ export const convertRuleToQuery = (
   }
 };
 
-const getConditionalQueryFor = (
-  ability: AnyAbility, 
-  method: string, 
-  subjectType: string, 
-  options?: GetConditionalQueryOptions
-): Query => {
-  options = options || {};
-  options.actionOnForbidden = options.actionOnForbidden || (() => {
-    throw new Forbidden("You're not allowed to make this request");
-  });
-
-  const rules = ability.rulesFor(method, subjectType).reverse();
-
-  let query = {};
-
-  for (let i = 0; i < rules.length; i++) {
-    const rule = rules[i];
-
-    const currentQuery = convertRuleToQuery(rule, options);
-    if (currentQuery === undefined) {
-      query = {};
-    } else {
-      query = mergeQuery(
-        query, 
-        currentQuery, { 
-          defaultHandle: "combine"
-        });
-    }
-  }
-
-  return query;
-};
-
-export default getConditionalQueryFor;
+export default convertRuleToQuery;

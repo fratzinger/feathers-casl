@@ -1,11 +1,11 @@
-import { HookContext } from "@feathersjs/feathers";
+import type { HookContext } from "@feathersjs/feathers";
 
-export const getContextPath = (context: HookContext): string => {
+export const getContextPath = (context: Pick<HookContext, "path">): string => {
   return context.path;
 };
 
-export const getModelName = (context: HookContext): string => {
+export const getModelName = (context: Pick<HookContext, "service">): string => {
   const { service } = context;
-  const modelName = service.modelName || service.Model && service.Model.name;
+  const modelName = service.modelName || (service.Model && service.Model.name);
   return modelName;
 };

@@ -2,8 +2,6 @@ import { getItems, replaceItems } from "feathers-hooks-common";
 import { subject } from "@casl/ability";
 import _pick from "lodash/pick";
 import _isEmpty from "lodash/isEmpty";
-import { HookContext } from "@feathersjs/feathers";
-import hasRestrictingFields from "../../utils/hasRestrictingFields";
 
 import { shouldSkip, mergeArrays } from "feathers-utils";
 
@@ -14,12 +12,18 @@ import {
   makeOptions
 } from "./authorize.hook.utils";
 
+import hasRestrictingFields from "../../utils/hasRestrictingFields";
+
 import getModelName from "../../utils/getModelName";
 
-import {
-  AuthorizeHookOptions, HasRestrictingFieldsOptions
-} from "../../types";
 import { Forbidden } from "@feathersjs/errors";
+import getAvailableFields from "../../utils/getAvailableFields";
+
+import type { HookContext } from "@feathersjs/feathers";
+import type {
+  AuthorizeHookOptions, 
+  HasRestrictingFieldsOptions
+} from "../../types";
 
 const HOOKNAME = "authorize";
 
@@ -28,9 +32,11 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     const $select = restore$select(context);
 
     if (
-      shouldSkip(HOOKNAME, context) ||
-      context.type !== "after" ||
-      !context.params
+      !options?.notSkippable && (
+        shouldSkip(HOOKNAME, context) ||
+        context.type !== "after" ||
+        !context.params
+      )
     ) { return context; }
 
     options = makeOptions(context.app, options);
@@ -56,11 +62,8 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     const { ability } = params;
     const items = getItems(context);
 
-    const availableFields = (!options?.availableFields)
-      ? undefined
-      : (typeof options.availableFields === "function")
-        ? options.availableFields(context)
-        : options.availableFields;
+    const availableFields = getAvailableFields(context, options);
+        
     const hasRestrictingFieldsOptions: HasRestrictingFieldsOptions = {
       availableFields: availableFields
     };

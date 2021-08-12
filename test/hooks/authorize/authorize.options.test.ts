@@ -11,7 +11,7 @@ const resolveAction = createAliasResolver({
 
 import { Application } from "@feathersjs/feathers";
 
-import authorize from "../../lib/hooks/authorize/authorize.hook";
+import authorize from "../../../lib/hooks/authorize/authorize.hook";
 
 describe("authorize.options.test.ts", function () {
   let app: Application;
@@ -31,6 +31,7 @@ describe("authorize.options.test.ts", function () {
         })
       );
       service = app.service("test");
+      
       //@ts-ignore
       service.hooks({
         before: {
@@ -49,7 +50,6 @@ describe("authorize.options.test.ts", function () {
           params: [
             [{ id: 0 }, { id: 1 }],
             {
-              //@ts-ignore
               ability: defineAbility((can) => {
                 can(["create-multi", "read-multi", "update-multi", "delete-multi"], "Test");
               }, { resolveAction }),
@@ -63,7 +63,6 @@ describe("authorize.options.test.ts", function () {
             { test: true },
             {
               query: { userId: 1 },
-              //@ts-ignore
               ability: defineAbility((can) => {
                 can(["create-multi", "read-multi", "update-multi", "delete-multi"], "Test");
               }, { resolveAction }),
@@ -76,7 +75,6 @@ describe("authorize.options.test.ts", function () {
             null,
             {
               query: { userId: 1 },
-              //@ts-ignore
               ability: defineAbility((can) => {
                 can(["create-multi", "read-multi", "update-multi", "delete-multi"], "Test");
               }, { resolveAction }),
@@ -97,7 +95,6 @@ describe("authorize.options.test.ts", function () {
           params: [
             [{ id: 0 }, { id: 1 }],
             {
-              //@ts-ignore
               ability: defineAbility((can) => {
                 can(["create", "read", "update", "delete"], "Test");
               }, { resolveAction }),
@@ -111,7 +108,6 @@ describe("authorize.options.test.ts", function () {
             { test: true },
             {
               query: { userId: 1 },
-              //@ts-ignore
               ability: defineAbility((can) => {
                 can(["create", "read", "update", "delete"], "Test");
               }, { resolveAction }),
@@ -124,7 +120,6 @@ describe("authorize.options.test.ts", function () {
             null,
             {
               query: { userId: 1 },
-              //@ts-ignore
               ability: defineAbility((can) => {
                 can(["create", "read", "update", "delete"], "Test");
               }, { resolveAction }),
@@ -255,7 +250,6 @@ describe("authorize.options.test.ts", function () {
       service.hooks({
         before: {
           all: [authorize({
-            //@ts-ignore
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             ability: defineAbility(() => {}, { resolveAction }),
             checkAbilityForInternal: true
@@ -287,7 +281,6 @@ describe("authorize.options.test.ts", function () {
       service.hooks({
         before: {
           all: [authorize({
-            //@ts-ignore
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             ability: defineAbility(() => {}, { resolveAction }),
           })],
@@ -295,7 +288,6 @@ describe("authorize.options.test.ts", function () {
       });
 
       const params = {
-        //@ts-ignore
         ability: defineAbility((can) => {
           can("manage", "all");
         }, { resolveAction }),
@@ -351,7 +343,6 @@ describe("authorize.options.test.ts", function () {
       service.hooks({
         before: {
           all: [authorize({
-            //@ts-ignore
             ability: () => defineAbility((can) => {
               can("manage", "all");
             }, { resolveAction }),
@@ -381,9 +372,7 @@ describe("authorize.options.test.ts", function () {
         before: {
           all: [
             authorize({
-              //@ts-ignore
               ability: () => {
-                //@ts-ignore
                 return Promise.resolve(defineAbility((can) => {
                   can("manage", "all");
                 }, { resolveAction }));
@@ -427,7 +416,6 @@ describe("authorize.options.test.ts", function () {
           const promise = assert.rejects(
             authorize({ 
               availableFields: ["id", "userId", "test"],
-              //@ts-ignore
               // eslint-disable-next-line @typescript-eslint/no-empty-function
               ability: () => defineAbility(() => {}, { resolveAction }),
               checkAbilityForInternal: true

@@ -1,14 +1,16 @@
-import { Ability, AnyAbility } from "@casl/ability";
+import getAvailableFields from "../utils/getAvailableFields";
+import { getContextPath } from "../utils/getDefaultModelName";
 
-import { Application, HookContext } from "@feathersjs/feathers";
-import { RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
+import type { Ability, AnyAbility } from "@casl/ability";
 
-import {
+import type { Application, HookContext } from "@feathersjs/feathers";
+import type { RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
+
+import type {
   ChannelOptions,
+  EventName,
   InitOptions
 } from "../types";
-
-import { getContextPath } from "../utils/getDefaultModelName";
 
 export const makeOptions = (app: Application, options?: Partial<ChannelOptions>): ChannelOptions => {
   if (!app) {
@@ -29,11 +31,9 @@ const defaultOptions: ChannelOptions = {
   restrictFields: true,
   availableFields: (context: HookContext): string[] => {
     const availableFields: string[] | ((context: HookContext) => string[]) = context.service.options?.casl?.availableFields;
-    if (!availableFields) return undefined;
-    return (typeof availableFields === "function")
-      ? availableFields(context)
-      : availableFields;
-  }
+    return getAvailableFields(context, { availableFields });
+  },
+  useActionName: "get"
 };
 
 export const makeDefaultOptions = (options?: Partial<ChannelOptions>): ChannelOptions => {
@@ -61,4 +61,14 @@ export const getAbility = (
   } else {
     return connection.ability;
   }
+};
+
+export const getEventName = (
+  method: "find" | "get" | "create" | "update" | "patch" | "remove"
+): EventName => {
+  if (method === "create") { return "created"; }
+  else if (method === "update") { return "updated"; }
+  else if (method === "patch") { return "patched"; }
+  else if (method === "remove") { return "removed"; }
+  return undefined;
 };
