@@ -12,7 +12,7 @@ const resolveAction = createAliasResolver({
   delete: "remove"
 });
 
-describe("authorize.relations", function() {
+describe.skip("authorize.relations", function() {
   const mock = () => {
     const app = feathers();
     app.use("artists", new Service({ 
