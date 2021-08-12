@@ -236,10 +236,10 @@ module.exports = {
 For `feathers-casl` to work properly, you have to whitelist some operators in your service options.
 Also make sure to set the adapter option in your `authorize` hook like: `authorize({ adapter: 'feathers-mongoose' })`
 
-- **feathers-memory**: `app.use('...', new Service({ whitelist: ['$not', '$and'] }))`
+- **feathers-memory**: `app.use('...', new Service({ whitelist: ['$nor', '$and'] }))`
 - **feathers-nedb**: `app.use'...', new Service({ whitelist: ['$not', '$and'] }))`
-- **feathers-mongodb**: `app.use("...', new Service({ whitelist: ["$and", "$nor"] }))`
-- **feathers-mongoose**: `app.use("...", new Service({ whitelist: ["$nor"] }))`
+- **feathers-mongodb**: `app.use("...', new Service({ whitelist: ['$nor', $and'] }))`
+- **feathers-mongoose**: `app.use("...", new Service({ whitelist: ['$nor', '$and'] }))`
 - **feathers-knex**: `app.use("...", new Service({ whitelist: ["$not"] }))`
 - **feathers-objection**: *nothing to do* :)
 - **feathers-sequelize**: This one is a little bit different than the others. See the following:
