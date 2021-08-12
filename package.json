@@ -39,7 +39,7 @@
     "docs:build": "vitepress build docs"
   },
   "dependencies": {
-    "@casl/ability": "^5.3.1",
+    "@casl/ability": "^5.4.0",
     "@feathersjs/errors": "^4.5.11",
     "@feathersjs/feathers": "^4.5.11",
     "@feathersjs/transport-commons": "^4.5.11",
@@ -78,7 +78,7 @@
     "mocha": "^8.4.0",
     "mongodb": "^3.6.11",
     "mongodb-memory-server": "^6.9.6",
-    "mongoose": "^5.13.6",
+    "mongoose": "^5.13.7",
     "nedb": "^1.8.0",
     "nyc": "^15.1.0",
     "objection": "^2.2.15",
@@ -90,6 +90,6 @@
     "ts-node": "^9.1.1",
     "type-fest": "^0.21.3",
     "typescript": "^4.3.5",
-    "vitepress": "^0.13.2"
+    "vitepress": "^0.16.1"
   }
 }
