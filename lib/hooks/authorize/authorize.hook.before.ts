@@ -17,8 +17,6 @@ import {
   setPersistedConfig,
   getAbility,
   getPersistedConfig,
-  handleConditionalSelect,
-  getConditionalSelect,
   throwUnlessCan
 } from "./authorize.hook.utils";
 
@@ -82,8 +80,6 @@ export default (
     
     // if context is with multiple items, there's a change that we need to handle each item separately
     if (multi) {
-      handleConditionalSelect(context, ability, "find", modelName);
-
       if (!couldHaveRestrictingFields(ability, "find", modelName)) {
         // if has no restricting fields at all -> can skip _pick() in after-hook
         setPersistedConfig(context, "skipRestrictingRead.fields", true);
@@ -142,19 +138,11 @@ const handleSingle = async (
 
   _set(context, "params.query", query);
 
-  if (method === "get") {
-    handleConditionalSelect(context, ability, method, modelName);
-    return;
-  }
-
   // ensure that only allowed data gets changed
   if (["update", "patch"].includes(method)) {
     const queryGet = Object.assign({}, params.query || {});
     if (queryGet.$select) {
-      const $select = getConditionalSelect(queryGet.$select, ability, method, modelName);
-      if ($select) {
-        queryGet.$select = $select;
-      }
+      delete queryGet.$select;
     }
     const paramsGet = Object.assign({}, params, { query: queryGet });
 

@@ -7,9 +7,10 @@ import { shouldSkip, mergeArrays } from "feathers-utils";
 
 import {
   getPersistedConfig,
-  restore$select,
   getAbility,
-  makeOptions
+  makeOptions,
+  getConditionalSelect,
+  refetchItems
 } from "./authorize.hook.utils";
 
 import hasRestrictingFields from "../../utils/hasRestrictingFields";
@@ -29,8 +30,6 @@ const HOOKNAME = "authorize";
 
 export default (options: AuthorizeHookOptions): ((context: HookContext) => Promise<HookContext>) => {
   return async (context: HookContext): Promise<HookContext> => {
-    const $select = restore$select(context);
-
     if (
       !options?.notSkippable && (
         shouldSkip(HOOKNAME, context) ||
@@ -38,6 +37,9 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
         !context.params
       )
     ) { return context; }
+
+    const itemOrItems = getItems(context);
+    if (!itemOrItems) { return context; }
 
     options = makeOptions(context.app, options);
 
@@ -60,7 +62,9 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     }
 
     const { ability } = params;
-    const items = getItems(context);
+    
+    const asArray = Array.isArray(itemOrItems);
+    let items = (asArray) ? itemOrItems : [itemOrItems];
 
     const availableFields = getAvailableFields(context, options);
         
@@ -68,8 +72,20 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       availableFields: availableFields
     };
 
+    const getOrFind = (asArray) ? "find" : "get";
+
+    const $select: string[] | undefined = params.query?.$select;
+
+    if (context.method !== "remove") {
+      const $newSelect = getConditionalSelect($select, ability, getOrFind, modelName);
+      if ($newSelect) {
+        const _items = await refetchItems(context);
+        if (_items) { items = _items; }
+      }
+    }
+
     const pickFieldsForItem = (item: Record<string, unknown>) => {
-      const method = (Array.isArray(items)) ? "find" : "get";
+      const method = (Array.isArray(itemOrItems)) ? "find" : "get";
       if (!skipCheckConditions && !ability.can(method, subject(modelName, item))) { 
         return undefined; 
       }
@@ -92,7 +108,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
     };
 
     let result;
-    if (Array.isArray(items)) {
+    if (asArray) {
       result = [];
       for (let i = 0, n = items.length; i < n; i++) {
         const item = pickFieldsForItem(items[i]);
@@ -101,7 +117,7 @@ export default (options: AuthorizeHookOptions): ((context: HookContext) => Promi
       }
 
     } else {
-      result = pickFieldsForItem(items);
+      result = pickFieldsForItem(items[0]);
       if (context.method === "get" && _isEmpty(result)) {
         if (options.actionOnForbidden) options.actionOnForbidden();
         throw new Forbidden(`You're not allowed to ${context.method} ${modelName}`);

@@ -1,6 +1,5 @@
 import _get from "lodash/get";
 import _set from "lodash/set";
-import _unset from "lodash/unset";
 
 import { Forbidden } from "@feathersjs/errors";
 
@@ -8,12 +7,16 @@ import getFieldsForConditions from "../../utils/getFieldsForConditions";
 import { makeDefaultBaseOptions } from "../common";
 import getAvailableFields from "../../utils/getAvailableFields";
 
+import { getItems } from "feathers-hooks-common";
+import { HOOKNAME } from "./authorize.hook";
+
 import {
-  isMulti
+  isMulti, 
+  markHookForSkip
 } from "feathers-utils";
 
 import type { AnyAbility } from "@casl/ability";
-import type { Application, HookContext } from "@feathersjs/feathers";
+import type { Application, HookContext, Params } from "@feathersjs/feathers";
 
 import type {
   Adapter,
@@ -105,16 +108,6 @@ export const getAbility = (
   return Promise.resolve(undefined);
 };
 
-const move = (context: HookContext, fromPath: Path, toPath: Path) => {
-  const val = _get(context, fromPath);
-
-  if (val !== undefined) {
-    _unset(context, fromPath);
-    _set(context, toPath, val);
-  }
-  return val;
-};
-
 export const throwUnlessCan = (
   ability: AnyAbility, 
   method: string, 
@@ -132,22 +125,28 @@ export const throwUnlessCan = (
   return true;
 };
 
-export const handleConditionalSelect = (
-  context: HookContext, 
-  ability: AnyAbility, 
-  method: string, 
-  modelName: string
-): boolean => {
-  if (!context.params?.query?.$select) { return false; }
-  const { $select } = context.params.query;
-  const $newSelect = getConditionalSelect($select, ability, method, modelName);
-  if ($newSelect) {
-    hide$select(context);
-    context.params.query.$select = $newSelect;
-    return true;
-  } else {
-    return false;
-  }
+export const refetchItems = async (
+  context: HookContext,
+  params?: Params
+): Promise<unknown[] | undefined> => {
+  if (context.type !== "after") { return; }
+  const itemOrItems = getItems(context);
+
+  const items = (!itemOrItems || Array.isArray(itemOrItems)) ? itemOrItems : [itemOrItems];
+  if (!items) { return; }
+
+  const idField = context.service.options?.id;
+  const ids = items.map(item => item[idField]);
+
+  params = Object.assign({}, params, { paginate: false });
+
+  markHookForSkip(HOOKNAME, "all", { params });
+  delete params.ability;
+  
+  const query = Object.assign({}, params.query, { [idField]: { $in: ids } });
+  params = Object.assign({}, params, { query });
+
+  return await context.service.find(params);
 };
 
 export const getConditionalSelect = (
@@ -185,19 +184,6 @@ export const checkMulti = (
 
   if (options?.actionOnForbidden) options.actionOnForbidden();
   throw new Forbidden(`You're not allowed to multi-${method} ${modelName}`);
-};
-
-export const hide$select = (context: HookContext): unknown => {
-  return move(context, "params.query.$select", "params.casl.$select");
-};
-
-export const restore$select = (context: HookContext): string[]|undefined => {
-  move(context, "params.casl.$select", "params.query.$select");
-  return _get(context, "params.query.$select");
-};
-
-export const get$select = (context: HookContext): unknown => {
-  return getPersistedConfig(context, "$select");
 };
 
 export const setPersistedConfig = (context: HookContext, key: Path, val: unknown): HookContext => {

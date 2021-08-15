@@ -12,7 +12,7 @@ import type {
   AuthorizeHookOptions
 } from "../../types";
 
-const HOOKNAME = "authorize";
+export const HOOKNAME = "authorize";
 
 export default (options?: Partial<AuthorizeHookOptions>): ((context: HookContext) => Promise<HookContext>) => {
   return async (context: HookContext): Promise<HookContext> => {
