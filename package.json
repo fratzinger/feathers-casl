@@ -1,6 +1,6 @@
 {
   "name": "feathers-casl",
-  "version": "0.6.1-1",
+  "version": "0.6.1-2",
   "description": "Add access control with CASL to your feathers application.",
   "author": "fratzinger",
   "homepage": "https://feathers-casl.netlify.app/",
