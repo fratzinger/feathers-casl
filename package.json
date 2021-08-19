@@ -44,7 +44,7 @@
     "@feathersjs/feathers": "^4.5.11",
     "@feathersjs/transport-commons": "^4.5.11",
     "feathers-hooks-common": "^5.0.6",
-    "feathers-utils": "^1.5.9",
+    "feathers-utils": "^1.5.10",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
