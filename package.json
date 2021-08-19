@@ -39,12 +39,12 @@
     "docs:build": "vitepress build docs"
   },
   "dependencies": {
-    "@casl/ability": "^5.4.0",
+    "@casl/ability": "^5.4.3",
     "@feathersjs/errors": "^4.5.11",
     "@feathersjs/feathers": "^4.5.11",
     "@feathersjs/transport-commons": "^4.5.11",
     "feathers-hooks-common": "^5.0.6",
-    "feathers-utils": "^1.5.8",
+    "feathers-utils": "^1.5.9",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
@@ -58,9 +58,9 @@
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/lodash": "^4.14.172",
     "@types/mocha": "^8.2.3",
-    "@types/node": "^15.14.7",
-    "@typescript-eslint/eslint-plugin": "^4.29.1",
-    "@typescript-eslint/parser": "^4.29.1",
+    "@types/node": "^15.14.8",
+    "@typescript-eslint/eslint-plugin": "^4.29.2",
+    "@typescript-eslint/parser": "^4.29.2",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "eslint": "^7.31.0",
@@ -71,7 +71,7 @@
     "feathers-mongodb": "^6.3.0",
     "feathers-mongoose": "^8.3.3",
     "feathers-nedb": "^5.1.0",
-    "feathers-objection": "^7.5.0",
+    "feathers-objection": "^7.5.1",
     "feathers-sequelize": "^6.2.0",
     "helmet": "^4.6.0",
     "knex": "^0.95.8",
