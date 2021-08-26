@@ -27,6 +27,11 @@ interface ConnectionsPerField {
 }
 
 export default (app: Application, data: Record<string, unknown>, context: HookContext, options?: Partial<ChannelOptions>): Channel|Channel[] => {
+  const { channels } = app;
+  
+  // skip if there are no channels
+  if (!channels?.length) { return undefined; }
+
   options = makeOptions(app, options);
   const { channelOnError, activated } = options;
   const modelName = getModelName(options.modelName, context);
@@ -35,8 +40,6 @@ export default (app: Application, data: Record<string, unknown>, context: HookCo
     return (!channelOnError) ? new Channel() : app.channel(channelOnError);
   }
 
-  const { channels } = app;
-  //return app.channel(channels);
   const allConnections = app.channel(channels).connections;
 
   const dataToTest = subject(modelName, data);
