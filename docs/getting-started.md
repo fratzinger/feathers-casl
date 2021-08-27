@@ -284,6 +284,34 @@ module.exports = function (app) {
 };
 ```
 
+### Using CASL with the REST (Express.js) transport
+
+In case you are not using sockets and want to use `feathers-casl` with the Express transport, you need to define the abilities right after your `authenticate()` hook and before the `authorize()` hook for each service relying on CASL.
+
+```js
+// src/services/tasks/tasks.hooks.js
+
+module.exports = {
+  before: {
+    all: [
+      authenticate('jwt'),
+      
+      // Add this to set abilities, if a user exists
+      context => {
+        const { user } = context.params
+        if (user) context.params.ability = defineAbilitiesFor(user)
+        return context
+      }
+    ]
+
+    // ...
+  },
+
+  // ...
+};
+
+```
+
 ## Testing
 
 Simply run `npm test` and all your tests in the `test/` directory will be run. The project has full support for *Visual Studio Code*. You can use the debugger to set breakpoints.
