@@ -143,22 +143,20 @@ describe("authorize.relations", function() {
   
       const believe = await serviceAlbums.create({ name: "Believe", artistId: justinBieber.id, date: 2012 });
       const purpose = await serviceAlbums.create({ name: "Purpose", artistId: justinBieber.id, date: 2020 });
-  
-      let albumsOfBlink = await serviceAlbums.find({ 
-        query: { "artist.name": "Blink182" },
-        ability: defineAbility((can) => {
-          can("read", "albums");
-          can("read", "artists", { name: "Justin Bieber" });
-        }, { resolveAction })
-      });
-      
-      assert.deepStrictEqual(
-        albumsOfBlink, 
-        [], 
-        "found no albums of blink182"
+
+      await assert.rejects(
+        serviceAlbums.find({ 
+          query: { "artist.name": "Blink182" },
+          ability: defineAbility((can) => {
+            can("read", "albums");
+            can("read", "artists", { name: "Justin Bieber" });
+          }, { resolveAction })
+        }),
+        (err) => err.name === "NotFound",
+        "found no albums"
       );
 
-      albumsOfBlink = await serviceAlbums.find({ 
+      const albumsOfBlink = await serviceAlbums.find({ 
         query: { "artist.name": "Blink182" },
         ability: defineAbility((can) => {
           can("read", "albums");
@@ -188,22 +186,20 @@ describe("authorize.relations", function() {
   
       const believe = await serviceAlbums.create({ name: "Believe", artistId: justinBieber.id, date: 2012 });
       const purpose = await serviceAlbums.create({ name: "Purpose", artistId: justinBieber.id, date: 2020 });
-  
-      let albumsOfBlink = await serviceAlbums.find({ 
-        query: { "artist.name": "Blink182", $select: ["id"] },
-        ability: defineAbility((can) => {
-          can("read", "albums");
-          can("read", "artists", { name: "Justin Bieber" });
-        }, { resolveAction })
-      });
-      
-      assert.deepStrictEqual(
-        albumsOfBlink, 
-        [], 
-        "found no albums of blink182"
-      );
 
-      albumsOfBlink = await serviceAlbums.find({ 
+      await assert.rejects(
+        serviceAlbums.find({ 
+          query: { "artist.name": "Blink182", $select: ["id"] },
+          ability: defineAbility((can) => {
+            can("read", "albums");
+            can("read", "artists", { name: "Justin Bieber" });
+          }, { resolveAction })
+        }),
+        (err) => err.name === "NotFound",
+        "found no albums"
+      );
+      
+      const albumsOfBlink = await serviceAlbums.find({ 
         query: { "artist.name": "Blink182", $select: ["id"] },
         ability: defineAbility((can) => {
           can("read", "albums");
