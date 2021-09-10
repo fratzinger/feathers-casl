@@ -74,21 +74,23 @@ export default function mergeQueryFromAbility<T>(
         });
       }
     }
+
+    if (_isEmpty(query)) {
+      return originalQuery;
+    }
   
-    if (!_isEmpty(query)) {
-      if (!originalQuery) {
-        return query;
-      } else {
-        const operators = service.options?.whitelist;
-        return mergeQuery(
-          originalQuery, 
-          query, { 
-            defaultHandle: "intersect",
-            operators,
-            useLogicalConjunction: true
-          }
-        );
-      }
+    if (!originalQuery) {
+      return query;
+    } else {
+      const operators = service.options?.whitelist;
+      return mergeQuery(
+        originalQuery, 
+        query, { 
+          defaultHandle: "intersect",
+          operators,
+          useLogicalConjunction: true
+        }
+      );
     }
   } else {
     return originalQuery;
