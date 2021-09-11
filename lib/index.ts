@@ -38,6 +38,8 @@ export const utils = {
   mergeQueryFromAbility
 };
 
+export * from "./types";
+
 if (typeof module !== "undefined") {
   module.exports = Object.assign(initialize, module.exports);
 }
