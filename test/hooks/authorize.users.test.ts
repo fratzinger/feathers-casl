@@ -98,10 +98,11 @@ describe("authorize.users.test.ts", function() {
   }
 
   it("user can update user", async function() {
+    let hadAbility = false;
     const { service } = await mockApp(
       (context) => {
         if (!context.params.ability) { return context; }
-        const hallo = "";
+        hadAbility = true;
       }
     );
     const admin = await service.create({ name: "user1", roleId: 1, companyId: 1 });
@@ -109,6 +110,7 @@ describe("authorize.users.test.ts", function() {
     const ability = mockAbility(admin);
 
     const user2Patched = await service.patch(user2.id, { roleId: 3 }, { ability });
-    const hallo = "";
+    assert.deepStrictEqual(user2Patched.roleId, 3);
+    assert.ok(hadAbility);
   });
 });
