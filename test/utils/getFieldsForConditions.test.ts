@@ -2,7 +2,7 @@ import { defineAbility } from "@casl/ability";
 import assert from "assert";
 import getFieldsForConditions from "../../lib/utils/getFieldsForConditions";
 
-describe("utils - getFieldsForConditions.test", function() {
+describe("utils - getFieldsForConditions", function() {
   it("returns empty array for no conditions", function() {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     const ability = defineAbility(() => {});

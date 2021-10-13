@@ -2,7 +2,7 @@ import { defineAbility } from "@casl/ability";
 import assert from "assert";
 import convertRuleToQuery from "../../lib/utils/convertRuleToQuery";
 
-describe("convertRuleToQuery.test.ts", function() {
+describe("utils - convertRuleToQuery", function() {
   it("", function() {
     const ability = defineAbility((can, cannot) => {
       can("create", "tests", { id: 1, test: true });

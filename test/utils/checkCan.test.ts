@@ -5,7 +5,7 @@ import { defineAbility } from "@casl/ability";
 
 import checkCan from "../../lib/utils/checkCan";
 
-describe("utils checkCan", function() {
+describe("utils - checkCan", function() {
   let app, service;
   before(async function() {
     app = feathers();

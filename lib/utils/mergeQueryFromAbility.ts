@@ -12,12 +12,11 @@ import type { AuthorizeHookOptions } from "../types";
 
 const adaptersFor$not = [
   "feathers-nedb",
+  "feathers-sequelize",
+  "feathers-objection"
 ];
 
-const adaptersFor$notAsArray = [
-  "feathers-objection", 
-  "feathers-sequelize"
-];
+const adaptersFor$notAsArray = [];
   
 const adaptersFor$nor = [
   "feathers-memory",
@@ -37,20 +36,23 @@ export default function mergeQueryFromAbility<T>(
   if (hasRestrictingConditions(ability, method, modelName)) {
     const adapter = getAdapter(app, options);
   
-    let query;
+    let query: Query;
     if (adaptersFor$not.includes(adapter)) {
+      // nedb
       query = rulesToQuery(ability, method, modelName, (rule) => {
         const { conditions } = rule;
         return (rule.inverted) ? { $not: conditions } : conditions;
       });
       query = simplifyQuery(query);
     } else if (adaptersFor$notAsArray.includes(adapter)) {
+      // objection, sequelize
       query = rulesToQuery(ability, method, modelName, (rule) => {
         const { conditions } = rule;
         return (rule.inverted) ? { $not: [conditions] } : conditions;
       });
       query = simplifyQuery(query);
     } else if (adaptersFor$nor.includes(adapter)) {
+      // memory, mongoose, mongodb
       query = rulesToQuery(ability, method, modelName, (rule) => {
         const { conditions } = rule;
         return (rule.inverted) ? { $nor: [conditions] } : conditions;
