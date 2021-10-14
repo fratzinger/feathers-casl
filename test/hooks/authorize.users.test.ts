@@ -8,7 +8,7 @@ import path from "path";
 
 declare module "feathers-sequelize" {
   interface SequelizeServiceOptions {
-    operators: Record<string, unknown>
+    operators: any
   }
 }
 
