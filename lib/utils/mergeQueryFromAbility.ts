@@ -11,12 +11,13 @@ import type { Application, Query, Service } from "@feathersjs/feathers";
 import type { AuthorizeHookOptions } from "../types";
 
 const adaptersFor$not = [
-  "feathers-nedb",
+  "feathers-nedb"
+];
+
+const adaptersFor$notAsArray = [
   "feathers-sequelize",
   "feathers-objection"
 ];
-
-const adaptersFor$notAsArray = [];
   
 const adaptersFor$nor = [
   "feathers-memory",

@@ -16,10 +16,11 @@ describe("authorize.users.test.ts", function() {
   function mockAbility(user) {
     const ability = defineAbility((can, cannot) => {
       can("manage", "all", { companyId: 1 });
-      //cannot(["create", "update", "remove"], "users", { roleId: 0 });
-      //cannot("remove", "users", { id: user.id });
-      //cannot(["update", "patch"], "users", ["roleId"], { id: user.id });
-      //cannot(["update", "patch"], "users", ["companyId"]);
+      can("manage", "all", { companyId: 2 });
+      cannot(["create", "update", "patch", "remove"], "users", { roleId: 0 });
+      cannot("remove", "users", { id: user.id });
+      cannot(["update", "patch"], "users", ["roleId"], { id: user.id });
+      cannot(["update", "patch"], "users", ["companyId"]);
     }, {
       resolveAction: createAliasResolver({
         update: "patch",
