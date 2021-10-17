@@ -32,6 +32,8 @@ export interface CheckBasicPermissionHookOptions extends HookBaseOptions {
   storeAbilityForAuthorize: boolean
 }
 
+export type CheckBasicPermissionUtilsOptions = Omit<CheckBasicPermissionHookOptions, "notSkippable">;
+
 export type CheckBasicPermissionHookOptionsExclusive = Pick<CheckBasicPermissionHookOptions, Exclude<keyof CheckBasicPermissionHookOptions, keyof HookBaseOptions>>
 
 export type AvailableFieldsOption = string[] | ((context: HookContext) => string[]);
