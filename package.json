@@ -24,13 +24,9 @@
     "lib": "lib"
   },
   "scripts": {
-    "preversion": "npm run lint && npm run test && npm run compile",
-    "publish": "git push origin --tags && git push origin",
     "compile": "shx rm -rf dist/ && tsc",
-    "release:pre": "npm version prerelease && npm publish --tag pre",
-    "release:patch": "npm version patch && npm publish",
-    "release:minor": "npm version minor && npm publish",
-    "release:major": "npm version major && npm publish",
+    "version": "npm run compile",
+    "release": "np",
     "mocha": "cross-env NODE_ENV=test TS_NODE_PROJECT='tsconfig.test.json' mocha --timeout 5000",
     "test": "npm run mocha",
     "coverage": "nyc npm run test",
@@ -80,6 +76,7 @@
     "mongodb-memory-server": "^6.9.6",
     "mongoose": "^5.13.11",
     "nedb": "^1.8.0",
+    "np": "^7.5.0",
     "nyc": "^15.1.0",
     "objection": "^2.2.17",
     "sequelize": "^5.22.4",
