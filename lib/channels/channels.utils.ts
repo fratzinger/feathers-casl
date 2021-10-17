@@ -12,10 +12,10 @@ import type {
   InitOptions
 } from "../types";
 
-export const makeOptions = (app: Application, options?: Partial<ChannelOptions>): ChannelOptions => {
-  if (!app) {
-    throw new Error("feathers-casl: You need to provide an 'app' to the channels:makeOptions function");
-  }
+export const makeOptions = (
+  app: Application, 
+  options?: Partial<ChannelOptions>
+): ChannelOptions => {
   options = options || {};
   return Object.assign({}, defaultOptions, getAppOptions(app), options);
 };
