@@ -148,7 +148,7 @@ const handleSingle = async (
 
     // TODO: If not allowed to .get() and to .[method](), then throw "NotFound" (maybe optional)
 
-    const getMethod = (service._get) ? service._get : service.get;
+    const getMethod = (service._get) ? "_get" : "get";
 
     const item = await service[getMethod](id, paramsGet);
   

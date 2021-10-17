@@ -48,7 +48,7 @@ const checkCan = async <S>(
     };
   }
 
-  const getMethod = (service._get) ? service._get : service.get;
+  const getMethod = (service._get) ? "_get" : "get";
   
   const item = await service[getMethod](id, params);
     
