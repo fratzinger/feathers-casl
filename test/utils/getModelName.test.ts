@@ -32,4 +32,17 @@ describe("utils - getModelName", function() {
       "returns custom modelName"
     );
   });
+
+  it("throws for other types", function() {
+    const vals = [null, [], {}, 1, true, false];
+
+    vals.forEach(val => {
+      const context = { path: "Test2", method: "Test3" } as unknown as HookContext;
+      assert.throws(
+        //@ts-expect-error val is not string, function or undefined
+        () => getModelName(val, context),
+        `throws on val: '${val}''`
+      );
+    });
+  });
 });

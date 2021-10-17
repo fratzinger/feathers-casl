@@ -70,4 +70,14 @@ describe("utils - convertRuleToQuery", function() {
       );
     });
   });
+
+  it("calls actionOnForbidden", function() {
+    let actionOnForbiddenCalled = false;
+    const [rule] = defineAbility((can, cannot) => {
+      cannot("create", "tests");
+    }).rules;
+    convertRuleToQuery(rule, { actionOnForbidden: () => { actionOnForbiddenCalled = true; } });
+
+    assert.ok(actionOnForbiddenCalled);
+  });
 });
