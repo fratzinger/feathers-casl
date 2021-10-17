@@ -148,7 +148,9 @@ const handleSingle = async (
 
     // TODO: If not allowed to .get() and to .[method](), then throw "NotFound" (maybe optional)
 
-    const item = await service._get(id, paramsGet);
+    const getMethod = (service._get) ? service._get : service.get;
+
+    const item = await service[getMethod](id, paramsGet);
   
     const restrictingFields = hasRestrictingFields(ability, method, subject(modelName, item), { availableFields });
     if (restrictingFields && (restrictingFields === true || restrictingFields.length === 0)) {

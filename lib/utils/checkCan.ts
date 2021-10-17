@@ -47,8 +47,10 @@ const checkCan = async <S>(
       query: { $select }
     };
   }
+
+  const getMethod = (service._get) ? service._get : service.get;
   
-  const item = await service._get(id, params);
+  const item = await service[getMethod](id, params);
     
   const can = throwUnlessCan(
     ability,
