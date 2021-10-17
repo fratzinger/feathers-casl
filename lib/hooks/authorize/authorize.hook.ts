@@ -14,10 +14,12 @@ import type {
 
 export const HOOKNAME = "authorize";
 
-export default (options?: Partial<AuthorizeHookOptions>): ((context: HookContext) => Promise<HookContext>) => {
+export default (
+  _options?: Partial<AuthorizeHookOptions>
+): ((context: HookContext) => Promise<HookContext>) => {
   return async (context: HookContext): Promise<HookContext> => {
     if (
-      !options?.notSkippable && (
+      !_options?.notSkippable && (
         shouldSkip(HOOKNAME, context) ||
         !context.params ||
         context.type === "error"
@@ -26,10 +28,10 @@ export default (options?: Partial<AuthorizeHookOptions>): ((context: HookContext
       return context;
     }
 
-    const fullOptions = makeOptions(context.app, options);
+    const options = makeOptions(context.app, _options);
     
     return (context.type === "before") 
-      ? await authorizeBefore(fullOptions)(context) 
-      : await authorizeAfter(fullOptions)(context);
+      ? await authorizeBefore(context, options)
+      : await authorizeAfter(context, options);
   };
 };
