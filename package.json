@@ -44,7 +44,7 @@
     "@feathersjs/feathers": "^4.5.11",
     "@feathersjs/transport-commons": "^4.5.11",
     "feathers-hooks-common": "^5.0.6",
-    "feathers-utils": "^1.5.10",
+    "feathers-utils": "^1.6.1",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
@@ -88,8 +88,8 @@
     "source-map-support": "^0.5.20",
     "sqlite3": "^5.0.2",
     "ts-node": "^10.3.0",
-    "type-fest": "^2.5.0",
+    "type-fest": "^2.5.1",
     "typescript": "^4.4.4",
-    "vitepress": "^0.20.0"
+    "vitepress": "^0.19.2"
   }
 }
