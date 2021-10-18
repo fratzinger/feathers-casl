@@ -23,6 +23,7 @@ export const makeOptions = (
 const defaultOptions: ChannelOptions = {
   activated: true,
   channelOnError: ["authenticated"],
+  channels: undefined,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ability: ((app: Application, connection: RealTimeConnection, data: Record<string, unknown>, context: HookContext): Ability => {
     return connection.ability;
