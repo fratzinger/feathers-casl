@@ -55,12 +55,12 @@ The best way to keep the rules, is in our `vuex`-store. So first, we add a custo
 
 ```js
 // src/store/vuex.plugin.casl.js
-import { Ability } from '@casl/ability';
+import { Ability, createAliasResolver, detectSubjectType as defaultDetector } from '@casl/ability';
 import { BaseModel } from '@/src/store/feathers/client.js';
 
 const detectSubjectType = (subject) => {
   if (typeof subject === 'string') return subject;
-  if (!(subject instanceof BaseModel)) return undefined;
+  if (!(subject instanceof BaseModel)) return defaultDetector(subject);
   return subject.constructor.servicePath;
 }
 
