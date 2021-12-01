@@ -12,7 +12,7 @@ import {
   isMulti
 } from "feathers-utils";
 
-import type { AnyAbility } from "@casl/ability";
+import type { AnyAbility, ForcedSubject } from "@casl/ability";
 import type { Application, HookContext } from "@feathersjs/feathers";
 
 import type {
@@ -115,10 +115,10 @@ const move = (context: HookContext, fromPath: Path, toPath: Path) => {
   return val;
 };
 
-export const throwUnlessCan = (
+export const throwUnlessCan = <T extends ForcedSubject<string>>(
   ability: AnyAbility, 
   method: string, 
-  resource: string|Record<string, unknown>, 
+  resource: string|T, 
   modelName: string,
   options: Partial<ThrowUnlessCanOptions>
 ): boolean => {

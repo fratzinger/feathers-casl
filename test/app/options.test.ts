@@ -1,6 +1,6 @@
 /* eslint-disable */
 import assert from "assert";
-import feathers, { Application, HookContext } from "@feathersjs/feathers";
+import { feathers, Application, HookContext } from "@feathersjs/feathers";
 import { Service } from "feathers-memory";
 import casl from "../../lib/initialize";
 import authorize from "../../lib/hooks/authorize/authorize.hook";

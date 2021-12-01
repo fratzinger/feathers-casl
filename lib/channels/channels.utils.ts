@@ -64,7 +64,7 @@ export const getAbility = (
 };
 
 export const getEventName = (
-  method: "find" | "get" | "create" | "update" | "patch" | "remove"
+  method: string
 ): EventName => {
   if (method === "create") { return "created"; }
   else if (method === "update") { return "updated"; }

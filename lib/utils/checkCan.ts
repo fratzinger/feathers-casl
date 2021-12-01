@@ -48,7 +48,7 @@ const checkCan = async <S>(
     };
   }
   
-  const item = await service._get(id, params);
+  const item = await service.get(id, params);
     
   const can = throwUnlessCan(
     ability,
