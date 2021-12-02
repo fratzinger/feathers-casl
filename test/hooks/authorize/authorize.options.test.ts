@@ -1,5 +1,5 @@
 import assert from "assert";
-import feathers from "@feathersjs/feathers";
+import { feathers } from "@feathersjs/feathers";
 import { Service } from "feathers-memory";
 import { createAliasResolver, defineAbility } from "@casl/ability";
 
@@ -14,8 +14,10 @@ import { Application } from "@feathersjs/feathers";
 import authorize from "../../../lib/hooks/authorize/authorize.hook";
 
 describe("authorize.options.test.ts", function () {
-  let app: Application;
+  type TestApplication = Application<{test: Service}>;
+  let app: TestApplication;
   let service: Service;
+
 
   describe("checkMultiActions", function () {
     beforeEach(function () {
@@ -136,7 +138,7 @@ describe("authorize.options.test.ts", function () {
 
   describe("modelName", function() {
     it("use service.modelName with string", async function() {
-      const app = feathers();
+      const app: TestApplication = feathers();
       app.use(
         "test",
         new Service({
@@ -172,7 +174,7 @@ describe("authorize.options.test.ts", function () {
     });
 
     it("use service.modelName with function", async function() {
-      const app = feathers();
+      const app: TestApplication = feathers();
       app.use(
         "test",
         new Service({
@@ -210,7 +212,7 @@ describe("authorize.options.test.ts", function () {
 
   describe("ability", function() {
     it("works if no ability is set at all", async function() {
-      const app = feathers();
+      const app: TestApplication = feathers();
       app.use(
         "test",
         new Service({
@@ -234,7 +236,7 @@ describe("authorize.options.test.ts", function () {
     });
 
     it("uses ability in options", async function() {
-      const app = feathers();
+      const app: TestApplication = feathers();
       app.use(
         "test",
         new Service({
@@ -265,7 +267,7 @@ describe("authorize.options.test.ts", function () {
     });
 
     it("uses params.ability over options.ability", async function() {
-      const app = feathers();
+      const app: TestApplication = feathers();
       app.use(
         "test",
         new Service({
@@ -298,7 +300,7 @@ describe("authorize.options.test.ts", function () {
     });
 
     it("uses ability as Promise", async function() {
-      const app = feathers();
+      const app: TestApplication = feathers();
       app.use(
         "test",
         new Service({
@@ -327,7 +329,7 @@ describe("authorize.options.test.ts", function () {
     });
 
     it("uses ability as function", async function() {
-      const app = feathers();
+      const app: TestApplication = feathers();
       app.use(
         "test",
         new Service({
@@ -355,7 +357,7 @@ describe("authorize.options.test.ts", function () {
     });
 
     it("uses ability as Promise", async function() {
-      const app = feathers();
+      const app: TestApplication = feathers();
       app.use(
         "test",
         new Service({
@@ -433,7 +435,7 @@ describe("authorize.options.test.ts", function () {
 
   describe("checkAbilityForInternal", function() {
     it("passes for internal call without params.ability and not allowed options.params by default", async function() {
-      const app = feathers();
+      const app: TestApplication = feathers();
       app.use(
         "test",
         new Service({
@@ -464,7 +466,7 @@ describe("authorize.options.test.ts", function () {
     });
 
     it("throws for external call without params.ability and not allowed options.params by default", async function() {
-      const app = feathers();
+      const app: TestApplication = feathers();
       app.use(
         "test",
         new Service({
@@ -496,7 +498,7 @@ describe("authorize.options.test.ts", function () {
     });
 
     it("throws for internal call without params.ability and not allowed options.params with checkAbilityForInternal: true", async function() {
-      const app = feathers();
+      const app: TestApplication = feathers();
       app.use(
         "test",
         new Service({

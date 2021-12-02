@@ -5,7 +5,7 @@ import {
   defineAbility
 } from "@casl/ability";
 import _cloneDeep from "lodash/cloneDeep";
-import { markHookForSkip } from "feathers-utils/dist";
+import { markHookForSkip } from "feathers-utils";
 import { HOOKNAME as HOOKNAME_CHECKBASICPERMISSION } from "../../../lib/hooks/checkBasicPermission.hook";
 import { HookContext } from "@feathersjs/feathers";
 

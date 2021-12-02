@@ -1,5 +1,5 @@
 import assert from "assert";
-import feathers, { Paginated } from "@feathersjs/feathers";
+import { feathers, Paginated } from "@feathersjs/feathers";
 import { createAliasResolver, defineAbility } from "@casl/ability";
 import _sortBy from "lodash/sortBy";
 

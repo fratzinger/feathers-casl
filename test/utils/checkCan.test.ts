@@ -1,5 +1,5 @@
 import assert from "assert";
-import feathers from "@feathersjs/feathers";
+import { feathers } from "@feathersjs/feathers";
 import { Service } from "feathers-memory";
 import { defineAbility } from "@casl/ability";
 
