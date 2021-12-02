@@ -21,17 +21,17 @@ const makeService = () => {
     Model,
     multi: true,
     whitelist: ["$not", "$and"],
-    casl: {
-      availableFields: [
-        "id", 
-        "userId", 
-        "hi", 
-        "test", 
-        "published",
-        "supersecret", 
-        "hidden"
-      ]
-    },
+    // casl: {
+    //   availableFields: [
+    //     "id", 
+    //     "userId", 
+    //     "hi", 
+    //     "test", 
+    //     "published",
+    //     "supersecret", 
+    //     "hidden"
+    //   ]
+    // },
     paginate: {
       default: 10,
       max: 50

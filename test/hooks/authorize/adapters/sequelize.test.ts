@@ -55,17 +55,17 @@ const makeService = () => {
       $not: Op.not
     },
     whitelist: ["$not"],
-    casl: {
-      availableFields: [
-        "id", 
-        "userId", 
-        "hi", 
-        "test", 
-        "published",
-        "supersecret", 
-        "hidden"
-      ]
-    },
+    // casl: {
+    //   availableFields: [
+    //     "id", 
+    //     "userId", 
+    //     "hi", 
+    //     "test", 
+    //     "published",
+    //     "supersecret", 
+    //     "hidden"
+    //   ]
+    // },
     paginate: {
       default: 10,
       max: 50

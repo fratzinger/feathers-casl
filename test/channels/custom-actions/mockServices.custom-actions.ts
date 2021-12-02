@@ -81,9 +81,9 @@ export default function(app: Application): void {
 
   app.use("articles", new Service({
     multi: true,
-    casl: {
-      availableFields: ["id", "test", "published", "test"]
-    }
+    // casl: {
+    //   availableFields: ["id", "test", "published", "test"]
+    // }
     //paginate: 
   }));
 
@@ -93,9 +93,9 @@ export default function(app: Application): void {
 
   app.use("comments", new Service({
     multi: true,
-    casl: {
-      availableFields: ["id", "title", "userId", "test"]
-    }
+    // casl: {
+    //   availableFields: ["id", "title", "userId", "test"]
+    // }
     //paginate:
   }));
 
@@ -104,9 +104,9 @@ export default function(app: Application): void {
   //#region users
   app.use("users", new Service({
     multi: true,
-    casl: {
-      availableFields: ["id", "email", "password"]
-    }
+    // casl: {
+    //   availableFields: ["id", "email", "password"]
+    // }
     //paginate: 
   }));
 
