@@ -69,7 +69,7 @@ export default function mergeQueryFromAbility<T>(
         $and.forEach(q => {
           query = mergeQuery(query, q, {
             defaultHandle: "intersect",
-            operators: service.options.whitelist,
+            operators: service.options?.whitelist,
             useLogicalConjunction: true
           });
         });
@@ -80,7 +80,7 @@ export default function mergeQueryFromAbility<T>(
       if (!originalQuery) {
         return query;
       } else {
-        const operators = service.options.whitelist;
+        const operators = service.options?.whitelist;
         return mergeQuery(
           originalQuery, 
           query, { 
