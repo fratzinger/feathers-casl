@@ -3,7 +3,6 @@ import makeTests from "./makeTests";
 import { Service } from "feathers-knex";
 import { getItems } from "feathers-hooks-common";
 import path from "path";
-import { ServiceCaslOptions } from "../../../../lib/types";
 import { HookContext } from "@feathersjs/feathers";
 
 const db  = knex({
@@ -21,29 +20,23 @@ db.schema.createTable("messages", table => {
   table.string("text");
 });
 
-declare module "@feathersjs/adapter-commons" {
-  interface ServiceOptions {
-    casl: ServiceCaslOptions
-  }
-}
-
 const makeService = () => {
   return new Service({
     Model: db,
     name: "tests",
     multi: true,
     whitelist: ["$not"],
-    // casl: {
-    //   availableFields: [
-    //     "id", 
-    //     "userId", 
-    //     "hi", 
-    //     "test", 
-    //     "published",
-    //     "supersecret", 
-    //     "hidden"
-    //   ]
-    // },
+    casl: {
+      availableFields: [
+        "id", 
+        "userId", 
+        "hi", 
+        "test", 
+        "published",
+        "supersecret", 
+        "hidden"
+      ]
+    },
     paginate: {
       default: 10,
       max: 50

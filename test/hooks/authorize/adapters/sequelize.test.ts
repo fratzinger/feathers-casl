@@ -3,7 +3,6 @@ import makeTests from "./makeTests";
 import { Service } from "feathers-sequelize";
 import { getItems } from "feathers-hooks-common";
 import path from "path";
-import { ServiceCaslOptions } from "../../../../lib/types";
 import { HookContext } from "@feathersjs/feathers";
 
 const sequelize = new Sequelize("sequelize", "", "", {
@@ -11,12 +10,6 @@ const sequelize = new Sequelize("sequelize", "", "", {
   storage: path.join(__dirname, "../../../.data/db.sqlite"),
   logging: false
 });
-
-declare module "@feathersjs/adapter-commons" {
-  interface ServiceOptions {
-    casl: ServiceCaslOptions
-  }
-}
 
 const Model = sequelize.define("tests", {
   userId: {
@@ -55,17 +48,17 @@ const makeService = () => {
       $not: Op.not
     },
     whitelist: ["$not"],
-    // casl: {
-    //   availableFields: [
-    //     "id", 
-    //     "userId", 
-    //     "hi", 
-    //     "test", 
-    //     "published",
-    //     "supersecret", 
-    //     "hidden"
-    //   ]
-    // },
+    casl: {
+      availableFields: [
+        "id", 
+        "userId", 
+        "hi", 
+        "test", 
+        "published",
+        "supersecret", 
+        "hidden"
+      ]
+    },
     paginate: {
       default: 10,
       max: 50

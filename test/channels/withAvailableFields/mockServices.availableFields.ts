@@ -7,7 +7,6 @@ import { Ability, createAliasResolver, defineAbility } from "../../../lib";
 import { Service } from "feathers-memory";
 import hashPassword from "@feathersjs/authentication-local/lib/hooks/hash-password";
 import protect from "@feathersjs/authentication-local/lib/hooks/protect";
-import { ServiceCaslOptions } from "../../../lib/types";
 
 const resolveAction = createAliasResolver({
   update: "patch",
@@ -15,12 +14,6 @@ const resolveAction = createAliasResolver({
   delete: "remove",
 });
 
-declare module "@feathersjs/adapter-commons" {
-  interface ServiceOptions {
-    casl: ServiceCaslOptions
-  }
-}
-  
 const defineAbilitiesFor = (user): Ability => {
   //@ts-ignore
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -71,9 +64,9 @@ export default function(app: Application): void {
 
   app.use("articles", new Service({
     multi: true,
-    // casl: {
-    //   availableFields: ["id", "test", "published", "test"]
-    // }
+    casl: {
+      availableFields: ["id", "test", "published", "test"]
+    }
     //paginate: 
   }));
 
@@ -83,9 +76,9 @@ export default function(app: Application): void {
 
   app.use("comments", new Service({
     multi: true,
-    // casl: {
-    //   availableFields: ["id", "title", "userId", "test"]
-    // }
+    casl: {
+      availableFields: ["id", "title", "userId", "test"]
+    }
     //paginate:
   }));
 
@@ -94,9 +87,9 @@ export default function(app: Application): void {
   //#region users
   app.use("users", new Service({
     multi: true,
-    // casl: {
-    //   availableFields: ["id", "email", "password"]
-    // }
+    casl: {
+      availableFields: ["id", "email", "password"]
+    }
     //paginate: 
   }));
 

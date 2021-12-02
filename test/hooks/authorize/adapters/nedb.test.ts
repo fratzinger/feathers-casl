@@ -2,7 +2,6 @@ import NeDB from "nedb";
 import { Service } from "feathers-nedb";
 import makeTests from "./makeTests";
 import path from "path";
-import { ServiceCaslOptions } from "../../../../lib/types";
 
 // Create a NeDB instance
 const Model = new NeDB({
@@ -10,28 +9,22 @@ const Model = new NeDB({
   autoload: true
 });
 
-declare module "@feathersjs/adapter-commons" {
-  interface ServiceOptions {
-    casl: ServiceCaslOptions
-  }
-}
-
 const makeService = () => {
   return new Service({
     Model,
     multi: true,
     whitelist: ["$not", "$and"],
-    // casl: {
-    //   availableFields: [
-    //     "id", 
-    //     "userId", 
-    //     "hi", 
-    //     "test", 
-    //     "published",
-    //     "supersecret", 
-    //     "hidden"
-    //   ]
-    // },
+    casl: {
+      availableFields: [
+        "id", 
+        "userId", 
+        "hi", 
+        "test", 
+        "published",
+        "supersecret", 
+        "hidden"
+      ]
+    },
     paginate: {
       default: 10,
       max: 50

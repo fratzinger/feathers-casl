@@ -3,32 +3,25 @@ import { MongoClient } from "mongodb";
 import { Service } from "feathers-mongodb";
 
 import makeTests from "./makeTests";
-import { ServiceCaslOptions } from "../../../../lib/types";
 
 let Model;
-
-declare module "@feathersjs/adapter-commons" {
-  interface ServiceOptions {
-    casl: ServiceCaslOptions
-  }
-}
 
 const makeService = () => {
   return new Service({
     Model,
     multi: true,
     whitelist: ["$and", "$nor"],
-    // casl: {
-    //   availableFields: [
-    //     "id", 
-    //     "userId", 
-    //     "hi", 
-    //     "test", 
-    //     "published",
-    //     "supersecret", 
-    //     "hidden"
-    //   ]
-    // },
+    casl: {
+      availableFields: [
+        "id", 
+        "userId", 
+        "hi", 
+        "test", 
+        "published",
+        "supersecret", 
+        "hidden"
+      ]
+    },
     paginate: {
       default: 10,
       max: 50

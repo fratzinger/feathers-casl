@@ -5,16 +5,9 @@ mongoose.Promise = global.Promise;
 
 import makeTests from "./makeTests";
 import { getItems } from "feathers-hooks-common";
-import { ServiceCaslOptions } from "../../../../lib/types";
 import { HookContext } from "@feathersjs/feathers";
 
 let Model;
-
-declare module "@feathersjs/adapter-commons" {
-  interface ServiceOptions {
-    casl: ServiceCaslOptions
-  }
-}
 
 const makeService = () => {
   return new Service({
@@ -22,17 +15,17 @@ const makeService = () => {
     multi: true,
     lean: true,
     whitelist: ["$nor"],
-    // casl: {
-    //   availableFields: [
-    //     "id", 
-    //     "userId", 
-    //     "hi", 
-    //     "test", 
-    //     "published",
-    //     "supersecret", 
-    //     "hidden"
-    //   ]
-    // },
+    casl: {
+      availableFields: [
+        "id", 
+        "userId", 
+        "hi", 
+        "test", 
+        "published",
+        "supersecret", 
+        "hidden"
+      ]
+    },
     paginate: {
       default: 10,
       max: 50
