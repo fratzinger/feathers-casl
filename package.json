@@ -44,7 +44,7 @@
     "@feathersjs/feathers": "5.0.0-pre.15",
     "@feathersjs/transport-commons": "5.0.0-pre.15",
     "feathers-hooks-common": "git+https://github.com/forgot/feathers-hooks-common.git#0c7546e2bbfc5873db82ecc30cbb701af58a90ab",
-    "feathers-utils": "git+https://github.com/geprog/feathers-utils.git#abc54f1a246dc2decb95fd655aeb181410696c65",
+    "feathers-utils": "git+https://github.com/geprog/feathers-utils.git#fedfc8be3ddaf6505a450bae9bb896cc572d2ab5",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
