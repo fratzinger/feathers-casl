@@ -27,6 +27,7 @@ import type {
   Path,
   ThrowUnlessCanOptions
 } from "../../types";
+import { Promisable } from "type-fest";
 
 export const makeOptions = (
   app: Application, 
@@ -83,6 +84,17 @@ export const getAbility = (
     }
   }
 
+  const persistedAbility = getPersistedConfig(context, "ability");
+
+  if (persistedAbility) {
+    if (typeof persistedAbility === "function") {
+      const ability = persistedAbility(context);
+      return Promise.resolve(ability);
+    } else {
+      return Promise.resolve(persistedAbility);
+    }
+  }
+
   if (!options.checkAbilityForInternal && !context.params?.provider) {
     return Promise.resolve(undefined);
   }
@@ -95,17 +107,8 @@ export const getAbility = (
       return Promise.resolve(options.ability);
     }
   }
-
-  if (getPersistedConfig(context, "ability")) {
-    if (typeof options.ability === "function") {
-      const ability = options.ability(context);
-      return Promise.resolve(ability);
-    } else {
-      return Promise.resolve(options.ability);
-    }
-  }
   
-  return Promise.resolve(undefined);
+  throw new Forbidden(`You're not allowed to ${context.method} on '${context.path}'`);
 };
 
 export const throwUnlessCan = (
@@ -190,6 +193,11 @@ export const setPersistedConfig = (context: HookContext, key: Path, val: unknown
   return _set(context, `params.casl.${key}`, val);
 };
 
-export const getPersistedConfig = (context: HookContext, key: Path): unknown => {
+export function getPersistedConfig (context: HookContext, key: "ability"): AnyAbility | ((context: HookContext) => Promisable<AnyAbility | undefined>) | undefined
+export function getPersistedConfig (context: HookContext, key: "skipRestrictingRead.conditions"): boolean
+export function getPersistedConfig (context: HookContext, key: "skipRestrictingRead.fields"): boolean
+export function getPersistedConfig (context: HookContext, key: "madeBasicCheck"): boolean
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getPersistedConfig (context: HookContext, key: Path): any {
   return _get(context, `params.casl.${key}`);
-};
+}
