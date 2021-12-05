@@ -1,5 +1,5 @@
 import assert from "assert";
-import feathers from "@feathersjs/feathers";
+import feathers, { HookContext } from "@feathersjs/feathers";
 import { Service } from "feathers-memory";
 import { createAliasResolver, defineAbility } from "@casl/ability";
 
@@ -129,7 +129,7 @@ describe("authorize.options.test.ts", function () {
       ];
       methods.forEach(async ({ method, params }) => {
         const promise = service[method](...params);
-        await assert.rejects(promise, err => err.name === "Forbidden", "rejects because 'method-multi' not defined");
+        await assert.rejects(promise, (err: Error) => err.name === "Forbidden", "rejects because 'method-multi' not defined");
       });
     });
   });
@@ -168,7 +168,7 @@ describe("authorize.options.test.ts", function () {
       assert.ok(result);
       await assert.rejects(() => {
         return service.update(0, { test: false });
-      }, err => err.name === "Forbidden", "update throws Forbidden");
+      }, (err: Error) => err.name === "Forbidden", "update throws Forbidden");
     });
 
     it("use service.modelName with function", async function() {
@@ -204,7 +204,7 @@ describe("authorize.options.test.ts", function () {
       assert.ok(result);
       await assert.rejects(() => {
         return service.update(0, { test: false });
-      }, err => err.name === "Forbidden", "update throws Forbidden");
+      }, (err: Error) => err.name === "Forbidden", "update throws Forbidden");
     });
   });
 
@@ -259,7 +259,7 @@ describe("authorize.options.test.ts", function () {
 
       await assert.rejects(
         service.create({ test: true }),
-        err => err.name === "Forbidden",
+        (err: Error) => err.name === "Forbidden",
         "throws even if no ability is set in params"
       );
     });
@@ -386,6 +386,86 @@ describe("authorize.options.test.ts", function () {
       assert.ok(result);
     });
 
+    it("uses persisted ability from 'context.params.casl.ability'", async function() {
+      const app = feathers();
+      app.use(
+        "test",
+        new Service({
+          multi: true,
+          paginate: {
+            default: 10,
+            max: 50
+          }
+        })
+      );
+      service = app.service("test");
+      //@ts-ignore
+      service.hooks({
+        before: {
+          all: [
+            authorize()
+          ],
+        }
+      });
+
+      await assert.doesNotReject(
+        service.create({ test: true })
+      );
+
+      await assert.rejects(
+        service.create(
+          { test: true },
+          { 
+            casl: {
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
+              ability: defineAbility(() => {})
+            } 
+          }),
+        (err: Error) => err.name === "Forbidden",
+        "throws Forbidden"
+      );
+    });
+
+    it("uses persisted ability as function from 'context.params.casl.ability'", async function() {
+      const app = feathers();
+      app.use(
+        "test",
+        new Service({
+          multi: true,
+          paginate: {
+            default: 10,
+            max: 50
+          }
+        })
+      );
+      service = app.service("test");
+      //@ts-ignore
+      service.hooks({
+        before: {
+          all: [
+            authorize()
+          ],
+        }
+      });
+
+      await assert.doesNotReject(
+        service.create({ test: true })
+      );
+
+      await assert.rejects(
+        service.create(
+          { test: true },
+          { 
+            casl: {
+              // eslint-disable-next-line @typescript-eslint/no-empty-function
+              ability: () => defineAbility(() => {})
+            } 
+          }),
+        (err: Error) => err.name === "Forbidden",
+        "throws Forbidden"
+      );
+    });
+
     it("fails for empty ability in options", async function() {
       const makeContext = (method, type) => {
         return {
@@ -421,7 +501,49 @@ describe("authorize.options.test.ts", function () {
               checkAbilityForInternal: true
             //@ts-ignore
             })(context),
-            err => err.name === "Forbidden",
+            (err: Error) => err.name === "Forbidden",
+            `'${type}:${method}' throws Forbidden`
+          );
+          promises.push(promise);
+        });
+      });
+      await Promise.all(promises);
+    });
+
+    it("fails for not defined ability on external", async function() {
+      const makeContext = (
+        method: "find" | "get" | "create" | "update" | "patch" | "remove", 
+        type: "before" | "after"
+      ): HookContext => {
+        return {
+          service: {
+            modelName: "Test",
+          },
+          path: "tests",
+          method,
+          type,
+          data: {
+            id: 1,
+            userId: 1,
+            test: true
+          },
+          params: {
+            provider: "rest",
+            query: {},
+          }
+        } as unknown as HookContext;
+      };
+  
+      const types: ("before" | "after")[] = ["before"];
+      const methods: ("find" | "get" | "create" | "update" | "patch" | "remove")[] = ["find", "get", "create", "update", "patch", "remove"];
+      const promises = [];
+      types.forEach(type => {
+        methods.forEach(method => {
+          const context = makeContext(method, type);
+          
+          const promise = assert.rejects(
+            authorize()(context),
+            (err: Error) => err.name === "Forbidden",
             `'${type}:${method}' throws Forbidden`
           );
           promises.push(promise);
@@ -490,7 +612,7 @@ describe("authorize.options.test.ts", function () {
 
       await assert.rejects(
         service.create({ test: true }, { provider: "rest" }),
-        err => err.name === "Forbidden",
+        (err: Error) => err.name === "Forbidden",
         "request throws Forbidden"
       );
     });
@@ -523,7 +645,7 @@ describe("authorize.options.test.ts", function () {
 
       await assert.rejects(
         service.create({ test: true }),
-        err => err.name === "Forbidden",
+        (err: Error) => err.name === "Forbidden",
         "request throws Forbidden"
       );
     });

@@ -152,7 +152,7 @@ describe("authorize.relations", function() {
             can("read", "artists", { name: "Justin Bieber" });
           }, { resolveAction })
         }),
-        (err) => err.name === "NotFound",
+        (err: Error) => err.name === "NotFound",
         "found no albums"
       );
 
@@ -195,7 +195,7 @@ describe("authorize.relations", function() {
             can("read", "artists", { name: "Justin Bieber" });
           }, { resolveAction })
         }),
-        (err) => err.name === "NotFound",
+        (err: Error) => err.name === "NotFound",
         "found no albums"
       );
       

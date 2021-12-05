@@ -94,7 +94,7 @@ describe("app-options / service-options", function() {
         service.find({
           query: {}
         }),
-        err => err.name === "Forbidden",
+        (err: Error) => err.name === "Forbidden",
         "throws Forbidden for no ability"
       )
   
@@ -162,7 +162,7 @@ describe("app-options / service-options", function() {
         service.find({
           query: {}
         }),
-        err => err.name === "Forbidden",
+        (err: Error) => err.name === "Forbidden",
         "throws Forbidden for no ability"
       )
   

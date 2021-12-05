@@ -181,7 +181,7 @@ export default (
         
         await assert.rejects(
           returnedItems,
-          (err) => err.name === "Forbidden",
+          (err: Error) => err.name === "Forbidden",
           "throws on find"
         );
       });
@@ -202,7 +202,7 @@ export default (
         
         await assert.rejects(
           returnedItems,
-          (err) => err.name === "Forbidden",
+          (err: Error) => err.name === "Forbidden",
           "throws on find"
         );
       });

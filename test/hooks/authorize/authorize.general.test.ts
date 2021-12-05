@@ -5,7 +5,7 @@ import {
   defineAbility
 } from "@casl/ability";
 import _cloneDeep from "lodash/cloneDeep";
-import { markHookForSkip } from "feathers-utils/dist";
+import { markHookForSkip } from "feathers-utils";
 import { HOOKNAME as HOOKNAME_CHECKBASICPERMISSION } from "../../../lib/hooks/checkBasicPermission.hook";
 import { HookContext } from "@feathersjs/feathers";
 
@@ -91,7 +91,7 @@ describe("authorize.general.test.ts", function() {
           markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
           const promise = assert.rejects(
             authorize()(context),
-            (err) => err.name === "Forbidden",
+            (err: Error) => err.name === "Forbidden",
             `'${type}:${method}': with no permissions returns 'Forbidden' error`
           );
           promises.push(promise);
@@ -476,7 +476,7 @@ describe("authorize.general.test.ts", function() {
   
         await assert.rejects(
           authorize()(context),
-          err => err.name === "Forbidden",
+          (err: Error) => err.name === "Forbidden",
           "rejects with 'Forbidden' error"
         );
       });
@@ -516,7 +516,7 @@ describe("authorize.general.test.ts", function() {
   
         await assert.rejects(
           authorize()(context),
-          err => err.name === "Forbidden",
+          (err: Error) => err.name === "Forbidden",
           "rejects with 'Forbidden' error"
         );
       });

@@ -37,8 +37,8 @@ const makeService = () => {
 };
 
 before(async function() {
-  const server = new MongoMemoryServer();
-  const uri = await server.getUri();
+  const server = await MongoMemoryServer.create();
+  const uri = server.getUri();
 
   const client = await MongoClient.connect(uri);
   Model = client.db("tests").collection("tests");
