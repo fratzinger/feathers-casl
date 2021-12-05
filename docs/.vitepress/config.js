@@ -7,7 +7,7 @@ module.exports = {
     logo: '/img/logo.svg',
     docsDir: 'docs',
     editLinks: true,
-    editLinkText: 'Edit this page on GitHub',
+    editLinkText: 'Edit on GitHub',
     lastUpdated: true,
     sidebarDepth: 1,
     sidebar: {
@@ -16,10 +16,10 @@ module.exports = {
         { text: 'Hooks', link: '/hooks'},
         { text: 'Channels', link: '/channels'},
         { text: 'Utils', link: '/utils' },
-        { text: 'Cookbook', link: '/cookbook'},
         { text: 'Client side', link: '/client-side'},
-        { text: 'Gotchas', link: '/gotchas'}
+        { text: 'Gotchas', link: '/gotchas'},
+        { text: 'Cookbook', link: '/cookbook'}
       ]
     }
   }
-  }
+}
