@@ -174,41 +174,42 @@ module.exports = {
 
 ### Add the authorize-hook to the services
 
-The `authorize`-hook can be used for all methods and has support for `multi: true`. You should use it as a `before` **AND** a `after` hook at the same time. Please make sure to define `before` at last position and `after` at first position. So you don't want to use it in `app.hooks` nor in `all`. For more information, see: [authorize hook](/hooks.html#authorize)
+The `authorize`-hook can be used for all methods and has support for `multi: true`. You should use it as a `before` **AND** a `after` hook at the same time. For more information, see: [authorize hook](/hooks.html#authorize)
 
-```js{5,11,14,17,20,23,26,32}
+```js{5-6,12,15,18,21,24,27,33}
 // src/services/tasks/tasks.hooks.js
 const { authenticate } = require('@feathersjs/authentication').hooks;
 const { authorize } = require('feathers-casl').hooks;
 
 // CAUTION! Make sure the adapter name fits your adapter (e.g. feathers-mongodb, feathers-sequelize, feathers-objection, feathers-knex, ...)!
+// You'll want to have the `authorize` as an early before-hook (right after the `authenticate` hook) and as a late after hook, since it could modify the result based on the ability of the requesting user
 
 module.exports = {
   before: {
     all: [authenticate('jwt')],
     find: [
-      authorize({ adapter: 'feathers-mongoose' }) // make sure this hook runs always last
+      authorize({ adapter: 'feathers-mongoose' })
     ],
     get: [
-      authorize({ adapter: 'feathers-mongoose' }) // make sure this hook runs always last
+      authorize({ adapter: 'feathers-mongoose' })
     ],
     create: [
-      authorize({ adapter: 'feathers-mongoose' }) // make sure this hook runs always last
+      authorize({ adapter: 'feathers-mongoose' })
     ],
     update: [
-      authorize({ adapter: 'feathers-mongoose' }) // make sure this hook runs always last
+      authorize({ adapter: 'feathers-mongoose' })
     ],
     patch: [
-      authorize({ adapter: 'feathers-mongoose' }) // make sure this hook runs always last
+      authorize({ adapter: 'feathers-mongoose' })
     ],
     remove: [
-      authorize({ adapter: 'feathers-mongoose' }) // make sure this hook runs always last
+      authorize({ adapter: 'feathers-mongoose' })
     ]
   },
 
   after: {
     all: [
-      authorize({ adapter: 'feathers-mongoose' }) // make sure this hook runs always first
+      authorize({ adapter: 'feathers-mongoose' })
     ],
     find: [],
     get: [],

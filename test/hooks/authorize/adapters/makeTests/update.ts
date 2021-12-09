@@ -115,7 +115,7 @@ export default (
         }, { resolveAction })
       });
       
-      await assert.rejects(promise, err => err.name === "NotFound", "cannot update item");
+      await assert.rejects(promise, (err: Error) => err.name === "NotFound", "cannot update item");
     });
 
     it.skip("tests against original data, not updated data and does not reject", async function () {
@@ -143,7 +143,7 @@ export default (
         }, { resolveAction })
       });
       
-      await assert.rejects(promise, err => err.name === "Forbidden", "rejects request");
+      await assert.rejects(promise, (err: Error) => err.name === "Forbidden", "rejects request");
     });
       
     it("assigns original data with updated data for restricted fields", async function () {
@@ -175,7 +175,7 @@ export default (
         }, { resolveAction })
       });
 
-      await assert.rejects(promise, err => err.name === "NotFound", "cannot update item");
+      await assert.rejects(promise, (err: Error) => err.name === "NotFound", "cannot update item");
 
       // TODO: Does not work with `userId: 1` for knex, memory, mongodb and nedb ?!
       const updatedItem2 = await service.update(item2[id], { test: false, userId: 3 } , {

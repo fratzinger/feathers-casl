@@ -47,8 +47,10 @@ const checkCan = async <S>(
       query: { $select }
     };
   }
+
+  const getMethod = (service._get) ? "_get" : "get";
   
-  const item = await service._get(id, params);
+  const item = await service[getMethod](id, params);
     
   const can = throwUnlessCan(
     ability,
@@ -57,6 +59,7 @@ const checkCan = async <S>(
     modelName,
     options
   );
+  
   return can;
 };
 

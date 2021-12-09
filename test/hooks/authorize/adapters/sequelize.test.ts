@@ -43,7 +43,7 @@ const Model = sequelize.define("tests", {
 
 declare module "feathers-sequelize" {
   interface SequelizeServiceOptions {
-    operators: Record<string, unknown>
+    operators: any
   }
 }
 

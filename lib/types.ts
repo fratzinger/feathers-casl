@@ -2,17 +2,17 @@ import { HookContext } from "@feathersjs/feathers";
 import { AnyAbility } from "@casl/ability";
 import { Application } from "@feathersjs/feathers";
 import "@feathersjs/transport-commons";
-import { RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
+import { Channel, RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
 
 
 export type Adapter = 
-"feathers-knex" |
-"feathers-memory" |
-"feathers-mongodb" |
-"feathers-mongoose" |
-"feathers-nedb" |
-"feathers-objection" |
-"feathers-sequelize";
+  "feathers-knex" |
+  "feathers-memory" |
+  "feathers-mongodb" |
+  "feathers-mongoose" |
+  "feathers-nedb" |
+  "feathers-objection" |
+  "feathers-sequelize";
 
 export interface ServiceCaslOptions {
   availableFields: string[]
@@ -31,6 +31,8 @@ export interface CheckBasicPermissionHookOptions extends HookBaseOptions {
   checkCreateForData: boolean | ((context: HookContext) => boolean)
   storeAbilityForAuthorize: boolean
 }
+
+export type CheckBasicPermissionUtilsOptions = Omit<CheckBasicPermissionHookOptions, "notSkippable">;
 
 export type CheckBasicPermissionHookOptionsExclusive = Pick<CheckBasicPermissionHookOptions, Exclude<keyof CheckBasicPermissionHookOptions, keyof HookBaseOptions>>
 
@@ -56,20 +58,20 @@ export type EventName = "created" | "updated" | "patched" | "removed";
 
 export interface ChannelOptions extends AuthorizeChannelCommonsOptions {
   ability: AnyAbility | ((app: Application, connection: RealTimeConnection, data: unknown, context: HookContext) => AnyAbility)
+  /** Easy way to disable filtering, default: `false` */
   activated: boolean
+  /** Channel that's used when there occures an error, default: `['authenticated']` */
   channelOnError: string[]
+  /** Prefiltered channels, default: `app.channel(app.channels)` */
+  channels: Channel | Channel[]
   modelName: GetModelName
   restrictFields: boolean
+  /** change action to use for events. For example: `'receive'`, default: `'get'` */
   useActionName: string | { [e in EventName]?: string }
 }
 
 export interface GetConditionalQueryOptions {
   actionOnForbidden?(): void
-}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface GetFieldsQueryOptions extends HasRestrictingFieldsOptions {
-  
 }
 
 export interface HasRestrictingFieldsOptions {

@@ -60,8 +60,8 @@ makeTests(
   { adapter: "feathers-mongoose" },
   afterHooks,
   async () => {
-    const server = new MongoMemoryServer();
-    const uri = await server.getUri();
+    const server = await MongoMemoryServer.create();
+    const uri = server.getUri();
 
     const client = await mongoose.connect(uri);
 

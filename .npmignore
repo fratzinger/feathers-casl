@@ -5,6 +5,7 @@
 # nyc
 .nyc_output
 coverage
+.codeclimate.yml
 
 # docs
 docs
@@ -14,3 +15,6 @@ test
 
 .github
 .vscode
+
+.nvmrc
+netlify.toml

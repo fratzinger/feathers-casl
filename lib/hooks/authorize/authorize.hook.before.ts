@@ -17,8 +17,6 @@ import {
   setPersistedConfig,
   getAbility,
   getPersistedConfig,
-  handleConditionalSelect,
-  getConditionalSelect,
   throwUnlessCan
 } from "./authorize.hook.utils";
 
@@ -37,82 +35,79 @@ import type {
 
 const HOOKNAME = "authorize";
 
-export default (
+export default async (
+  context: HookContext,
   options: AuthorizeHookOptions
-): ((context: HookContext) => Promise<HookContext>) => {
-  return async (context: HookContext): Promise<HookContext> => {
-    if (
-      !options?.notSkippable && (
-        shouldSkip(HOOKNAME, context) ||
+): Promise<HookContext> => {
+  if (
+    !options?.notSkippable && (
+      shouldSkip(HOOKNAME, context) ||
         context.type !== "before" ||
         !context.params
-      )
-    ) { return context; }
+    )
+  ) { return context; }
 
-    if (!getPersistedConfig(context, "madeBasicCheck")) {
-      const basicCheck = checkBasicPermission({
-        notSkippable: true,
-        ability: options.ability,
-        actionOnForbidden: options.actionOnForbidden,
-        checkAbilityForInternal: options.checkAbilityForInternal,
-        checkCreateForData: true,
-        checkMultiActions: options.checkMultiActions,
-        modelName: options.modelName,
-        storeAbilityForAuthorize: true
-      });
-      await basicCheck(context);
-    }
+  if (!getPersistedConfig(context, "madeBasicCheck")) {
+    const basicCheck = checkBasicPermission({
+      notSkippable: true,
+      ability: options.ability,
+      actionOnForbidden: options.actionOnForbidden,
+      checkAbilityForInternal: options.checkAbilityForInternal,
+      checkCreateForData: true,
+      checkMultiActions: options.checkMultiActions,
+      modelName: options.modelName,
+      storeAbilityForAuthorize: true
+    });
+    await basicCheck(context);
+  }
 
-    if (!options.modelName) {
-      return context;
-    }
-    const modelName = (typeof options.modelName === "string")
-      ? options.modelName
-      : options.modelName(context);
-
-    if (!modelName) { return context; }
-
-    const ability = await getAbility(context, options);
-    if (!ability) {
-      // Ignore internal or not authenticated requests
-      return context;
-    }
-
-    const multi = isMulti(context);
-    
-    // if context is with multiple items, there's a change that we need to handle each item separately
-    if (multi) {
-      handleConditionalSelect(context, ability, "find", modelName);
-
-      if (!couldHaveRestrictingFields(ability, "find", modelName)) {
-        // if has no restricting fields at all -> can skip _pick() in after-hook
-        setPersistedConfig(context, "skipRestrictingRead.fields", true);
-      }
-    }
-
-    if (["find", "get"].includes(context.method) || (isMulti && !hasRestrictingConditions(ability, "find", modelName))) {
-      setPersistedConfig(context, "skipRestrictingRead.conditions", true);
-    }
-
-    const { method, id } = context;
-    const availableFields = getAvailableFields(context, options);
-
-    if (["get", "patch", "update", "remove"].includes(method) && id != null) {
-      // single: get | patch | update | remove
-      await handleSingle(context, ability, modelName, availableFields, options);
-    } else if (method === "find" || (["patch", "remove"].includes(method) && id == null)) {
-      // multi: find | patch | remove
-      await handleMulti(context, ability, modelName, availableFields, options);
-    } else if (method === "create") {
-      // create: single | multi
-      checkCreatePerItem(context, ability, modelName, { 
-        actionOnForbidden: options.actionOnForbidden, 
-        checkCreateForData: true 
-      });
-    }
-
+  if (!options.modelName) {
     return context;
-  };
+  }
+  const modelName = (typeof options.modelName === "string")
+    ? options.modelName
+    : options.modelName(context);
+
+  if (!modelName) { return context; }
+
+  const ability = await getAbility(context, options);
+  if (!ability) {
+    // Ignore internal or not authenticated requests
+    return context;
+  }
+
+  const multi = isMulti(context);
+    
+  // if context is with multiple items, there's a change that we need to handle each item separately
+  if (multi) {
+    if (!couldHaveRestrictingFields(ability, "find", modelName)) {
+      // if has no restricting fields at all -> can skip _pick() in after-hook
+      setPersistedConfig(context, "skipRestrictingRead.fields", true);
+    }
+  }
+
+  if (["find", "get"].includes(context.method) || (isMulti && !hasRestrictingConditions(ability, "find", modelName))) {
+    setPersistedConfig(context, "skipRestrictingRead.conditions", true);
+  }
+
+  const { method, id } = context;
+  const availableFields = getAvailableFields(context, options);
+
+  if (["get", "patch", "update", "remove"].includes(method) && id != null) {
+    // single: get | patch | update | remove
+    await handleSingle(context, ability, modelName, availableFields, options);
+  } else if (method === "find" || (["patch", "remove"].includes(method) && id == null)) {
+    // multi: find | patch | remove
+    await handleMulti(context, ability, modelName, availableFields, options);
+  } else if (method === "create") {
+    // create: single | multi
+    checkCreatePerItem(context, ability, modelName, { 
+      actionOnForbidden: options.actionOnForbidden, 
+      checkCreateForData: true 
+    });
+  }
+
+  return context;
 };
 
 const handleSingle = async (
@@ -142,25 +137,19 @@ const handleSingle = async (
 
   _set(context, "params.query", query);
 
-  if (method === "get") {
-    handleConditionalSelect(context, ability, method, modelName);
-    return;
-  }
-
   // ensure that only allowed data gets changed
   if (["update", "patch"].includes(method)) {
     const queryGet = Object.assign({}, params.query || {});
     if (queryGet.$select) {
-      const $select = getConditionalSelect(queryGet.$select, ability, method, modelName);
-      if ($select) {
-        queryGet.$select = $select;
-      }
+      delete queryGet.$select;
     }
     const paramsGet = Object.assign({}, params, { query: queryGet });
 
     // TODO: If not allowed to .get() and to .[method](), then throw "NotFound" (maybe optional)
 
-    const item = await service._get(id, paramsGet);
+    const getMethod = (service._get) ? "_get" : "get";
+
+    const item = await service[getMethod](id, paramsGet);
   
     const restrictingFields = hasRestrictingFields(ability, method, subject(modelName, item), { availableFields });
     if (restrictingFields && (restrictingFields === true || restrictingFields.length === 0)) {

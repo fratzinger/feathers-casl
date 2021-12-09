@@ -5,13 +5,21 @@ import { defineAbility } from "@casl/ability";
 
 import checkCan from "../../lib/utils/checkCan";
 
-describe("utils checkCan", function() {
-  let app, service;
+describe("utils - checkCan", function() {
+  let app, service, service2;
   before(async function() {
     app = feathers();
     app.use("tests", new Service({ multi: true }));
     service = app.service("tests");
     await service.create([
+      { id: 0, test: true, published: true },
+      { id: 1, test: false, published: true, hi: 1 },
+      { id: 2, test: null, published: false }
+    ]);
+
+    app.use("another-tests", new Service({ multi: true }));
+    service2 = app.service("another-tests");
+    await service2.create([
       { id: 0, test: true, published: true },
       { id: 1, test: false, published: true, hi: 1 },
       { id: 2, test: null, published: false }
@@ -47,6 +55,10 @@ describe("utils checkCan", function() {
     );
     await assert.rejects(
       () => checkCan(ability, 0, "patch", "tests", service),
+      "'patch:0' rejects"
+    );
+    await assert.rejects(
+      () => checkCan(ability, 0, "update", "another-tests", service),
       "'patch:0' rejects"
     );
   });

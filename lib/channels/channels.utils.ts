@@ -12,10 +12,10 @@ import type {
   InitOptions
 } from "../types";
 
-export const makeOptions = (app: Application, options?: Partial<ChannelOptions>): ChannelOptions => {
-  if (!app) {
-    throw new Error("feathers-casl: You need to provide an 'app' to the channels:makeOptions function");
-  }
+export const makeOptions = (
+  app: Application, 
+  options?: Partial<ChannelOptions>
+): ChannelOptions => {
   options = options || {};
   return Object.assign({}, defaultOptions, getAppOptions(app), options);
 };
@@ -23,6 +23,7 @@ export const makeOptions = (app: Application, options?: Partial<ChannelOptions>)
 const defaultOptions: ChannelOptions = {
   activated: true,
   channelOnError: ["authenticated"],
+  channels: undefined,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ability: ((app: Application, connection: RealTimeConnection, data: Record<string, unknown>, context: HookContext): Ability => {
     return connection.ability;

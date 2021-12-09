@@ -11,12 +11,12 @@ import type { Application, Query, Service } from "@feathersjs/feathers";
 import type { AuthorizeHookOptions } from "../types";
 
 const adaptersFor$not = [
-  "feathers-nedb",
+  "feathers-nedb"
 ];
 
 const adaptersFor$notAsArray = [
-  "feathers-objection", 
-  "feathers-sequelize"
+  "feathers-sequelize",
+  "feathers-objection"
 ];
   
 const adaptersFor$nor = [
@@ -37,20 +37,23 @@ export default function mergeQueryFromAbility<T>(
   if (hasRestrictingConditions(ability, method, modelName)) {
     const adapter = getAdapter(app, options);
   
-    let query;
+    let query: Query;
     if (adaptersFor$not.includes(adapter)) {
+      // nedb
       query = rulesToQuery(ability, method, modelName, (rule) => {
         const { conditions } = rule;
         return (rule.inverted) ? { $not: conditions } : conditions;
       });
       query = simplifyQuery(query);
     } else if (adaptersFor$notAsArray.includes(adapter)) {
+      // objection, sequelize
       query = rulesToQuery(ability, method, modelName, (rule) => {
         const { conditions } = rule;
         return (rule.inverted) ? { $not: [conditions] } : conditions;
       });
       query = simplifyQuery(query);
     } else if (adaptersFor$nor.includes(adapter)) {
+      // memory, mongoose, mongodb
       query = rulesToQuery(ability, method, modelName, (rule) => {
         const { conditions } = rule;
         return (rule.inverted) ? { $nor: [conditions] } : conditions;
@@ -74,21 +77,23 @@ export default function mergeQueryFromAbility<T>(
         });
       }
     }
+
+    if (_isEmpty(query)) {
+      return originalQuery;
+    }
   
-    if (!_isEmpty(query)) {
-      if (!originalQuery) {
-        return query;
-      } else {
-        const operators = service.options?.whitelist;
-        return mergeQuery(
-          originalQuery, 
-          query, { 
-            defaultHandle: "intersect",
-            operators,
-            useLogicalConjunction: true
-          }
-        );
-      }
+    if (!originalQuery) {
+      return query;
+    } else {
+      const operators = service.options?.whitelist;
+      return mergeQuery(
+        originalQuery, 
+        query, { 
+          defaultHandle: "intersect",
+          operators,
+          useLogicalConjunction: true
+        }
+      );
     }
   } else {
     return originalQuery;

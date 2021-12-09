@@ -2,7 +2,7 @@ import { defineAbility } from "@casl/ability";
 import assert from "assert";
 import convertRuleToQuery from "../../lib/utils/convertRuleToQuery";
 
-describe("convertRuleToQuery.test.ts", function() {
+describe("utils - convertRuleToQuery", function() {
   it("", function() {
     const ability = defineAbility((can, cannot) => {
       can("create", "tests", { id: 1, test: true });
@@ -69,5 +69,15 @@ describe("convertRuleToQuery.test.ts", function() {
         `${i}: expected result for rule is: '${JSON.stringify(expected[i])}'`
       );
     });
+  });
+
+  it("calls actionOnForbidden", function() {
+    let actionOnForbiddenCalled = false;
+    const [rule] = defineAbility((can, cannot) => {
+      cannot("create", "tests");
+    }).rules;
+    convertRuleToQuery(rule, { actionOnForbidden: () => { actionOnForbiddenCalled = true; } });
+
+    assert.ok(actionOnForbiddenCalled);
   });
 });

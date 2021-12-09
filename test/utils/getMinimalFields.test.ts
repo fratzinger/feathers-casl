@@ -46,7 +46,7 @@ describe("utils - getMinimalFields", function() {
     });
   });
 
-  it("returns empty of array with availableFields: []", function() {
+  it("returns empty array with availableFields: []", function() {
     const ability = defineAbility((can) => {
       can("manage", "all", ["id"]);
     });
@@ -54,7 +54,19 @@ describe("utils - getMinimalFields", function() {
     methods.forEach(method => {
       const record: Record<string, unknown> =  { id: 1, test: true };
       const fields = getMinimalFields(ability, method, subject("tests", record), { availableFields });
-      assert.deepStrictEqual(fields, [], `subset of array for method '${method}'`);
+      assert.deepStrictEqual(fields, [], `empty array for method '${method}'`);
+    });
+  });
+
+  it("returns empty array when not allowed", function() {
+    const ability = defineAbility((can, cannot) => {
+      cannot("manage", "all");
+    });
+
+    methods.forEach(method => {
+      const record: Record<string, unknown> =  { id: 1, test: true };
+      const fields = getMinimalFields(ability, method, subject("tests", record), { checkCan: true });
+      assert.deepStrictEqual(fields, [], `empty array for method '${method}'`);
     });
   });
 
