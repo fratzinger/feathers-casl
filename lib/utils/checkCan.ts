@@ -59,6 +59,7 @@ const checkCan = async <S>(
     modelName,
     options
   );
+  
   return can;
 };
 

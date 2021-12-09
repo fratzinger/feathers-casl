@@ -3,6 +3,7 @@ import * as channels from "./channels";
 
 // utils
 import checkCan from "./utils/checkCan";
+import checkBasicPermission from "./utils/checkBasicPermission";
 import hasRestrictingConditions from "./utils/hasRestrictingConditions";
 import hasRestrictingFields from "./utils/hasRestrictingFields";
 import mergeQueryFromAbility from "./utils/mergeQueryFromAbility";
@@ -33,6 +34,7 @@ export {
 
 export const utils = {
   checkCan,
+  checkBasicPermission,
   hasRestrictingConditions,
   hasRestrictingFields,
   mergeQueryFromAbility
