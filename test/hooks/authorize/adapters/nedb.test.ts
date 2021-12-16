@@ -1,4 +1,4 @@
-import NeDB from "nedb";
+import NeDB from "@seald-io/nedb";
 import { Service } from "feathers-nedb";
 import makeTests from "./makeTests";
 import path from "path";
