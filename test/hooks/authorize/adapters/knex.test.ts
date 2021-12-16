@@ -3,7 +3,6 @@ import makeTests from "./makeTests";
 import { Service } from "feathers-knex";
 import { getItems } from "feathers-hooks-common";
 import path from "path";
-import { ServiceCaslOptions } from "../../../../lib/types";
 import { HookContext } from "@feathersjs/feathers";
 
 const db  = knex({
@@ -20,12 +19,6 @@ db.schema.createTable("messages", table => {
   table.increments("id");
   table.string("text");
 });
-
-declare module "@feathersjs/adapter-commons" {
-  interface ServiceOptions {
-    casl: ServiceCaslOptions
-  }
-}
 
 const makeService = () => {
   return new Service({
@@ -60,6 +53,7 @@ const boolFields = [
 
 const afterHooks = [
   (context: HookContext) => {
+    //@ts-expect-error type error because feathers-hooks-common not on feathers@5
     let items = getItems(context);
     const isArray = Array.isArray(items);
     items = (isArray) ? items : [items];

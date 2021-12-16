@@ -48,6 +48,7 @@ const checkCan = async <S>(
     };
   }
 
+  //@ts-expect-error _get is not exposed
   const getMethod = (service._get) ? "_get" : "get";
   
   const item = await service[getMethod](id, params);

@@ -4,7 +4,6 @@ import { Service } from "feathers-objection";
 import { getItems } from "feathers-hooks-common";
 import knex from "knex";
 import path from "path";
-import { ServiceCaslOptions } from "../../../../lib/types";
 import { HookContext } from "@feathersjs/feathers";
 
 const db  = knex({
@@ -17,12 +16,6 @@ const db  = knex({
 });
 
 Model.knex(db);
-
-declare module "@feathersjs/adapter-commons" {
-  interface ServiceOptions {
-    casl: ServiceCaslOptions
-  }
-}
 
 class TestModel extends Model {
   static get tableName() {
@@ -73,6 +66,7 @@ const boolFields = [
 
 const afterHooks = [
   (context: HookContext) => {
+    //@ts-expect-error type error because feathers-hooks-common not on feathers@5
     let items = getItems(context);
     const isArray = Array.isArray(items);
     items = (isArray) ? items : [items];

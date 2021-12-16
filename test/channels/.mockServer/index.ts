@@ -2,8 +2,8 @@ import path from "path";
 import helmet from "helmet";
 import cors from "cors";
 
-import feathers from "@feathersjs/feathers";
-import express, { Application } from "@feathersjs/express";
+import { feathers } from "@feathersjs/feathers";
+import express, { Application, json, urlencoded, rest } from "@feathersjs/express";
 import socketio from "@feathersjs/socketio";
 import { Service } from "feathers-memory";
 
@@ -37,11 +37,11 @@ const mockServer = (options: MockServerOptions): ExportMockServer => {
     contentSecurityPolicy: false
   }));
   app.use(cors());
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+  app.use(json());
+  app.use(urlencoded({ extended: true }));
 
   // Set up Plugins and providers
-  app.configure(express.rest());
+  app.configure(rest());
   app.configure(socketio());
 
   app.configure(services);
@@ -51,9 +51,9 @@ const mockServer = (options: MockServerOptions): ExportMockServer => {
 
   app.hooks({});
 
-  const articles = app.service("articles");
-  const comments = app.service("comments");
-  const users = app.service("users");
+  const articles = app.service("articles") as any as Service;
+  const comments = app.service("comments") as any as Service;
+  const users = app.service("users") as any as Service;
 
   app.configure(casl());
   return {

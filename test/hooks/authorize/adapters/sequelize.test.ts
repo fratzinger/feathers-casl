@@ -3,7 +3,6 @@ import makeTests from "./makeTests";
 import { Service } from "feathers-sequelize";
 import { getItems } from "feathers-hooks-common";
 import path from "path";
-import { ServiceCaslOptions } from "../../../../lib/types";
 import { HookContext } from "@feathersjs/feathers";
 
 const sequelize = new Sequelize("sequelize", "", "", {
@@ -11,12 +10,6 @@ const sequelize = new Sequelize("sequelize", "", "", {
   storage: path.join(__dirname, "../../../.data/db.sqlite"),
   logging: false
 });
-
-declare module "@feathersjs/adapter-commons" {
-  interface ServiceOptions {
-    casl: ServiceCaslOptions
-  }
-}
 
 const Model = sequelize.define("tests", {
   userId: {
@@ -77,6 +70,7 @@ const afterHooks = [
   (context: HookContext) => {
     const { Model } = context.service;
     const fields = Model.fieldRawAttributesMap;
+    //@ts-expect-error type error because feathers-hooks-common not on feathers@5
     let items = getItems(context);
     items = (Array.isArray(items)) ? items : [items];
 

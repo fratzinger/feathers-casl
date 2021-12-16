@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import assert from "assert";
 import { createAliasResolver, defineAbility } from "@casl/ability";
-import feathers from "@feathersjs/feathers";
+import { feathers } from "@feathersjs/feathers";
 import authorize from "../../../lib/hooks/authorize/authorize.hook";
 import { Service } from "feathers-memory";
 import { joinQuery } from "feathers-fletching";

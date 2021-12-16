@@ -5,16 +5,9 @@ mongoose.Promise = global.Promise;
 
 import makeTests from "./makeTests";
 import { getItems } from "feathers-hooks-common";
-import { ServiceCaslOptions } from "../../../../lib/types";
 import { HookContext } from "@feathersjs/feathers";
 
 let Model;
-
-declare module "@feathersjs/adapter-commons" {
-  interface ServiceOptions {
-    casl: ServiceCaslOptions
-  }
-}
 
 const makeService = () => {
   return new Service({
@@ -42,6 +35,7 @@ const makeService = () => {
 
 const afterHooks = [
   (context: HookContext) => {
+    //@ts-expect-error type error because feathers-hooks-common not on feathers@5
     let items = getItems(context);
     items = (Array.isArray(items)) ? items : [items];
   

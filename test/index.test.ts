@@ -6,7 +6,7 @@ import index, {
   getChannelsWithReadAbility,
   hooks
 } from "../lib";
-import feathers from "@feathersjs/feathers";
+import { feathers } from "@feathersjs/feathers";
 
 import { ServiceCaslOptions } from "../lib/types";
 

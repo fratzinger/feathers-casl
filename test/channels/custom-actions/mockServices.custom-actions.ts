@@ -15,7 +15,7 @@ const resolveAction = createAliasResolver({
   delete: "remove",
 });
 
-declare module "@feathersjs/adapter-commons" {
+declare module "feathers-memory/node_modules/@feathersjs/adapter-commons" {
   interface ServiceOptions {
     casl: ServiceCaslOptions
   }
@@ -60,8 +60,6 @@ export default function(app: Application): void {
   authService.hooks({
     after: {
       all: [],
-      find: [],
-      get: [],
       create: [
         (context: HookContext): HookContext => {
           const { user } = context.result;
@@ -73,8 +71,6 @@ export default function(app: Application): void {
           return context;
         }
       ],
-      update: [],
-      patch: [],
       remove: []
     }
   });

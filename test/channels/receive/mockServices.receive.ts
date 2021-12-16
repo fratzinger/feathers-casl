@@ -7,7 +7,6 @@ import { Ability, createAliasResolver, defineAbility } from "../../../lib";
 import { Service } from "feathers-memory";
 import hashPassword from "@feathersjs/authentication-local/lib/hooks/hash-password";
 import protect from "@feathersjs/authentication-local/lib/hooks/protect";
-import { ServiceCaslOptions } from "../../../lib/types";
 
 const resolveAction = createAliasResolver({
   update: "patch",
@@ -15,12 +14,6 @@ const resolveAction = createAliasResolver({
   delete: "remove",
 });
 
-declare module "@feathersjs/adapter-commons" {
-  interface ServiceOptions {
-    casl: ServiceCaslOptions
-  }
-}
-  
 const defineAbilitiesFor = (user): Ability => {
   //@ts-ignore
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -54,8 +47,6 @@ export default function(app: Application): void {
   authService.hooks({
     after: {
       all: [],
-      find: [],
-      get: [],
       create: [
         (context: HookContext): HookContext => {
           const { user } = context.result;
@@ -67,8 +58,6 @@ export default function(app: Application): void {
           return context;
         }
       ],
-      update: [],
-      patch: [],
       remove: []
     }
   });
@@ -113,8 +102,6 @@ export default function(app: Application): void {
   users.hooks({
     before: {
       all: [],
-      find: [],
-      get: [],
       create: [ hashPassword("password") ],
       update: [ hashPassword("password") ],
       patch: [ hashPassword("password") ],

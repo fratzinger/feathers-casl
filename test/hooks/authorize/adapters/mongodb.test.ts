@@ -3,15 +3,8 @@ import { MongoClient } from "mongodb";
 import { Service } from "feathers-mongodb";
 
 import makeTests from "./makeTests";
-import { ServiceCaslOptions } from "../../../../lib/types";
 
 let Model;
-
-declare module "@feathersjs/adapter-commons" {
-  interface ServiceOptions {
-    casl: ServiceCaslOptions
-  }
-}
 
 const makeService = () => {
   return new Service({

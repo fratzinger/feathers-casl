@@ -40,6 +40,7 @@ export default async (
     )
   ) { return context; }
 
+  //@ts-expect-error type error because feathers-hooks-common not on feathers@5
   const itemOrItems = getItems(context);
   if (!itemOrItems) { return context; }
 
@@ -126,6 +127,7 @@ export default async (
     }
   }
 
+  //@ts-expect-error type error because feathers-hooks-common not on feathers@5
   replaceItems(context, result);
 
   return context;

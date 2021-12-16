@@ -1,20 +1,13 @@
-import NeDB from "nedb";
+import NeDB from "@seald-io/nedb";
 import { Service } from "feathers-nedb";
 import makeTests from "./makeTests";
 import path from "path";
-import { ServiceCaslOptions } from "../../../../lib/types";
 
 // Create a NeDB instance
 const Model = new NeDB({
   filename: path.join(__dirname, "../../../.data/tests.db"),
   autoload: true
 });
-
-declare module "@feathersjs/adapter-commons" {
-  interface ServiceOptions {
-    casl: ServiceCaslOptions
-  }
-}
 
 const makeService = () => {
   return new Service({

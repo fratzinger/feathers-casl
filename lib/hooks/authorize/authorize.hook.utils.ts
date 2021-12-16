@@ -15,7 +15,7 @@ import {
   markHookForSkip
 } from "feathers-utils";
 
-import type { AnyAbility } from "@casl/ability";
+import type { AnyAbility, ForcedSubject } from "@casl/ability";
 import type { Application, HookContext, Params } from "@feathersjs/feathers";
 
 import type {
@@ -111,10 +111,10 @@ export const getAbility = (
   throw new Forbidden(`You're not allowed to ${context.method} on '${context.path}'`);
 };
 
-export const throwUnlessCan = (
+export const throwUnlessCan = <T extends ForcedSubject<string>>(
   ability: AnyAbility, 
   method: string, 
-  resource: string|Record<string, unknown>, 
+  resource: string|T, 
   modelName: string,
   options: Partial<ThrowUnlessCanOptions>
 ): boolean => {
@@ -133,6 +133,7 @@ export const refetchItems = async (
   params?: Params
 ): Promise<unknown[] | undefined> => {
   if (context.type !== "after") { return; }
+  //@ts-expect-error type error because feathers-hooks-common not on feathers@5
   const itemOrItems = getItems(context);
 
   const items = (!itemOrItems || Array.isArray(itemOrItems)) ? itemOrItems : [itemOrItems];

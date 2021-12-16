@@ -44,6 +44,7 @@ export const checkCreatePerItem = (
   if (!checkCreateForData) { return context; }
 
   // we have all information we need (maybe we need populated data?)
+  //@ts-expect-error type error because feathers-hooks-common not on feathers@5
   let items = getItems(context);
   items = (Array.isArray(items)) ? items : [items];
 

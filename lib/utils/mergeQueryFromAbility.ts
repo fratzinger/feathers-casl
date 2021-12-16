@@ -7,7 +7,8 @@ import hasRestrictingConditions from "./hasRestrictingConditions";
 import simplifyQuery from "./simplifyQuery";
 
 import type { AnyAbility } from "@casl/ability";
-import type { Application, Query, Service } from "@feathersjs/feathers";
+import type { Application, Query } from "@feathersjs/feathers";
+import type { AdapterService } from "@feathersjs/adapter-commons";
 import type { AuthorizeHookOptions } from "../types";
 
 const adaptersFor$not = [
@@ -31,7 +32,7 @@ export default function mergeQueryFromAbility<T>(
   method: string,
   modelName: string,
   originalQuery: Query,
-  service: Service<T>,
+  service: AdapterService<T>,
   options: Pick<AuthorizeHookOptions, "adapter">
 ): Query {
   if (hasRestrictingConditions(ability, method, modelName)) {
@@ -71,7 +72,7 @@ export default function mergeQueryFromAbility<T>(
         $and.forEach(q => {
           query = mergeQuery(query, q, {
             defaultHandle: "intersect",
-            operators: service.operators,
+            operators: service.options?.whitelist,
             useLogicalConjunction: true
           });
         });
