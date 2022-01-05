@@ -121,7 +121,7 @@ export default async (
   } else {
     result = pickFieldsForItem(items[0]);
     if (context.method === "get" && _isEmpty(result)) {
-      if (options.actionOnForbidden) options.actionOnForbidden();
+      if (options.onForbidden) options.onForbidden(context);
       throw new Forbidden(`You're not allowed to ${context.method} ${modelName}`);
     }
   }

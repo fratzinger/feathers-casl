@@ -13,7 +13,7 @@ import type {
 
 const defaultOptions: HookBaseOptions = {
   ability: undefined,
-  actionOnForbidden: undefined,
+  onForbidden: undefined,
   checkMultiActions: false,
   checkAbilityForInternal: false,
   modelName: (context: Pick<HookContext, "path">): string => {
@@ -30,7 +30,7 @@ export const checkCreatePerItem = (
   context: HookContext,
   ability: AnyAbility,
   modelName: string,
-  options: Partial<Pick<ThrowUnlessCanOptions, "actionOnForbidden" | "skipThrow">> & Partial<Pick<CheckBasicPermissionHookOptions, "checkCreateForData">>
+  options: Partial<Pick<ThrowUnlessCanOptions, "onForbidden" | "skipThrow">> & Partial<Pick<CheckBasicPermissionHookOptions, "checkCreateForData">>
 ): HookContext => {
   const { method } = context;
   if (method !== "create" || !options.checkCreateForData) {
@@ -53,7 +53,8 @@ export const checkCreatePerItem = (
       method,
       subject(modelName, items[i]),
       modelName,
-      options
+      options,
+      context
     );
   }
 

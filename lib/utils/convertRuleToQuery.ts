@@ -32,14 +32,15 @@ const invertedProp = (
 };
 
 const convertRuleToQuery = (
+  context: any,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   rule: SubjectRawRule<any, any, MongoQuery<AnyObject>> | ClaimRawRule<any>, 
   options?: GetConditionalQueryOptions): Query => 
 {
   const { conditions, inverted } = rule;
   if (!conditions) {
-    if (inverted && options?.actionOnForbidden) {
-      options.actionOnForbidden();
+    if (inverted && options?.onForbidden) {
+      options.onForbidden(context);
     }
     return undefined;
   }

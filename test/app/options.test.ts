@@ -39,7 +39,7 @@ const mockApp = () => {
 }
 
 interface CalledOptions {
-  calledActionOnForbidden?: boolean
+  calledOnForbidden?: boolean
   calledAbility?: boolean
   calledModelName?: boolean
 }
@@ -48,7 +48,7 @@ describe("app-options / service-options", function() {
   describe("authorize hook", function() {
     it("calls app options for authorize hook", async function() {
       const { app, service } = mockApp();
-      let calledActionOnForbidden = false;
+      let calledOnForbidden = false;
       let calledAbility = false;
       let calledModelName = false;
   
@@ -56,8 +56,8 @@ describe("app-options / service-options", function() {
       let calledChannelModelName = false;
       app.configure(casl({
         authorizeHook: {
-          actionOnForbidden: () => {
-            calledActionOnForbidden = true;
+          onForbidden: () => {
+            calledOnForbidden = true;
           },
           checkMultiActions: true,
           ability: (context: HookContext): Ability => {
@@ -99,7 +99,7 @@ describe("app-options / service-options", function() {
       )
   
       assert.ok(calledAbility, "called ability function");
-      assert.ok(calledActionOnForbidden, "called actionOnForbidden function");
+      assert.ok(calledOnForbidden, "called onForbidden function");
       assert.ok(calledModelName, "called modelName function");
   
       //assert.ok(calledChannelAbility, "called ability function on channels");
@@ -123,8 +123,8 @@ describe("app-options / service-options", function() {
           all: [
             authorize({ 
               availableFields: ["id", "userId", "hi", "test", "published"],
-              actionOnForbidden: () => {
-                serviceCalled.calledActionOnForbidden = true;
+              onForbidden: () => {
+                serviceCalled.calledOnForbidden = true;
               },
               checkMultiActions: true,
               ability: (context: HookContext): Ability => {
@@ -142,8 +142,8 @@ describe("app-options / service-options", function() {
   
       app.configure(casl({
         authorizeHook: {
-          actionOnForbidden: () => {
-            appCalled.calledActionOnForbidden = true;
+          onForbidden: () => {
+            appCalled.calledOnForbidden = true;
           },
           checkAbilityForInternal: true,
           checkMultiActions: true,
@@ -167,11 +167,11 @@ describe("app-options / service-options", function() {
       )
   
       assert.ok(serviceCalled.calledAbility, "called ability function from service options");
-      assert.ok(serviceCalled.calledActionOnForbidden, "called actionOnForbidden function from service options");
+      assert.ok(serviceCalled.calledOnForbidden, "called onForbidden function from service options");
       assert.ok(serviceCalled.calledModelName, "called modelName function from service options");
   
       assert.ok(!appCalled.calledAbility, "not called ability function from app options");
-      assert.ok(!appCalled.calledActionOnForbidden, "not called actionOnForbidden function from app options");
+      assert.ok(!appCalled.calledOnForbidden, "not called onForbidden function from app options");
       assert.ok(!appCalled.calledModelName, "not called modelName function from app options");
   
       //assert.ok(calledChannelAbility, "called ability function on channels");

@@ -12,7 +12,7 @@ const makeOptions = (
 ): UtilCheckCanOptions => {
   const defaultOptions: UtilCheckCanOptions = {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    actionOnForbidden: () => {},
+    onForbidden: () => {},
     checkGeneral: true,
     skipThrow: false,
     useConditionalSelect: true
@@ -35,7 +35,8 @@ const checkCan = async <S>(
       method,
       modelName,
       modelName,
-      options
+      options,
+      undefined
     );
     if (!can) { return false; }
   }
@@ -57,7 +58,8 @@ const checkCan = async <S>(
     method,
     subject(modelName, item),
     modelName,
-    options
+    options,
+    undefined
   );
   
   return can;

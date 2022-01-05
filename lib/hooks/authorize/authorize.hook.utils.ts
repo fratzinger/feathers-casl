@@ -116,10 +116,11 @@ export const throwUnlessCan = (
   method: string, 
   resource: string|Record<string, unknown>, 
   modelName: string,
-  options: Partial<ThrowUnlessCanOptions>
+  options: Partial<ThrowUnlessCanOptions>,
+  context: HookContext
 ): boolean => {
   if (ability.cannot(method, resource)) {
-    if (options.actionOnForbidden) options.actionOnForbidden();
+    if (options.onForbidden) options.onForbidden(context);
     if (!options.skipThrow) {
       throw new Forbidden(`You are not allowed to ${method} ${modelName}`);
     }
@@ -173,7 +174,7 @@ export const checkMulti = (
   context: HookContext, 
   ability: AnyAbility, 
   modelName: string,
-  options?: Pick<AuthorizeHookOptions, "actionOnForbidden">
+  options?: Pick<AuthorizeHookOptions, "onForbidden">
 ): boolean => {
   const { method } = context;
   const currentIsMulti = isMulti(context);
@@ -185,7 +186,7 @@ export const checkMulti = (
     return true;
   }
 
-  if (options?.actionOnForbidden) options.actionOnForbidden();
+  if (options?.onForbidden) options.onForbidden(context);
   throw new Forbidden(`You're not allowed to multi-${method} ${modelName}`);
 };
 

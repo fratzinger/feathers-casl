@@ -51,7 +51,7 @@ export default async (
     const basicCheck = checkBasicPermission({
       notSkippable: true,
       ability: options.ability,
-      actionOnForbidden: options.actionOnForbidden,
+      onForbidden: options.onForbidden,
       checkAbilityForInternal: options.checkAbilityForInternal,
       checkCreateForData: true,
       checkMultiActions: options.checkMultiActions,
@@ -102,7 +102,7 @@ export default async (
   } else if (method === "create") {
     // create: single | multi
     checkCreatePerItem(context, ability, modelName, { 
-      actionOnForbidden: options.actionOnForbidden, 
+      onForbidden: options.onForbidden, 
       checkCreateForData: true 
     });
   }
@@ -126,7 +126,7 @@ const handleSingle = async (
   const { params, method, service, id } = context;
 
   const query = mergeQueryFromAbility(
-    context.app,
+    context,
     ability,
     method,
     modelName,
@@ -153,7 +153,7 @@ const handleSingle = async (
   
     const restrictingFields = hasRestrictingFields(ability, method, subject(modelName, item), { availableFields });
     if (restrictingFields && (restrictingFields === true || restrictingFields.length === 0)) {
-      if (options.actionOnForbidden) { options.actionOnForbidden(); }
+      if (options.onForbidden) { options.onForbidden(context); }
       throw new Forbidden("You're not allowed to make this request");
     }
         
@@ -165,11 +165,11 @@ const handleSingle = async (
 
     // if fields are not overlapping -> throw
     if (_isEmpty(data)) {
-      if (options.actionOnForbidden) { options.actionOnForbidden(); }
+      if (options.onForbidden) { options.onForbidden(context); }
       throw new Forbidden("You're not allowed to make this request");
     }
 
-    //TODO: if some fields not match -> `actionOnForbiddenUpdate`
+    //TODO: if some fields not match -> `onForbiddenUpdate`
 
     if (method === "patch") {
       context.data = data;
@@ -188,7 +188,7 @@ const checkData = (
   ability: AnyAbility,
   modelName: string,
   data: Record<string, unknown>,
-  options: Pick<AuthorizeHookOptions, "actionOnForbidden" | "usePatchData" | "useUpdateData">
+  options: Pick<AuthorizeHookOptions, "onForbidden" | "usePatchData" | "useUpdateData">
 ): void => {
   if (
     (context.method === "patch" && !options.usePatchData) ||
@@ -199,7 +199,8 @@ const checkData = (
     `${context.method}-data`,
     subject(modelName, data),
     modelName,
-    options
+    options,
+    context
   );
 };
 
@@ -216,7 +217,7 @@ const handleMulti = async (
   if (method === "patch") {
     const fields = hasRestrictingFields(ability, method, modelName, { availableFields });
     if (fields === true) {
-      if (options.actionOnForbidden) { options.actionOnForbidden(); }
+      if (options.onForbidden) { options.onForbidden(context); }
       throw new Forbidden("You're not allowed to make this request");
     }
     if (fields && fields.length > 0) {

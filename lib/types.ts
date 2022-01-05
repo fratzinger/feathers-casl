@@ -20,7 +20,7 @@ export interface ServiceCaslOptions {
 
 export interface HookBaseOptions {
   ability: AnyAbility | ((context: HookContext) => AnyAbility | Promise<AnyAbility>)
-  actionOnForbidden: undefined | (() => void)
+  onForbidden: undefined | ((context: HookContext) => void)
   checkAbilityForInternal: boolean
   checkMultiActions: boolean
   modelName: GetModelName
@@ -71,7 +71,7 @@ export interface ChannelOptions extends AuthorizeChannelCommonsOptions {
 }
 
 export interface GetConditionalQueryOptions {
-  actionOnForbidden?(): void
+  onForbidden?(context: HookContext): void
 }
 
 export interface HasRestrictingFieldsOptions {
@@ -91,7 +91,7 @@ export interface GetMinimalFieldsOptions {
 
 export type Path = string|Array<string|number>;
 
-export interface ThrowUnlessCanOptions extends Pick<HookBaseOptions, "actionOnForbidden"> {
+export interface ThrowUnlessCanOptions extends Pick<HookBaseOptions, "onForbidden"> {
   skipThrow: boolean
 }
 

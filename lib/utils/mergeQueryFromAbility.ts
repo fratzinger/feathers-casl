@@ -7,7 +7,7 @@ import hasRestrictingConditions from "./hasRestrictingConditions";
 import simplifyQuery from "./simplifyQuery";
 
 import type { AnyAbility } from "@casl/ability";
-import type { Application, Query, Service } from "@feathersjs/feathers";
+import type { Application, HookContext, Query, Service } from "@feathersjs/feathers";
 import type { AuthorizeHookOptions } from "../types";
 
 const adaptersFor$not = [
@@ -26,7 +26,7 @@ const adaptersFor$nor = [
 ];
 
 export default function mergeQueryFromAbility<T>(
-  app: Application,
+  context: HookContext,
   ability: AnyAbility,
   method: string,
   modelName: string,
@@ -35,7 +35,7 @@ export default function mergeQueryFromAbility<T>(
   options: Pick<AuthorizeHookOptions, "adapter">
 ): Query {
   if (hasRestrictingConditions(ability, method, modelName)) {
-    const adapter = getAdapter(app, options);
+    const adapter = getAdapter(context.app, options);
   
     let query: Query;
     if (adaptersFor$not.includes(adapter)) {
@@ -62,7 +62,7 @@ export default function mergeQueryFromAbility<T>(
     } else {
       query = rulesToQuery(ability, method, modelName, (rule) => {
         const { conditions } = rule;
-        return (rule.inverted) ? convertRuleToQuery(rule) : conditions;
+        return (rule.inverted) ? convertRuleToQuery(context, rule) : conditions;
       });
       query = simplifyQuery(query);
       if (query.$and) {
