@@ -71,6 +71,19 @@ export default (
       await clean(app, service);
     });
 
+    it("returns empty with $in: []", async function() {
+      await clean(app, service);
+        
+      const item1 = await service.create({ test: true, userId: 1 });
+      const item2 = await service.create({ test: true, userId: 2 });
+      const item3 = await service.create({ test: true, userId: 3 });
+      const emptyItems = await service.find({ query: { [id]: { $in: [] } }, paginate: false  });
+      const allItems = await service.find({ query: { [id]: { $in: [ item1[id], item2[id], item3[id] ] } }, paginate: false });
+
+      assert.deepStrictEqual(emptyItems, [], "returned empty array");
+      assert.deepStrictEqual(allItems, [item1, item2, item3], "returned all items");
+    });
+
     describe("without query", function() {
       it("returns full items", async function () {
         const readMethods = ["read", "find"];
