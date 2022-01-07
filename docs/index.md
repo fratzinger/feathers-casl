@@ -3,8 +3,10 @@ home: true
 heroImage: /img/logo.svg
 heroText: feathers-casl
 tagLine: Add access control with CASL to your feathers application. Support for `@casl/ability^5` and `@feathersjs/feathers^4`
-actionText: Get Started
-actionLink: ./getting-started
+actions:
+  - text: Get Started
+    link: ./getting-started
+    type: primary
 features:
 - title: Decide who can do what 🛡️
   details: Make permissions for create, read, update or delete (even separate multiple support)

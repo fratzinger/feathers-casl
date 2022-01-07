@@ -1,6 +1,5 @@
 ---
 title: Utils
-sidebarDepth: 2
 ---
 
 # Utils
