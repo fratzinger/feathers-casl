@@ -1,6 +1,5 @@
 ---
 title: Channels
-sidebarDepth: 2
 ---
 
 # Channels

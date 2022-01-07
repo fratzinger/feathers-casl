@@ -1,6 +1,5 @@
 ---
 title: Gotchas
-sidebarDepth: 2
 ---
 
 # Gotchas
