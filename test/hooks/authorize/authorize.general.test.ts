@@ -91,7 +91,7 @@ describe("authorize.general.test.ts", function() {
           markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
           const promise = assert.rejects(
             authorize()(context),
-            (err) => err.name === "Forbidden",
+            (err: Error) => err.name === "Forbidden",
             `'${type}:${method}': with no permissions returns 'Forbidden' error`
           );
           promises.push(promise);
@@ -268,6 +268,48 @@ describe("authorize.general.test.ts", function() {
       await Promise.all(promises);
     });
 
+    it("passes for undefined modelName", async function() {
+      const makeContext = (method: string, type: string) => {
+        return {
+          service: {
+            modelName: "Test",
+          },
+          path: "tests",
+          method,
+          type,
+          data: {
+            id: 1,
+            userId: 1,
+            test: true
+          },
+          params: {
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            ability: defineAbility(() => {}, { resolveAction }),
+            query: {},
+          }
+        } as unknown as HookContext;
+      };
+  
+      const types = ["before"];
+      const methods = ["find", "get", "create", "update", "patch", "remove"];
+      const promises = [];
+      types.forEach(type => {
+        methods.forEach(method => {
+          const context = makeContext(method, type);
+          
+          markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
+          const query = Object.assign({}, context.params.query);
+          
+          const promise = authorize({ modelName: undefined })(context)
+            .then(result => {
+              assert.deepStrictEqual(result.params.query, query, `'${type}:${method}': does not change query object`);
+            });
+          promises.push(promise);
+        });
+      });
+      await Promise.all(promises);
+    });
+
     it("makes clean query with multiple rules", async function() {
       const expectedResult = { id: 1, userId: 1, test: true };
       const makeContext = (method, type) => {
@@ -434,7 +476,7 @@ describe("authorize.general.test.ts", function() {
   
         await assert.rejects(
           authorize()(context),
-          err => err.name === "Forbidden",
+          (err: Error) => err.name === "Forbidden",
           "rejects with 'Forbidden' error"
         );
       });
@@ -474,7 +516,7 @@ describe("authorize.general.test.ts", function() {
   
         await assert.rejects(
           authorize()(context),
-          err => err.name === "Forbidden",
+          (err: Error) => err.name === "Forbidden",
           "rejects with 'Forbidden' error"
         );
       });

@@ -1,6 +1,5 @@
 ---
 title: Cookbook
-sidebarDepth: 2
 ---
 
 # Cookbook

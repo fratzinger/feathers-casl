@@ -8,7 +8,23 @@ const simplifyQuery = (
   replaceAnd = true,
   replaceOr = true
 ): Query => {
+  if (!query.$and && !query.$or) { return query; }
   let result = _cloneDeep(query);
+
+  if (result.$and && !result.$and.length) {
+    delete result.$and;
+  }
+
+  if (result.$or && !result.$or.length) {
+    delete result.$or;
+  }
+
+  /*if (result.$and && result.$or) {
+    const or = (result.$or.length > 1) ? { $or: result.$or } : result.$or[0];
+    result.$and.push(or);
+    delete result.$or;
+  }*/
+
   if (result.$and) {
     const $and = [];
     result.$and.forEach(q => {

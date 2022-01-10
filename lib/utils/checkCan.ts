@@ -47,8 +47,11 @@ const checkCan = async <S>(
       query: { $select }
     };
   }
+
+  // @ts-expect-error _get does not exist on feathers 5
+  const getMethod = (service._get) ? "_get" : "get";
   
-  const item = await service.get(id, params);
+  const item = await service[getMethod](id, params);
     
   const can = throwUnlessCan(
     ability,
@@ -57,6 +60,7 @@ const checkCan = async <S>(
     modelName,
     options
   );
+  
   return can;
 };
 

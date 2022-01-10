@@ -85,7 +85,7 @@ describe("checkBasicPermission.test.ts", function() {
           const context = makeContext(method, type);
           const promise = assert.rejects(
             checkBasicPermission()(context),
-            (err) => err.name === "Forbidden",
+            (err: Error) => err.name === "Forbidden",
             `'${type}:${method}': with no permissions returns 'Forbidden' error`
           );
           promises.push(promise);
@@ -343,7 +343,7 @@ describe("checkBasicPermission.test.ts", function() {
     
       await assert.rejects(
         checkBasicPermission({ checkCreateForData: true })(context),
-        err => err.name === "Forbidden",
+        (err: Error) => err.name === "Forbidden",
         "rejects with 'Forbidden' error"
       );
     });
@@ -381,7 +381,7 @@ describe("checkBasicPermission.test.ts", function() {
     
       await assert.rejects(
         checkBasicPermission({ checkCreateForData: true })(context),
-        err => err.name === "Forbidden",
+        (err: Error) => err.name === "Forbidden",
         "rejects with 'Forbidden' error"
       );
     });
@@ -409,7 +409,7 @@ describe("checkBasicPermission.test.ts", function() {
     
       await assert.doesNotReject(
         checkBasicPermission({ checkCreateForData: false })(context),
-        err => err.name === "Forbidden",
+        (err: Error) => err.name === "Forbidden",
         "does not reject"
       );
     });
@@ -447,7 +447,7 @@ describe("checkBasicPermission.test.ts", function() {
     
       await assert.doesNotReject(
         checkBasicPermission({ checkCreateForData: false })(context),
-        err => err.name === "Forbidden",
+        (err: Error) => err.name === "Forbidden",
         "does not reject"
       );
     });

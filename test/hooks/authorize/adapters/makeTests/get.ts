@@ -138,7 +138,7 @@ export default (
       // the requesting user should not have the knowledge, that the item exist at all
       await assert.rejects(
         returnedItem,
-        (err) => err.name === "NotFound",
+        (err: Error) => err.name === "NotFound",
         "rejects for id not allowed"
       );
     });
@@ -157,7 +157,7 @@ export default (
       // the requesting user should not have the knowledge, that the item exist at all
       await assert.rejects(
         returnedItem,
-        (err) => err.name === "NotFound",
+        (err: Error) => err.name === "NotFound",
         "rejects for id not allowed"
       );
     });
@@ -178,7 +178,7 @@ export default (
       // default behavior with `$select: ['nonExistent']` is: `{[id]: ${id} }`
       await assert.rejects(
         promise,
-        (err) => err.name === "Forbidden",
+        (err: Error) => err.name === "Forbidden",
         "rejects for id not allowed"
       );
     });

@@ -1,20 +1,20 @@
-module.exports = {
-  root: true,
-  env: {
-    node: true,
-    mocha: true
+{
+  "root": true,
+  "env": {
+    "node": true,
+    "mocha": true
   },
-  parser: "@typescript-eslint/parser",
-  plugins: [
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
     "security",
     "@typescript-eslint"
   ],
-  extends: [
+  "extends": [
     "eslint:recommended",
     "plugin:security/recommended",
     "plugin:@typescript-eslint/recommended"
   ],
-  rules: {
+  "rules": {
     "quotes": ["warn", "double", "avoid-escape"],
     "indent": ["warn", 2, { "SwitchCase": 1 }],
     "semi": ["warn", "always"],
@@ -32,7 +32,7 @@ module.exports = {
     "object-curly-spacing": ["warn", "always"],
     "prefer-const": ["warn"]
   },
-  overrides: [
+  "overrides": [
     {
       "files": ["test/**/*.ts"],
       "rules": {
@@ -40,5 +40,5 @@ module.exports = {
       }
     }
   ]
-};
+}
   

@@ -123,7 +123,7 @@ export default (
       
       await assert.rejects(
         promise,
-        (err) => err.name === "Forbidden",
+        (err: Error) => err.name === "Forbidden",
         "rejects"
       );
     });
@@ -150,7 +150,7 @@ export default (
             cannot("create", "tests", { userId: 1 });
           }, { resolveAction })
         }), 
-        err => err.name === "Forbidden", 
+        (err: Error) => err.name === "Forbidden", 
         "cannot create item"
       );
 

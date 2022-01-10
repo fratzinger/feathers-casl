@@ -114,7 +114,7 @@ export default (
         }, { resolveAction })
       });
       
-      await assert.rejects(promise, err => err.name === "NotFound", "cannot remove item");
+      await assert.rejects(promise, (err: Error) => err.name === "NotFound", "cannot remove item");
     });
       
     it("removes item and returns empty object for not overlapping '$select' and 'restricting fields'", async function() {
@@ -131,7 +131,7 @@ export default (
       assert.deepStrictEqual(result, {}, "returned item is empty because of $select and restricting fields");
       await assert.rejects(
         service.get(item[id]),
-        err => err.name === "NotFound",
+        (err: Error) => err.name === "NotFound",
         "item was deleted"
       );
     });

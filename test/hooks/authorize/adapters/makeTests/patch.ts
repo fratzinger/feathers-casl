@@ -116,7 +116,7 @@ export default (
         }, { resolveAction })
       });
       
-      await assert.rejects(promise, err => err.name === "Forbidden", "rejects request");
+      await assert.rejects(promise, (err: Error) => err.name === "Forbidden", "rejects request");
     });
       
     it("assigns original data with patched data for restricted fields", async function () {
@@ -148,7 +148,7 @@ export default (
         }, { resolveAction })
       });
       
-      await assert.rejects(promise, err => err.name === "NotFound", "cannot patch item");
+      await assert.rejects(promise, (err: Error) => err.name === "NotFound", "cannot patch item");
 
       const patchedItem2 = await service.patch(item2[id], { test: false } , {
         ability: defineAbility((can, cannot) => {

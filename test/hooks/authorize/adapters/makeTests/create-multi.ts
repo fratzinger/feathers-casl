@@ -131,7 +131,7 @@ export default (
         
       await assert.rejects(
         promise,
-        (err) => err.name === "Forbidden",
+        (err: Error) => err.name === "Forbidden",
         "rejects because different userId"
       );
     });
