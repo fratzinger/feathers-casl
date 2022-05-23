@@ -27,12 +27,12 @@ interface ConnectionsPerField {
 import type { HookContext, Application } from "@feathersjs/feathers";
 import type { ChannelOptions } from "../types";
 
-export default (
+export default async (
   app: Application, 
   data: Record<string, any>, 
   context: HookContext, 
   _options?: Partial<ChannelOptions>
-): undefined | Channel | Channel[] => {
+): Promise<undefined | Channel | Channel[]> => {
   if (!_options?.channels && !app.channels.length) {
     return undefined;
   }
@@ -67,10 +67,10 @@ export default (
   if (!options.restrictFields) {
     // return all fields for allowed
     result = channels.map(channel => {
-      return channel.filter(conn => { 
-        const ability = getAbility(app, data, conn, context, options);
+      return new Channel(channel.connections.filter(async conn => { 
+        const ability = await getAbility(app, data, conn, context, options);
         return ability && ability.can(method, dataToTest);
-      });
+      }), channel.data);
     });
   } else {
     // filter by restricted Fields
@@ -82,7 +82,7 @@ export default (
 
       for (let j = 0, o = connections.length; j < o; j++) {
         const connection = connections[j];
-        const { ability } = connection;
+        const ability = await getAbility(app, data, connection, context, options);
         if (!ability || !ability.can(method, dataToTest)) {
           // connection cannot read item -> don't send data
           continue; 

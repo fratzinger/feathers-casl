@@ -48,16 +48,16 @@ const getAppOptions = (app: Application): ChannelOptions | Record<string, never>
     : {};
 };
 
-export const getAbility = (
+export const getAbility = async (
   app: Application, 
   data: Record<string, unknown>,
   connection: RealTimeConnection,
   context: HookContext,
   options: Partial<ChannelOptions>
-): undefined | AnyAbility => {
+): Promise<undefined | AnyAbility> => {
   if (options.ability) {
     return (typeof options.ability === "function") ?
-      options.ability(app, connection, data, context) :
+      await options.ability(app, connection, data, context) :
       options.ability;
   } else {
     return connection.ability;
