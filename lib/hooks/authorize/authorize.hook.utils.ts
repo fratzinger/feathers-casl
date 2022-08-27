@@ -15,7 +15,7 @@ import {
   markHookForSkip
 } from "feathers-utils";
 
-import type { AnyAbility, ForcedSubject } from "@casl/ability";
+import type { Ability, AnyAbility, ForcedSubject } from "@casl/ability";
 import type { Application, HookContext, Params } from "@feathersjs/feathers";
 
 import type {
@@ -128,9 +128,13 @@ export const throwUnlessCan = <T extends ForcedSubject<string>>(
   return true;
 };
 
+interface FeathersCaslParams extends Params {
+  ability?: Ability;
+}
+
 export const refetchItems = async (
   context: HookContext,
-  params?: Params
+  params?: FeathersCaslParams
 ): Promise<unknown[] | undefined> => {
   if (context.type !== "after") { return; }
   //@ts-expect-error type error because feathers-hooks-common not on feathers@5

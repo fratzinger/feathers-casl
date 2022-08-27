@@ -20,7 +20,7 @@ export default (
   return async (context: HookContext): Promise<HookContext> => {
     if (
       !_options?.notSkippable && (
-        shouldSkip(HOOKNAME, context) ||
+        shouldSkip(HOOKNAME, context as any) ||
         context.type !== "before" ||
         !context.params
       )

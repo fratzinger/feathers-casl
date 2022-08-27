@@ -30,7 +30,7 @@ const makeService = () => {
       default: 10,
       max: 50
     }
-  });
+  } as any);
 };
 
 const afterHooks = [
@@ -69,7 +69,7 @@ makeTests(
       hidden: { type: Boolean }
     }, {
       timestamps: false,
-      skipVersioning: true
+      skipVersioning: true as any
     });
 
     if (client.modelNames().includes("tests")) {

@@ -54,7 +54,7 @@ const makeService = () => {
       default: 10,
       max: 50
     }
-  });
+  } as any);
 };
 
 const boolFields = [

@@ -76,8 +76,8 @@ export default async (
     return context;
   }
 
-  const multi = isMulti(context);
-    
+  const multi = isMulti(context as any);
+
   // if context is with multiple items, there's a change that we need to handle each item separately
   if (multi) {
     if (!couldHaveRestrictingFields(ability, "find", modelName)) {

@@ -151,7 +151,7 @@ describe("authorize.relations", function() {
             can("read", "albums");
             can("read", "artists", { name: "Justin Bieber" });
           }, { resolveAction })
-        }),
+        } as any),
         (err: Error) => err.name === "NotFound",
         "found no albums"
       );
@@ -162,8 +162,8 @@ describe("authorize.relations", function() {
           can("read", "albums");
           can("read", "artists", { name: "Blink182" });
         }, { resolveAction })
-      });
       
+      } as any);
       assert.deepStrictEqual(
         albumsOfBlink.sort(), 
         [enemaOfTheState, pantsAndJacket, california].sort(), 
@@ -194,7 +194,7 @@ describe("authorize.relations", function() {
             can("read", "albums");
             can("read", "artists", { name: "Justin Bieber" });
           }, { resolveAction })
-        }),
+        } as any),
         (err: Error) => err.name === "NotFound",
         "found no albums"
       );
@@ -205,8 +205,8 @@ describe("authorize.relations", function() {
           can("read", "albums");
           can("read", "artists", { name: "Blink182" });
         }, { resolveAction })
-      });
-      
+      } as any);
+
       assert.deepStrictEqual(
         albumsOfBlink.sort(), 
         [{ id: enemaOfTheState.id }, { id: pantsAndJacket.id }, { id: california.id }].sort(), 
@@ -236,8 +236,8 @@ describe("authorize.relations", function() {
           can("read", "albums", { "artist.name": "Blink182" });
           can("read", "artists");
         }, { resolveAction })
-      });
-      
+      } as any);
+
       assert.deepStrictEqual(
         albumsOfBlink.sort(), 
         [enemaOfTheState, pantsAndJacket, california].sort(), 
@@ -272,8 +272,8 @@ describe("authorize.relations", function() {
           can(["update"], "albums", { "artist.name": "Blink182" });
           can("read", "artists");
         }, { resolveAction })
-      });
-      
+      } as any);
+
       assert.deepStrictEqual(
         albumsOfBlink, 
         [
@@ -289,7 +289,7 @@ describe("authorize.relations", function() {
           "artist.name": { $ne: "Blink182" }
         },
         paginate: false
-      });
+      } as any);
 
       assert.strictEqual(otherAlbums.length, 4, "albums not from Blink182 are four");
 
@@ -323,8 +323,8 @@ describe("authorize.relations", function() {
           can(["update"], "albums", { "artist.name": "Blink182" });
           can("read", "artists");
         }, { resolveAction })
-      });
-      
+      } as any);
+
       assert.deepStrictEqual(
         albumsOfBlink, 
         [
@@ -340,7 +340,7 @@ describe("authorize.relations", function() {
           "artist.name": { $ne: "Blink182" }
         },
         paginate: false
-      });
+      } as any);
 
       assert.strictEqual(otherAlbums.length, 4, "albums not from Blink182 are four");
 

@@ -5,7 +5,10 @@ import "@feathersjs/transport-commons";
 import { Channel, RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
 
 
-export type Adapter = 
+export type Adapter =
+  "@feathersjs/memory" |
+  "@feathersjs/mongodb" |
+  "@feathersjs/knex" |
   "feathers-knex" |
   "feathers-memory" |
   "feathers-mongodb" |

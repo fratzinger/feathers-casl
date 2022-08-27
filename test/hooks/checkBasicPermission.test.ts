@@ -37,7 +37,7 @@ describe("checkBasicPermission.test.ts", function() {
     
       const types = ["before"];
       const methods = ["find", "get", "create", "update", "patch", "remove"];
-      const promises = [];
+      const promises: Promise<any>[] = [];
       types.forEach(type => {
         methods.forEach(method => {
           const context = makeContext(method, type);
@@ -79,7 +79,7 @@ describe("checkBasicPermission.test.ts", function() {
     
       const types = ["before"];
       const methods = ["find", "get", "create", "update", "patch", "remove"];
-      const promises = [];
+      const promises: Promise<any>[] = [];
       types.forEach(type => {
         methods.forEach(method => {
           const context = makeContext(method, type);
@@ -119,7 +119,7 @@ describe("checkBasicPermission.test.ts", function() {
     
       const types = ["before"];
       const methods = ["find", "get", "create", "update", "patch", "remove"];
-      const promises = [];
+      const promises: Promise<any>[] = [];
       types.forEach(type => {
         methods.forEach(method => {
           const context = makeContext(method, type);
@@ -159,7 +159,7 @@ describe("checkBasicPermission.test.ts", function() {
     
       const types = ["before"];
       const methods = ["find", "get", "create", "update", "patch", "remove"];
-      const promises = [];
+      const promises: Promise<any>[] = [];
       types.forEach(type => {
         methods.forEach(method => {
           const context = makeContext(method, type);
@@ -197,13 +197,13 @@ describe("checkBasicPermission.test.ts", function() {
             query: {},
           }
         } as unknown as HookContext;
-        markHookForSkip("checkBasicPermission", "all", context);
+        markHookForSkip("checkBasicPermission", "all", context as any);
         return context;
       };
     
       const types = ["before"];
       const methods = ["find", "get", "create", "update", "patch", "remove"];
-      const promises = [];
+      const promises: Promise<any>[] = [];
       types.forEach(type => {
         methods.forEach(method => {
           const context = makeContext(method, type);

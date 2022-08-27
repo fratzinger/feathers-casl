@@ -1,24 +1,28 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { MongoClient } from "mongodb";
-import { Service } from "feathers-mongodb";
+import { MongoDBService } from "@feathersjs/mongodb";
 
 import makeTests from "./makeTests";
 
 let Model;
 
 const makeService = () => {
-  return new Service({
+  return new MongoDBService({
     Model,
     multi: true,
-    whitelist: ["$and", "$nor"],
+    filters: {
+      $and: true,
+      $nor: true
+    } as const,
+    operators: ["$and", "$nor"],
     casl: {
       availableFields: [
-        "id", 
-        "userId", 
-        "hi", 
-        "test", 
+        "id",
+        "userId",
+        "hi",
+        "test",
         "published",
-        "supersecret", 
+        "supersecret",
         "hidden"
       ]
     },
@@ -38,10 +42,10 @@ before(async function() {
 });
 
 makeTests(
-  "feathers-mongodb", 
-  makeService, 
-  async (app, service) => { 
+  "@feathersjs/mongodb",
+  makeService,
+  async (app, service) => {
     await service.remove(null);
   },
-  { adapter: "feathers-mongodb" },
+  { adapter: "@feathersjs/mongodb" },
 );

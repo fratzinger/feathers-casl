@@ -8,7 +8,7 @@ import simplifyQuery from "./simplifyQuery";
 
 import type { AnyAbility } from "@casl/ability";
 import type { Application, Query } from "@feathersjs/feathers";
-import type { AdapterService } from "@feathersjs/adapter-commons";
+import type { AdapterBase } from "@feathersjs/adapter-commons";
 import type { AuthorizeHookOptions } from "../types";
 
 const adaptersFor$not = [
@@ -19,11 +19,12 @@ const adaptersFor$notAsArray = [
   "feathers-sequelize",
   "feathers-objection"
 ];
-  
+
 const adaptersFor$nor = [
   "feathers-memory",
   "feathers-mongoose",
-  "feathers-mongodb"
+  "feathers-mongodb",
+  "@feathersjs/mongodb",
 ];
 
 export default function mergeQueryFromAbility<T>(
@@ -32,7 +33,7 @@ export default function mergeQueryFromAbility<T>(
   method: string,
   modelName: string,
   originalQuery: Query,
-  service: AdapterService<T>,
+  service: AdapterBase<T>,
   options: Pick<AuthorizeHookOptions, "adapter">
 ): Query {
   if (hasRestrictingConditions(ability, method, modelName)) {
@@ -86,12 +87,14 @@ export default function mergeQueryFromAbility<T>(
     if (!originalQuery) {
       return query;
     } else {
-      const operators = service.options?.whitelist;
+      const operators = service.options?.whitelist || service.options?.operators;
+      const filters = service.options?.filters
       return mergeQuery(
-        originalQuery, 
-        query, { 
+        originalQuery,
+        query, {
           defaultHandle: "intersect",
           operators,
+          filters: filters as any,
           useLogicalConjunction: true
         }
       );

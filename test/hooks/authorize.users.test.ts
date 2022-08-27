@@ -110,7 +110,7 @@ describe("authorize.users.test.ts", function() {
     const user2 = await service.create({ name: "user2", roleId: 2, companyId: 1 });
     const ability = mockAbility(admin);
 
-    const user2Patched: Record<string, any> = await service.patch(user2.id, { roleId: 3 }, { ability });
+    const user2Patched: Record<string, any> = await service.patch(user2.id, { roleId: 3 }, { ability } as any);
     assert.deepStrictEqual(user2Patched.roleId, 3);
     assert.ok(hadAbility);
   });
