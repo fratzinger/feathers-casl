@@ -35,7 +35,7 @@ export default async (
   if (
     !options?.notSkippable && (
       shouldSkip(HOOKNAME, context as any) ||
-        context.type !== "after" ||
+        ![null, "after"].includes(context.type) ||
         !context.params
     )
   ) { return context; }

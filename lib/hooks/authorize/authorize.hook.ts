@@ -4,34 +4,48 @@ import { makeOptions } from "./authorize.hook.utils";
 import authorizeAfter from "./authorize.hook.after";
 import authorizeBefore from "./authorize.hook.before";
 
-import type {
-  HookContext
-} from "@feathersjs/feathers";
+import type { HookContext, NextFunction } from "@feathersjs/feathers";
+import type { AuthorizeHookOptions } from "../../types";
 
-import type {
-  AuthorizeHookOptions
-} from "../../types";
+type Options = Partial<AuthorizeHookOptions>;
 
 export const HOOKNAME = "authorize";
 
-export default (
-  _options?: Partial<AuthorizeHookOptions>
-): ((context: HookContext) => Promise<HookContext>) => {
+const skip = (_opts, _context) => {
+  return (
+    !_opts?.notSkippable &&
+    (shouldSkip(HOOKNAME, _context) ||
+      !_context.params ||
+      _context.type === "error")
+  );
+};
+
+export default (_options?: Options) => {
   return async (context: HookContext): Promise<HookContext> => {
-    if (
-      !_options?.notSkippable && (
-        shouldSkip(HOOKNAME, context as any) ||
-        !context.params ||
-        context.type === "error"
-      )
-    ) {
+    const hookShouldBeSkipped = skip(_options, context);
+    if (hookShouldBeSkipped) {
       return context;
     }
 
     const options = makeOptions(context.app, _options);
-    
-    return (context.type === "before") 
+
+    return context.type === "before"
       ? await authorizeBefore(context, options)
       : await authorizeAfter(context, options);
+  };
+};
+
+export const authorizeAround = (_options?: Options) => {
+  return async function authorizeAround(context: HookContext, next: NextFunction) {
+    const options = makeOptions(context.app, _options);
+    const hookShouldBeSkipped = skip(_options, context);
+
+    if (hookShouldBeSkipped) {
+      await next();
+    } else {
+      await authorizeBefore(context, options);
+      await next();
+      await authorizeAfter(context, options);
+    }
   };
 };

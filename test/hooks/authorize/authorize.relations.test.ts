@@ -109,26 +109,26 @@ describe("authorize.relations", function() {
       const blink182 = await serviceArtists.create({ name: "Blink182" });
       const sum41 = await serviceArtists.create({ name: "Sum 41" });
       const justinBieber = await serviceArtists.create({ name: "Justin Bieber" });
-  
+
       const enemaOfTheState = await serviceAlbums.create({ name: "Enema of the State", artistId: blink182.id, date: 1999 });
       const pantsAndJacket = await serviceAlbums.create({ name: "Take Off Your Pants and Jacket", artistId: blink182.id, date: 2001 });
       const california = await serviceAlbums.create({ name: "California", artistId: blink182.id, date: 2016 });
-  
+
       const killer = await serviceAlbums.create({ name: "All Killer No Filler", artistId: sum41.id, date: 2001 });
       const hero = await serviceAlbums.create({ name: "Underclass Hero", artistId: sum41.id, date: 2007 });
-  
+
       const believe = await serviceAlbums.create({ name: "Believe", artistId: justinBieber.id, date: 2012 });
       const purpose = await serviceAlbums.create({ name: "Purpose", artistId: justinBieber.id, date: 2020 });
-  
+
       const albumsOfBlink = await serviceAlbums.find({ query: { "artist.name": "Blink182" } });
       assert.deepStrictEqual(
-        albumsOfBlink.sort(), 
-        [enemaOfTheState, pantsAndJacket, california].sort(), 
+        albumsOfBlink.sort(),
+        [enemaOfTheState, pantsAndJacket, california].sort(),
         "found all albums of blink182"
       );
     });
-  
-    it("basic example with ability", async function() {
+
+    it.only("basic example with ability", async function() {
       const { app, serviceAlbums, serviceArtists } = mock();
       const blink182 = await serviceArtists.create({ name: "Blink182" });
       const sum41 = await serviceArtists.create({ name: "Sum 41" });
@@ -144,14 +144,22 @@ describe("authorize.relations", function() {
       const believe = await serviceAlbums.create({ name: "Believe", artistId: justinBieber.id, date: 2012 });
       const purpose = await serviceAlbums.create({ name: "Purpose", artistId: justinBieber.id, date: 2020 });
 
+      // Why should this fail instead of returning an empty result?
+      const shouldFail = serviceAlbums.find({
+        query: { "artist.name": "Blink182" },
+        ability: defineAbility((can) => {
+          can("read", "albums");
+          can("read", "artists", { name: "Justin Bieber" });
+        }, { resolveAction })
+      } as any)
+        .then(result => {
+          console.log(result);
+        }).catch((error: unknown) => {
+          console.log(error);
+        });
+
       await assert.rejects(
-        serviceAlbums.find({ 
-          query: { "artist.name": "Blink182" },
-          ability: defineAbility((can) => {
-            can("read", "albums");
-            can("read", "artists", { name: "Justin Bieber" });
-          }, { resolveAction })
-        } as any),
+        shouldFail,
         (err: Error) => err.name === "NotFound",
         "found no albums"
       );

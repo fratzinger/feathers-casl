@@ -42,7 +42,7 @@ export default async (
   if (
     !options?.notSkippable && (
       shouldSkip(HOOKNAME, context as any) ||
-        context.type !== "before" ||
+        ![null, "before"].includes(context.type) ||
         !context.params
     )
   ) { return context; }
