@@ -181,7 +181,7 @@ export const checkMulti = (
   options?: Pick<AuthorizeHookOptions, "actionOnForbidden">
 ): boolean => {
   const { method } = context;
-  const currentIsMulti = isMulti(context);
+  const currentIsMulti = isMulti(context as any);
   if (!currentIsMulti) { return true; }
   if (
     (method === "find" && ability.can(method, modelName)) ||
