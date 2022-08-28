@@ -21,7 +21,7 @@ const skip = (_opts, _context) => {
 };
 
 export default (_options?: Options) => {
-  return async (context: HookContext): Promise<HookContext> => {
+  return async (context: HookContext, next?: NextFunction) => {
     const hookShouldBeSkipped = skip(_options, context);
     if (hookShouldBeSkipped) {
       return context;
@@ -29,23 +29,19 @@ export default (_options?: Options) => {
 
     const options = makeOptions(context.app, _options);
 
-    return context.type === "before"
-      ? await authorizeBefore(context, options)
-      : await authorizeAfter(context, options);
-  };
-};
-
-export const authorizeAround = (_options?: Options) => {
-  return async function authorizeAround(context: HookContext, next: NextFunction) {
-    const options = makeOptions(context.app, _options);
-    const hookShouldBeSkipped = skip(_options, context);
-
-    if (hookShouldBeSkipped) {
-      await next();
+    if (next) {
+      if (hookShouldBeSkipped) {
+        await next();
+      } else {
+        await authorizeBefore(context, options);
+        await next();
+        await authorizeAfter(context, options);
+      }
+      return context
     } else {
-      await authorizeBefore(context, options);
-      await next();
-      await authorizeAfter(context, options);
+      return context.type === "before"
+        ? await authorizeBefore(context, options)
+        : await authorizeAfter(context, options);
     }
   };
 };
