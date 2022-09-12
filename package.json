@@ -39,8 +39,8 @@
     "test": "npm run mocha",
     "coverage": "nyc npm run test",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "docs": "vuepress dev docs",
-    "docs:build": "vuepress build docs"
+    "docs": "vitepress dev docs",
+    "docs:build": "vitepress build docs"
   },
   "dependencies": {
     "@casl/ability": "^5.4.3",
@@ -91,10 +91,10 @@
     "shx": "^0.3.3",
     "socket.io-client": "^2.4.0",
     "source-map-support": "^0.5.20",
-    "sqlite3": "^5.0.2",
+    "sqlite3": "^5.0.11",
     "ts-node": "^10.3.0",
     "type-fest": "^2.5.1",
     "typescript": "^4.4.4",
-    "vuepress": "^2.0.0-beta.32"
+    "vitepress": "^1.0.0-alpha.13"
   }
 }

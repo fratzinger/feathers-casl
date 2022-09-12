@@ -1,7 +1,3 @@
----
-title: Cookbook
----
-
 # Cookbook
 
 ## Get availableFields for adapters
