@@ -25,11 +25,11 @@ interface ConnectionsPerField {
 }
 
 import type { HookContext, Application } from "@feathersjs/feathers";
-import type { ChannelOptions } from "../types";
+import type { ChannelOptions, AnyData } from "../types";
 
 export default (
   app: Application, 
-  data: Record<string, any>, 
+  data: AnyData, 
   context: HookContext, 
   _options?: Partial<ChannelOptions>
 ): undefined | Channel | Channel[] => {

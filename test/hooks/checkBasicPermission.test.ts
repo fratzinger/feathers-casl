@@ -4,7 +4,7 @@ import {
   defineAbility
 } from "@casl/ability";
 import checkBasicPermission from "../../lib/hooks/checkBasicPermission.hook";
-import { HookContext } from "@feathersjs/feathers";
+import type { HookContext } from "@feathersjs/feathers";
 import { markHookForSkip } from "feathers-utils";
 
 const resolveAction = createAliasResolver({

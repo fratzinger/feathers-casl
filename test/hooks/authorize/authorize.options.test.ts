@@ -1,5 +1,6 @@
 import assert from "assert";
-import feathers, { HookContext } from "@feathersjs/feathers";
+import type { HookContext } from "@feathersjs/feathers";
+import feathers from "@feathersjs/feathers";
 import { Service } from "feathers-memory";
 import { createAliasResolver, defineAbility } from "@casl/ability";
 
@@ -9,7 +10,7 @@ const resolveAction = createAliasResolver({
   delete: "remove",
 });
 
-import { Application } from "@feathersjs/feathers";
+import type { Application } from "@feathersjs/feathers";
 
 import authorize from "../../../lib/hooks/authorize/authorize.hook";
 

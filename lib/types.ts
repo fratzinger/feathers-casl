@@ -1,8 +1,11 @@
-import { HookContext } from "@feathersjs/feathers";
-import { AnyAbility } from "@casl/ability";
-import { Application } from "@feathersjs/feathers";
+import type { HookContext } from "@feathersjs/feathers";
+import type { AnyAbility } from "@casl/ability";
+import type { Application } from "@feathersjs/feathers";
 import "@feathersjs/transport-commons";
-import { Channel, RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
+import type { Channel, RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyData = Record<string, any>
 
 
 export type Adapter = 
