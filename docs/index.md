@@ -28,7 +28,7 @@ features:
   details: Channels aren't a after thought but a first class citizen for permissions.
 ---
 
-<style lang="scss">
+<style>
 .VPImage.image-src {
   width: 250px;
   height: 250px;
