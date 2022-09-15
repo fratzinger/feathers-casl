@@ -7,7 +7,7 @@ import getFieldsForConditions from "../../utils/getFieldsForConditions";
 import { makeDefaultBaseOptions } from "../common";
 import getAvailableFields from "../../utils/getAvailableFields";
 
-import { getItems } from "feathers-hooks-common";
+import { getItemsIsArray } from "feathers-utils";
 import { HOOKNAME } from "./authorize.hook";
 
 import {
@@ -27,7 +27,7 @@ import type {
   Path,
   ThrowUnlessCanOptions
 } from "../../types";
-import { Promisable } from "type-fest";
+import type { Promisable } from "type-fest";
 
 export const makeOptions = (
   app: Application, 
@@ -133,9 +133,8 @@ export const refetchItems = async (
   params?: Params
 ): Promise<unknown[] | undefined> => {
   if (context.type !== "after") { return; }
-  const itemOrItems = getItems(context);
+  const { items } = getItemsIsArray(context);
 
-  const items = (!itemOrItems || Array.isArray(itemOrItems)) ? itemOrItems : [itemOrItems];
   if (!items) { return; }
 
   const idField = context.service.options?.id;

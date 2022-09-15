@@ -1,5 +1,6 @@
 import assert from "assert";
-import feathers, { Paginated } from "@feathersjs/feathers";
+import type { Paginated } from "@feathersjs/feathers";
+import feathers from "@feathersjs/feathers";
 import { createAliasResolver, defineAbility } from "@casl/ability";
 import _sortBy from "lodash/sortBy";
 
@@ -9,10 +10,10 @@ const resolveAction = createAliasResolver({
   delete: "remove",
 });
 
-import { Application } from "@feathersjs/feathers";
+import type { Application } from "@feathersjs/feathers";
 
 import authorize from "../../../../../lib/hooks/authorize/authorize.hook";
-import { Adapter, AuthorizeHookOptions } from "../../../../../lib/types";
+import type { Adapter, AuthorizeHookOptions } from "../../../../../lib/types";
 
 export default (
   adapterName: Adapter,
@@ -488,6 +489,38 @@ export default (
           ],
           "just returned one item"
         );
+      });
+
+      it("works with nested $and/$or", async function () {
+        // no
+        await service.create({ test: true, published: false, hidden: true, userId: 1 });
+        await service.create({ test: true, published: false, hidden: false, userId: 2 });
+        await service.create({ test: true, published: true, hidden: true, userId: 3 });
+
+        // yes
+        await service.create({ test: true, published: false, hidden: false, userId: 1 });
+        await service.create({ test: true, published: true, hidden: false, userId: 2 });
+        
+        
+        const returnedItems = await service.find({
+          ability: defineAbility((can) => {
+            can("read", "tests", { userId: 1 });
+            can("read", "tests", { userId: { $ne: 1 }, published: true });
+          }, { resolveAction }),
+          query: {
+            $or: [
+              { userId: 1 },
+              { userId: { $ne: 1 }, published: true }
+            ],
+            userId: { $in: [1, 2, 3] },
+            hidden: false
+          },
+          paginate: false
+        }) as any[];
+
+        const hallo = "";
+
+        assert.deepEqual(returnedItems.length, 2);
       });
     });
   });

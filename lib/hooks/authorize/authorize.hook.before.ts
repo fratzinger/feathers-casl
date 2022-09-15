@@ -2,7 +2,8 @@ import { Forbidden } from "@feathersjs/errors";
 import _isEmpty from "lodash/isEmpty";
 import _pick from "lodash/pick";
 import _set from "lodash/set";
-import { AnyAbility, subject } from "@casl/ability";
+import type { AnyAbility } from "@casl/ability";
+import { subject } from "@casl/ability";
 
 import {
   shouldSkip,

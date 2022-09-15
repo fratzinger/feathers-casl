@@ -1,5 +1,5 @@
 import { Service } from "feathers-memory";
-import { ServiceCaslOptions } from "../../../../lib/types";
+import type { ServiceCaslOptions } from "../../../../lib/types";
 import makeTests from "./makeTests";
 
 declare module "@feathersjs/adapter-commons" {

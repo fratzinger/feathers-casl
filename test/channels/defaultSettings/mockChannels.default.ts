@@ -1,9 +1,9 @@
 import assert from "assert";
 import "@feathersjs/transport-commons";
-import { HookContext, Params } from "@feathersjs/feathers";
+import type { HookContext, Params } from "@feathersjs/feathers";
 
 import { getChannelsWithReadAbility, makeOptions } from "../../../lib/channels";
-import { Application } from "@feathersjs/express";
+import type { Application } from "@feathersjs/express";
 
 export default function(app: Application): void {
   if(typeof app.channel !== "function") {
