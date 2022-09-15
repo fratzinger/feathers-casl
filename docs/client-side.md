@@ -1,7 +1,3 @@
----
-title: Client side
----
-
 # Client side
 
 ## General

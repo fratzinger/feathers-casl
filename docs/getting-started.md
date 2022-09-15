@@ -1,7 +1,3 @@
----
-title: Getting Started
----
-
 # Getting Started
 
 <p align="center">

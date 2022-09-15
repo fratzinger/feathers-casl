@@ -74,8 +74,7 @@ makeTests(
       supersecret: { type: Boolean },
       hidden: { type: Boolean }
     }, {
-      timestamps: false,
-      skipVersioning: true
+      timestamps: false
     });
 
     if (client.modelNames().includes("tests")) {

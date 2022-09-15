@@ -1,7 +1,3 @@
----
-title: Gotchas
----
-
 # Gotchas
 
 Here is the place for common mistakes for defined rules and unexpected behavior.
