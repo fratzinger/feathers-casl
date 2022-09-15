@@ -9,6 +9,14 @@ export default defineConfig({
     editLink: { pattern: 'https://github.com/fratzinger/feathers-casl/edit/master/docs/:path', text: 'Edit this page on GitHub' },
     lastUpdatedText: 'Last Updated',
     socialLinks: [
+      {
+        icon: "twitter",
+        link: "https://twitter.com/feathersjs",
+      },
+      {
+        icon: "discord",
+        link: "https://discord.gg/qa8kez8QBx",
+      },
       { icon: 'github', link: 'https://github.com/fratzinger/feathers-casl' }
     ],
     sidebar: [
