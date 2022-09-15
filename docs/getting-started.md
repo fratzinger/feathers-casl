@@ -11,6 +11,7 @@
 ![libraries.io](https://img.shields.io/librariesio/release/npm/feathers-casl)
 ![npm](https://img.shields.io/npm/dm/feathers-casl)
 ![GitHub license](https://img.shields.io/github/license/fratzinger/feathers-casl)
+[![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/qa8kez8QBx)
 
 ## About
 
