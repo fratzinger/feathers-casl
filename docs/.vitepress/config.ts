@@ -47,5 +47,10 @@ export default defineConfig({
       message: 'Released under the MIT License.',
       copyright: 'Copyright © 2020-present Frederik Schmatz'
     },
+    algolia: {
+      appId: 'XJKV0V1N7U',
+      apiKey: 'a4c3e7c6c2fcd7b1baa2ac04e17b9f72',
+      indexName: 'feathers-casl'
+    }
   }
 });
