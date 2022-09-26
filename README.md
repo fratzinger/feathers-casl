@@ -12,6 +12,7 @@
 [![npm](https://img.shields.io/npm/dm/feathers-casl)](https://www.npmjs.com/package/feathers-casl)
 [![GitHub license](https://img.shields.io/github/license/fratzinger/feathers-casl)](https://github.com/fratzinger/feathers-casl/blob/master/LICENSE)
 [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/qa8kez8QBx)
+[![kandi X-Ray](https://kandi.openweaver.com/badges/xray.svg)](https://kandi.openweaver.com/typescript/fratzinger/feathers-casl)
 
 ## About
 
