@@ -1,13 +1,14 @@
-import { Application, HookContext } from "@feathersjs/feathers";
+import type { Application, HookContext } from "@feathersjs/feathers";
 import { AuthenticationService, JWTStrategy } from "@feathersjs/authentication";
 import { LocalStrategy } from "@feathersjs/authentication-local";
 import { expressOauth } from "@feathersjs/authentication-oauth";
 
-import { Ability, createAliasResolver, defineAbility } from "../../../lib";
+import type { Ability } from "../../../lib";
+import { createAliasResolver, defineAbility } from "../../../lib";
 import { Service } from "feathers-memory";
 import hashPassword from "@feathersjs/authentication-local/lib/hooks/hash-password";
 import protect from "@feathersjs/authentication-local/lib/hooks/protect";
-import { ServiceCaslOptions } from "../../../lib/types";
+import type { ServiceCaslOptions } from "../../../lib/types";
 
 const resolveAction = createAliasResolver({
   update: "patch",

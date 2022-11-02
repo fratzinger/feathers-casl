@@ -144,17 +144,15 @@ describe("authorize.relations", function() {
       const believe = await serviceAlbums.create({ name: "Believe", artistId: justinBieber.id, date: 2012 });
       const purpose = await serviceAlbums.create({ name: "Purpose", artistId: justinBieber.id, date: 2020 });
 
-      await assert.rejects(
-        serviceAlbums.find({ 
-          query: { "artist.name": "Blink182" },
-          ability: defineAbility((can) => {
-            can("read", "albums");
-            can("read", "artists", { name: "Justin Bieber" });
-          }, { resolveAction })
-        }),
-        (err: Error) => err.name === "NotFound",
-        "found no albums"
-      );
+      const noAlbums = await serviceAlbums.find({ 
+        query: { "artist.name": "Blink182" },
+        ability: defineAbility((can) => {
+          can("read", "albums");
+          can("read", "artists", { name: "Justin Bieber" });
+        }, { resolveAction })
+      });
+
+      assert.strictEqual(noAlbums.length, 0, "found no albums");
 
       const albumsOfBlink = await serviceAlbums.find({ 
         query: { "artist.name": "Blink182" },
@@ -187,17 +185,15 @@ describe("authorize.relations", function() {
       const believe = await serviceAlbums.create({ name: "Believe", artistId: justinBieber.id, date: 2012 });
       const purpose = await serviceAlbums.create({ name: "Purpose", artistId: justinBieber.id, date: 2020 });
 
-      await assert.rejects(
-        serviceAlbums.find({ 
-          query: { "artist.name": "Blink182", $select: ["id"] },
-          ability: defineAbility((can) => {
-            can("read", "albums");
-            can("read", "artists", { name: "Justin Bieber" });
-          }, { resolveAction })
-        }),
-        (err: Error) => err.name === "NotFound",
-        "found no albums"
-      );
+      const noAlbums = await serviceAlbums.find({ 
+        query: { "artist.name": "Blink182", $select: ["id"] },
+        ability: defineAbility((can) => {
+          can("read", "albums");
+          can("read", "artists", { name: "Justin Bieber" });
+        }, { resolveAction })
+      });
+
+      assert.strictEqual(noAlbums.length, 0, "found no albums");
       
       const albumsOfBlink = await serviceAlbums.find({ 
         query: { "artist.name": "Blink182", $select: ["id"] },

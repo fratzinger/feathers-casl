@@ -8,10 +8,10 @@ const resolveAction = createAliasResolver({
   delete: "remove",
 });
 
-import { Application } from "@feathersjs/feathers";
+import type { Application } from "@feathersjs/feathers";
 
 import authorize from "../../../../../lib/hooks/authorize/authorize.hook";
-import { Adapter, AuthorizeHookOptions } from "../../../../../lib/types";
+import type { Adapter, AuthorizeHookOptions } from "../../../../../lib/types";
 
 export default (
   adapterName: Adapter,

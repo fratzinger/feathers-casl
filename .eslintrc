@@ -23,20 +23,23 @@
     "camelcase": "warn",
     "require-atomic-updates": "off",
     "prefer-destructuring": ["warn", {
-      "array": false,
-      "object": true
+      "AssignmentExpression": { "object": false, "array": false },
+      "VariableDeclarator": { "object": true, "array": true }
     }, {
       "enforceForRenamedProperties": false
     }],
     "security/detect-object-injection": "off",
     "object-curly-spacing": ["warn", "always"],
-    "prefer-const": ["warn"]
+    "prefer-const": ["warn"],
+    "@typescript-eslint/consistent-type-imports": ["warn", { "prefer": "type-imports" }]
   },
   "overrides": [
     {
       "files": ["test/**/*.ts"],
       "rules": {
-        "@typescript-eslint/ban-ts-comment": ["off"]
+        "@typescript-eslint/ban-ts-comment": ["off"],
+        "@typescript-eslint/no-explicit-any": ["off"],
+        "@typescript-eslint/no-unused-vars": ["off"]
       }
     }
   ]

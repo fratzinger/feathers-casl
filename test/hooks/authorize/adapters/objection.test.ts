@@ -1,11 +1,11 @@
 import { Model } from "objection";
 import makeTests from "./makeTests";
 import { Service } from "feathers-objection";
-import { getItems } from "feathers-hooks-common";
+import { getItemsIsArray } from "feathers-utils";
 import knex from "knex";
 import path from "path";
-import { ServiceCaslOptions } from "../../../../lib/types";
-import { HookContext } from "@feathersjs/feathers";
+import type { ServiceCaslOptions } from "../../../../lib/types";
+import type { HookContext } from "@feathersjs/feathers";
 
 const db  = knex({
   client: "sqlite3",
@@ -39,7 +39,7 @@ class TestModel extends Model {
       supersecret: { type: ["boolean", "null"] },
       hidden: { type: ["boolean", "null"] }
     }
-  }
+  };
 }
 
 const makeService = () => {
@@ -73,9 +73,7 @@ const boolFields = [
 
 const afterHooks = [
   (context: HookContext) => {
-    let items = getItems(context);
-    const isArray = Array.isArray(items);
-    items = (isArray) ? items : [items];
+    const { items, isArray } = getItemsIsArray(context);
 
     const result = items;
 

@@ -8,7 +8,7 @@ import index, {
 } from "../lib";
 import feathers from "@feathersjs/feathers";
 
-import { ServiceCaslOptions } from "../lib/types";
+import type { ServiceCaslOptions } from "../lib/types";
 
 declare module "@feathersjs/feathers" {
     interface Application {

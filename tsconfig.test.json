@@ -11,4 +11,3 @@
   "include": ["lib/**/*"],
   "exclude": ["node_modules", "**/*.test.js"]
 }
-  

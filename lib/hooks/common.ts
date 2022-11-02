@@ -1,5 +1,5 @@
 import { subject } from "@casl/ability";
-import { getItems } from "feathers-hooks-common";
+import { getItemsIsArray } from "feathers-utils";
 
 import { throwUnlessCan } from "./authorize/authorize.hook.utils";
 
@@ -44,8 +44,7 @@ export const checkCreatePerItem = (
   if (!checkCreateForData) { return context; }
 
   // we have all information we need (maybe we need populated data?)
-  let items = getItems(context);
-  items = (Array.isArray(items)) ? items : [items];
+  const { items } = getItemsIsArray(context);
 
   for (let i = 0, n = items.length; i < n; i++) {
     throwUnlessCan(

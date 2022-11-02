@@ -3,7 +3,7 @@ import { MongoClient } from "mongodb";
 import { Service } from "feathers-mongodb";
 
 import makeTests from "./makeTests";
-import { ServiceCaslOptions } from "../../../../lib/types";
+import type { ServiceCaslOptions } from "../../../../lib/types";
 
 let Model;
 

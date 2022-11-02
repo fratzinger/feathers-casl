@@ -4,9 +4,9 @@ import { Service } from "feathers-mongoose";
 mongoose.Promise = global.Promise;
 
 import makeTests from "./makeTests";
-import { getItems } from "feathers-hooks-common";
-import { ServiceCaslOptions } from "../../../../lib/types";
-import { HookContext } from "@feathersjs/feathers";
+import { getItemsIsArray } from "feathers-utils";
+import type { ServiceCaslOptions } from "../../../../lib/types";
+import type { HookContext } from "@feathersjs/feathers";
 
 let Model;
 
@@ -42,8 +42,7 @@ const makeService = () => {
 
 const afterHooks = [
   (context: HookContext) => {
-    let items = getItems(context);
-    items = (Array.isArray(items)) ? items : [items];
+    const { items } = getItemsIsArray(context);
   
     items.forEach(item => {
       delete item.__v;        
@@ -74,8 +73,7 @@ makeTests(
       supersecret: { type: Boolean },
       hidden: { type: Boolean }
     }, {
-      timestamps: false,
-      skipVersioning: true
+      timestamps: false
     });
 
     if (client.modelNames().includes("tests")) {

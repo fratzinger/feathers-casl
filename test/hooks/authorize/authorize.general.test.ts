@@ -7,7 +7,7 @@ import {
 import _cloneDeep from "lodash/cloneDeep";
 import { markHookForSkip } from "feathers-utils";
 import { HOOKNAME as HOOKNAME_CHECKBASICPERMISSION } from "../../../lib/hooks/checkBasicPermission.hook";
-import { HookContext } from "@feathersjs/feathers";
+import type { HookContext } from "@feathersjs/feathers";
 
 const resolveAction = createAliasResolver({
   update: "patch",

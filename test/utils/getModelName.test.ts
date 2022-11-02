@@ -1,4 +1,4 @@
-import { HookContext } from "@feathersjs/feathers";
+import type { HookContext } from "@feathersjs/feathers";
 import assert from "assert";
 
 import getModelName from "../../lib/utils/getModelName";

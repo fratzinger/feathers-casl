@@ -1,10 +1,10 @@
 import { Sequelize, DataTypes, Op } from "sequelize";
 import makeTests from "./makeTests";
 import { Service } from "feathers-sequelize";
-import { getItems } from "feathers-hooks-common";
+import { getItemsIsArray } from "feathers-utils";
 import path from "path";
-import { ServiceCaslOptions } from "../../../../lib/types";
-import { HookContext } from "@feathersjs/feathers";
+import type { ServiceCaslOptions } from "../../../../lib/types";
+import type { HookContext } from "@feathersjs/feathers";
 
 const sequelize = new Sequelize("sequelize", "", "", {
   dialect: "sqlite",
@@ -77,8 +77,7 @@ const afterHooks = [
   (context: HookContext) => {
     const { Model } = context.service;
     const fields = Model.fieldRawAttributesMap;
-    let items = getItems(context);
-    items = (Array.isArray(items)) ? items : [items];
+    const { items } = getItemsIsArray(context);
 
     items.forEach(item => {
       const keys = Object.keys(item);
