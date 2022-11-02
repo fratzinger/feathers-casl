@@ -60,7 +60,7 @@ export type EventName = "created" | "updated" | "patched" | "removed";
 
 
 export interface ChannelOptions extends AuthorizeChannelCommonsOptions {
-  ability: AnyAbility | ((app: Application, connection: RealTimeConnection, data: unknown, context: HookContext) => AnyAbility)
+  ability: AnyAbility | ((app: Application, connection: RealTimeConnection, data: unknown, context: HookContext) => Promise<AnyAbility> | AnyAbility)
   /** Easy way to disable filtering, default: `false` */
   activated: boolean
   /** Channel that's used when there occures an error, default: `['authenticated']` */
