@@ -1,14 +1,13 @@
-import getAvailableFields from "../utils/getAvailableFields";
-import { getContextPath } from "../utils/getDefaultModelName";
+import { getAvailableFields } from "../utils";
 
 import type { Ability, AnyAbility } from "@casl/ability";
 
 import type { Application, HookContext } from "@feathersjs/feathers";
-import type { RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
+import type { RealTimeConnection } from "@feathersjs/transport-commons";
 
 import type { ChannelOptions, EventName, InitOptions } from "../types";
 
-export const makeOptions = (
+export const makeChannelOptions = (
   app: Application,
   options?: Partial<ChannelOptions>
 ): ChannelOptions => {
@@ -24,12 +23,12 @@ const defaultOptions: ChannelOptions = {
   ability: (
     app: Application,
     connection: RealTimeConnection,
-    data: Record<string, unknown>,
+    data: Record<string, any>,
     context: HookContext
   ): Ability => {
     return connection.ability;
   },
-  modelName: getContextPath,
+  modelName: (context) => context.path,
   restrictFields: true,
   availableFields: (context: HookContext): string[] => {
     const availableFields: string[] | ((context: HookContext) => string[]) =

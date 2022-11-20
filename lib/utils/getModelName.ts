@@ -1,6 +1,6 @@
 import type { HookContext } from "@feathersjs/feathers";
 
-const getModelName = (
+export const getModelName = (
   modelName: string | ((context: HookContext) => string),
   context: HookContext
 ): string => {
@@ -16,5 +16,3 @@ const getModelName = (
 
   throw new Error("feathers-casl: 'modelName' is not a string or function");
 };
-
-export default getModelName;

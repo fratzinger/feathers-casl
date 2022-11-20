@@ -1,8 +1,8 @@
-import assert from "assert";
+import assert from "node:assert";
 import "@feathersjs/transport-commons";
 import type { HookContext, Params } from "@feathersjs/feathers";
 
-import { getChannelsWithReadAbility, makeOptions } from "../../../lib/channels";
+import { getChannelsWithReadAbility, makeChannelOptions } from "../../../lib";
 import type { Application } from "@feathersjs/express";
 
 export default function (app: Application): void {
@@ -26,7 +26,7 @@ export default function (app: Application): void {
     }
   });
 
-  const caslOptions = makeOptions(app);
+  const caslOptions = makeChannelOptions(app);
 
   //@ts-ignore
   const fields = caslOptions.availableFields({

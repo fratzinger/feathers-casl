@@ -1,16 +1,14 @@
 import { shouldSkip } from "feathers-utils";
 
-import { makeOptions } from "./authorize.hook.utils";
-import authorizeAfter from "./authorize.hook.after";
-import authorizeBefore from "./authorize.hook.before";
+import { HOOKNAME, makeOptions } from "./authorize.hook.utils";
+import { authorizeAfter } from "./authorize.hook.after";
+import { authorizeBefore } from "./authorize.hook.before";
 
 import type { HookContext } from "@feathersjs/feathers";
 
 import type { AuthorizeHookOptions } from "../../types";
 
-export const HOOKNAME = "authorize";
-
-export default <H extends HookContext = HookContext>(
+export const authorize = <H extends HookContext = HookContext>(
   _options?: Partial<AuthorizeHookOptions>
 ) => {
   return async (context: H) => {

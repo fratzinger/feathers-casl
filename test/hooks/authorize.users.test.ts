@@ -1,10 +1,10 @@
-import assert from "assert";
+import assert from "node:assert";
 import { createAliasResolver, defineAbility } from "@casl/ability";
 import { Sequelize, Op, DataTypes } from "sequelize";
 import { feathers } from "@feathersjs/feathers";
 import { SequelizeService } from "feathers-sequelize";
-import authorize from "../../lib/hooks/authorize/authorize.hook";
-import path from "path";
+import { authorize } from "../../lib";
+import path from "node:path";
 
 describe("authorize.users.test.ts", function () {
   function mockAbility(user) {

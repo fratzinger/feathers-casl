@@ -3,7 +3,7 @@ import _cloneDeep from "lodash/cloneDeep.js";
 
 import type { Query } from "@feathersjs/feathers";
 
-const simplifyQuery = (
+export const simplifyQuery = (
   query: Query,
   replaceAnd = true,
   replaceOr = true
@@ -55,5 +55,3 @@ const simplifyQuery = (
   }
   return result;
 };
-
-export default simplifyQuery;

@@ -2,11 +2,10 @@ import type { Application, HookContext } from "@feathersjs/feathers";
 import { AuthenticationService, JWTStrategy } from "@feathersjs/authentication";
 import { LocalStrategy } from "@feathersjs/authentication-local";
 
-import type { Ability } from "../../../lib";
-import { createAliasResolver, defineAbility } from "../../../lib";
 import { MemoryService } from "@feathersjs/memory";
 import hashPassword from "@feathersjs/authentication-local/lib/hooks/hash-password";
 import protect from "@feathersjs/authentication-local/lib/hooks/protect";
+import { createAliasResolver, defineAbility } from "@casl/ability";
 
 const resolveAction = createAliasResolver({
   update: "patch",
@@ -14,9 +13,7 @@ const resolveAction = createAliasResolver({
   delete: "remove",
 });
 
-const defineAbilitiesFor = (user): Ability => {
-  //@ts-ignore
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+const defineAbilitiesFor = (user) => {
   return defineAbility(
     (can, cannot) => {
       if (user.id === 0) {

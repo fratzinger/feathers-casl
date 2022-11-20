@@ -11,14 +11,16 @@ import {
   makeOptions,
   getConditionalSelect,
   refetchItems,
+  HOOKNAME,
 } from "./authorize.hook.utils";
 
-import hasRestrictingFields from "../../utils/hasRestrictingFields";
-
-import getModelName from "../../utils/getModelName";
+import {
+  getAvailableFields,
+  hasRestrictingFields,
+  getModelName,
+} from "../../utils";
 
 import { Forbidden } from "@feathersjs/errors";
-import getAvailableFields from "../../utils/getAvailableFields";
 
 import type { HookContext } from "@feathersjs/feathers";
 import type {
@@ -26,9 +28,7 @@ import type {
   HasRestrictingFieldsOptions,
 } from "../../types";
 
-const HOOKNAME = "authorize";
-
-export default async <H extends HookContext = HookContext>(
+export const authorizeAfter = async <H extends HookContext = HookContext>(
   context: H,
   options: AuthorizeHookOptions
 ) => {

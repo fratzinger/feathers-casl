@@ -1,2 +1,2 @@
-export { default as authorize } from "./authorize/authorize.hook";
-export { default as checkBasicPermission } from "./checkBasicPermission.hook";
+export { authorize } from "./authorize/authorize.hook";
+export { checkBasicPermission } from "./checkBasicPermission.hook";

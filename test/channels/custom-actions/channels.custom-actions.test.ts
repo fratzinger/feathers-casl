@@ -1,16 +1,17 @@
-import assert from "assert";
-import { feathers, Application } from "@feathersjs/feathers";
+import assert from "node:assert";
+import type { Application } from "@feathersjs/feathers";
+import { feathers } from "@feathersjs/feathers";
 import socketio from "@feathersjs/socketio-client";
-import type { Server } from "http";
-import io from "socket.io-client";
+import type { Server } from "node:http";
+import { io } from "socket.io-client";
 
 import mockServer from "../.mockServer";
 import channels1 from "./mockChannels.custom-actions";
 import services1 from "./mockServices.custom-actions";
 
-const promiseTimeout = function(
-  ms: number, 
-  promise: Promise<unknown>, 
+const promiseTimeout = function (
+  ms: number,
+  promise: Promise<unknown>,
   rejectMessage?: string
 ): Promise<unknown> {
   // Create a promise that rejects in <ms> milliseconds
@@ -22,13 +23,10 @@ const promiseTimeout = function(
   });
 
   // Returns a race between our timeout and the passed in promise
-  return Promise.race([
-    promise,
-    timeout
-  ]);
+  return Promise.race([promise, timeout]);
 };
 
-describe("channels.custom-actions.test.ts", function() {
+describe("channels.custom-actions.test.ts", function () {
   let server: Server;
   let app: Application;
 
@@ -38,13 +36,13 @@ describe("channels.custom-actions.test.ts", function() {
     { id: 1, email: "2", password: "2" },
     { id: 2, email: "3", password: "3" },
     { id: 3, email: "4", password: "4" },
-    { id: 4, email: "5", password: "5" }
+    { id: 4, email: "5", password: "5" },
   ];
 
-  before(async function() {
+  beforeAll(async function () {
     const mock = mockServer({
       channels: channels1,
-      services: services1
+      services: services1,
     });
     // eslint-disable-next-line prefer-destructuring
     app = mock.app;
@@ -65,7 +63,7 @@ describe("channels.custom-actions.test.ts", function() {
       await client.service("authentication").create({
         strategy: "local",
         email: user.email,
-        password: user.email
+        password: user.email,
       });
     });
 
@@ -77,7 +75,7 @@ describe("channels.custom-actions.test.ts", function() {
     await Promise.all(promises);
   });
 
-  after(async function() {
+  afterAll(async function () {
     server.close();
   });
 
@@ -86,13 +84,21 @@ describe("channels.custom-actions.test.ts", function() {
     methodName: string,
     event: string,
     expectedPerClient: unknown,
-    i: number) => {
-    assert.ok(Object.prototype.hasOwnProperty.call(expectedPerClient, i), `client${i} has expected value`);
+    i: number
+  ) => {
+    assert.ok(
+      Object.prototype.hasOwnProperty.call(expectedPerClient, i),
+      `client${i} has expected value`
+    );
     const expected = expectedPerClient[i];
     const fulFill = new Promise((resolve) => {
       clients[i].service(servicePath).on(event, (result) => {
         if (expected) {
-          assert.deepStrictEqual(result, expected, `'client${i}:${servicePath}:${methodName}': result is expected`);
+          assert.deepStrictEqual(
+            result,
+            expected,
+            `'client${i}:${servicePath}:${methodName}': result is expected`
+          );
         }
         resolve(result);
       });
@@ -100,25 +106,31 @@ describe("channels.custom-actions.test.ts", function() {
 
     if (expected) {
       await assert.doesNotReject(
-        promiseTimeout(100, fulFill, `'client${i}:${servicePath}:${methodName}': timeout`)
-          .finally(() => {
-            clients[i].service(servicePath).removeAllListeners(event);
-          }),
+        promiseTimeout(
+          100,
+          fulFill,
+          `'client${i}:${servicePath}:${methodName}': timeout`
+        ).finally(() => {
+          clients[i].service(servicePath).removeAllListeners(event);
+        }),
         `'client${i}:${servicePath}:${methodName}': receives message`
       );
     } else {
       await assert.rejects(
-        promiseTimeout(80, fulFill, `'client${i}:${servicePath}:${methodName}': timeout`)
-          .finally(() => {
-            clients[i].service(servicePath).removeAllListeners(event);
-          }),
+        promiseTimeout(
+          80,
+          fulFill,
+          `'client${i}:${servicePath}:${methodName}': timeout`
+        ).finally(() => {
+          clients[i].service(servicePath).removeAllListeners(event);
+        }),
         () => true,
         `'client${i}:${servicePath}:${methodName}': does not receive message`
       );
     }
   };
 
-  it("users receive events", async function() {
+  it("users receive events", async function () {
     const services = ["articles", "comments"];
 
     for (let i = 0, n = services.length; i < n; i++) {
@@ -130,51 +142,58 @@ describe("channels.custom-actions.test.ts", function() {
           event: "created",
           expectedPerClient: {
             0: { id: 0, published: true, test: true, userId: 4 },
-            1: (servicePath === "articles") ? { id: 0, published: true, test: true, userId: 4 } : false,
+            1:
+              servicePath === "articles"
+                ? { id: 0, published: true, test: true, userId: 4 }
+                : false,
             2: false,
             3: { id: 0, published: true, test: true, userId: 4 },
-            4: (servicePath === "articles") ? false : { id: 0 },
-            5: false
-          } 
+            4: servicePath === "articles" ? false : { id: 0 },
+            5: false,
+          },
         },
         update: {
           params: [0, { test: false, userId: 4 }],
           event: "updated",
           expectedPerClient: {
             0: { id: 0, test: false, userId: 4 },
-            1: (servicePath === "comments") ? { test: false } : false,
+            1: servicePath === "comments" ? { test: false } : false,
             2: false,
             3: { id: 0, test: false, userId: 4 },
             4: false,
-            5: false
-          }
+            5: false,
+          },
         },
         patch: {
           params: [0, { test: true, userId: 1, title: "test" }],
           event: "patched",
           expectedPerClient: {
             0: { id: 0, test: true, userId: 1, title: "test" },
-            1: (servicePath === "comments") ? { id: 0, test: true, userId: 1, title: "test" } : false,
+            1:
+              servicePath === "comments"
+                ? { id: 0, test: true, userId: 1, title: "test" }
+                : false,
             2: false,
             3: { id: 0, test: true, userId: 1, title: "test" },
             4: false,
-            5: false
-          }
+            5: false,
+          },
         },
         remove: {
           params: [0],
           event: "removed",
           expectedPerClient: {
             0: { id: 0, test: true, userId: 1, title: "test" },
-            1: (servicePath === "articles") 
-              ? { id: 0, test: true, userId: 1, title: "test" }
-              : { id: 0 },
+            1:
+              servicePath === "articles"
+                ? { id: 0, test: true, userId: 1, title: "test" }
+                : { id: 0 },
             2: false,
             3: { id: 0, test: true, userId: 1, title: "test" },
             4: false,
-            5: false
-          }
-        }
+            5: false,
+          },
+        },
       };
 
       const methodNames = Object.keys(methods);
@@ -184,10 +203,10 @@ describe("channels.custom-actions.test.ts", function() {
         const service = app.service(servicePath);
         const { event, params, expectedPerClient } = method;
 
-        const promises = clients.map((client, i) => 
+        const promises = clients.map((client, i) =>
           checkClient(servicePath, methodName, event, expectedPerClient, i)
         );
-        
+
         service[methodName](...params);
 
         await Promise.all(promises);

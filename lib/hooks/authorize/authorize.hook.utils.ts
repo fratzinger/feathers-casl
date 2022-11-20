@@ -3,14 +3,10 @@ import _set from "lodash/set.js";
 
 import { Forbidden } from "@feathersjs/errors";
 
-import getFieldsForConditions from "../../utils/getFieldsForConditions";
+import { getFieldsForConditions, getAvailableFields } from "../../utils";
 import { makeDefaultBaseOptions } from "../common";
-import getAvailableFields from "../../utils/getAvailableFields";
 
-import { getItemsIsArray } from "feathers-utils";
-import { HOOKNAME } from "./authorize.hook";
-
-import { isMulti, markHookForSkip } from "feathers-utils";
+import { getItemsIsArray, isMulti, markHookForSkip } from "feathers-utils";
 
 import type { AnyAbility, ForcedSubject } from "@casl/ability";
 import type { Application, HookContext, Params } from "@feathersjs/feathers";
@@ -31,6 +27,8 @@ declare module "@feathersjs/feathers" {
     ability?: AnyAbility;
   }
 }
+
+export const HOOKNAME = "authorize";
 
 export const makeOptions = <A extends Application = Application>(
   app: A,

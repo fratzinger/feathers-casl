@@ -4,7 +4,7 @@ import { mergeArrays } from "feathers-utils";
 import type { AnyAbility } from "@casl/ability";
 import type { GetMinimalFieldsOptions } from "../types";
 
-const getMinimalFields = (
+export const getMinimalFields = (
   ability: AnyAbility,
   action: string,
   subject: Record<string, unknown>,
@@ -41,5 +41,3 @@ const getMinimalFields = (
   });
   return fields;
 };
-
-export default getMinimalFields;

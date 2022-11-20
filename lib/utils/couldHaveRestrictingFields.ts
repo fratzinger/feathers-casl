@@ -1,6 +1,6 @@
 import type { AnyAbility } from "@casl/ability";
 
-function couldHaveRestrictingFields(
+export function couldHaveRestrictingFields(
   ability: AnyAbility,
   action: string,
   subjectType: string
@@ -9,5 +9,3 @@ function couldHaveRestrictingFields(
     return !!rule.fields;
   });
 }
-
-export default couldHaveRestrictingFields;

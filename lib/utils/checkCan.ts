@@ -1,7 +1,7 @@
 import { subject } from "@casl/ability";
 import { throwUnlessCan } from "../hooks/authorize/authorize.hook.utils";
 
-import getFieldsForConditions from "./getFieldsForConditions";
+import { getFieldsForConditions } from "./getFieldsForConditions";
 
 import type { AnyAbility } from "@casl/ability";
 import type { Id, Service } from "@feathersjs/feathers";
@@ -20,7 +20,7 @@ const makeOptions = (
   return Object.assign(defaultOptions, providedOptions || {});
 };
 
-const checkCan = async <S>(
+export const checkCan = async <S>(
   ability: AnyAbility,
   id: Id,
   method: string,
@@ -59,5 +59,3 @@ const checkCan = async <S>(
 
   return can;
 };
-
-export default checkCan;

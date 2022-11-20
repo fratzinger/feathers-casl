@@ -1,13 +1,11 @@
-import assert from "assert";
+import assert from "node:assert";
 import type { Application, HookContext } from "@feathersjs/feathers";
 import { feathers } from "@feathersjs/feathers";
 import { MemoryService } from "@feathersjs/memory";
-import casl from "../../lib/initialize";
-import authorize from "../../lib/hooks/authorize/authorize.hook";
-import type { Ability } from "../../lib/index";
-import { defineAbility } from "../../lib/index";
-import type { RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
-import type { InitOptions } from "../../lib/types";
+import casl, { authorize } from "../../lib";
+import type { RealTimeConnection } from "@feathersjs/transport-commons";
+import type { InitOptions } from "../../lib";
+import { defineAbility } from "@casl/ability";
 
 const mockApp = () => {
   const app = feathers();
@@ -67,7 +65,7 @@ describe("app-options / service-options", function () {
               calledActionOnForbidden = true;
             },
             checkMultiActions: true,
-            ability: (context: HookContext): Ability => {
+            ability: (context: HookContext) => {
               calledAbility = true;
               return defineAbility(() => {});
             },
@@ -85,7 +83,7 @@ describe("app-options / service-options", function () {
               connection: RealTimeConnection,
               data: unknown,
               context: HookContext
-            ): Ability => {
+            ) => {
               calledChannelAbility = true;
               return defineAbility(() => {});
             },
@@ -143,7 +141,7 @@ describe("app-options / service-options", function () {
                 serviceCalled.calledActionOnForbidden = true;
               },
               checkMultiActions: true,
-              ability: (context: HookContext): Ability => {
+              ability: (context: HookContext) => {
                 serviceCalled.calledAbility = true;
                 return defineAbility(() => {});
               },
@@ -164,7 +162,7 @@ describe("app-options / service-options", function () {
             },
             checkAbilityForInternal: true,
             checkMultiActions: true,
-            ability: (context: HookContext): Ability => {
+            ability: (context: HookContext) => {
               appCalled.calledAbility = true;
               return defineAbility(() => {});
             },

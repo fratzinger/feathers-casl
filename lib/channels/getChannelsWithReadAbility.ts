@@ -1,19 +1,15 @@
 import _isEqual from "lodash/isEqual.js";
 import _pick from "lodash/pick.js";
 import _isEmpty from "lodash/isEmpty.js";
-import "@feathersjs/transport-commons";
+import { Channel } from "@feathersjs/transport-commons";
 import { subject } from "@casl/ability";
 
-import { Channel } from "@feathersjs/transport-commons/lib/channels/channel/base";
+import { makeChannelOptions, getAbility, getEventName } from "./channels.utils";
 
-import { makeOptions, getAbility, getEventName } from "./channels.utils";
+import { getModelName, getAvailableFields } from "../utils";
+import { hasRestrictingFields } from "../utils/hasRestrictingFields";
 
-import getModelName from "../utils/getModelName";
-import hasRestrictingFields from "../utils/hasRestrictingFields";
-
-import getAvailableFields from "../utils/getAvailableFields";
-
-import type { RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
+import type { RealTimeConnection } from "@feathersjs/transport-commons";
 
 interface ConnectionsPerField {
   fields: false | string[];
@@ -23,7 +19,7 @@ interface ConnectionsPerField {
 import type { HookContext, Application } from "@feathersjs/feathers";
 import type { ChannelOptions, AnyData } from "../types";
 
-export default (
+export const getChannelsWithReadAbility = (
   app: Application,
   data: AnyData,
   context: HookContext,
@@ -33,7 +29,7 @@ export default (
     return undefined;
   }
 
-  const options = makeOptions(app, _options);
+  const options = makeChannelOptions(app, _options);
   const { channelOnError, activated } = options;
   const modelName = getModelName(options.modelName, context);
 

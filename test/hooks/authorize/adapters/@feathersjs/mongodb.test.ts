@@ -3,7 +3,7 @@ import { MongoClient } from "mongodb";
 import { MongoDBService } from "@feathersjs/mongodb";
 
 import makeTests from "../makeTests";
-import type { Adapter, ServiceCaslOptions } from "../../../../../lib/types";
+import type { Adapter, ServiceCaslOptions } from "../../../../../lib";
 import { filterArray } from "feathers-utils";
 
 let Model;
@@ -40,7 +40,7 @@ const makeService = () => {
   });
 };
 
-before(async function () {
+beforeAll(async function () {
   const server = await MongoMemoryServer.create();
   const uri = server.getUri();
 

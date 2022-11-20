@@ -1,7 +1,7 @@
 import type { HookContext } from "@feathersjs/feathers";
 import type { AuthorizeChannelCommonsOptions } from "../types";
 
-const getAvailableFields = (
+export const getAvailableFields = (
   context: HookContext,
   options?: Partial<Pick<AuthorizeChannelCommonsOptions, "availableFields">>
 ): undefined | string[] => {
@@ -11,5 +11,3 @@ const getAvailableFields = (
     ? options.availableFields(context)
     : options.availableFields;
 };
-
-export default getAvailableFields;

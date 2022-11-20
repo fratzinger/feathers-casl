@@ -1,10 +1,10 @@
 import { Model } from "objection";
 import makeTests from "./makeTests";
 import { Service } from "feathers-objection";
-import { filterArray, getItemsIsArray } from "feathers-utils";
-import knex from "knex";
-import path from "path";
-import type { ServiceCaslOptions } from "../../../../lib/types";
+import { getItemsIsArray } from "feathers-utils";
+import { knex } from "knex";
+import path from "node:path";
+import type { ServiceCaslOptions } from "../../../../lib";
 import type { HookContext } from "@feathersjs/feathers";
 
 const db = knex({

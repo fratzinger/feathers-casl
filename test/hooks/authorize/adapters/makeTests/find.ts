@@ -1,8 +1,11 @@
-import assert from "assert";
-import type { Paginated } from "@feathersjs/feathers";
+import assert from "node:assert";
+import type { Paginated, Application } from "@feathersjs/feathers";
 import { feathers } from "@feathersjs/feathers";
 import { createAliasResolver, defineAbility } from "@casl/ability";
 import _sortBy from "lodash/sortBy.js";
+
+import { authorize } from "../../../../../lib";
+import type { Adapter, AuthorizeHookOptions } from "../../../../../lib";
 
 const resolveAction = createAliasResolver({
   update: "patch",
@@ -10,26 +13,18 @@ const resolveAction = createAliasResolver({
   delete: "remove",
 });
 
-import type { Application } from "@feathersjs/feathers";
-
-import authorize from "../../../../../lib/hooks/authorize/authorize.hook";
-import type { Adapter, AuthorizeHookOptions } from "../../../../../lib/types";
-
 export default (
   adapterName: Adapter,
   makeService: () => any,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
-  afterHooks?: unknown[]
+  afterHooks?: any[]
 ): void => {
   let app: Application;
   let service;
   let id;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const itSkip = (
-    adapterToTest: Adapter | Adapter[]
-  ): Mocha.TestFunction | Mocha.PendingTestFunction => {
+  const itSkip = (adapterToTest: Adapter | Adapter[]) => {
     const condition =
       typeof adapterToTest === "string"
         ? adapterName === adapterToTest

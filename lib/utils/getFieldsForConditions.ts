@@ -1,6 +1,6 @@
 import type { AnyAbility } from "@casl/ability";
 
-const getFieldsForConditions = (
+export const getFieldsForConditions = (
   ability: AnyAbility,
   action: string,
   modelName: string
@@ -20,5 +20,3 @@ const getFieldsForConditions = (
   }
   return allFields;
 };
-
-export default getFieldsForConditions;

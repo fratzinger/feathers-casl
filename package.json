@@ -17,36 +17,35 @@
     "authorization"
   ],
   "license": "MIT",
-  "main": "dist/",
-  "types": "dist/",
-  "directories": {
-    "test": "test",
-    "lib": "lib"
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
   },
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": ">= 14.0.0"
   },
-  "files": [
-    "CHANGELOG.md",
-    "LICENSE",
-    "README.md",
-    "src/**",
-    "lib/**",
-    "dist/**"
-  ],
   "scripts": {
-    "compile": "shx rm -rf dist/ && tsc",
-    "version": "npm run compile",
+    "build": "unbuild",
+    "version": "npm run build",
     "release": "np",
-    "mocha": "cross-env NODE_ENV=test TS_NODE_PROJECT='tsconfig.test.json' mocha --timeout 5000",
-    "test": "npm run mocha",
-    "coverage": "nyc npm run test",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "docs": "vitepress dev docs",
     "docs:build": "vitepress build docs"
   },
+  "peerDependencies": {
+    "@casl/ability": "^5.0.0"
+  },
   "dependencies": {
-    "@casl/ability": "^6.3.2",
     "@feathersjs/errors": "^5.0.0-pre.33",
     "@feathersjs/feathers": "^5.0.0-pre.33",
     "@feathersjs/transport-commons": "^5.0.0-pre.33",
@@ -55,6 +54,7 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
+    "@casl/ability": "^6.3.2",
     "@feathersjs/adapter-commons": "^5.0.0-pre.33",
     "@feathersjs/authentication": "^5.0.0-pre.33",
     "@feathersjs/authentication-local": "^5.0.0-pre.33",
@@ -65,19 +65,21 @@
     "@feathersjs/mongodb": "^5.0.0-pre.33",
     "@feathersjs/socketio": "^5.0.0-pre.33",
     "@feathersjs/socketio-client": "^5.0.0-pre.33",
-    "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@seald-io/nedb": "^3.1.0",
     "@types/lodash": "^4.14.189",
-    "@types/mocha": "^10.0.0",
     "@types/node": "^18.11.9",
     "@typescript-eslint/eslint-plugin": "^5.43.0",
     "@typescript-eslint/parser": "^5.43.0",
+    "@vitest/coverage-c8": "^0.25.2",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
+    "eslint-import-resolver-typescript": "^3.5.2",
+    "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-security": "^1.5.0",
+    "eslint-plugin-unicorn": "^45.0.0",
     "feathers-fletching": "^1.20.5",
     "feathers-knex": "^8.0.1",
     "feathers-memory": "^4.1.0",
@@ -87,22 +89,21 @@
     "feathers-sequelize": "^7.0.0-pre.0",
     "helmet": "^6.0.0",
     "knex": "^2.3.0",
-    "mocha": "^10.1.0",
     "mongodb": "^4.12.0",
     "mongodb-memory-server": "^8.10.0",
     "mongoose": "^6.7.2",
     "np": "^7.6.2",
-    "nyc": "^15.1.0",
     "objection": "^3.0.1",
     "prettier": "^2.7.1",
     "sequelize": "^6.25.7",
     "shx": "^0.3.4",
     "socket.io-client": "^4.5.3",
-    "source-map-support": "^0.5.21",
     "sqlite3": "^5.1.2",
-    "ts-node": "^10.9.1",
     "type-fest": "^3.2.0",
     "typescript": "^4.9.3",
-    "vitepress": "^1.0.0-alpha.29"
+    "unbuild": "^1.0.1",
+    "vite": "^3.2.4",
+    "vitepress": "^1.0.0-alpha.29",
+    "vitest": "^0.25.2"
   }
 }

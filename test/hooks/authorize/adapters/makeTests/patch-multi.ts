@@ -1,19 +1,19 @@
-import assert from "assert";
+import assert from "node:assert";
 import { feathers } from "@feathersjs/feathers";
 import { createAliasResolver, defineAbility } from "@casl/ability";
 import _sortBy from "lodash/sortBy.js";
 import _isEqual from "lodash/isEqual.js";
+
+import type { Application } from "@feathersjs/feathers";
+
+import { authorize } from "../../../../../lib";
+import type { Adapter, AuthorizeHookOptions } from "../../../../../lib";
 
 const resolveAction = createAliasResolver({
   update: "patch",
   read: ["get", "find"],
   delete: "remove",
 });
-
-import type { Application } from "@feathersjs/feathers";
-
-import authorize from "../../../../../lib/hooks/authorize/authorize.hook";
-import type { Adapter, AuthorizeHookOptions } from "../../../../../lib/types";
 
 export default (
   adapterName: Adapter,
@@ -26,10 +26,7 @@ export default (
   let service;
   let id;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const itSkip = (
-    adapterToTest: Adapter | Adapter[]
-  ): Mocha.TestFunction | Mocha.PendingTestFunction => {
+  const itSkip = (adapterToTest: Adapter | Adapter[]) => {
     const condition =
       typeof adapterToTest === "string"
         ? adapterName === adapterToTest

@@ -7,29 +7,30 @@ import { subject } from "@casl/ability";
 
 import { shouldSkip, isMulti } from "feathers-utils";
 
-import hasRestrictingFields from "../../utils/hasRestrictingFields";
-import hasRestrictingConditions from "../../utils/hasRestrictingConditions";
-import couldHaveRestrictingFields from "../../utils/couldHaveRestrictingFields";
+import {
+  hasRestrictingFields,
+  hasRestrictingConditions,
+  couldHaveRestrictingFields,
+  getAvailableFields,
+} from "../../utils";
 
 import {
   setPersistedConfig,
   getAbility,
   getPersistedConfig,
   throwUnlessCan,
+  HOOKNAME,
 } from "./authorize.hook.utils";
 
-import checkBasicPermission from "../checkBasicPermission.hook";
-import getAvailableFields from "../../utils/getAvailableFields";
+import { checkBasicPermission } from "../checkBasicPermission.hook";
 import { checkCreatePerItem } from "../common";
-import mergeQueryFromAbility from "../../utils/mergeQueryFromAbility";
+import { mergeQueryFromAbility } from "../../utils/mergeQueryFromAbility";
 
 import type { HookContext } from "@feathersjs/feathers";
 
 import type { AuthorizeHookOptions } from "../../types";
 
-const HOOKNAME = "authorize";
-
-export default async <H extends HookContext = HookContext>(
+export const authorizeBefore = async <H extends HookContext = HookContext>(
   context: H,
   options: AuthorizeHookOptions
 ) => {

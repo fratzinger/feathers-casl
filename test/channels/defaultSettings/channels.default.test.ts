@@ -1,9 +1,9 @@
-import assert from "assert";
+import assert from "node:assert";
 import type { Application } from "@feathersjs/feathers";
 import { feathers } from "@feathersjs/feathers";
 import socketio from "@feathersjs/socketio-client";
-import type { Server } from "http";
-import io from "socket.io-client";
+import type { Server } from "node:http";
+import { io } from "socket.io-client";
 
 import mockServer from "../.mockServer";
 import channels1 from "./mockChannels.default";
@@ -39,7 +39,7 @@ describe("channels.default.test.ts", function () {
     { id: 2, email: "3", password: "3" },
   ];
 
-  before(async function () {
+  beforeAll(async function () {
     const mock = mockServer({
       channels: channels1,
       services: services1,
@@ -95,7 +95,7 @@ describe("channels.default.test.ts", function () {
     await Promise.all(promises);
   });
 
-  after(async function () {
+  afterAll(async function () {
     server.close();
   });
 

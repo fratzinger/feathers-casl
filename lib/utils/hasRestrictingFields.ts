@@ -1,5 +1,5 @@
 import { permittedFieldsOf } from "@casl/ability/extra";
-import getMinimalFields from "./getMinimalFields";
+import { getMinimalFields } from "./getMinimalFields";
 
 import type { AnyAbility, Subject } from "@casl/ability";
 import type { PermittedFieldsOptions } from "@casl/ability/extra";
@@ -15,7 +15,7 @@ function areSameArray<T>(arr1: T[], arr2: T[]): boolean {
   return result;
 }
 
-const hasRestrictingFields = (
+export const hasRestrictingFields = (
   ability: AnyAbility,
   action: string,
   subject: Subject,
@@ -66,5 +66,3 @@ const hasRestrictingFields = (
 
   return true;
 };
-
-export default hasRestrictingFields;

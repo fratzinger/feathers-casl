@@ -1,8 +1,8 @@
-import knex from "knex";
+import { knex } from "knex";
 import makeTests from "../makeTests";
 import { KnexService } from "@feathersjs/knex";
 import { filterArray, getItemsIsArray } from "feathers-utils";
-import path from "path";
+import path from "node:path";
 import type { HookContext } from "@feathersjs/feathers";
 import type { Adapter, ServiceCaslOptions } from "../../../../../lib";
 

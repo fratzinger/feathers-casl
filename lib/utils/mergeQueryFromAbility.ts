@@ -2,9 +2,9 @@ import { rulesToQuery } from "@casl/ability/extra";
 import { mergeQuery } from "feathers-utils";
 import _isEmpty from "lodash/isEmpty.js";
 import { getAdapter } from "../hooks/authorize/authorize.hook.utils";
-import convertRuleToQuery from "./convertRuleToQuery";
-import hasRestrictingConditions from "./hasRestrictingConditions";
-import simplifyQuery from "./simplifyQuery";
+import { convertRuleToQuery } from "./convertRuleToQuery";
+import { hasRestrictingConditions } from "./hasRestrictingConditions";
+import { simplifyQuery } from "./simplifyQuery";
 
 import type { AnyAbility } from "@casl/ability";
 import type { Application, Query } from "@feathersjs/feathers";
@@ -24,7 +24,7 @@ const adaptersFor$nor: Adapter[] = [
   "@feathersjs/mongodb",
 ];
 
-export default function mergeQueryFromAbility<T>(
+export const mergeQueryFromAbility = <T>(
   app: Application,
   ability: AnyAbility,
   method: string,
@@ -32,7 +32,7 @@ export default function mergeQueryFromAbility<T>(
   originalQuery: Query,
   service: AdapterBase<T>,
   options: Pick<AuthorizeHookOptions, "adapter">
-): Query {
+): Query => {
   if (hasRestrictingConditions(ability, method, modelName)) {
     const adapter = getAdapter(app, options);
 
@@ -95,4 +95,4 @@ export default function mergeQueryFromAbility<T>(
   } else {
     return originalQuery;
   }
-}
+};

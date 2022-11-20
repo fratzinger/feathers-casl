@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import assert from "assert";
+import assert from "node:assert";
 import { createAliasResolver, defineAbility } from "@casl/ability";
 import { feathers } from "@feathersjs/feathers";
-import authorize from "../../../lib/hooks/authorize/authorize.hook";
+import { authorize } from "../../../lib";
 import { MemoryService } from "@feathersjs/memory";
 import { joinQuery } from "feathers-fletching";
 import { filterArray } from "feathers-utils";
@@ -10,7 +10,7 @@ import { filterArray } from "feathers-utils";
 const resolveAction = createAliasResolver({
   update: "patch",
   read: ["get", "find"],
-  delete: "remove"
+  delete: "remove",
 });
 
 describe("authorize.relations", function () {
@@ -23,8 +23,8 @@ describe("authorize.relations", function () {
         startId: 1,
         // whitelist: ["$not", "$and"],
         filters: {
-          ...filterArray("$and")
-        }
+          ...filterArray("$and"),
+        },
       })
     );
     app.use(
@@ -34,8 +34,8 @@ describe("authorize.relations", function () {
         startId: 1,
         // whitelist: ["$not", "$and"],
         filters: {
-          ...filterArray("$and")
-        }
+          ...filterArray("$and"),
+        },
       })
     );
 
@@ -51,10 +51,10 @@ describe("authorize.relations", function () {
           return {
             ...params,
             user: context.params.user,
-            ability: context.params.ability
+            ability: context.params.ability,
           };
-        }
-      }
+        },
+      },
     });
 
     serviceArtists.hooks({
@@ -65,7 +65,7 @@ describe("authorize.relations", function () {
         create: [],
         update: [],
         patch: [],
-        remove: []
+        remove: [],
       },
       after: {
         all: [authorize()],
@@ -74,8 +74,8 @@ describe("authorize.relations", function () {
         create: [],
         update: [],
         patch: [],
-        remove: []
-      }
+        remove: [],
+      },
     });
 
     serviceAlbums.hooks({
@@ -86,7 +86,7 @@ describe("authorize.relations", function () {
         create: [],
         update: [],
         patch: [],
-        remove: []
+        remove: [],
       },
       after: {
         all: [joinQueriesAlbums, authorize()],
@@ -95,14 +95,14 @@ describe("authorize.relations", function () {
         create: [],
         update: [],
         patch: [],
-        remove: []
-      }
+        remove: [],
+      },
     });
 
     return {
       app,
       serviceAlbums,
-      serviceArtists
+      serviceArtists,
     };
   };
 
@@ -112,49 +112,49 @@ describe("authorize.relations", function () {
       const blink182 = await serviceArtists.create({ name: "Blink182" });
       const sum41 = await serviceArtists.create({ name: "Sum 41" });
       const justinBieber = await serviceArtists.create({
-        name: "Justin Bieber"
+        name: "Justin Bieber",
       });
 
       const enemaOfTheState = await serviceAlbums.create({
         name: "Enema of the State",
         artistId: blink182.id,
-        date: 1999
+        date: 1999,
       });
       const pantsAndJacket = await serviceAlbums.create({
         name: "Take Off Your Pants and Jacket",
         artistId: blink182.id,
-        date: 2001
+        date: 2001,
       });
       const california = await serviceAlbums.create({
         name: "California",
         artistId: blink182.id,
-        date: 2016
+        date: 2016,
       });
 
       const killer = await serviceAlbums.create({
         name: "All Killer No Filler",
         artistId: sum41.id,
-        date: 2001
+        date: 2001,
       });
       const hero = await serviceAlbums.create({
         name: "Underclass Hero",
         artistId: sum41.id,
-        date: 2007
+        date: 2007,
       });
 
       const believe = await serviceAlbums.create({
         name: "Believe",
         artistId: justinBieber.id,
-        date: 2012
+        date: 2012,
       });
       const purpose = await serviceAlbums.create({
         name: "Purpose",
         artistId: justinBieber.id,
-        date: 2020
+        date: 2020,
       });
 
       const albumsOfBlink = await serviceAlbums.find({
-        query: { "artist.name": "Blink182" }
+        query: { "artist.name": "Blink182" },
       });
       assert.deepStrictEqual(
         albumsOfBlink.sort(),
@@ -168,45 +168,45 @@ describe("authorize.relations", function () {
       const blink182 = await serviceArtists.create({ name: "Blink182" });
       const sum41 = await serviceArtists.create({ name: "Sum 41" });
       const justinBieber = await serviceArtists.create({
-        name: "Justin Bieber"
+        name: "Justin Bieber",
       });
 
       const enemaOfTheState = await serviceAlbums.create({
         name: "Enema of the State",
         artistId: blink182.id,
-        date: 1999
+        date: 1999,
       });
       const pantsAndJacket = await serviceAlbums.create({
         name: "Take Off Your Pants and Jacket",
         artistId: blink182.id,
-        date: 2001
+        date: 2001,
       });
       const california = await serviceAlbums.create({
         name: "California",
         artistId: blink182.id,
-        date: 2016
+        date: 2016,
       });
 
       const killer = await serviceAlbums.create({
         name: "All Killer No Filler",
         artistId: sum41.id,
-        date: 2001
+        date: 2001,
       });
       const hero = await serviceAlbums.create({
         name: "Underclass Hero",
         artistId: sum41.id,
-        date: 2007
+        date: 2007,
       });
 
       const believe = await serviceAlbums.create({
         name: "Believe",
         artistId: justinBieber.id,
-        date: 2012
+        date: 2012,
       });
       const purpose = await serviceAlbums.create({
         name: "Purpose",
         artistId: justinBieber.id,
-        date: 2020
+        date: 2020,
       });
 
       const noAlbums = await serviceAlbums.find({
@@ -217,7 +217,7 @@ describe("authorize.relations", function () {
             can("read", "artists", { name: "Justin Bieber" });
           },
           { resolveAction }
-        )
+        ),
       });
 
       assert.strictEqual(noAlbums.length, 0, "found no albums");
@@ -230,7 +230,7 @@ describe("authorize.relations", function () {
             can("read", "artists", { name: "Blink182" });
           },
           { resolveAction }
-        )
+        ),
       });
 
       assert.deepStrictEqual(
@@ -245,45 +245,45 @@ describe("authorize.relations", function () {
       const blink182 = await serviceArtists.create({ name: "Blink182" });
       const sum41 = await serviceArtists.create({ name: "Sum 41" });
       const justinBieber = await serviceArtists.create({
-        name: "Justin Bieber"
+        name: "Justin Bieber",
       });
 
       const enemaOfTheState = await serviceAlbums.create({
         name: "Enema of the State",
         artistId: blink182.id,
-        date: 1999
+        date: 1999,
       });
       const pantsAndJacket = await serviceAlbums.create({
         name: "Take Off Your Pants and Jacket",
         artistId: blink182.id,
-        date: 2001
+        date: 2001,
       });
       const california = await serviceAlbums.create({
         name: "California",
         artistId: blink182.id,
-        date: 2016
+        date: 2016,
       });
 
       const killer = await serviceAlbums.create({
         name: "All Killer No Filler",
         artistId: sum41.id,
-        date: 2001
+        date: 2001,
       });
       const hero = await serviceAlbums.create({
         name: "Underclass Hero",
         artistId: sum41.id,
-        date: 2007
+        date: 2007,
       });
 
       const believe = await serviceAlbums.create({
         name: "Believe",
         artistId: justinBieber.id,
-        date: 2012
+        date: 2012,
       });
       const purpose = await serviceAlbums.create({
         name: "Purpose",
         artistId: justinBieber.id,
-        date: 2020
+        date: 2020,
       });
 
       const noAlbums = await serviceAlbums.find({
@@ -294,7 +294,7 @@ describe("authorize.relations", function () {
             can("read", "artists", { name: "Justin Bieber" });
           },
           { resolveAction }
-        )
+        ),
       });
 
       assert.strictEqual(noAlbums.length, 0, "found no albums");
@@ -307,7 +307,7 @@ describe("authorize.relations", function () {
             can("read", "artists", { name: "Blink182" });
           },
           { resolveAction }
-        )
+        ),
       });
 
       assert.deepStrictEqual(
@@ -315,7 +315,7 @@ describe("authorize.relations", function () {
         [
           { id: enemaOfTheState.id },
           { id: pantsAndJacket.id },
-          { id: california.id }
+          { id: california.id },
         ].sort(),
         "found all albums of blink182"
       );
@@ -326,45 +326,45 @@ describe("authorize.relations", function () {
       const blink182 = await serviceArtists.create({ name: "Blink182" });
       const sum41 = await serviceArtists.create({ name: "Sum 41" });
       const justinBieber = await serviceArtists.create({
-        name: "Justin Bieber"
+        name: "Justin Bieber",
       });
 
       const enemaOfTheState = await serviceAlbums.create({
         name: "Enema of the State",
         artistId: blink182.id,
-        date: 1999
+        date: 1999,
       });
       const pantsAndJacket = await serviceAlbums.create({
         name: "Take Off Your Pants and Jacket",
         artistId: blink182.id,
-        date: 2001
+        date: 2001,
       });
       const california = await serviceAlbums.create({
         name: "California",
         artistId: blink182.id,
-        date: 2016
+        date: 2016,
       });
 
       const killer = await serviceAlbums.create({
         name: "All Killer No Filler",
         artistId: sum41.id,
-        date: 2001
+        date: 2001,
       });
       const hero = await serviceAlbums.create({
         name: "Underclass Hero",
         artistId: sum41.id,
-        date: 2007
+        date: 2007,
       });
 
       const believe = await serviceAlbums.create({
         name: "Believe",
         artistId: justinBieber.id,
-        date: 2012
+        date: 2012,
       });
       const purpose = await serviceAlbums.create({
         name: "Purpose",
         artistId: justinBieber.id,
-        date: 2020
+        date: 2020,
       });
 
       const albumsOfBlink = await serviceAlbums.find({
@@ -375,7 +375,7 @@ describe("authorize.relations", function () {
             can("read", "artists");
           },
           { resolveAction }
-        )
+        ),
       });
 
       assert.deepStrictEqual(
@@ -392,51 +392,51 @@ describe("authorize.relations", function () {
       const blink182 = await serviceArtists.create({ name: "Blink182" });
       const sum41 = await serviceArtists.create({ name: "Sum 41" });
       const justinBieber = await serviceArtists.create({
-        name: "Justin Bieber"
+        name: "Justin Bieber",
       });
 
       const enemaOfTheState = await serviceAlbums.create({
         name: "Enema of the State",
         artistId: blink182.id,
-        date: 1999
+        date: 1999,
       });
       const pantsAndJacket = await serviceAlbums.create({
         name: "Take Off Your Pants and Jacket",
         artistId: blink182.id,
-        date: 2001
+        date: 2001,
       });
       const california = await serviceAlbums.create({
         name: "California",
         artistId: blink182.id,
-        date: 2016
+        date: 2016,
       });
 
       const killer = await serviceAlbums.create({
         name: "All Killer No Filler",
         artistId: sum41.id,
-        date: 2001
+        date: 2001,
       });
       const hero = await serviceAlbums.create({
         name: "Underclass Hero",
         artistId: sum41.id,
-        date: 2007
+        date: 2007,
       });
 
       const believe = await serviceAlbums.create({
         name: "Believe",
         artistId: justinBieber.id,
-        date: 2012
+        date: 2012,
       });
       const purpose = await serviceAlbums.create({
         name: "Purpose",
         artistId: justinBieber.id,
-        date: 2020
+        date: 2020,
       });
 
       const albumsOfBlink = await serviceAlbums.patch(
         null,
         {
-          stars: 5
+          stars: 5,
         },
         {
           query: {},
@@ -447,7 +447,7 @@ describe("authorize.relations", function () {
               can("read", "artists");
             },
             { resolveAction }
-          )
+          ),
         }
       );
 
@@ -456,17 +456,17 @@ describe("authorize.relations", function () {
         [
           { ...enemaOfTheState, stars: 5 },
           { ...pantsAndJacket, stars: 5 },
-          { ...california, stars: 5 }
+          { ...california, stars: 5 },
         ],
         "only updated Albums of Blink182"
       );
 
       const otherAlbums = await serviceAlbums.find({
         query: {
-          "artist.name": { $ne: "Blink182" }
+          "artist.name": { $ne: "Blink182" },
         },
         // @ts-ignore
-        paginate: false
+        paginate: false,
       });
 
       assert.strictEqual(
@@ -488,51 +488,51 @@ describe("authorize.relations", function () {
       const blink182 = await serviceArtists.create({ name: "Blink182" });
       const sum41 = await serviceArtists.create({ name: "Sum 41" });
       const justinBieber = await serviceArtists.create({
-        name: "Justin Bieber"
+        name: "Justin Bieber",
       });
 
       const enemaOfTheState = await serviceAlbums.create({
         name: "Enema of the State",
         artistId: blink182.id,
-        date: 1999
+        date: 1999,
       });
       const pantsAndJacket = await serviceAlbums.create({
         name: "Take Off Your Pants and Jacket",
         artistId: blink182.id,
-        date: 2001
+        date: 2001,
       });
       const california = await serviceAlbums.create({
         name: "California",
         artistId: blink182.id,
-        date: 2016
+        date: 2016,
       });
 
       const killer = await serviceAlbums.create({
         name: "All Killer No Filler",
         artistId: sum41.id,
-        date: 2001
+        date: 2001,
       });
       const hero = await serviceAlbums.create({
         name: "Underclass Hero",
         artistId: sum41.id,
-        date: 2007
+        date: 2007,
       });
 
       const believe = await serviceAlbums.create({
         name: "Believe",
         artistId: justinBieber.id,
-        date: 2012
+        date: 2012,
       });
       const purpose = await serviceAlbums.create({
         name: "Purpose",
         artistId: justinBieber.id,
-        date: 2020
+        date: 2020,
       });
 
       const albumsOfBlink = await serviceAlbums.patch(
         null,
         {
-          stars: 5
+          stars: 5,
         },
         {
           query: {},
@@ -543,7 +543,7 @@ describe("authorize.relations", function () {
               can("read", "artists");
             },
             { resolveAction }
-          )
+          ),
         }
       );
 
@@ -552,17 +552,17 @@ describe("authorize.relations", function () {
         [
           { ...enemaOfTheState, stars: 5 },
           { ...pantsAndJacket, stars: 5 },
-          { ...california, stars: 5 }
+          { ...california, stars: 5 },
         ],
         "only updated Albums of Blink182"
       );
 
       const otherAlbums = await serviceAlbums.find({
         query: {
-          "artist.name": { $ne: "Blink182" }
+          "artist.name": { $ne: "Blink182" },
         },
         // @ts-ignore
-        paginate: false
+        paginate: false,
       });
 
       assert.strictEqual(

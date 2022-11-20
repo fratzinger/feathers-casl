@@ -1,17 +1,17 @@
-import assert from "assert";
+import assert from "node:assert";
 import { feathers } from "@feathersjs/feathers";
 import { createAliasResolver, defineAbility } from "@casl/ability";
+
+import type { Application } from "@feathersjs/feathers";
+
+import { authorize } from "../../../../../lib";
+import type { Adapter, AuthorizeHookOptions } from "../../../../../lib";
 
 const resolveAction = createAliasResolver({
   update: "patch",
   read: ["get", "find"],
   delete: "remove",
 });
-
-import type { Application } from "@feathersjs/feathers";
-
-import authorize from "../../../../../lib/hooks/authorize/authorize.hook";
-import type { Adapter, AuthorizeHookOptions } from "../../../../../lib/types";
 
 export default (
   adapterName: Adapter,

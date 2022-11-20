@@ -1,13 +1,14 @@
-import assert from "assert";
+import assert from "node:assert";
+import type { Application } from "@feathersjs/feathers";
 import { feathers } from "@feathersjs/feathers";
 import { MemoryService } from "@feathersjs/memory";
 import { defineAbility } from "@casl/ability";
 
-import checkCan from "../../lib/utils/checkCan";
+import { checkCan } from "../../lib";
 
 describe("utils - checkCan", function () {
-  let app, service, service2;
-  before(async function () {
+  let app: Application, service, service2;
+  beforeAll(async function () {
     app = feathers();
     app.use("tests", new MemoryService({ multi: true }));
     service = app.service("tests");

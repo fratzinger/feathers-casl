@@ -31,7 +31,7 @@ const invertedProp = (
   }
 };
 
-const convertRuleToQuery = (
+export const convertRuleToQuery = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   rule: SubjectRawRule<any, any, MongoQuery<AnyObject>> | ClaimRawRule<any>,
   options?: GetConditionalQueryOptions
@@ -66,5 +66,3 @@ const convertRuleToQuery = (
     return conditions as Query;
   }
 };
-
-export default convertRuleToQuery;

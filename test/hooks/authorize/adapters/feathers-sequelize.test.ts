@@ -1,11 +1,10 @@
 import { Sequelize, DataTypes, Op } from "sequelize";
 import makeTests from "./makeTests";
 import { SequelizeService } from "feathers-sequelize";
-import { getItemsIsArray } from "feathers-utils";
-import path from "path";
-import type { ServiceCaslOptions } from "../../../../lib/types";
+import { getItemsIsArray, filterArray } from "feathers-utils";
+import path from "node:path";
+import type { ServiceCaslOptions } from "../../../../lib";
 import type { HookContext } from "@feathersjs/feathers";
-import { filterArray } from "feathers-utils";
 
 const sequelize = new Sequelize("sequelize", "", "", {
   dialect: "sqlite",

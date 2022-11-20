@@ -1,21 +1,18 @@
-import assert from "assert";
+import assert from "node:assert";
 import { feathers } from "@feathersjs/feathers";
 import { MemoryService } from "@feathersjs/memory";
-import {
-  AnyMongoAbility,
-  createAliasResolver,
-  defineAbility
-} from "@casl/ability";
+import type { AnyMongoAbility } from "@casl/ability";
+import { createAliasResolver, defineAbility } from "@casl/ability";
 
 const resolveAction = createAliasResolver({
   update: "patch",
   read: ["get", "find"],
-  delete: "remove"
+  delete: "remove",
 });
 
 import type { Application, HookContext } from "@feathersjs/feathers";
 
-import authorize from "../../../lib/hooks/authorize/authorize.hook";
+import { authorize } from "../../../lib";
 
 declare module "@feathersjs/adapter-commons" {
   interface AdapterParams {
@@ -40,8 +37,8 @@ describe("authorize.options.test.ts", function () {
           multi: true,
           paginate: {
             default: 10,
-            max: 50
-          }
+            max: 50,
+          },
         })
       );
       service = app.service("test");
@@ -49,11 +46,11 @@ describe("authorize.options.test.ts", function () {
       //@ts-ignore
       service.hooks({
         before: {
-          all: [authorize({ checkMultiActions: true })]
+          all: [authorize({ checkMultiActions: true })],
         },
         after: {
-          all: [authorize({ checkMultiActions: true })]
-        }
+          all: [authorize({ checkMultiActions: true })],
+        },
       });
     });
 
@@ -71,15 +68,15 @@ describe("authorize.options.test.ts", function () {
                       "create-multi",
                       "read-multi",
                       "update-multi",
-                      "delete-multi"
+                      "delete-multi",
                     ],
                     "Test"
                   );
                 },
                 { resolveAction }
-              )
-            }
-          ]
+              ),
+            },
+          ],
         },
         {
           method: "patch",
@@ -95,15 +92,15 @@ describe("authorize.options.test.ts", function () {
                       "create-multi",
                       "read-multi",
                       "update-multi",
-                      "delete-multi"
+                      "delete-multi",
                     ],
                     "Test"
                   );
                 },
                 { resolveAction }
-              )
-            }
-          ]
+              ),
+            },
+          ],
         },
         {
           method: "remove",
@@ -118,16 +115,16 @@ describe("authorize.options.test.ts", function () {
                       "create-multi",
                       "read-multi",
                       "update-multi",
-                      "delete-multi"
+                      "delete-multi",
                     ],
                     "Test"
                   );
                 },
                 { resolveAction }
-              )
-            }
-          ]
-        }
+              ),
+            },
+          ],
+        },
       ];
       methods.forEach(async ({ method, params }) => {
         const result = await service[method](...params);
@@ -147,9 +144,9 @@ describe("authorize.options.test.ts", function () {
                   can(["create", "read", "update", "delete"], "Test");
                 },
                 { resolveAction }
-              )
-            }
-          ]
+              ),
+            },
+          ],
         },
         {
           method: "patch",
@@ -163,9 +160,9 @@ describe("authorize.options.test.ts", function () {
                   can(["create", "read", "update", "delete"], "Test");
                 },
                 { resolveAction }
-              )
-            }
-          ]
+              ),
+            },
+          ],
         },
         {
           method: "remove",
@@ -178,10 +175,10 @@ describe("authorize.options.test.ts", function () {
                   can(["create", "read", "update", "delete"], "Test");
                 },
                 { resolveAction }
-              )
-            }
-          ]
-        }
+              ),
+            },
+          ],
+        },
       ];
       methods.forEach(async ({ method, params }) => {
         const promise = service[method](...params);
@@ -203,8 +200,8 @@ describe("authorize.options.test.ts", function () {
           multi: true,
           paginate: {
             default: 10,
-            max: 50
-          }
+            max: 50,
+          },
         })
       );
       service = app.service("test");
@@ -222,10 +219,10 @@ describe("authorize.options.test.ts", function () {
                 { resolveAction }
               ),
               modelName: "Test",
-              checkAbilityForInternal: true
-            })
-          ]
-        }
+              checkAbilityForInternal: true,
+            }),
+          ],
+        },
       });
 
       const result = await service.create({ id: 0, test: true });
@@ -247,8 +244,8 @@ describe("authorize.options.test.ts", function () {
           multi: true,
           paginate: {
             default: 10,
-            max: 50
-          }
+            max: 50,
+          },
         })
       );
       service = app.service("test");
@@ -266,10 +263,10 @@ describe("authorize.options.test.ts", function () {
                 { resolveAction }
               ),
               modelName: (context) => context.service.modelName,
-              checkAbilityForInternal: true
-            })
-          ]
-        }
+              checkAbilityForInternal: true,
+            }),
+          ],
+        },
       });
 
       const result = await service.create({ id: 0, test: true });
@@ -293,16 +290,16 @@ describe("authorize.options.test.ts", function () {
           multi: true,
           paginate: {
             default: 10,
-            max: 50
-          }
+            max: 50,
+          },
         })
       );
       service = app.service("test");
       //@ts-ignore
       service.hooks({
         before: {
-          all: [authorize()]
-        }
+          all: [authorize()],
+        },
       });
 
       const item = await service.create({ test: true });
@@ -317,8 +314,8 @@ describe("authorize.options.test.ts", function () {
           multi: true,
           paginate: {
             default: 10,
-            max: 50
-          }
+            max: 50,
+          },
         })
       );
       service = app.service("test");
@@ -329,10 +326,10 @@ describe("authorize.options.test.ts", function () {
             authorize({
               // eslint-disable-next-line @typescript-eslint/no-empty-function
               ability: defineAbility(() => {}, { resolveAction }),
-              checkAbilityForInternal: true
-            })
-          ]
-        }
+              checkAbilityForInternal: true,
+            }),
+          ],
+        },
       });
 
       await assert.rejects(
@@ -350,8 +347,8 @@ describe("authorize.options.test.ts", function () {
           multi: true,
           paginate: {
             default: 10,
-            max: 50
-          }
+            max: 50,
+          },
         })
       );
       service = app.service("test");
@@ -361,10 +358,10 @@ describe("authorize.options.test.ts", function () {
           all: [
             authorize({
               // eslint-disable-next-line @typescript-eslint/no-empty-function
-              ability: defineAbility(() => {}, { resolveAction })
-            })
-          ]
-        }
+              ability: defineAbility(() => {}, { resolveAction }),
+            }),
+          ],
+        },
       });
 
       const params = {
@@ -373,7 +370,7 @@ describe("authorize.options.test.ts", function () {
             can("manage", "all");
           },
           { resolveAction }
-        )
+        ),
       };
 
       const result = await service.create({ test: true }, params);
@@ -388,8 +385,8 @@ describe("authorize.options.test.ts", function () {
           multi: true,
           paginate: {
             default: 10,
-            max: 50
-          }
+            max: 50,
+          },
         })
       );
       service = app.service("test");
@@ -406,10 +403,10 @@ describe("authorize.options.test.ts", function () {
                   },
                   { resolveAction }
                 )
-              )
-            })
-          ]
-        }
+              ),
+            }),
+          ],
+        },
       });
 
       const result = await service.create({ test: true });
@@ -424,8 +421,8 @@ describe("authorize.options.test.ts", function () {
           multi: true,
           paginate: {
             default: 10,
-            max: 50
-          }
+            max: 50,
+          },
         })
       );
       service = app.service("test");
@@ -440,10 +437,10 @@ describe("authorize.options.test.ts", function () {
                     can("manage", "all");
                   },
                   { resolveAction }
-                )
-            })
-          ]
-        }
+                ),
+            }),
+          ],
+        },
       });
 
       const result = await service.create({ test: true });
@@ -458,8 +455,8 @@ describe("authorize.options.test.ts", function () {
           multi: true,
           paginate: {
             default: 10,
-            max: 50
-          }
+            max: 50,
+          },
         })
       );
       service = app.service("test");
@@ -477,10 +474,10 @@ describe("authorize.options.test.ts", function () {
                     { resolveAction }
                   )
                 );
-              }
-            })
-          ]
-        }
+              },
+            }),
+          ],
+        },
       });
 
       const result = await service.create({ test: true });
@@ -495,8 +492,8 @@ describe("authorize.options.test.ts", function () {
           multi: true,
           paginate: {
             default: 10,
-            max: 50
-          }
+            max: 50,
+          },
         })
       );
       //@ts-ignore
@@ -504,8 +501,8 @@ describe("authorize.options.test.ts", function () {
       //@ts-ignore
       service.hooks({
         before: {
-          all: [authorize()]
-        }
+          all: [authorize()],
+        },
       });
 
       await assert.doesNotReject(service.create({ test: true }));
@@ -516,8 +513,8 @@ describe("authorize.options.test.ts", function () {
           {
             casl: {
               // eslint-disable-next-line @typescript-eslint/no-empty-function
-              ability: defineAbility(() => {})
-            }
+              ability: defineAbility(() => {}),
+            },
           }
         ),
         (err: Error) => err.name === "Forbidden",
@@ -533,8 +530,8 @@ describe("authorize.options.test.ts", function () {
           multi: true,
           paginate: {
             default: 10,
-            max: 50
-          }
+            max: 50,
+          },
         })
       );
       //@ts-ignore
@@ -542,8 +539,8 @@ describe("authorize.options.test.ts", function () {
       //@ts-ignore
       service.hooks({
         before: {
-          all: [authorize()]
-        }
+          all: [authorize()],
+        },
       });
 
       await assert.doesNotReject(service.create({ test: true }));
@@ -554,8 +551,8 @@ describe("authorize.options.test.ts", function () {
           {
             casl: {
               // eslint-disable-next-line @typescript-eslint/no-empty-function
-              ability: () => defineAbility(() => {})
-            }
+              ability: () => defineAbility(() => {}),
+            },
           }
         ),
         (err: Error) => err.name === "Forbidden",
@@ -567,7 +564,7 @@ describe("authorize.options.test.ts", function () {
       const makeContext = (method, type) => {
         return {
           service: {
-            modelName: "Test"
+            modelName: "Test",
           },
           path: "tests",
           method,
@@ -575,11 +572,11 @@ describe("authorize.options.test.ts", function () {
           data: {
             id: 1,
             userId: 1,
-            test: true
+            test: true,
           },
           params: {
-            query: {}
-          }
+            query: {},
+          },
         };
       };
 
@@ -595,7 +592,7 @@ describe("authorize.options.test.ts", function () {
               availableFields: ["id", "userId", "test"],
               // eslint-disable-next-line @typescript-eslint/no-empty-function
               ability: () => defineAbility(() => {}, { resolveAction }),
-              checkAbilityForInternal: true
+              checkAbilityForInternal: true,
               //@ts-ignore
             })(context),
             (err: Error) => err.name === "Forbidden",
@@ -614,7 +611,7 @@ describe("authorize.options.test.ts", function () {
       ): HookContext => {
         return {
           service: {
-            modelName: "Test"
+            modelName: "Test",
           },
           path: "tests",
           method,
@@ -622,12 +619,12 @@ describe("authorize.options.test.ts", function () {
           data: {
             id: 1,
             userId: 1,
-            test: true
+            test: true,
           },
           params: {
             provider: "rest",
-            query: {}
-          }
+            query: {},
+          },
         } as unknown as HookContext;
       };
 
@@ -666,8 +663,8 @@ describe("authorize.options.test.ts", function () {
           multi: true,
           paginate: {
             default: 10,
-            max: 50
-          }
+            max: 50,
+          },
         })
       );
       service = app.service("test");
@@ -677,10 +674,10 @@ describe("authorize.options.test.ts", function () {
           all: [
             authorize({
               // eslint-disable-next-line @typescript-eslint/no-empty-function
-              ability: defineAbility(() => {})
-            })
-          ]
-        }
+              ability: defineAbility(() => {}),
+            }),
+          ],
+        },
       });
 
       await assert.doesNotReject(
@@ -697,8 +694,8 @@ describe("authorize.options.test.ts", function () {
           multi: true,
           paginate: {
             default: 10,
-            max: 50
-          }
+            max: 50,
+          },
         })
       );
       service = app.service("test");
@@ -708,10 +705,10 @@ describe("authorize.options.test.ts", function () {
           all: [
             authorize({
               // eslint-disable-next-line @typescript-eslint/no-empty-function
-              ability: defineAbility(() => {})
-            })
-          ]
-        }
+              ability: defineAbility(() => {}),
+            }),
+          ],
+        },
       });
 
       await assert.rejects(
@@ -729,8 +726,8 @@ describe("authorize.options.test.ts", function () {
           multi: true,
           paginate: {
             default: 10,
-            max: 50
-          }
+            max: 50,
+          },
         })
       );
       service = app.service("test");
@@ -741,10 +738,10 @@ describe("authorize.options.test.ts", function () {
             authorize({
               // eslint-disable-next-line @typescript-eslint/no-empty-function
               ability: defineAbility(() => {}),
-              checkAbilityForInternal: true
-            })
-          ]
-        }
+              checkAbilityForInternal: true,
+            }),
+          ],
+        },
       });
 
       await assert.rejects(
