@@ -1,7 +1,7 @@
 import assert from "assert";
 import { feathers, Application } from "@feathersjs/feathers";
 import socketio from "@feathersjs/socketio-client";
-import { Server } from "http";
+import type { Server } from "http";
 import io from "socket.io-client";
 
 import mockServer from "../.mockServer";

@@ -1,7 +1,8 @@
 import assert from "assert";
-import { feathers, Paginated } from "@feathersjs/feathers";
+import type { Paginated } from "@feathersjs/feathers";
+import { feathers } from "@feathersjs/feathers";
 import { createAliasResolver, defineAbility } from "@casl/ability";
-import _sortBy from "lodash/sortBy";
+import _sortBy from "lodash/sortBy.js";
 
 const resolveAction = createAliasResolver({
   update: "patch",
@@ -9,14 +10,14 @@ const resolveAction = createAliasResolver({
   delete: "remove",
 });
 
-import { Application } from "@feathersjs/feathers";
+import type { Application } from "@feathersjs/feathers";
 
 import authorize from "../../../../../lib/hooks/authorize/authorize.hook";
-import { Adapter, AuthorizeHookOptions } from "../../../../../lib/types";
+import type { Adapter, AuthorizeHookOptions } from "../../../../../lib/types";
 
 export default (
   adapterName: Adapter,
-  makeService: () => unknown,
+  makeService: () => any,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
   afterHooks?: unknown[]
@@ -29,30 +30,36 @@ export default (
   const itSkip = (
     adapterToTest: Adapter | Adapter[]
   ): Mocha.TestFunction | Mocha.PendingTestFunction => {
-    const condition = (typeof adapterToTest === "string")
-      ? adapterName === adapterToTest
-      : adapterToTest.includes(adapterName);
-    return (condition)
-      ? it.skip
-      : it;
+    const condition =
+      typeof adapterToTest === "string"
+        ? adapterName === adapterToTest
+        : adapterToTest.includes(adapterName);
+    return condition ? it.skip : it;
   };
-      
-  describe(`${adapterName}: beforeAndAfter - find`, function () {
 
+  describe(`${adapterName}: beforeAndAfter - find`, function () {
     beforeEach(async function () {
       app = feathers();
-      app.use(
-        "tests",
-        makeService()
-      );
+      app.use("tests", makeService());
       service = app.service("tests");
-    
+
       // eslint-disable-next-line prefer-destructuring
       id = service.options.id;
-    
-      const options = Object.assign({
-        availableFields: [id, "userId", "hi", "test", "published", "supersecret", "hidden"] 
-      }, authorizeHookOptions);
+
+      const options = Object.assign(
+        {
+          availableFields: [
+            id,
+            "userId",
+            "hi",
+            "test",
+            "published",
+            "supersecret",
+            "hidden",
+          ],
+        },
+        authorizeHookOptions
+      );
       const allAfterHooks = [];
       if (afterHooks) {
         allAfterHooks.push(...afterHooks);
@@ -61,37 +68,48 @@ export default (
 
       service.hooks({
         before: {
-          all: [ authorize(options) ],
+          all: [authorize(options)],
         },
         after: {
-          all: allAfterHooks
+          all: allAfterHooks,
         },
       });
-    
+
       await clean(app, service);
     });
 
-    describe("without query", function() {
+    describe("without query", function () {
       it("returns full items", async function () {
         const readMethods = ["read", "find"];
-        
+
         for (const read of readMethods) {
           await clean(app, service);
-        
+
           await service.create({ test: true, userId: 1 });
           await service.create({ test: true, userId: 2 });
           await service.create({ test: true, userId: 3 });
           const items = (await service.find({ paginate: false })) as unknown[];
-          assert.strictEqual(items.length, 3, `has three items for read: '${read}'`);
-          
+          assert.strictEqual(
+            items.length,
+            3,
+            `has three items for read: '${read}'`
+          );
+
           const returnedItems = await service.find({
-            ability: defineAbility((can) => {
-              can(read, "tests");
-            }, { resolveAction }),
+            ability: defineAbility(
+              (can) => {
+                can(read, "tests");
+              },
+              { resolveAction }
+            ),
             paginate: false,
           });
-          
-          assert.deepStrictEqual(returnedItems, items, `items are the same for read: '${read}'`);
+
+          assert.deepStrictEqual(
+            returnedItems,
+            items,
+            `items are the same for read: '${read}'`
+          );
         }
       });
 
@@ -101,14 +119,17 @@ export default (
         await service.create({ test: true, userId: 3 });
         const items = await service.find({ paginate: false });
         assert.strictEqual(items.length, 3, "has three items");
-        
-        const returnedItems = await service.find({
-          ability: defineAbility((can) => {
-            can("read", "tests", { userId: 1 });
-          }, { resolveAction }),
-          paginate: false
-        }) as Paginated<unknown>;
-        
+
+        const returnedItems = (await service.find({
+          ability: defineAbility(
+            (can) => {
+              can("read", "tests", { userId: 1 });
+            },
+            { resolveAction }
+          ),
+          paginate: false,
+        })) as Paginated<unknown>;
+
         assert.deepStrictEqual(
           returnedItems,
           [{ [id]: item1[id], test: true, userId: 1 }],
@@ -122,21 +143,24 @@ export default (
         await service.create({ test: true, userId: 3 });
         const items = (await service.find({ paginate: false })) as unknown[];
         assert.strictEqual(items.length, 3, "has three items");
-        
+
         const returnedItems = await service.find({
-          ability: defineAbility((can) => {
-            can("read", "tests", { userId: 1 }),
-            can("read", "tests", [id], { userId: 2 });
-          }, { resolveAction }),
+          ability: defineAbility(
+            (can) => {
+              can("read", "tests", { userId: 1 }),
+                can("read", "tests", [id], { userId: 2 });
+            },
+            { resolveAction }
+          ),
           paginate: false,
         });
-        
+
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
-          _sortBy([
-            { [id]: item1[id], test: true, userId: 1 }, 
-            { [id]: item2[id] }
-          ], id),
+          _sortBy(
+            [{ [id]: item1[id], test: true, userId: 1 }, { [id]: item2[id] }],
+            id
+          ),
           "just returned one item"
         );
       });
@@ -147,21 +171,27 @@ export default (
         await await service.create({ test: true, userId: 3 });
         const items = (await service.find({ paginate: false })) as unknown[];
         assert.strictEqual(items.length, 3, "has three items");
-        
-        const returnedItems = await service.find({
-          ability: defineAbility((can, cannot) => {
-            can("read", "tests");
-            cannot("read", "tests", { userId: 3 });
-          }, { resolveAction }),
-          paginate: false
-        }) as Paginated<unknown>;
-        
+
+        const returnedItems = (await service.find({
+          ability: defineAbility(
+            (can, cannot) => {
+              can("read", "tests");
+              cannot("read", "tests", { userId: 3 });
+            },
+            { resolveAction }
+          ),
+          paginate: false,
+        })) as Paginated<unknown>;
+
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
-          _sortBy([
-            { [id]: item1[id], test: true, userId: 1 },
-            { [id]: item2[id], test: true, userId: 2 },
-          ], id),
+          _sortBy(
+            [
+              { [id]: item1[id], test: true, userId: 1 },
+              { [id]: item2[id], test: true, userId: 2 },
+            ],
+            id
+          ),
           "just returned two items without userId: 3"
         );
       });
@@ -172,13 +202,13 @@ export default (
         await service.create({ test: true, userId: 3 });
         const items = (await service.find({ paginate: false })) as unknown[];
         assert.strictEqual(items.length, 3, "has three items");
-        
+
         const returnedItems = service.find({
           // eslint-disable-next-line @typescript-eslint/no-empty-function
           ability: defineAbility(() => {}, { resolveAction }),
           paginate: false,
         });
-        
+
         await assert.rejects(
           returnedItems,
           (err: Error) => err.name === "Forbidden",
@@ -192,14 +222,17 @@ export default (
         await service.create({ test: true, userId: 3 });
         const items = (await service.find({ paginate: false })) as unknown[];
         assert.strictEqual(items.length, 3, "has three items");
-        
+
         const returnedItems = service.find({
-          ability: defineAbility((can, cannot) => {
-            cannot("read", "tests");
-          }, { resolveAction }),
+          ability: defineAbility(
+            (can, cannot) => {
+              cannot("read", "tests");
+            },
+            { resolveAction }
+          ),
           paginate: false,
         });
-        
+
         await assert.rejects(
           returnedItems,
           (err: Error) => err.name === "Forbidden",
@@ -213,15 +246,18 @@ export default (
         await service.create({ test: true, userId: 3 });
         const items = await service.find({ paginate: false });
         assert.strictEqual(items.length, 3, "has three items");
-        
-        const returnedItems = await service.find({
-          ability: defineAbility((can) => {
-            can("read", "tests", { userId: 1 });
-            can("manage", "all");
-          }, { resolveAction }),
-          paginate: false
-        }) as Paginated<unknown>;
-        
+
+        const returnedItems = (await service.find({
+          ability: defineAbility(
+            (can) => {
+              can("read", "tests", { userId: 1 });
+              can("manage", "all");
+            },
+            { resolveAction }
+          ),
+          paginate: false,
+        })) as Paginated<unknown>;
+
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
           _sortBy(items, id),
@@ -235,56 +271,67 @@ export default (
         await service.create({ test: true, userId: 3 });
         const items = await service.find({ paginate: false });
         assert.strictEqual(items.length, 3, "has three items");
-        
-        const returnedItems = await service.find({
-          ability: defineAbility((can) => {
-            can("manage", "all");
-            can("read", "tests", { userId: 1 });
-          }, { resolveAction }),
-          paginate: false
-        }) as Paginated<unknown>;
-        
+
+        const returnedItems = (await service.find({
+          ability: defineAbility(
+            (can) => {
+              can("manage", "all");
+              can("read", "tests", { userId: 1 });
+            },
+            { resolveAction }
+          ),
+          paginate: false,
+        })) as Paginated<unknown>;
+
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
           _sortBy(items, id),
           "returns all items"
         );
       });
-  
-      it("'manage:all' and 'cannot' combined", async function() {
+
+      it("'manage:all' and 'cannot' combined", async function () {
         await service.create({ test: true, userId: 1 });
         const item2 = await service.create({ test: true, userId: 2 });
         const item3 = await service.create({ test: true, userId: 3 });
         const items = await service.find({ paginate: false });
         assert.strictEqual(items.length, 3, "has three items");
-        
-        const returnedItems = await service.find({
-          ability: defineAbility((can, cannot) => {
-            can("manage", "all");
-            cannot("read", "tests", { userId: 1 });
-            cannot("read", "tests", ["test", "userId"], { userId: 2 });
-          }, { resolveAction }),
-          paginate: false
-        }) as Paginated<unknown>;
-        
+
+        const returnedItems = (await service.find({
+          ability: defineAbility(
+            (can, cannot) => {
+              can("manage", "all");
+              cannot("read", "tests", { userId: 1 });
+              cannot("read", "tests", ["test", "userId"], { userId: 2 });
+            },
+            { resolveAction }
+          ),
+          paginate: false,
+        })) as Paginated<unknown>;
+
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
-          _sortBy([
-            { [id]: item2[id] }, 
-            item3
-          ], id),
+          _sortBy([{ [id]: item2[id] }, item3], id),
           "returns subset of items"
         );
       });
-  
-      it("combines rules by $or", async function() {
-        const item1 = await service.create({ test: true, userId: 1, published: false });
-        const item2 = await service.create({ test: true, userId: 2, published: true });
+
+      it("combines rules by $or", async function () {
+        const item1 = await service.create({
+          test: true,
+          userId: 1,
+          published: false,
+        });
+        const item2 = await service.create({
+          test: true,
+          userId: 2,
+          published: true,
+        });
         await service.create({ test: true, userId: 3, published: false });
-  
+
         const items = (await service.find({ paginate: false })) as unknown[];
         assert(items.length === 3, "has two items");
-  
+
         const returnedItems = await service.find({
           ability: defineAbility(
             (can) => {
@@ -295,7 +342,7 @@ export default (
           ),
           paginate: false,
         });
-  
+
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
           _sortBy([item1, item2], id),
@@ -304,7 +351,7 @@ export default (
       });
     });
 
-    describe("with additional query", function() {
+    describe("with additional query", function () {
       it("returns only allowed items", async function () {
         await service.create({ test: false, userId: 1 });
         await service.create({ test: true, userId: 2 });
@@ -313,17 +360,20 @@ export default (
         await service.create({ test: false, userId: 2 });
         const items = (await service.find({ paginate: false })) as unknown[];
         assert.strictEqual(items.length, 5, "has five items");
-        
+
         const returnedItems = await service.find({
-          ability: defineAbility((can) => {
-            can("read", "tests", { userId: 3 });
-          }, { resolveAction }),
+          ability: defineAbility(
+            (can) => {
+              can("read", "tests", { userId: 3 });
+            },
+            { resolveAction }
+          ),
           query: {
-            test: false
+            test: false,
           },
-          paginate: false
+          paginate: false,
         });
-        
+
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
           _sortBy([item4], id),
@@ -337,24 +387,24 @@ export default (
         await service.create({ test: true, userId: 3 });
         const items = (await service.find({ paginate: false })) as unknown[];
         assert.strictEqual(items.length, 3, "has three items");
-        
+
         const returnedItems = await service.find({
-          ability: defineAbility((can) => {
-            can("read", "tests", { userId: 1 }),
-            can("read", "tests", [id], { userId: 2 });
-          }, { resolveAction }),
+          ability: defineAbility(
+            (can) => {
+              can("read", "tests", { userId: 1 }),
+                can("read", "tests", [id], { userId: 2 });
+            },
+            { resolveAction }
+          ),
           query: {
-            $select: [id, "test"]
+            $select: [id, "test"],
           },
           paginate: false,
         });
-        
+
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
-          _sortBy([
-            { [id]: item1[id], test: true }, 
-            { [id]: item2[id] }
-          ], id),
+          _sortBy([{ [id]: item1[id], test: true }, { [id]: item2[id] }], id),
           "just returned one item"
         );
       });
@@ -366,72 +416,73 @@ export default (
         await service.create({ test: true, userId: 4 });
         const items = (await service.find({ paginate: false })) as unknown[];
         assert.strictEqual(items.length, 4, "has four items");
-          
-        const returnedItems = await service.find({
-          ability: defineAbility((can, cannot) => {
-            can("read", "tests", { userId: 1 });
-            can("read", "tests", { userId: 2 });
-            cannot("read", "tests", { userId: 4 });
-          }, { resolveAction }),
+
+        const returnedItems = (await service.find({
+          ability: defineAbility(
+            (can, cannot) => {
+              can("read", "tests", { userId: 1 });
+              can("read", "tests", { userId: 2 });
+              cannot("read", "tests", { userId: 4 });
+            },
+            { resolveAction }
+          ),
           query: {
             $or: [
               {
-                userId: 1
+                userId: 1,
               },
               {
-                userId: 3
+                userId: 3,
               },
               {
-                userId: 4
-              }
-            ]
+                userId: 4,
+              },
+            ],
           },
-          paginate: false
-        }) as Paginated<unknown>;
-          
+          paginate: false,
+        })) as Paginated<unknown>;
+
         assert.deepStrictEqual(
           returnedItems,
-          [
-            { [id]: item1[id], test: true, userId: 1 },
-          ],
+          [{ [id]: item1[id], test: true, userId: 1 }],
           "just returned one item"
         );
       });
 
-      it("returns only allowed items with '$and' query", async function() {
+      it("returns only allowed items with '$and' query", async function () {
         const item1 = await service.create({ test: true, userId: 1 });
         const item2 = await service.create({ test: true, userId: 2 });
         await service.create({ test: false, userId: 1 });
         await service.create({ test: true, userId: 4 });
         const items = (await service.find({ paginate: false })) as unknown[];
         assert.strictEqual(items.length, 4, "has four items");
-          
-        const returnedItems = await service.find({
-          ability: defineAbility((can, cannot) => {
-            can("read", "tests", { userId: 1 });
-            can("read", "tests", { userId: 2 });
-            cannot("read", "tests", { userId: 4 });
-          }, { resolveAction }),
+
+        const returnedItems = (await service.find({
+          ability: defineAbility(
+            (can, cannot) => {
+              can("read", "tests", { userId: 1 });
+              can("read", "tests", { userId: 2 });
+              cannot("read", "tests", { userId: 4 });
+            },
+            { resolveAction }
+          ),
           query: {
             $and: [
               {
-                test: true
-              }
-            ]
+                test: true,
+              },
+            ],
           },
-          paginate: false
-        }) as Paginated<unknown>;
-          
+          paginate: false,
+        })) as Paginated<unknown>;
+
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
-          _sortBy([
-            item1,
-            item2
-          ], id),
+          _sortBy([item1, item2], id),
           "just returned two items"
         );
       });
-        
+
       it("returns only allowed items with '$in' query", async function () {
         const item1 = await service.create({ test: true, userId: 1 });
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -440,54 +491,112 @@ export default (
         const item3 = await service.create({ test: true, userId: 3 });
         const items = (await service.find({ paginate: false })) as unknown[];
         assert.strictEqual(items.length, 3, "has three items");
-        
-        const returnedItems = await service.find({
-          ability: defineAbility((can) => {
-            can("read", "tests", { userId: 1 });
-          }, { resolveAction }),
+
+        const returnedItems = (await service.find({
+          ability: defineAbility(
+            (can) => {
+              can("read", "tests", { userId: 1 });
+            },
+            { resolveAction }
+          ),
           query: {
             userId: {
-              $in: [1, 2]
-            }
+              $in: [1, 2],
+            },
           },
-          paginate: false
-        }) as Paginated<unknown>;
-        
+          paginate: false,
+        })) as Paginated<unknown>;
+
         assert.deepStrictEqual(
           returnedItems,
-          [
-            { [id]: item1[id], test: true, userId: 1 },
-          ],
+          [{ [id]: item1[id], test: true, userId: 1 }],
           "just returned one item"
         );
       });
-        
+
       it("returns only allowed items with '$nin' query", async function () {
         const item1 = await service.create({ test: true, userId: 1 });
         await service.create({ test: true, userId: 2 });
         await service.create({ test: true, userId: 3 });
         const items = (await service.find({ paginate: false })) as unknown[];
         assert.strictEqual(items.length, 3, "has three items");
-        
-        const returnedItems = await service.find({
-          ability: defineAbility((can) => {
-            can("read", "tests", { userId: 1 });
-          }, { resolveAction }),
+
+        const returnedItems = (await service.find({
+          ability: defineAbility(
+            (can) => {
+              can("read", "tests", { userId: 1 });
+            },
+            { resolveAction }
+          ),
           query: {
             userId: {
-              $nin: [3]
-            }
+              $nin: [3],
+            },
           },
-          paginate: false
-        }) as Paginated<unknown>;
-        
+          paginate: false,
+        })) as Paginated<unknown>;
+
         assert.deepStrictEqual(
           returnedItems,
-          [
-            { [id]: item1[id], test: true, userId: 1 },
-          ],
+          [{ [id]: item1[id], test: true, userId: 1 }],
           "just returned one item"
         );
+      });
+
+      it("works with nested $and/$or", async function () {
+        // no
+        await service.create({
+          test: true,
+          published: false,
+          hidden: true,
+          userId: 1,
+        });
+        await service.create({
+          test: true,
+          published: false,
+          hidden: false,
+          userId: 2,
+        });
+        await service.create({
+          test: true,
+          published: true,
+          hidden: true,
+          userId: 3,
+        });
+
+        // yes
+        await service.create({
+          test: true,
+          published: false,
+          hidden: false,
+          userId: 1,
+        });
+        await service.create({
+          test: true,
+          published: true,
+          hidden: false,
+          userId: 2,
+        });
+
+        const returnedItems = (await service.find({
+          ability: defineAbility(
+            (can) => {
+              can("read", "tests", { userId: 1 });
+              can("read", "tests", { userId: { $ne: 1 }, published: true });
+            },
+            { resolveAction }
+          ),
+          query: {
+            $or: [{ userId: 1 }, { userId: { $ne: 1 }, published: true }],
+            userId: { $in: [1, 2, 3] },
+            hidden: false,
+          },
+          paginate: false,
+        })) as any[];
+
+        const hallo = "";
+
+        assert.deepEqual(returnedItems.length, 2);
       });
     });
   });

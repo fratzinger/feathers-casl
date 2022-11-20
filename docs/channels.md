@@ -1,8 +1,3 @@
----
-title: Channels
-sidebarDepth: 2
----
-
 # Channels
 
 One of the biggest advantages of `feathers-casl` is the built in support for channels. If you're not familiar with channels, please read the official [feathers.js docs](https://docs.feathersjs.com/api/channels.html). This chapter is only relevant for you, if you're using realtime connections (most likely [socket.io](https://docs.feathersjs.com/api/client/socketio.html)). You can't use channels, if you've 'only' a REST app by using express.js or koa.

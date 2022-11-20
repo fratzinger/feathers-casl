@@ -1,6 +1,6 @@
 import { rulesToQuery } from "@casl/ability/extra";
 import { mergeQuery } from "feathers-utils";
-import _isEmpty from "lodash/isEmpty";
+import _isEmpty from "lodash/isEmpty.js";
 import { getAdapter } from "../hooks/authorize/authorize.hook.utils";
 import convertRuleToQuery from "./convertRuleToQuery";
 import hasRestrictingConditions from "./hasRestrictingConditions";
@@ -8,22 +8,20 @@ import simplifyQuery from "./simplifyQuery";
 
 import type { AnyAbility } from "@casl/ability";
 import type { Application, Query } from "@feathersjs/feathers";
-import type { AdapterService } from "@feathersjs/adapter-commons";
-import type { AuthorizeHookOptions } from "../types";
+import type { AdapterBase } from "@feathersjs/adapter-commons";
+import type { Adapter, AuthorizeHookOptions } from "../types";
 
-const adaptersFor$not = [
-  "feathers-nedb"
-];
+const adaptersFor$not: Adapter[] = ["feathers-nedb"];
 
-const adaptersFor$notAsArray = [
+const adaptersFor$notAsArray: Adapter[] = [
   "feathers-sequelize",
-  "feathers-objection"
+  "feathers-objection",
 ];
-  
-const adaptersFor$nor = [
-  "feathers-memory",
+
+const adaptersFor$nor: Adapter[] = [
+  "@feathersjs/memory",
   "feathers-mongoose",
-  "feathers-mongodb"
+  "@feathersjs/mongodb",
 ];
 
 export default function mergeQueryFromAbility<T>(
@@ -32,48 +30,49 @@ export default function mergeQueryFromAbility<T>(
   method: string,
   modelName: string,
   originalQuery: Query,
-  service: AdapterService<T>,
+  service: AdapterBase<T>,
   options: Pick<AuthorizeHookOptions, "adapter">
 ): Query {
   if (hasRestrictingConditions(ability, method, modelName)) {
     const adapter = getAdapter(app, options);
-  
+
     let query: Query;
     if (adaptersFor$not.includes(adapter)) {
       // nedb
       query = rulesToQuery(ability, method, modelName, (rule) => {
         const { conditions } = rule;
-        return (rule.inverted) ? { $not: conditions } : conditions;
+        return rule.inverted ? { $not: conditions } : conditions;
       });
       query = simplifyQuery(query);
     } else if (adaptersFor$notAsArray.includes(adapter)) {
       // objection, sequelize
       query = rulesToQuery(ability, method, modelName, (rule) => {
         const { conditions } = rule;
-        return (rule.inverted) ? { $not: [conditions] } : conditions;
+        return rule.inverted ? { $not: [conditions] } : conditions;
       });
       query = simplifyQuery(query);
     } else if (adaptersFor$nor.includes(adapter)) {
       // memory, mongoose, mongodb
       query = rulesToQuery(ability, method, modelName, (rule) => {
         const { conditions } = rule;
-        return (rule.inverted) ? { $nor: [conditions] } : conditions;
+        return rule.inverted ? { $nor: [conditions] } : conditions;
       });
       query = simplifyQuery(query);
     } else {
       query = rulesToQuery(ability, method, modelName, (rule) => {
         const { conditions } = rule;
-        return (rule.inverted) ? convertRuleToQuery(rule) : conditions;
+        return rule.inverted ? convertRuleToQuery(rule) : conditions;
       });
       query = simplifyQuery(query);
       if (query.$and) {
         const { $and } = query;
         delete query.$and;
-        $and.forEach(q => {
+        $and.forEach((q) => {
           query = mergeQuery(query, q, {
             defaultHandle: "intersect",
-            operators: service.options?.whitelist,
-            useLogicalConjunction: true
+            operators: service.options?.operators,
+            filters: service.options?.filters,
+            useLogicalConjunction: true,
           });
         });
       }
@@ -82,19 +81,16 @@ export default function mergeQueryFromAbility<T>(
     if (_isEmpty(query)) {
       return originalQuery;
     }
-  
+
     if (!originalQuery) {
       return query;
     } else {
-      const operators = service.options?.whitelist;
-      return mergeQuery(
-        originalQuery, 
-        query, { 
-          defaultHandle: "intersect",
-          operators,
-          useLogicalConjunction: true
-        }
-      );
+      return mergeQuery(originalQuery, query, {
+        defaultHandle: "intersect",
+        operators: service.options?.operators,
+        filters: service.options?.filters,
+        useLogicalConjunction: true,
+      });
     }
   } else {
     return originalQuery;

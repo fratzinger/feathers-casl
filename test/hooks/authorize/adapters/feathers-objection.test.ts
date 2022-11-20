@@ -1,21 +1,28 @@
 import { Model } from "objection";
 import makeTests from "./makeTests";
 import { Service } from "feathers-objection";
-import { getItems } from "feathers-hooks-common";
+import { filterArray, getItemsIsArray } from "feathers-utils";
 import knex from "knex";
 import path from "path";
-import { HookContext } from "@feathersjs/feathers";
+import type { ServiceCaslOptions } from "../../../../lib/types";
+import type { HookContext } from "@feathersjs/feathers";
 
-const db  = knex({
+const db = knex({
   client: "sqlite3",
   debug: false,
   connection: {
-    filename: path.join(__dirname, "../../../.data/db.sqlite")
+    filename: path.join(__dirname, "../../../.data/db.sqlite"),
   },
-  useNullAsDefault: true
+  useNullAsDefault: true,
 });
 
 Model.knex(db);
+
+declare module "feathers-objection" {
+  interface ObjectionServiceOptions {
+    casl: ServiceCaslOptions;
+  }
+}
 
 class TestModel extends Model {
   static get tableName() {
@@ -30,9 +37,9 @@ class TestModel extends Model {
       test: { type: ["boolean", "null"] },
       published: { type: ["boolean", "null"] },
       supersecret: { type: ["boolean", "null"] },
-      hidden: { type: ["boolean", "null"] }
-    }
-  }
+      hidden: { type: ["boolean", "null"] },
+    },
+  };
 }
 
 const makeService = () => {
@@ -41,41 +48,37 @@ const makeService = () => {
     multi: true,
     casl: {
       availableFields: [
-        "id", 
-        "userId", 
-        "hi", 
-        "test", 
+        "id",
+        "userId",
+        "hi",
+        "test",
         "published",
-        "supersecret", 
-        "hidden"
-      ]
+        "supersecret",
+        "hidden",
+      ],
     },
     paginate: {
       default: 10,
-      max: 50
-    }
+      max: 50,
+    },
+    // filters: {
+    //   // @ts-ignore
+    //   ...filterArray("$and")
+    // }
   });
 };
 
-const boolFields = [
-  "test",
-  "published",
-  "supersecret",
-  "hidden"
-];
+const boolFields = ["test", "published", "supersecret", "hidden"];
 
 const afterHooks = [
   (context: HookContext) => {
-    //@ts-expect-error type error because feathers-hooks-common not on feathers@5
-    let items = getItems(context);
-    const isArray = Array.isArray(items);
-    items = (isArray) ? items : [items];
+    const { items, isArray } = getItemsIsArray(context);
 
     const result = items;
 
     result.forEach((item, i) => {
       const keys = Object.keys(item);
-      keys.forEach(key => {
+      keys.forEach((key) => {
         if (item[key] === null) {
           delete item[key];
           return;
@@ -88,16 +91,16 @@ const afterHooks = [
       result[i] = { ...item };
     });
 
-    context.result = (isArray) ? result : result[0];
-  }
+    context.result = isArray ? result : result[0];
+  },
 ];
 
 makeTests(
-  "feathers-objection", 
-  makeService, 
+  "feathers-objection",
+  makeService,
   async () => {
     await db.schema.dropTableIfExists("tests");
-    await db.schema.createTable("tests", table => {
+    await db.schema.createTable("tests", (table) => {
       table.increments("id");
       table.integer("userId");
       table.string("hi");

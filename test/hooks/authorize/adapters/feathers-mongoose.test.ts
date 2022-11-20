@@ -4,10 +4,17 @@ import { Service } from "feathers-mongoose";
 mongoose.Promise = global.Promise;
 
 import makeTests from "./makeTests";
-import { getItems } from "feathers-hooks-common";
-import { HookContext } from "@feathersjs/feathers";
+import { getItemsIsArray } from "feathers-utils";
+import type { ServiceCaslOptions } from "../../../../lib/types";
+import type { HookContext } from "@feathersjs/feathers";
 
 let Model;
+
+declare module "feathers-mongoose" {
+  interface MongooseServiceOptions {
+    casl: ServiceCaslOptions;
+  }
+}
 
 const makeService = () => {
   return new Service({
@@ -17,38 +24,36 @@ const makeService = () => {
     whitelist: ["$nor"],
     casl: {
       availableFields: [
-        "id", 
-        "userId", 
-        "hi", 
-        "test", 
+        "id",
+        "userId",
+        "hi",
+        "test",
         "published",
-        "supersecret", 
-        "hidden"
-      ]
+        "supersecret",
+        "hidden",
+      ],
     },
     paginate: {
       default: 10,
-      max: 50
-    }
+      max: 50,
+    },
   });
 };
 
 const afterHooks = [
   (context: HookContext) => {
-    //@ts-expect-error type error because feathers-hooks-common not on feathers@5
-    let items = getItems(context);
-    items = (Array.isArray(items)) ? items : [items];
-  
-    items.forEach(item => {
-      delete item.__v;        
+    const { items } = getItemsIsArray(context);
+
+    items.forEach((item) => {
+      delete item.__v;
     });
-  }
+  },
 ];
 
 makeTests(
-  "feathers-mongoose", 
+  "feathers-mongoose",
   makeService,
-  async (app, service) => { 
+  async (app, service) => {
     await service.remove(null);
   },
   { adapter: "feathers-mongoose" },
@@ -60,17 +65,19 @@ makeTests(
     const client = await mongoose.connect(uri);
 
     const { Schema } = client;
-    const schema = new Schema({
-      userId: { type: Number },
-      hi: { type: String },
-      test: { type: Boolean },
-      published: { type: Boolean },
-      supersecret: { type: Boolean },
-      hidden: { type: Boolean }
-    }, {
-      timestamps: false,
-      skipVersioning: true
-    });
+    const schema = new Schema(
+      {
+        userId: { type: Number },
+        hi: { type: String },
+        test: { type: Boolean },
+        published: { type: Boolean },
+        supersecret: { type: Boolean },
+        hidden: { type: Boolean },
+      },
+      {
+        timestamps: false,
+      }
+    );
 
     if (client.modelNames().includes("tests")) {
       client.deleteModel("tests");

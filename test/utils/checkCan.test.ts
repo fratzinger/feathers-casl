@@ -1,32 +1,32 @@
 import assert from "assert";
 import { feathers } from "@feathersjs/feathers";
-import { Service } from "feathers-memory";
+import { MemoryService } from "@feathersjs/memory";
 import { defineAbility } from "@casl/ability";
 
 import checkCan from "../../lib/utils/checkCan";
 
-describe("utils - checkCan", function() {
+describe("utils - checkCan", function () {
   let app, service, service2;
-  before(async function() {
+  before(async function () {
     app = feathers();
-    app.use("tests", new Service({ multi: true }));
+    app.use("tests", new MemoryService({ multi: true }));
     service = app.service("tests");
     await service.create([
       { id: 0, test: true, published: true },
       { id: 1, test: false, published: true, hi: 1 },
-      { id: 2, test: null, published: false }
+      { id: 2, test: null, published: false },
     ]);
 
-    app.use("another-tests", new Service({ multi: true }));
+    app.use("another-tests", new MemoryService({ multi: true }));
     service2 = app.service("another-tests");
     await service2.create([
       { id: 0, test: true, published: true },
       { id: 1, test: false, published: true, hi: 1 },
-      { id: 2, test: null, published: false }
+      { id: 2, test: null, published: false },
     ]);
   });
 
-  it("general 'checkCan'", async function() {
+  it("general 'checkCan'", async function () {
     const ability = defineAbility((can, cannot) => {
       can("get", "tests");
       can("update", "tests", { published: true });
@@ -63,24 +63,36 @@ describe("utils - checkCan", function() {
     );
   });
 
-  it("'checkCan' with skipThrow", async function() {
+  it("'checkCan' with skipThrow", async function () {
     const ability = defineAbility((can, cannot) => {
       can("get", "tests");
       can("update", "tests", { published: true });
       cannot("patch", "tests");
       can("remove", "tests", { test: true });
     });
-    let can = await checkCan(ability, 0, "get", "tests", service, { skipThrow: true });
+    let can = await checkCan(ability, 0, "get", "tests", service, {
+      skipThrow: true,
+    });
     assert.strictEqual(can, true, "'get:0' returns true");
-    can = await checkCan(ability, 0, "update", "tests", service, { skipThrow: true });
+    can = await checkCan(ability, 0, "update", "tests", service, {
+      skipThrow: true,
+    });
     assert.strictEqual(can, true, "'update:0' returns true");
-    can = await checkCan(ability, 0, "remove", "tests", service, { skipThrow: true });
+    can = await checkCan(ability, 0, "remove", "tests", service, {
+      skipThrow: true,
+    });
     assert.strictEqual(can, true, "'update:0' returns true");
-    can = await checkCan(ability, 1, "remove", "tests", service, { skipThrow: true });
+    can = await checkCan(ability, 1, "remove", "tests", service, {
+      skipThrow: true,
+    });
     assert.strictEqual(can, false, "'remove:1' returns false");
-    can = await checkCan(ability, 2, "update", "tests", service, { skipThrow: true });
+    can = await checkCan(ability, 2, "update", "tests", service, {
+      skipThrow: true,
+    });
     assert.strictEqual(can, false, "'update:2' returns false");
-    can = await checkCan(ability, 0, "patch", "tests", service, { skipThrow: true });
+    can = await checkCan(ability, 0, "patch", "tests", service, {
+      skipThrow: true,
+    });
     assert.strictEqual(can, false, "'patch:0' returns false");
   });
 });

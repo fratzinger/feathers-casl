@@ -1,12 +1,12 @@
 import assert from "assert";
 import "@feathersjs/transport-commons";
-import { HookContext, Params } from "@feathersjs/feathers";
+import type { HookContext, Params } from "@feathersjs/feathers";
 
 import { getChannelsWithReadAbility, makeOptions } from "../../../lib/channels";
-import { Application } from "@feathersjs/express";
+import type { Application } from "@feathersjs/express";
 
-export default function(app: Application): void {
-  if(typeof app.channel !== "function") {
+export default function (app: Application): void {
+  if (typeof app.channel !== "function") {
     // If no real-time functionality has been configured just return
     return;
   }
@@ -17,7 +17,7 @@ export default function(app: Application): void {
   });
 
   app.on("login", (authResult: unknown, { connection }: Params): void => {
-    if(connection) {
+    if (connection) {
       // The connection is no longer anonymous, remove it
       app.channel("anonymous").leave(connection);
 
@@ -30,15 +30,23 @@ export default function(app: Application): void {
 
   //@ts-ignore
   const fields = caslOptions.availableFields({
-    service: app.service("users")
+    service: app.service("users"),
   });
 
-  assert.deepStrictEqual(fields, ["id", "email", "password"], "gets availableFields from service correctly");
+  assert.deepStrictEqual(
+    fields,
+    ["id", "email", "password"],
+    "gets availableFields from service correctly"
+  );
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.publish((data: unknown, context: HookContext) => {
-
-    const result = getChannelsWithReadAbility(app, data as Record<string, unknown>, context, caslOptions);
+    const result = getChannelsWithReadAbility(
+      app,
+      data as Record<string, unknown>,
+      context,
+      caslOptions
+    );
 
     // e.g. to publish all service events to all authenticated users use
     return result;

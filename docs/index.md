@@ -1,16 +1,36 @@
 ---
-home: true
-heroImage: /img/logo.svg
-heroText: feathers-casl
-tagLine: Add access control with CASL to your feathers application. Support for `@casl/ability^5` and `@feathersjs/feathers^4`
-actionText: Get Started
-actionLink: ./getting-started
+layout: home
+
+hero:
+  name: feathers-casl
+  # text: Vite & Vue Powered Static Site Generator
+  image:
+    src: /img/logo.svg
+    alt: feathers-casl
+  tagline: Add access control with CASL to your feathers application.
+  actions:
+    - theme: brand
+      text: Get Started
+      link: /getting-started
+    - theme: alt
+      text: View on GitHub
+      link: https://github.com/fratzinger/feathers-casl
+
 features:
-- title: Decide who can do what 🛡️
+- icon: 🛡️
+  title: Decide who can do what
   details: Make permissions for create, read, update or delete (even separate multiple support)
-- title: complex access control with fields & conditions ❓
+- icon: ❓
+  title: complex access control with fields & conditions
   details: Simple query syntax supports multiple, nested, and even recursive populates.
-- title: Built in channels support 💬
-  details: Defining a relationship is as simple as specifying the primary and foreign keys.
-footer: MIT Licensed | Copyright © 2020-present | Frederik Schmatz
+- icon: 💬
+  title: Built in channels support
+  details: Channels aren't a after thought but a first class citizen for permissions.
 ---
+
+<style>
+.VPImage.image-src {
+  width: 250px;
+  height: 250px;
+}
+</style>

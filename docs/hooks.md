@@ -1,8 +1,3 @@
----
-title: Hooks
-sidebarDepth: 2
----
-
 # Hooks
 
 ## authorize

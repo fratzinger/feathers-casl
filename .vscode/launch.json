@@ -14,7 +14,7 @@
           "--require",
           "ts-node/register",
           "--timeout",
-          "999999",
+          "10000",
           "--colors",
           "--recursive"
         ],

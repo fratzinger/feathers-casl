@@ -1,13 +1,11 @@
 import { Forbidden } from "@feathersjs/errors";
-import _isEmpty from "lodash/isEmpty";
-import _pick from "lodash/pick";
-import _set from "lodash/set";
-import { AnyAbility, subject } from "@casl/ability";
+import _isEmpty from "lodash/isEmpty.js";
+import _pick from "lodash/pick.js";
+import _set from "lodash/set.js";
+import type { AnyAbility } from "@casl/ability";
+import { subject } from "@casl/ability";
 
-import {
-  shouldSkip,
-  isMulti
-} from "feathers-utils";
+import { shouldSkip, isMulti } from "feathers-utils";
 
 import hasRestrictingFields from "../../utils/hasRestrictingFields";
 import hasRestrictingConditions from "../../utils/hasRestrictingConditions";
@@ -17,7 +15,7 @@ import {
   setPersistedConfig,
   getAbility,
   getPersistedConfig,
-  throwUnlessCan
+  throwUnlessCan,
 } from "./authorize.hook.utils";
 
 import checkBasicPermission from "../checkBasicPermission.hook";
@@ -25,27 +23,24 @@ import getAvailableFields from "../../utils/getAvailableFields";
 import { checkCreatePerItem } from "../common";
 import mergeQueryFromAbility from "../../utils/mergeQueryFromAbility";
 
-import type {
-  HookContext
-} from "@feathersjs/feathers";
+import type { HookContext } from "@feathersjs/feathers";
 
-import type {
-  AuthorizeHookOptions
-} from "../../types";
+import type { AuthorizeHookOptions } from "../../types";
 
 const HOOKNAME = "authorize";
 
-export default async (
-  context: HookContext,
+export default async <H extends HookContext = HookContext>(
+  context: H,
   options: AuthorizeHookOptions
-): Promise<HookContext> => {
+) => {
   if (
-    !options?.notSkippable && (
-      shouldSkip(HOOKNAME, context) ||
-        context.type !== "before" ||
-        !context.params
-    )
-  ) { return context; }
+    !options?.notSkippable &&
+    (shouldSkip(HOOKNAME, context) ||
+      context.type !== "before" ||
+      !context.params)
+  ) {
+    return context;
+  }
 
   if (!getPersistedConfig(context, "madeBasicCheck")) {
     const basicCheck = checkBasicPermission({
@@ -56,7 +51,7 @@ export default async (
       checkCreateForData: true,
       checkMultiActions: options.checkMultiActions,
       modelName: options.modelName,
-      storeAbilityForAuthorize: true
+      storeAbilityForAuthorize: true,
     });
     await basicCheck(context);
   }
@@ -64,11 +59,14 @@ export default async (
   if (!options.modelName) {
     return context;
   }
-  const modelName = (typeof options.modelName === "string")
-    ? options.modelName
-    : options.modelName(context);
+  const modelName =
+    typeof options.modelName === "string"
+      ? options.modelName
+      : options.modelName(context);
 
-  if (!modelName) { return context; }
+  if (!modelName) {
+    return context;
+  }
 
   const ability = await getAbility(context, options);
   if (!ability) {
@@ -77,7 +75,7 @@ export default async (
   }
 
   const multi = isMulti(context);
-    
+
   // if context is with multiple items, there's a change that we need to handle each item separately
   if (multi) {
     if (!couldHaveRestrictingFields(ability, "find", modelName)) {
@@ -86,7 +84,10 @@ export default async (
     }
   }
 
-  if (["find", "get"].includes(context.method) || (isMulti && !hasRestrictingConditions(ability, "find", modelName))) {
+  if (
+    ["find", "get"].includes(context.method) ||
+    (isMulti && !hasRestrictingConditions(ability, "find", modelName))
+  ) {
     setPersistedConfig(context, "skipRestrictingRead.conditions", true);
   }
 
@@ -96,27 +97,30 @@ export default async (
   if (["get", "patch", "update", "remove"].includes(method) && id != null) {
     // single: get | patch | update | remove
     await handleSingle(context, ability, modelName, availableFields, options);
-  } else if (method === "find" || (["patch", "remove"].includes(method) && id == null)) {
+  } else if (
+    method === "find" ||
+    (["patch", "remove"].includes(method) && id == null)
+  ) {
     // multi: find | patch | remove
     await handleMulti(context, ability, modelName, availableFields, options);
   } else if (method === "create") {
     // create: single | multi
-    checkCreatePerItem(context, ability, modelName, { 
-      actionOnForbidden: options.actionOnForbidden, 
-      checkCreateForData: true 
+    checkCreatePerItem(context, ability, modelName, {
+      actionOnForbidden: options.actionOnForbidden,
+      checkCreateForData: true,
     });
   }
 
   return context;
 };
 
-const handleSingle = async (
-  context: HookContext,
+const handleSingle = async <H extends HookContext = HookContext>(
+  context: H,
   ability: AnyAbility,
   modelName: string,
   availableFields: string[] | undefined,
   options: AuthorizeHookOptions
-): Promise<HookContext> => {
+) => {
   // single: get | patch | update | remove
 
   // get complete item for `throwUnlessCan`-check to be trustworthy
@@ -147,25 +151,41 @@ const handleSingle = async (
 
     // TODO: If not allowed to .get() and to .[method](), then throw "NotFound" (maybe optional)
 
-    const getMethod = (service._get) ? "_get" : "get";
+    const getMethod = service._get ? "_get" : "get";
 
     const item = await service[getMethod](id, paramsGet);
-  
-    const restrictingFields = hasRestrictingFields(ability, method, subject(modelName, item), { availableFields });
-    if (restrictingFields && (restrictingFields === true || restrictingFields.length === 0)) {
-      if (options.actionOnForbidden) { options.actionOnForbidden(); }
+
+    const restrictingFields = hasRestrictingFields(
+      ability,
+      method,
+      subject(modelName, item),
+      { availableFields }
+    );
+    if (
+      restrictingFields &&
+      (restrictingFields === true || restrictingFields.length === 0)
+    ) {
+      if (options.actionOnForbidden) {
+        options.actionOnForbidden();
+      }
       throw new Forbidden("You're not allowed to make this request");
     }
-        
-    const data = (!restrictingFields) ? context.data : _pick(context.data, restrictingFields as string[]);
+
+    const data = !restrictingFields
+      ? context.data
+      : _pick(context.data, restrictingFields as string[]);
 
     checkData(context, ability, modelName, data, options);
 
-    if (!restrictingFields) { return context; }
+    if (!restrictingFields) {
+      return context;
+    }
 
     // if fields are not overlapping -> throw
     if (_isEmpty(data)) {
-      if (options.actionOnForbidden) { options.actionOnForbidden(); }
+      if (options.actionOnForbidden) {
+        options.actionOnForbidden();
+      }
       throw new Forbidden("You're not allowed to make this request");
     }
 
@@ -183,17 +203,22 @@ const handleSingle = async (
   return context;
 };
 
-const checkData = (
-  context: HookContext,
+const checkData = <H extends HookContext = HookContext>(
+  context: H,
   ability: AnyAbility,
   modelName: string,
   data: Record<string, unknown>,
-  options: Pick<AuthorizeHookOptions, "actionOnForbidden" | "usePatchData" | "useUpdateData">
+  options: Pick<
+    AuthorizeHookOptions,
+    "actionOnForbidden" | "usePatchData" | "useUpdateData"
+  >
 ): void => {
   if (
     (context.method === "patch" && !options.usePatchData) ||
     (context.method === "update" && !options.useUpdateData)
-  ) { return; }
+  ) {
+    return;
+  }
   throwUnlessCan(
     ability,
     `${context.method}-data`,
@@ -203,20 +228,24 @@ const checkData = (
   );
 };
 
-const handleMulti = async (
-  context: HookContext,
+const handleMulti = async <H extends HookContext = HookContext>(
+  context: H,
   ability: AnyAbility,
   modelName: string,
   availableFields: string[] | undefined,
   options: AuthorizeHookOptions
-): Promise<HookContext> => {
+): Promise<H> => {
   const { method } = context;
   // multi: find | patch | remove
 
   if (method === "patch") {
-    const fields = hasRestrictingFields(ability, method, modelName, { availableFields });
+    const fields = hasRestrictingFields(ability, method, modelName, {
+      availableFields,
+    });
     if (fields === true) {
-      if (options.actionOnForbidden) { options.actionOnForbidden(); }
+      if (options.actionOnForbidden) {
+        options.actionOnForbidden();
+      }
       throw new Forbidden("You're not allowed to make this request");
     }
     if (fields && fields.length > 0) {
@@ -224,7 +253,7 @@ const handleMulti = async (
       context.data = data;
     }
   }
-  
+
   const query = mergeQueryFromAbility(
     context.app,
     ability,

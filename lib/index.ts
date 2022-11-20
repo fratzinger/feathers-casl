@@ -20,24 +20,21 @@ export { getChannelsWithReadAbility } from "./channels";
 
 export { default as makeAbilityFromRules } from "./makeAbilityFromRules";
 
-export { 
-  Ability, 
+export {
+  Ability,
   AbilityBuilder,
-  createAliasResolver, 
-  defineAbility
+  createAliasResolver,
+  defineAbility,
 } from "@casl/ability";
 
-export { 
-  checkCan,
-  mergeQueryFromAbility
-};
+export { checkCan, mergeQueryFromAbility };
 
 export const utils = {
   checkCan,
   checkBasicPermission,
   hasRestrictingConditions,
   hasRestrictingFields,
-  mergeQueryFromAbility
+  mergeQueryFromAbility,
 };
 
 export * from "./types";

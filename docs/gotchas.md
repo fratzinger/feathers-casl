@@ -1,8 +1,3 @@
----
-title: Gotchas
-sidebarDepth: 2
----
-
 # Gotchas
 
 Here is the place for common mistakes for defined rules and unexpected behavior.

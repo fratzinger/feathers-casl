@@ -1,8 +1,3 @@
----
-title: Client side
-sidebarDepth: 2
----
-
 # Client side
 
 ## General
