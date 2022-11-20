@@ -6,12 +6,7 @@ import { authorize } from "../../../lib";
 import { MemoryService } from "@feathersjs/memory";
 import { joinQuery } from "feathers-fletching";
 import { filterArray } from "feathers-utils";
-
-const resolveAction = createAliasResolver({
-  update: "patch",
-  read: ["get", "find"],
-  delete: "remove",
-});
+import { resolveAction } from "../../test-utils";
 
 describe("authorize.relations", function () {
   const mock = () => {

@@ -3,12 +3,7 @@ import { createAliasResolver, defineAbility } from "@casl/ability";
 import { checkBasicPermission } from "../../lib";
 import type { HookContext } from "@feathersjs/feathers";
 import { markHookForSkip } from "feathers-utils";
-
-const resolveAction = createAliasResolver({
-  update: "patch",
-  read: ["get", "find"],
-  delete: "remove",
-});
+import { resolveAction } from "../test-utils";
 
 describe("checkBasicPermission.test.ts", function () {
   describe("general", function () {

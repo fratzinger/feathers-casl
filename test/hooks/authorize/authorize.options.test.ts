@@ -4,15 +4,10 @@ import { MemoryService } from "@feathersjs/memory";
 import type { AnyMongoAbility } from "@casl/ability";
 import { createAliasResolver, defineAbility } from "@casl/ability";
 
-const resolveAction = createAliasResolver({
-  update: "patch",
-  read: ["get", "find"],
-  delete: "remove",
-});
-
 import type { Application, HookContext } from "@feathersjs/feathers";
 
 import { authorize } from "../../../lib";
+import { resolveAction } from "../../test-utils";
 
 declare module "@feathersjs/adapter-commons" {
   interface AdapterParams {

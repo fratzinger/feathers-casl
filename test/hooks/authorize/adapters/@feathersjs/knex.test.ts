@@ -16,7 +16,7 @@ const db = knex({
   client: "sqlite3",
   debug: false,
   connection: {
-    filename: path.join(__dirname, "../../../../.data/db.sqlite"),
+    filename: ":memory:",
   },
   useNullAsDefault: true,
 });

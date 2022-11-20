@@ -6,12 +6,7 @@ import _sortBy from "lodash/sortBy.js";
 
 import { authorize } from "../../../../../lib";
 import type { Adapter, AuthorizeHookOptions } from "../../../../../lib";
-
-const resolveAction = createAliasResolver({
-  update: "patch",
-  read: ["get", "find"],
-  delete: "remove",
-});
+import { resolveAction } from "../../../../test-utils";
 
 export default (
   adapterName: Adapter,

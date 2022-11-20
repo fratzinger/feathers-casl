@@ -6,12 +6,7 @@ import { filterArray, filterObject, markHookForSkip } from "feathers-utils";
 import { HOOKNAME as HOOKNAME_CHECKBASICPERMISSION } from "../../../lib/hooks/checkBasicPermission.hook";
 import type { HookContext } from "@feathersjs/feathers";
 import { MemoryService } from "@feathersjs/memory";
-
-const resolveAction = createAliasResolver({
-  update: "patch",
-  read: ["get", "find"],
-  delete: "remove",
-});
+import { resolveAction } from "../../test-utils";
 
 describe("authorize.general.test.ts", function () {
   describe("before", function () {

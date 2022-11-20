@@ -1,6 +1,5 @@
-module.exports = {
+{
   "host": "localhost",
-  "port": 3028,
   "paginate": {
     "default": 10,
     "max": 50
@@ -9,10 +8,7 @@ module.exports = {
     "entity": "user",
     "service": "users",
     "secret": "knP4c3uAPU+/RmFBLYOVbvYXgNk=",
-    "authStrategies": [
-      "jwt",
-      "local"
-    ],
+    "authStrategies": ["jwt", "local"],
     "jwtOptions": {
       "header": {
         "typ": "access"
@@ -27,4 +23,4 @@ module.exports = {
       "passwordField": "password"
     }
   }
-};
+}

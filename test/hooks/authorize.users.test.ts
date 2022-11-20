@@ -5,6 +5,7 @@ import { feathers } from "@feathersjs/feathers";
 import { SequelizeService } from "feathers-sequelize";
 import { authorize } from "../../lib";
 import path from "node:path";
+import { resolveAction } from "../test-utils";
 
 describe("authorize.users.test.ts", function () {
   function mockAbility(user) {
@@ -18,11 +19,7 @@ describe("authorize.users.test.ts", function () {
         cannot(["update", "patch"], "users", ["companyId"]);
       },
       {
-        resolveAction: createAliasResolver({
-          update: "patch",
-          read: ["get", "find"],
-          delete: "remove",
-        }),
+        resolveAction,
       }
     );
     return ability;

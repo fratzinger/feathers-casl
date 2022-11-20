@@ -8,19 +8,8 @@ import { io } from "socket.io-client";
 import mockServer from "../.mockServer";
 import channels1 from "./mockChannels.availableFields";
 import services1 from "./mockServices.availableFields";
-
-const promiseTimeout = function (ms, promise, rejectMessage?) {
-  // Create a promise that rejects in <ms> milliseconds
-  const timeout = new Promise((resolve, reject) => {
-    const id = setTimeout(() => {
-      clearTimeout(id);
-      reject(rejectMessage || "timeout");
-    }, ms);
-  });
-
-  // Returns a race between our timeout and the passed in promise
-  return Promise.race([promise, timeout]);
-};
+import getPort from "get-port";
+import { promiseTimeout } from "../../test-utils";
 
 describe("channels.availableFields.test.ts", function () {
   let server: Server;
@@ -47,7 +36,9 @@ describe("channels.availableFields.test.ts", function () {
     // eslint-disable-next-line prefer-destructuring
     app = mock.app;
 
-    const port = app.get("port");
+    const port = await getPort();
+    app.set("port", port);
+
     server = await app.listen(port);
     await new Promise((resolve) => {
       server.on("listening", resolve);

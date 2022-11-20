@@ -6,9 +6,7 @@ import path from "node:path";
 import type { ServiceCaslOptions } from "../../../../lib";
 import type { HookContext } from "@feathersjs/feathers";
 
-const sequelize = new Sequelize("sequelize", "", "", {
-  dialect: "sqlite",
-  storage: path.join(__dirname, "../../../.data/db.sqlite"),
+const sequelize = new Sequelize("sqlite::memory:", {
   logging: false,
 });
 
