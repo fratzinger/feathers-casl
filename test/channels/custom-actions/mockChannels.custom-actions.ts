@@ -1,27 +1,32 @@
 import assert from "node:assert";
 import "@feathersjs/transport-commons";
-import type { HookContext, Params } from "@feathersjs/feathers";
+import type {
+  HookContext,
+  Params,
+  RealTimeConnection,
+} from "@feathersjs/feathers";
 
 import { getChannelsWithReadAbility, makeChannelOptions } from "../../../lib";
 import type { Application } from "@feathersjs/express";
 
 export default function (app: Application): void {
   if (typeof app.channel !== "function") {
-    // If no real-time functionality has been configured just return
     return;
   }
 
-  app.on("connection", (connection: unknown): void => {
-    // On a new real-time connection, add it to the anonymous channel
+  app.on("connection", (connection: RealTimeConnection): void => {
     app.channel("anonymous").join(connection);
   });
 
-  app.on("login", (authResult: unknown, { connection }: Params): void => {
+  app.on("login", (authResult: any, params: Params): void => {
+    const { connection } = params;
     if (connection) {
-      // The connection is no longer anonymous, remove it
-      app.channel("anonymous").leave(connection);
+      if (authResult.ability) {
+        connection.ability = authResult.ability;
+        connection.rules = authResult.rules;
+      }
 
-      // Add it to the authenticated user channel
+      app.channel("anonymous").leave(connection);
       app.channel("authenticated").join(connection);
     }
   });

@@ -19,7 +19,7 @@ declare module "@feathersjs/adapter-commons" {
 }
 
 describe("authorize.options.test.ts", function () {
-  type TestApplication = Application<{ test: MemoryService }>;
+  type TestApplication = Application<{ tests: MemoryService }>;
   let app: TestApplication;
   let service: MemoryService;
 
@@ -27,7 +27,7 @@ describe("authorize.options.test.ts", function () {
     beforeEach(function () {
       app = feathers();
       app.use(
-        "test",
+        "tests",
         new MemoryService({
           multi: true,
           paginate: {
@@ -36,7 +36,7 @@ describe("authorize.options.test.ts", function () {
           },
         })
       );
-      service = app.service("test");
+      service = app.service("tests");
 
       //@ts-ignore
       service.hooks({
@@ -58,15 +58,7 @@ describe("authorize.options.test.ts", function () {
             {
               ability: defineAbility(
                 (can) => {
-                  can(
-                    [
-                      "create-multi",
-                      "read-multi",
-                      "update-multi",
-                      "delete-multi",
-                    ],
-                    "Test"
-                  );
+                  can(["create-multi", "create"], "tests");
                 },
                 { resolveAction }
               ),
@@ -82,15 +74,7 @@ describe("authorize.options.test.ts", function () {
               query: { userId: 1 },
               ability: defineAbility(
                 (can) => {
-                  can(
-                    [
-                      "create-multi",
-                      "read-multi",
-                      "update-multi",
-                      "delete-multi",
-                    ],
-                    "Test"
-                  );
+                  can(["patch-multi", "patch"], "tests");
                 },
                 { resolveAction }
               ),
@@ -105,15 +89,7 @@ describe("authorize.options.test.ts", function () {
               query: { userId: 1 },
               ability: defineAbility(
                 (can) => {
-                  can(
-                    [
-                      "create-multi",
-                      "read-multi",
-                      "update-multi",
-                      "delete-multi",
-                    ],
-                    "Test"
-                  );
+                  can(["remove-multi", "remove"], "tests");
                 },
                 { resolveAction }
               ),
@@ -136,7 +112,7 @@ describe("authorize.options.test.ts", function () {
             {
               ability: defineAbility(
                 (can) => {
-                  can(["create", "read", "update", "delete"], "Test");
+                  can(["create"], "tests");
                 },
                 { resolveAction }
               ),
@@ -152,7 +128,7 @@ describe("authorize.options.test.ts", function () {
               query: { userId: 1 },
               ability: defineAbility(
                 (can) => {
-                  can(["create", "read", "update", "delete"], "Test");
+                  can(["patch"], "tests");
                 },
                 { resolveAction }
               ),
@@ -167,7 +143,7 @@ describe("authorize.options.test.ts", function () {
               query: { userId: 1 },
               ability: defineAbility(
                 (can) => {
-                  can(["create", "read", "update", "delete"], "Test");
+                  can(["remove"], "tests");
                 },
                 { resolveAction }
               ),
@@ -190,7 +166,7 @@ describe("authorize.options.test.ts", function () {
     it("use service.modelName with string", async function () {
       const app: TestApplication = feathers();
       app.use(
-        "test",
+        "tests",
         new MemoryService({
           multi: true,
           paginate: {
@@ -199,7 +175,7 @@ describe("authorize.options.test.ts", function () {
           },
         })
       );
-      service = app.service("test");
+      service = app.service("tests");
       //@ts-ignore
       service.modelName = "Test";
       //@ts-ignore
@@ -234,7 +210,7 @@ describe("authorize.options.test.ts", function () {
     it("use service.modelName with function", async function () {
       const app: TestApplication = feathers();
       app.use(
-        "test",
+        "tests",
         new MemoryService({
           multi: true,
           paginate: {
@@ -243,7 +219,7 @@ describe("authorize.options.test.ts", function () {
           },
         })
       );
-      service = app.service("test");
+      service = app.service("tests");
       //@ts-ignore
       service.modelName = "Test";
       //@ts-ignore
@@ -280,7 +256,7 @@ describe("authorize.options.test.ts", function () {
     it("works if no ability is set at all", async function () {
       const app: TestApplication = feathers();
       app.use(
-        "test",
+        "tests",
         new MemoryService({
           multi: true,
           paginate: {
@@ -289,7 +265,7 @@ describe("authorize.options.test.ts", function () {
           },
         })
       );
-      service = app.service("test");
+      service = app.service("tests");
       //@ts-ignore
       service.hooks({
         before: {
@@ -304,7 +280,7 @@ describe("authorize.options.test.ts", function () {
     it("uses ability in options", async function () {
       const app: TestApplication = feathers();
       app.use(
-        "test",
+        "tests",
         new MemoryService({
           multi: true,
           paginate: {
@@ -313,7 +289,7 @@ describe("authorize.options.test.ts", function () {
           },
         })
       );
-      service = app.service("test");
+      service = app.service("tests");
       //@ts-ignore
       service.hooks({
         before: {
@@ -337,7 +313,7 @@ describe("authorize.options.test.ts", function () {
     it("uses params.ability over options.ability", async function () {
       const app: TestApplication = feathers();
       app.use(
-        "test",
+        "tests",
         new MemoryService({
           multi: true,
           paginate: {
@@ -346,7 +322,7 @@ describe("authorize.options.test.ts", function () {
           },
         })
       );
-      service = app.service("test");
+      service = app.service("tests");
       //@ts-ignore
       service.hooks({
         before: {
@@ -375,7 +351,7 @@ describe("authorize.options.test.ts", function () {
     it("uses ability as Promise", async function () {
       const app: TestApplication = feathers();
       app.use(
-        "test",
+        "tests",
         new MemoryService({
           multi: true,
           paginate: {
@@ -384,7 +360,7 @@ describe("authorize.options.test.ts", function () {
           },
         })
       );
-      service = app.service("test");
+      service = app.service("tests");
       //@ts-ignore
       service.hooks({
         before: {
@@ -411,7 +387,7 @@ describe("authorize.options.test.ts", function () {
     it("uses ability as function", async function () {
       const app: TestApplication = feathers();
       app.use(
-        "test",
+        "tests",
         new MemoryService({
           multi: true,
           paginate: {
@@ -420,7 +396,7 @@ describe("authorize.options.test.ts", function () {
           },
         })
       );
-      service = app.service("test");
+      service = app.service("tests");
       //@ts-ignore
       service.hooks({
         before: {
@@ -445,7 +421,7 @@ describe("authorize.options.test.ts", function () {
     it("uses ability as Promise", async function () {
       const app: TestApplication = feathers();
       app.use(
-        "test",
+        "tests",
         new MemoryService({
           multi: true,
           paginate: {
@@ -454,7 +430,7 @@ describe("authorize.options.test.ts", function () {
           },
         })
       );
-      service = app.service("test");
+      service = app.service("tests");
       //@ts-ignore
       service.hooks({
         before: {
@@ -482,7 +458,7 @@ describe("authorize.options.test.ts", function () {
     it("uses persisted ability from 'context.params.casl.ability'", async function () {
       const app = feathers();
       app.use(
-        "test",
+        "tests",
         new MemoryService({
           multi: true,
           paginate: {
@@ -492,7 +468,7 @@ describe("authorize.options.test.ts", function () {
         })
       );
       //@ts-ignore
-      service = app.service("test");
+      service = app.service("tests");
       //@ts-ignore
       service.hooks({
         before: {
@@ -520,7 +496,7 @@ describe("authorize.options.test.ts", function () {
     it("uses persisted ability as function from 'context.params.casl.ability'", async function () {
       const app = feathers();
       app.use(
-        "test",
+        "tests",
         new MemoryService({
           multi: true,
           paginate: {
@@ -530,7 +506,7 @@ describe("authorize.options.test.ts", function () {
         })
       );
       //@ts-ignore
-      service = app.service("test");
+      service = app.service("tests");
       //@ts-ignore
       service.hooks({
         before: {
@@ -558,9 +534,6 @@ describe("authorize.options.test.ts", function () {
     it("fails for empty ability in options", async function () {
       const makeContext = (method, type) => {
         return {
-          service: {
-            modelName: "Test",
-          },
           path: "tests",
           method,
           type,
@@ -605,9 +578,6 @@ describe("authorize.options.test.ts", function () {
         type: "before" | "after"
       ): HookContext => {
         return {
-          service: {
-            modelName: "Test",
-          },
           path: "tests",
           method,
           type,
@@ -653,7 +623,7 @@ describe("authorize.options.test.ts", function () {
     it("passes for internal call without params.ability and not allowed options.params by default", async function () {
       const app: TestApplication = feathers();
       app.use(
-        "test",
+        "tests",
         new MemoryService({
           multi: true,
           paginate: {
@@ -662,7 +632,7 @@ describe("authorize.options.test.ts", function () {
           },
         })
       );
-      service = app.service("test");
+      service = app.service("tests");
       //@ts-ignore
       service.hooks({
         before: {
@@ -684,7 +654,7 @@ describe("authorize.options.test.ts", function () {
     it("throws for external call without params.ability and not allowed options.params by default", async function () {
       const app: TestApplication = feathers();
       app.use(
-        "test",
+        "tests",
         new MemoryService({
           multi: true,
           paginate: {
@@ -693,7 +663,7 @@ describe("authorize.options.test.ts", function () {
           },
         })
       );
-      service = app.service("test");
+      service = app.service("tests");
       //@ts-ignore
       service.hooks({
         before: {
@@ -716,7 +686,7 @@ describe("authorize.options.test.ts", function () {
     it("throws for internal call without params.ability and not allowed options.params with checkAbilityForInternal: true", async function () {
       const app: TestApplication = feathers();
       app.use(
-        "test",
+        "tests",
         new MemoryService({
           multi: true,
           paginate: {
@@ -725,7 +695,7 @@ describe("authorize.options.test.ts", function () {
           },
         })
       );
-      service = app.service("test");
+      service = app.service("tests");
       //@ts-ignore
       service.hooks({
         before: {

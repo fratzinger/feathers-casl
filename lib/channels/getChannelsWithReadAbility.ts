@@ -60,6 +60,7 @@ export const getChannelsWithReadAbility = (
 
   if (!options.restrictFields) {
     // return all fields for allowed
+
     result = channels.map((channel) => {
       return channel.filter((conn) => {
         const ability = getAbility(app, data, conn, context, options);

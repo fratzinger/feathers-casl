@@ -13,9 +13,7 @@ describe("authorize.general.test.ts", function () {
     it("passes if no ability", async function () {
       const makeContext = (method: string, type: string) => {
         return {
-          service: {
-            modelName: "Test",
-          },
+          service: {},
           path: "tests",
           method,
           type,
@@ -57,7 +55,6 @@ describe("authorize.general.test.ts", function () {
       const makeContext = (method = "find", type = "before") => {
         return {
           service: {
-            modelName: "Test",
             get(id) {
               return { id, userId: 1 };
             },
@@ -100,9 +97,7 @@ describe("authorize.general.test.ts", function () {
     it("passes for 'manage' 'all' permission", async function () {
       const makeContext = (method, type) => {
         return {
-          service: {
-            modelName: "Test",
-          },
+          service: {},
           path: "tests",
           method,
           type,
@@ -152,10 +147,8 @@ describe("authorize.general.test.ts", function () {
       const makeContext = (method, type) => {
         const path = "tests";
         return {
-          service: {
-            modelName: "Test",
-          },
-          path: "tests",
+          service: {},
+          path,
           method,
           type,
           data: {
@@ -198,9 +191,7 @@ describe("authorize.general.test.ts", function () {
     it("passes for 'manage' 'all' permission with availableFields: undefined", async function () {
       const makeContext = (method, type) => {
         return {
-          service: {
-            modelName: "Test",
-          },
+          service: {},
           path: "tests",
           method,
           type,
@@ -249,9 +240,7 @@ describe("authorize.general.test.ts", function () {
     it("passes if skip", async function () {
       const makeContext = (method: string, type: string) => {
         return {
-          service: {
-            modelName: "Test",
-          },
+          service: {},
           path: "tests",
           method,
           type,
@@ -295,9 +284,7 @@ describe("authorize.general.test.ts", function () {
     it("passes for undefined modelName", async function () {
       const makeContext = (method: string, type: string) => {
         return {
-          service: {
-            modelName: "Test",
-          },
+          service: {},
           path: "tests",
           method,
           type,
@@ -343,9 +330,7 @@ describe("authorize.general.test.ts", function () {
       const expectedResult = { id: 1, userId: 1, test: true };
       const makeContext = (method, type) => {
         return {
-          service: {
-            modelName: "Test",
-          },
+          service: {},
           path: "tests",
           method,
           type,
@@ -379,9 +364,7 @@ describe("authorize.general.test.ts", function () {
     describe("create", function () {
       it("'create:single' passes", async function () {
         const context = {
-          service: {
-            modelName: "Test",
-          },
+          service: {},
           path: "tests",
           method: "create",
           type: "before",
@@ -411,9 +394,7 @@ describe("authorize.general.test.ts", function () {
 
       it("'create:multi' passes", async function () {
         const context = {
-          service: {
-            modelName: "Test",
-          },
+          service: {},
           path: "tests",
           method: "create",
           type: "before",
@@ -456,9 +437,7 @@ describe("authorize.general.test.ts", function () {
 
       it("'create:multi' fails with 'checkMultiActions: true'", async function () {
         const context = {
-          service: {
-            modelName: "Test",
-          },
+          service: {},
           path: "tests",
           method: "create",
           type: "before",
@@ -501,9 +480,7 @@ describe("authorize.general.test.ts", function () {
 
       it("'create:single' fails", async function () {
         const context = {
-          service: {
-            modelName: "Test",
-          },
+          service: {},
           path: "tests",
           method: "create",
           type: "before",
@@ -534,9 +511,7 @@ describe("authorize.general.test.ts", function () {
 
       it("'create:multi' fails", async function () {
         const context = {
-          service: {
-            modelName: "Test",
-          },
+          service: {},
           path: "tests",
           method: "create",
           type: "before",
@@ -684,9 +659,7 @@ describe("authorize.general.test.ts", function () {
     describe("patch", function () {
       it("'patch:multi' passes with 'patch-multi' and 'checkMultiActions: true'", async function () {
         const context = {
-          service: {
-            modelName: "Test",
-          },
+          service: {},
           path: "tests",
           method: "patch",
           type: "before",
@@ -711,9 +684,7 @@ describe("authorize.general.test.ts", function () {
 
       it("'patch:multi' fails with 'checkMultiActions: true'", async function () {
         const context = {
-          service: {
-            modelName: "Test",
-          },
+          service: {},
           path: "tests",
           method: "patch",
           type: "before",
@@ -740,9 +711,7 @@ describe("authorize.general.test.ts", function () {
     describe("remove", function () {
       it("'remove:multi' passes with 'remove-multi' and 'checkMultiActions: true'", async function () {
         const context = {
-          service: {
-            modelName: "Test",
-          },
+          service: {},
           path: "tests",
           method: "remove",
           type: "before",
@@ -766,9 +735,7 @@ describe("authorize.general.test.ts", function () {
 
       it("'remove:multi' fails with 'checkMultiActions: true'", async function () {
         const context = {
-          service: {
-            modelName: "Test",
-          },
+          service: {},
           path: "tests",
           method: "remove",
           type: "before",
@@ -797,9 +764,7 @@ describe("authorize.general.test.ts", function () {
       const expectedResult = { id: 1, userId: 1, test: true };
       const makeContext = (method, type) => {
         return {
-          service: {
-            modelName: "Test",
-          },
+          service: {},
           path: "tests",
           method,
           type,
@@ -894,9 +859,7 @@ describe("authorize.general.test.ts", function () {
       const expectedResult = [{ id: 1, userId: 1, test: true }];
       const makeContext = (method, type) => {
         return {
-          service: {
-            modelName: "Test",
-          },
+          service: {},
           path: "tests",
           method,
           type,

@@ -43,7 +43,7 @@
     "docs:build": "vitepress build docs"
   },
   "peerDependencies": {
-    "@casl/ability": "^5.0.0"
+    "@casl/ability": ">= 5.0.0 < 6"
   },
   "dependencies": {
     "@feathersjs/errors": "^5.0.0-pre.33",
