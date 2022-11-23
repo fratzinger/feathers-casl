@@ -1,8 +1,3 @@
----
-title: Utils
-sidebarDepth: 2
----
-
 # Utils
 
 Besides the hooks and channels of `feathers-casl`, it provides utils to be used in your custom hooks orxs services.

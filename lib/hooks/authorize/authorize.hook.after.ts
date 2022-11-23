@@ -1,56 +1,67 @@
-import { getItems, replaceItems } from "feathers-hooks-common";
+import { replaceItems } from "feathers-hooks-common";
 import { subject } from "@casl/ability";
-import _pick from "lodash/pick";
-import _isEmpty from "lodash/isEmpty";
+import _pick from "lodash/pick.js";
+import _isEmpty from "lodash/isEmpty.js";
 
-import { shouldSkip, mergeArrays } from "feathers-utils";
+import { shouldSkip, mergeArrays, getItemsIsArray } from "feathers-utils";
 
 import {
   getPersistedConfig,
   getAbility,
   makeOptions,
   getConditionalSelect,
-  refetchItems
+  refetchItems,
+  HOOKNAME,
 } from "./authorize.hook.utils";
 
-import hasRestrictingFields from "../../utils/hasRestrictingFields";
-
-import getModelName from "../../utils/getModelName";
+import {
+  getAvailableFields,
+  hasRestrictingFields,
+  getModelName,
+} from "../../utils";
 
 import { Forbidden } from "@feathersjs/errors";
-import getAvailableFields from "../../utils/getAvailableFields";
 
 import type { HookContext } from "@feathersjs/feathers";
 import type {
-  AuthorizeHookOptions, 
-  HasRestrictingFieldsOptions
+  AuthorizeHookOptions,
+  HasRestrictingFieldsOptions,
 } from "../../types";
 
-const HOOKNAME = "authorize";
-
-export default async (
-  context: HookContext,
+export const authorizeAfter = async <H extends HookContext = HookContext>(
+  context: H,
   options: AuthorizeHookOptions
-): Promise<HookContext> => {
+) => {
   if (
-    !options?.notSkippable && (
-      shouldSkip(HOOKNAME, context) ||
-        context.type !== "after" ||
-        !context.params
-    )
-  ) { return context; }
+    !options?.notSkippable &&
+    (shouldSkip(HOOKNAME, context) ||
+      context.type !== "after" ||
+      !context.params)
+  ) {
+    return context;
+  }
 
-  //@ts-expect-error type error because feathers-hooks-common not on feathers@5
-  const itemOrItems = getItems(context);
-  if (!itemOrItems) { return context; }
+  // eslint-disable-next-line prefer-const
+  let { isArray, items } = getItemsIsArray(context);
+  if (!items.length) {
+    return context;
+  }
 
   options = makeOptions(context.app, options);
 
   const modelName = getModelName(options.modelName, context);
-  if (!modelName) { return context; }
+  if (!modelName) {
+    return context;
+  }
 
-  const skipCheckConditions = getPersistedConfig(context, "skipRestrictingRead.conditions");
-  const skipCheckFields = getPersistedConfig(context, "skipRestrictingRead.fields");
+  const skipCheckConditions = getPersistedConfig(
+    context,
+    "skipRestrictingRead.conditions"
+  );
+  const skipCheckFields = getPersistedConfig(
+    context,
+    "skipRestrictingRead.fields"
+  );
 
   if (skipCheckConditions && skipCheckFields) {
     return context;
@@ -65,35 +76,46 @@ export default async (
   }
 
   const { ability } = params;
-    
-  const asArray = Array.isArray(itemOrItems);
-  let items = (asArray) ? itemOrItems : [itemOrItems];
 
   const availableFields = getAvailableFields(context, options);
-        
+
   const hasRestrictingFieldsOptions: HasRestrictingFieldsOptions = {
-    availableFields: availableFields
+    availableFields: availableFields,
   };
 
-  const getOrFind = (asArray) ? "find" : "get";
+  const getOrFind = isArray ? "find" : "get";
 
   const $select: string[] | undefined = params.query?.$select;
 
   if (context.method !== "remove") {
-    const $newSelect = getConditionalSelect($select, ability, getOrFind, modelName);
+    const $newSelect = getConditionalSelect(
+      $select,
+      ability,
+      getOrFind,
+      modelName
+    );
     if ($newSelect) {
       const _items = await refetchItems(context);
-      if (_items) { items = _items; }
+      if (_items) {
+        items = _items;
+      }
     }
   }
 
   const pickFieldsForItem = (item: Record<string, unknown>) => {
-    const method = (Array.isArray(itemOrItems)) ? "find" : "get";
-    if (!skipCheckConditions && !ability.can(method, subject(modelName, item))) { 
-      return undefined; 
+    if (
+      !skipCheckConditions &&
+      !ability.can(getOrFind, subject(modelName, item))
+    ) {
+      return undefined;
     }
-      
-    let fields = hasRestrictingFields(ability, method, subject(modelName, item), hasRestrictingFieldsOptions);
+
+    let fields = hasRestrictingFields(
+      ability,
+      getOrFind,
+      subject(modelName, item),
+      hasRestrictingFieldsOptions
+    );
 
     if (fields === true) {
       // full restriction
@@ -104,30 +126,32 @@ export default async (
     } else if (fields && $select) {
       fields = mergeArrays(fields, $select, "intersect") as string[];
     } else {
-      fields = (fields) ? fields : $select;
+      fields = fields ? fields : $select;
     }
 
     return _pick(item, fields);
   };
 
   let result;
-  if (asArray) {
+  if (isArray) {
     result = [];
     for (let i = 0, n = items.length; i < n; i++) {
       const item = pickFieldsForItem(items[i]);
 
-      if (item) { result.push(item); }
+      if (item) {
+        result.push(item);
+      }
     }
-
   } else {
     result = pickFieldsForItem(items[0]);
     if (context.method === "get" && _isEmpty(result)) {
       if (options.actionOnForbidden) options.actionOnForbidden();
-      throw new Forbidden(`You're not allowed to ${context.method} ${modelName}`);
+      throw new Forbidden(
+        `You're not allowed to ${context.method} ${modelName}`
+      );
     }
   }
 
-  //@ts-expect-error type error because feathers-hooks-common not on feathers@5
   replaceItems(context, result);
 
   return context;

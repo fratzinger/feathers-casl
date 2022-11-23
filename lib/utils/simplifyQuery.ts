@@ -1,14 +1,16 @@
-import _isEqual from "lodash/isEqual";
-import _cloneDeep from "lodash/cloneDeep";
+import _isEqual from "lodash/isEqual.js";
+import _cloneDeep from "lodash/cloneDeep.js";
 
 import type { Query } from "@feathersjs/feathers";
 
-const simplifyQuery = (
+export const simplifyQuery = (
   query: Query,
   replaceAnd = true,
   replaceOr = true
 ): Query => {
-  if (!query.$and && !query.$or) { return query; }
+  if (!query.$and && !query.$or) {
+    return query;
+  }
   let result = _cloneDeep(query);
 
   if (result.$and && !result.$and.length) {
@@ -27,9 +29,9 @@ const simplifyQuery = (
 
   if (result.$and) {
     const $and = [];
-    result.$and.forEach(q => {
+    result.$and.forEach((q) => {
       q = simplifyQuery(q, true, true);
-      if ($and.some(x => _isEqual(x, q))) return;
+      if ($and.some((x) => _isEqual(x, q))) return;
       $and.push(q);
     });
     if (replaceAnd && $and.length === 1 && Object.keys(result).length === 1) {
@@ -40,9 +42,9 @@ const simplifyQuery = (
   }
   if (result.$or) {
     const $or = [];
-    result.$or.forEach(q => {
+    result.$or.forEach((q) => {
       q = simplifyQuery(q, true, true);
-      if ($or.some(x => _isEqual(x, q))) return;
+      if ($or.some((x) => _isEqual(x, q))) return;
       $or.push(q);
     });
     if (replaceOr && $or.length === 1 && Object.keys(result).length === 1) {
@@ -53,5 +55,3 @@ const simplifyQuery = (
   }
   return result;
 };
-
-export default simplifyQuery;

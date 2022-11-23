@@ -1,14 +1,13 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-    "search.exclude": {
-      "**/node_modules": true,
-      "**/public": true,
-      "**/package-lock.json": true
-    },
-    "workbench.colorCustomizations": {
-      "activityBar.background": "#29b757",
-      "titleBar.activeBackground": "#29b757",
-      "titleBar.activeForeground": "#FAFBF4"
-    }
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/public": true,
+    "**/package-lock.json": true
+  },
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#29b757",
+    "titleBar.activeBackground": "#29b757",
+    "titleBar.activeForeground": "#FAFBF4"
   }
-  
+}

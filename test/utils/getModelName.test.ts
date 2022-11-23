@@ -1,10 +1,10 @@
-import { HookContext } from "@feathersjs/feathers";
-import assert from "assert";
+import type { HookContext } from "@feathersjs/feathers";
+import assert from "node:assert";
 
-import getModelName from "../../lib/utils/getModelName";
+import { getModelName } from "../../lib";
 
-describe("utils - getModelName", function() {
-  it("as undefined", function() {
+describe("utils - getModelName", function () {
+  it("as undefined", function () {
     const modelName = undefined;
     const context = { path: "Test2" } as unknown as HookContext;
     assert.strictEqual(
@@ -14,7 +14,7 @@ describe("utils - getModelName", function() {
     );
   });
 
-  it("as string", function() {
+  it("as string", function () {
     const modelName = "Test1";
     const context = { path: "Test2" } as unknown as HookContext;
     assert.strictEqual(
@@ -24,20 +24,26 @@ describe("utils - getModelName", function() {
     );
   });
 
-  it("as function", function() {
-    const context = { path: "Test2", method: "Test3" } as unknown as HookContext;
+  it("as function", function () {
+    const context = {
+      path: "Test2",
+      method: "Test3",
+    } as unknown as HookContext;
     assert.strictEqual(
-      getModelName((c => c.method), context),
+      getModelName((c) => c.method, context),
       context.method,
       "returns custom modelName"
     );
   });
 
-  it("throws for other types", function() {
+  it("throws for other types", function () {
     const vals = [null, [], {}, 1, true, false];
 
-    vals.forEach(val => {
-      const context = { path: "Test2", method: "Test3" } as unknown as HookContext;
+    vals.forEach((val) => {
+      const context = {
+        path: "Test2",
+        method: "Test3",
+      } as unknown as HookContext;
       assert.throws(
         //@ts-expect-error val is not string, function or undefined
         () => getModelName(val, context),

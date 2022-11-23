@@ -1,8 +1,3 @@
----
-title: Getting Started
-sidebarDepth: 2
----
-
 # Getting Started
 
 <p align="center">
@@ -13,9 +8,10 @@ sidebarDepth: 2
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/fratzinger/feathers-casl/Node.js%20CI)
 ![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/fratzinger/feathers-casl)
 ![Code Climate coverage](https://img.shields.io/codeclimate/coverage/fratzinger/feathers-casl)
-![David](https://img.shields.io/david/fratzinger/feathers-casl)
+![libraries.io](https://img.shields.io/librariesio/release/npm/feathers-casl)
 ![npm](https://img.shields.io/npm/dm/feathers-casl)
-[![GitHub license](https://img.shields.io/github/license/fratzinger/feathers-casl)](https://github.com/fratzinger/feathers-casl/blob/master/LICENSE)
+![GitHub license](https://img.shields.io/github/license/fratzinger/feathers-casl)
+[![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/qa8kez8QBx)
 
 ## About
 
@@ -117,6 +113,52 @@ const defineAbilitiesFor = (user) => {
 module.exports = {
   defineRulesFor,
   defineAbilitiesFor
+};
+
+```
+Typescript version of the code:
+
+```js
+// src/services/authentication/authentication.abilities.ts
+import { createAliasResolver, makeAbilityFromRules } from 'feathers-casl';
+import { AbilityBuilder, Ability } from '@casl/ability';
+
+// don't forget this, as `read` is used internally
+const resolveAction = createAliasResolver({
+    update: 'patch',       // define the same rules for update & patch
+    read: ['get', 'find'], // use 'read' as a equivalent for 'get' & 'find'
+    delete: 'remove'       // use 'delete' or 'remove'
+});
+
+export const defineRulesFor = (user: any) => {
+    // also see https://casl.js.org/v5/en/guide/define-rules
+    const { can, cannot, rules } = new AbilityBuilder(Ability);
+
+    if (user.role && user.role.name === 'SuperAdmin') {
+        // SuperAdmin can do evil
+        can('manage', 'all');
+        return rules;
+    }
+
+    if (user.role && user.role.name === 'Admin') {
+        can('create', 'users');
+    }
+
+    can('read', 'users');
+    can('update', 'users', { id: user.id });
+    cannot('update', 'users', ['roleId'], { id: user.id });
+    cannot('delete', 'users', { id: user.id });
+
+    can('manage', 'tasks', { userId: user.id });
+    can('create-multi', 'posts', { userId: user.id });
+
+    return rules;
+};
+
+export const defineAbilitiesFor = (user: any) => {
+    const rules = defineRulesFor(user);
+
+    return makeAbilityFromRules(rules, { resolveAction });
 };
 
 ```

@@ -1,54 +1,62 @@
-import assert from "assert";
+import assert from "node:assert";
 import "@feathersjs/transport-commons";
-import { HookContext, Params } from "@feathersjs/feathers";
+import type {
+  HookContext,
+  Params,
+  RealTimeConnection,
+} from "@feathersjs/feathers";
 
-import { getChannelsWithReadAbility, makeOptions } from "../../../lib/channels";
-import { Application } from "@feathersjs/express";
+import { getChannelsWithReadAbility, makeChannelOptions } from "../../../lib";
+import type { Application } from "@feathersjs/express";
 
-export default function(app: Application): void {
-  if(typeof app.channel !== "function") {
-    // If no real-time functionality has been configured just return
+export default function (app: Application): void {
+  if (typeof app.channel !== "function") {
     return;
   }
 
-  app.on("connection", (connection: unknown): void => {
-    // On a new real-time connection, add it to the anonymous channel
+  app.on("connection", (connection: RealTimeConnection): void => {
     app.channel("anonymous").join(connection);
   });
 
-  app.on("login", (authResult: unknown, { connection }: Params): void => {
-    if(connection) {
-      // The connection is no longer anonymous, remove it
-      app.channel("anonymous").leave(connection);
+  app.on("login", (authResult: any, params: Params): void => {
+    const { connection } = params;
+    if (connection) {
+      if (authResult.ability) {
+        connection.ability = authResult.ability;
+        connection.rules = authResult.rules;
+      }
 
-      // Add it to the authenticated user channel
+      app.channel("anonymous").leave(connection);
       app.channel("authenticated").join(connection);
     }
   });
 
-  const caslOptions = makeOptions(app, {
+  const caslOptions = makeChannelOptions(app, {
     useActionName: {
       created: "receive-created",
       patched: "receive-patched",
       removed: "receive-removed",
-      updated: "receive-updated" 
-    }
+      updated: "receive-updated",
+    },
   });
 
   //@ts-ignore
   const fields = caslOptions.availableFields({
-    service: app.service("users")
+    service: app.service("users"),
   });
 
-  assert.deepStrictEqual(fields, ["id", "email", "password"], "gets availableFields from service correctly");
+  assert.deepStrictEqual(
+    fields,
+    ["id", "email", "password"],
+    "gets availableFields from service correctly"
+  );
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.publish((data: unknown, context: HookContext) => {
-
     const result = getChannelsWithReadAbility(
-      app, 
-      data as Record<string, unknown>, 
-      context, 
+      app,
+      data as Record<string, unknown>,
+      context,
       caslOptions
     );
 

@@ -1,19 +1,12 @@
-import _get from "lodash/get";
-import _set from "lodash/set";
+import _get from "lodash/get.js";
+import _set from "lodash/set.js";
 
 import { Forbidden } from "@feathersjs/errors";
 
-import getFieldsForConditions from "../../utils/getFieldsForConditions";
+import { getFieldsForConditions, getAvailableFields } from "../../utils";
 import { makeDefaultBaseOptions } from "../common";
-import getAvailableFields from "../../utils/getAvailableFields";
 
-import { getItems } from "feathers-hooks-common";
-import { HOOKNAME } from "./authorize.hook";
-
-import {
-  isMulti, 
-  markHookForSkip
-} from "feathers-utils";
+import { getItemsIsArray, isMulti, markHookForSkip } from "feathers-utils";
 
 import type { AnyAbility, ForcedSubject } from "@casl/ability";
 import type { Application, HookContext, Params } from "@feathersjs/feathers";
@@ -25,26 +18,40 @@ import type {
   HookBaseOptions,
   InitOptions,
   Path,
-  ThrowUnlessCanOptions
+  ThrowUnlessCanOptions,
 } from "../../types";
-import { Promisable } from "type-fest";
+import type { Promisable } from "type-fest";
 
-export const makeOptions = (
-  app: Application, 
+declare module "@feathersjs/feathers" {
+  interface Params {
+    ability?: AnyAbility;
+  }
+}
+
+export const HOOKNAME = "authorize";
+
+export const makeOptions = <A extends Application = Application>(
+  app: A,
   options?: Partial<AuthorizeHookOptions>
 ): AuthorizeHookOptions => {
   options = options || {};
-  return Object.assign(makeDefaultBaseOptions(), defaultOptions, getAppOptions(app), options);
+  return Object.assign(
+    makeDefaultBaseOptions(),
+    defaultOptions,
+    getAppOptions(app),
+    options
+  );
 };
 
-const defaultOptions: AuthorizeHookOptionsExclusive = {
+const defaultOptions: AuthorizeHookOptionsExclusive<HookContext> = {
   adapter: undefined,
-  availableFields: (context: HookContext): string[] => {
-    const availableFields: string[] | ((context: HookContext) => string[]) = context.service.options?.casl?.availableFields;
+  availableFields: (context): string[] => {
+    const availableFields: string[] | ((context: HookContext) => string[]) =
+      context.service.options?.casl?.availableFields;
     return getAvailableFields(context, { availableFields });
   },
   usePatchData: false,
-  useUpdateData: false
+  useUpdateData: false,
 };
 
 export const makeDefaultOptions = (
@@ -53,9 +60,11 @@ export const makeDefaultOptions = (
   return Object.assign(makeDefaultBaseOptions(), defaultOptions, options);
 };
 
-const getAppOptions = (app: Application): AuthorizeHookOptions | Record<string, never> => {
+const getAppOptions = (
+  app: Application
+): AuthorizeHookOptions | Record<string, never> => {
   const caslOptions: InitOptions = app?.get("casl");
-  return (caslOptions && caslOptions.authorizeHook)
+  return caslOptions && caslOptions.authorizeHook
     ? caslOptions.authorizeHook
     : {};
 };
@@ -64,18 +73,22 @@ export const getAdapter = (
   app: Application,
   options: Pick<AuthorizeHookOptions, "adapter">
 ): Adapter => {
-  if (options.adapter) { return options.adapter; }
+  if (options.adapter) {
+    return options.adapter;
+  }
   const caslAppOptions = app?.get("casl") as InitOptions;
-  if (caslAppOptions?.defaultAdapter) { return caslAppOptions.defaultAdapter; }
-  return "feathers-memory";
+  if (caslAppOptions?.defaultAdapter) {
+    return caslAppOptions.defaultAdapter;
+  }
+  return "@feathersjs/memory";
 };
 
 export const getAbility = (
-  context: HookContext, 
+  context: HookContext,
   options?: Pick<HookBaseOptions, "ability" | "checkAbilityForInternal">
-): Promise<AnyAbility|undefined> => {
+): Promise<AnyAbility | undefined> => {
   // if params.ability is set, return it over options.ability
-  if (context?.params?.ability) { 
+  if (context?.params?.ability) {
     if (typeof context.params.ability === "function") {
       const ability = context.params.ability(context);
       return Promise.resolve(ability);
@@ -107,14 +120,16 @@ export const getAbility = (
       return Promise.resolve(options.ability);
     }
   }
-  
-  throw new Forbidden(`You're not allowed to ${context.method} on '${context.path}'`);
+
+  throw new Forbidden(
+    `You're not allowed to ${context.method} on '${context.path}'`
+  );
 };
 
 export const throwUnlessCan = <T extends ForcedSubject<string>>(
-  ability: AnyAbility, 
-  method: string, 
-  resource: string|T, 
+  ability: AnyAbility,
+  method: string,
+  resource: string | T,
   modelName: string,
   options: Partial<ThrowUnlessCanOptions>
 ): boolean => {
@@ -132,21 +147,23 @@ export const refetchItems = async (
   context: HookContext,
   params?: Params
 ): Promise<unknown[] | undefined> => {
-  if (context.type !== "after") { return; }
-  //@ts-expect-error type error because feathers-hooks-common not on feathers@5
-  const itemOrItems = getItems(context);
+  if (context.type !== "after") {
+    return;
+  }
+  const { items } = getItemsIsArray(context);
 
-  const items = (!itemOrItems || Array.isArray(itemOrItems)) ? itemOrItems : [itemOrItems];
-  if (!items) { return; }
+  if (!items) {
+    return;
+  }
 
   const idField = context.service.options?.id;
-  const ids = items.map(item => item[idField]);
+  const ids = items.map((item) => item[idField]);
 
   params = Object.assign({}, params, { paginate: false });
 
-  markHookForSkip(HOOKNAME, "all", { params });
+  markHookForSkip(HOOKNAME, "all", { params } as any);
   delete params.ability;
-  
+
   const query = Object.assign({}, params.query, { [idField]: { $in: ids } });
   params = Object.assign({}, params, { query });
 
@@ -154,34 +171,40 @@ export const refetchItems = async (
 };
 
 export const getConditionalSelect = (
-  $select: string[], 
-  ability: AnyAbility, 
-  method: string, 
+  $select: string[],
+  ability: AnyAbility,
+  method: string,
   modelName: string
 ): undefined | string[] => {
-  if (!$select?.length) { return undefined; }
+  if (!$select?.length) {
+    return undefined;
+  }
   const fields = getFieldsForConditions(ability, method, modelName);
-  if (!fields.length) { 
-    return undefined; 
+  if (!fields.length) {
+    return undefined;
   }
 
-  const fieldsToAdd = fields.filter(field => !$select.includes(field));
-  if (!fieldsToAdd.length) { return undefined; }
+  const fieldsToAdd = fields.filter((field) => !$select.includes(field));
+  if (!fieldsToAdd.length) {
+    return undefined;
+  }
   return [...$select, ...fieldsToAdd];
 };
 
 export const checkMulti = (
-  context: HookContext, 
-  ability: AnyAbility, 
+  context: HookContext,
+  ability: AnyAbility,
   modelName: string,
   options?: Pick<AuthorizeHookOptions, "actionOnForbidden">
 ): boolean => {
   const { method } = context;
   const currentIsMulti = isMulti(context);
-  if (!currentIsMulti) { return true; }
+  if (!currentIsMulti) {
+    return true;
+  }
   if (
     (method === "find" && ability.can(method, modelName)) ||
-    (ability.can(`${method}-multi`, modelName))
+    ability.can(`${method}-multi`, modelName)
   ) {
     return true;
   }
@@ -190,15 +213,34 @@ export const checkMulti = (
   throw new Forbidden(`You're not allowed to multi-${method} ${modelName}`);
 };
 
-export const setPersistedConfig = (context: HookContext, key: Path, val: unknown): HookContext => {
+export const setPersistedConfig = (
+  context: HookContext,
+  key: Path,
+  val: unknown
+): HookContext => {
   return _set(context, `params.casl.${key}`, val);
 };
 
-export function getPersistedConfig (context: HookContext, key: "ability"): AnyAbility | ((context: HookContext) => Promisable<AnyAbility | undefined>) | undefined
-export function getPersistedConfig (context: HookContext, key: "skipRestrictingRead.conditions"): boolean
-export function getPersistedConfig (context: HookContext, key: "skipRestrictingRead.fields"): boolean
-export function getPersistedConfig (context: HookContext, key: "madeBasicCheck"): boolean
+export function getPersistedConfig(
+  context: HookContext,
+  key: "ability"
+):
+  | AnyAbility
+  | ((context: HookContext) => Promisable<AnyAbility | undefined>)
+  | undefined;
+export function getPersistedConfig(
+  context: HookContext,
+  key: "skipRestrictingRead.conditions"
+): boolean;
+export function getPersistedConfig(
+  context: HookContext,
+  key: "skipRestrictingRead.fields"
+): boolean;
+export function getPersistedConfig(
+  context: HookContext,
+  key: "madeBasicCheck"
+): boolean;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getPersistedConfig (context: HookContext, key: Path): any {
+export function getPersistedConfig(context: HookContext, key: Path): any {
   return _get(context, `params.casl.${key}`);
 }

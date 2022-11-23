@@ -1,101 +1,139 @@
-import { HookContext } from "@feathersjs/feathers";
-import { AnyAbility } from "@casl/ability";
-import { Application } from "@feathersjs/feathers";
+import type { HookContext, Application } from "@feathersjs/feathers";
+import type { AnyAbility, AnyMongoAbility } from "@casl/ability";
 import "@feathersjs/transport-commons";
-import { Channel, RealTimeConnection } from "@feathersjs/transport-commons/lib/channels/channel/base";
+import type {
+  Channel,
+  RealTimeConnection,
+} from "@feathersjs/transport-commons";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyData = Record<string, any>;
 
-export type Adapter = 
-  "feathers-knex" |
-  "feathers-memory" |
-  "feathers-mongodb" |
-  "feathers-mongoose" |
-  "feathers-nedb" |
-  "feathers-objection" |
-  "feathers-sequelize";
+export type Adapter =
+  | "@feathersjs/memory"
+  | "@feathersjs/knex"
+  | "@feathersjs/mongodb"
+  | "feathers-mongoose"
+  | "feathers-nedb"
+  | "feathers-objection"
+  | "feathers-sequelize";
 
 export interface ServiceCaslOptions {
-  availableFields: string[]
+  availableFields: string[];
 }
 
-export interface HookBaseOptions {
-  ability: AnyAbility | ((context: HookContext) => AnyAbility | Promise<AnyAbility>)
-  actionOnForbidden: undefined | (() => void)
-  checkAbilityForInternal: boolean
-  checkMultiActions: boolean
-  modelName: GetModelName
-  notSkippable: boolean
+export interface CaslParams<A extends AnyMongoAbility = AnyMongoAbility> {
+  ability?: A;
+  casl?: {
+    ability: A | (() => A);
+  };
 }
 
-export interface CheckBasicPermissionHookOptions extends HookBaseOptions {
-  checkCreateForData: boolean | ((context: HookContext) => boolean)
-  storeAbilityForAuthorize: boolean
+export interface HookBaseOptions<H extends HookContext = HookContext> {
+  ability: AnyAbility | ((context: H) => AnyAbility | Promise<AnyAbility>);
+  actionOnForbidden: undefined | (() => void);
+  checkAbilityForInternal: boolean;
+  checkMultiActions: boolean;
+  modelName: GetModelName;
+  notSkippable: boolean;
 }
 
-export type CheckBasicPermissionUtilsOptions = Omit<CheckBasicPermissionHookOptions, "notSkippable">;
-
-export type CheckBasicPermissionHookOptionsExclusive = Pick<CheckBasicPermissionHookOptions, Exclude<keyof CheckBasicPermissionHookOptions, keyof HookBaseOptions>>
-
-export type AvailableFieldsOption = string[] | ((context: HookContext) => string[]);
-
-export interface AuthorizeChannelCommonsOptions {
-  availableFields: AvailableFieldsOption
+export interface CheckBasicPermissionHookOptions<
+  H extends HookContext = HookContext
+> extends HookBaseOptions<H> {
+  checkCreateForData: boolean | ((context: H) => boolean);
+  storeAbilityForAuthorize: boolean;
 }
 
-export interface AuthorizeHookOptions extends HookBaseOptions, AuthorizeChannelCommonsOptions {
-  adapter: Adapter
-  useUpdateData: boolean
-  usePatchData: boolean
+export type CheckBasicPermissionUtilsOptions<
+  H extends HookContext = HookContext
+> = Omit<CheckBasicPermissionHookOptions<H>, "notSkippable">;
+
+export type CheckBasicPermissionHookOptionsExclusive<
+  H extends HookContext = HookContext
+> = Pick<
+  CheckBasicPermissionHookOptions<H>,
+  Exclude<keyof CheckBasicPermissionHookOptions, keyof HookBaseOptions>
+>;
+
+export type AvailableFieldsOption<H extends HookContext = HookContext> =
+  | string[]
+  | ((context: H) => string[]);
+
+export interface AuthorizeChannelCommonsOptions<
+  H extends HookContext = HookContext
+> {
+  availableFields: AvailableFieldsOption<H>;
 }
 
-export type AuthorizeHookOptionsExclusive = Pick<AuthorizeHookOptions, Exclude<keyof AuthorizeHookOptions, keyof HookBaseOptions>>
+export interface AuthorizeHookOptions<H extends HookContext = HookContext>
+  extends HookBaseOptions<H>,
+    AuthorizeChannelCommonsOptions<H> {
+  adapter: Adapter;
+  useUpdateData: boolean;
+  usePatchData: boolean;
+}
 
+export type AuthorizeHookOptionsExclusive<H extends HookContext = HookContext> =
+  Pick<
+    AuthorizeHookOptions<H>,
+    Exclude<keyof AuthorizeHookOptions<H>, keyof HookBaseOptions<H>>
+  >;
 
-export type GetModelName = string | ((context: HookContext) => string)
+export type GetModelName<H extends HookContext = HookContext> =
+  | string
+  | ((context: H) => string);
 
 export type EventName = "created" | "updated" | "patched" | "removed";
 
-
 export interface ChannelOptions extends AuthorizeChannelCommonsOptions {
-  ability: AnyAbility | ((app: Application, connection: RealTimeConnection, data: unknown, context: HookContext) => AnyAbility)
+  ability:
+    | AnyAbility
+    | ((
+        app: Application,
+        connection: RealTimeConnection,
+        data: unknown,
+        context: HookContext
+      ) => AnyAbility);
   /** Easy way to disable filtering, default: `false` */
-  activated: boolean
-  /** Channel that's used when there occures an error, default: `['authenticated']` */
-  channelOnError: string[]
+  activated: boolean;
+  /** Channel that's used when there occurs an error, default: `['authenticated']` */
+  channelOnError: string[];
   /** Prefiltered channels, default: `app.channel(app.channels)` */
-  channels: Channel | Channel[]
-  modelName: GetModelName
-  restrictFields: boolean
+  channels: Channel | Channel[];
+  modelName: GetModelName;
+  restrictFields: boolean;
   /** change action to use for events. For example: `'receive'`, default: `'get'` */
-  useActionName: string | { [e in EventName]?: string }
+  useActionName: string | { [e in EventName]?: string };
 }
 
 export interface GetConditionalQueryOptions {
-  actionOnForbidden?(): void
+  actionOnForbidden?(): void;
 }
 
 export interface HasRestrictingFieldsOptions {
-  availableFields: string[]
+  availableFields: string[];
 }
 
-export interface InitOptions {
-  defaultAdapter: Adapter
-  authorizeHook: AuthorizeHookOptions
-  channels: ChannelOptions
+export interface InitOptions<H extends HookContext = HookContext> {
+  defaultAdapter: Adapter;
+  authorizeHook: AuthorizeHookOptions<H>;
+  channels: ChannelOptions;
 }
 
 export interface GetMinimalFieldsOptions {
-  availableFields?: string[],
-  checkCan?: boolean
+  availableFields?: string[];
+  checkCan?: boolean;
 }
 
-export type Path = string|Array<string|number>;
+export type Path = string | Array<string | number>;
 
-export interface ThrowUnlessCanOptions extends Pick<HookBaseOptions, "actionOnForbidden"> {
-  skipThrow: boolean
+export interface ThrowUnlessCanOptions
+  extends Pick<HookBaseOptions, "actionOnForbidden"> {
+  skipThrow: boolean;
 }
 
 export interface UtilCheckCanOptions extends ThrowUnlessCanOptions {
-  checkGeneral?: boolean,
-  useConditionalSelect?: boolean
+  checkGeneral?: boolean;
+  useConditionalSelect?: boolean;
 }

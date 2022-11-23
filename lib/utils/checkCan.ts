@@ -1,7 +1,7 @@
 import { subject } from "@casl/ability";
 import { throwUnlessCan } from "../hooks/authorize/authorize.hook.utils";
 
-import getFieldsForConditions from "./getFieldsForConditions";
+import { getFieldsForConditions } from "./getFieldsForConditions";
 
 import type { AnyAbility } from "@casl/ability";
 import type { Id, Service } from "@feathersjs/feathers";
@@ -15,12 +15,12 @@ const makeOptions = (
     actionOnForbidden: () => {},
     checkGeneral: true,
     skipThrow: false,
-    useConditionalSelect: true
+    useConditionalSelect: true,
   };
   return Object.assign(defaultOptions, providedOptions || {});
 };
 
-const checkCan = async <S>(
+export const checkCan = async <S>(
   ability: AnyAbility,
   id: Id,
   method: string,
@@ -30,29 +30,25 @@ const checkCan = async <S>(
 ): Promise<boolean> => {
   const options = makeOptions(providedOptions);
   if (options.checkGeneral) {
-    const can = throwUnlessCan(
-      ability,
-      method,
-      modelName,
-      modelName,
-      options
-    );
-    if (!can) { return false; }
+    const can = throwUnlessCan(ability, method, modelName, modelName, options);
+    if (!can) {
+      return false;
+    }
   }
-  
+
   let params;
   if (options.useConditionalSelect) {
     const $select = getFieldsForConditions(ability, method, modelName);
     params = {
-      query: { $select }
+      query: { $select },
     };
   }
 
   //@ts-expect-error _get is not exposed
-  const getMethod = (service._get) ? "_get" : "get";
-  
+  const getMethod = service._get ? "_get" : "get";
+
   const item = await service[getMethod](id, params);
-    
+
   const can = throwUnlessCan(
     ability,
     method,
@@ -60,8 +56,6 @@ const checkCan = async <S>(
     modelName,
     options
   );
-  
+
   return can;
 };
-
-export default checkCan;

@@ -1,8 +1,3 @@
----
-title: Cookbook
-sidebarDepth: 2
----
-
 # Cookbook
 
 ## Get availableFields for adapters
