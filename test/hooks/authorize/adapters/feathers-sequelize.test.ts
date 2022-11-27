@@ -103,5 +103,5 @@ makeTests(
     await Model.sync({ force: true });
   },
   { adapter: "feathers-sequelize" },
-  afterHooks
+  { afterHooks }
 );

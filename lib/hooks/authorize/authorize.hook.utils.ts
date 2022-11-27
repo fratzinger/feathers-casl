@@ -147,7 +147,7 @@ export const refetchItems = async (
   context: HookContext,
   params?: Params
 ): Promise<unknown[] | undefined> => {
-  if (context.type !== "after") {
+  if (!context.result) {
     return;
   }
   const { items } = getItemsIsArray(context);

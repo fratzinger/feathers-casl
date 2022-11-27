@@ -7,27 +7,28 @@ import _sortBy from "lodash/sortBy.js";
 import { authorize } from "../../../../../lib";
 import type { Adapter, AuthorizeHookOptions } from "../../../../../lib";
 import { resolveAction } from "../../../../test-utils";
+import type { MakeTestsOptions } from "./_makeTests.types";
 
 export default (
-  adapterName: Adapter,
+  name: Adapter | string,
   makeService: () => any,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
-  afterHooks?: any[]
+  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] }
 ): void => {
   let app: Application;
   let service;
   let id;
 
-  const itSkip = (adapterToTest: Adapter | Adapter[]) => {
+  const itSkip = (adapterToTest: string | string[]) => {
     const condition =
       typeof adapterToTest === "string"
-        ? adapterName === adapterToTest
-        : adapterToTest.includes(adapterName);
+        ? name === adapterToTest
+        : adapterToTest.includes(name);
     return condition ? it.skip : it;
   };
 
-  describe(`${adapterName}: beforeAndAfter - find`, function () {
+  describe(`${name}: beforeAndAfter - find`, function () {
     beforeEach(async function () {
       app = feathers();
       app.use("tests", makeService());
@@ -50,20 +51,32 @@ export default (
         },
         authorizeHookOptions
       );
-      const allAfterHooks = [];
-      if (afterHooks) {
-        allAfterHooks.push(...afterHooks);
-      }
-      allAfterHooks.push(authorize(options));
 
-      service.hooks({
-        before: {
-          all: [authorize(options)],
-        },
-        after: {
-          all: allAfterHooks,
-        },
-      });
+      afterHooks = Array.isArray(afterHooks)
+        ? afterHooks
+        : afterHooks
+        ? [afterHooks]
+        : [];
+
+      if (around) {
+        service.hooks({
+          around: {
+            all: [authorize(options)],
+          },
+          after: {
+            all: afterHooks,
+          },
+        });
+      } else {
+        service.hooks({
+          before: {
+            all: [authorize(options)],
+          },
+          after: {
+            all: [...afterHooks, authorize(options)],
+          },
+        });
+      }
 
       await clean(app, service);
     });

@@ -11,16 +11,17 @@ import type { Application, Query } from "@feathersjs/feathers";
 import type { AdapterBase } from "@feathersjs/adapter-commons";
 import type { Adapter, AuthorizeHookOptions } from "../types";
 
-const adaptersFor$not: Adapter[] = ["feathers-nedb"];
+// const adaptersFor$not: Adapter[] = ["feathers-nedb"];
+const adaptersFor$not: Adapter[] = [];
 
 const adaptersFor$notAsArray: Adapter[] = [
   "feathers-sequelize",
-  "feathers-objection",
+  // "feathers-objection",
 ];
 
 const adaptersFor$nor: Adapter[] = [
   "@feathersjs/memory",
-  "feathers-mongoose",
+  // "feathers-mongoose",
   "@feathersjs/mongodb",
 ];
 

@@ -8,19 +8,20 @@ import type { Application } from "@feathersjs/feathers";
 import { authorize } from "../../../../../lib";
 import type { Adapter, AuthorizeHookOptions } from "../../../../../lib";
 import { resolveAction } from "../../../../test-utils";
+import type { MakeTestsOptions } from "./_makeTests.types";
 
 export default (
-  adapterName: Adapter,
+  adapterName: Adapter | string,
   makeService: () => any,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
-  afterHooks?: unknown[]
+  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] }
 ): void => {
   let app: Application;
   let service;
   let id;
 
-  const itSkip = (adapterToTest: Adapter | Adapter[]) => {
+  const itSkip = (adapterToTest: string | string[]) => {
     const condition =
       typeof adapterToTest === "string"
         ? adapterName === adapterToTest
@@ -51,20 +52,33 @@ export default (
         },
         authorizeHookOptions
       );
-      const allAfterHooks = [];
-      if (afterHooks) {
-        allAfterHooks.push(...afterHooks);
-      }
-      allAfterHooks.push(authorize(options));
 
-      service.hooks({
-        before: {
-          all: [authorize(options)],
-        },
-        after: {
-          all: allAfterHooks,
-        },
-      });
+      afterHooks = Array.isArray(afterHooks)
+        ? afterHooks
+        : afterHooks
+        ? [afterHooks]
+        : [];
+
+      if (around) {
+        service.hooks({
+          around: {
+            all: [authorize(options)],
+          },
+          before: {},
+          after: {
+            all: [...afterHooks],
+          },
+        });
+      } else {
+        service.hooks({
+          before: {
+            all: [authorize(options)],
+          },
+          after: {
+            all: [...afterHooks, authorize(options)],
+          },
+        });
+      }
 
       await clean(app, service);
     });

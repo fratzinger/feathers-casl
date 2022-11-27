@@ -34,12 +34,7 @@ export const authorizeBefore = async <H extends HookContext = HookContext>(
   context: H,
   options: AuthorizeHookOptions
 ) => {
-  if (
-    !options?.notSkippable &&
-    (shouldSkip(HOOKNAME, context) ||
-      context.type !== "before" ||
-      !context.params)
-  ) {
+  if (shouldSkip(HOOKNAME, context, options) || !context.params) {
     return context;
   }
 

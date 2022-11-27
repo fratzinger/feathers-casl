@@ -10,95 +10,99 @@ import makePatchMultiTests from "./patch-multi";
 import makeRemoveTests from "./remove";
 import makeRemoveMultiTests from "./remove-multi";
 import type { Adapter, AuthorizeHookOptions } from "../../../../../lib";
+import type { MakeTestsOptions } from "./_makeTests.types";
 
 export default async function (
-  adapterName: Adapter,
+  name: Adapter | string,
   makeService: () => unknown,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
-  afterHooks?: unknown[],
-  actionBefore?: () => Promise<void>
+  makeTestsOptions: MakeTestsOptions = {
+    around: false,
+    afterHooks: [],
+    actionBefore: () => {},
+  }
 ): Promise<void> {
-  describe(`authorize-hook '${adapterName}'`, function () {
-    if (actionBefore) {
-      beforeAll(actionBefore);
+  describe(`authorize-hook '${name}'`, function () {
+    if (makeTestsOptions.actionBefore) {
+      beforeAll(makeTestsOptions.actionBefore);
     }
     makeFindTests(
-      adapterName,
+      name,
       makeService,
       clean,
       authorizeHookOptions,
-      afterHooks
+      makeTestsOptions
     );
     makeGetTests(
-      adapterName,
+      name,
       makeService,
       clean,
       authorizeHookOptions,
-      afterHooks
+      makeTestsOptions
     );
     makeCreateTests(
-      adapterName,
+      name,
       makeService,
       clean,
       authorizeHookOptions,
-      afterHooks
+      makeTestsOptions
     );
     makeCreateMultiTests(
-      adapterName,
+      name,
       makeService,
       clean,
       authorizeHookOptions,
-      afterHooks
+      makeTestsOptions
     );
     makeUpdateTests(
-      adapterName,
+      name,
       makeService,
       clean,
       authorizeHookOptions,
-      afterHooks
+      makeTestsOptions
     );
     makeUpdateDataTests(
-      adapterName,
+      name,
       makeService,
       clean,
       Object.assign({ useUpdateData: true }, authorizeHookOptions),
-      afterHooks
+      makeTestsOptions
     );
     makePatchTests(
-      adapterName,
+      name,
       makeService,
       clean,
       authorizeHookOptions,
-      afterHooks
+      makeTestsOptions
     );
     makePatchDataTests(
-      adapterName,
+      name,
       makeService,
       clean,
       Object.assign({ usePatchData: true }, authorizeHookOptions),
-      afterHooks
+      makeTestsOptions
     );
     makePatchMultiTests(
-      adapterName,
+      name,
       makeService,
       clean,
       authorizeHookOptions,
-      afterHooks
+      makeTestsOptions
     );
     makeRemoveTests(
-      adapterName,
+      name,
       makeService,
       clean,
       authorizeHookOptions,
-      afterHooks
+      makeTestsOptions
     );
     makeRemoveMultiTests(
-      adapterName,
+      name,
       makeService,
       clean,
       authorizeHookOptions,
-      afterHooks
+      makeTestsOptions
     );
   });
 }

@@ -13,9 +13,9 @@ export type Adapter =
   | "@feathersjs/memory"
   | "@feathersjs/knex"
   | "@feathersjs/mongodb"
-  | "feathers-mongoose"
-  | "feathers-nedb"
-  | "feathers-objection"
+  // | "feathers-mongoose"
+  // | "feathers-nedb"
+  // | "feathers-objection"
   | "feathers-sequelize";
 
 export interface ServiceCaslOptions {
