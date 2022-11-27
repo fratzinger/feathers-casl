@@ -33,14 +33,12 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
   options: AuthorizeHookOptions
 ) => {
   if (shouldSkip(HOOKNAME, context, options) || !context.params) {
-    context.type === null && console.log(context.type);
     return context;
   }
 
   // eslint-disable-next-line prefer-const
   let { isArray, items } = getItemsIsArray(context);
   if (!items.length) {
-    context.type === null && console.log(context.type, "no items");
     return context;
   }
 
@@ -48,7 +46,6 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
 
   const modelName = getModelName(options.modelName, context);
   if (!modelName) {
-    context.type === null && console.log(context.type, "No model name found");
     return context;
   }
 
@@ -69,7 +66,6 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
 
   params.ability = await getAbility(context, options);
   if (!params.ability) {
-    context.type === null && console.log(context.type, "no ability");
     // Ignore internal or not authenticated requests
     return context;
   }
@@ -95,8 +91,6 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
     );
     if ($newSelect) {
       const _items = await refetchItems(context);
-      context.type === null &&
-        console.log(context.type, "refetch items", _items);
       if (_items) {
         items = _items;
       }
@@ -118,9 +112,6 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
       hasRestrictingFieldsOptions
     );
 
-    context.type === null &&
-      console.log("pickFields", fields, skipCheckFields, $select);
-
     if (fields === true) {
       // full restriction
       return {};
@@ -129,8 +120,6 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
       return item;
     } else if (fields && $select) {
       fields = mergeArrays(fields, $select, "intersect") as string[];
-      context.type === null &&
-        console.log("mergedFields", fields, skipCheckFields, $select);
     } else {
       fields = fields ? fields : $select;
     }
@@ -143,8 +132,6 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
     result = [];
     for (let i = 0, n = items.length; i < n; i++) {
       const item = pickFieldsForItem(items[i]);
-
-      context.type === null && console.log(item);
 
       if (item) {
         result.push(item);
