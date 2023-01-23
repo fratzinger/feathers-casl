@@ -3,7 +3,6 @@ import { authorize } from "../../../lib";
 import { createAliasResolver, defineAbility } from "@casl/ability";
 import _cloneDeep from "lodash/cloneDeep.js";
 import { filterArray, filterObject, markHookForSkip } from "feathers-utils";
-import { HOOKNAME as HOOKNAME_CHECKBASICPERMISSION } from "../../../lib/hooks/checkBasicPermission.hook";
 import type { HookContext } from "@feathersjs/feathers";
 import { MemoryService } from "@feathersjs/memory";
 import { resolveAction } from "../../test-utils";
@@ -35,7 +34,7 @@ describe("authorize.general.test.ts", function () {
         methods.forEach((method) => {
           const context = makeContext(method, type);
 
-          markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
+          markHookForSkip("checkBasicPermission", "all", context);
           const query = Object.assign({}, context.params.query);
 
           const promise = authorize()(context).then((result) => {
@@ -82,7 +81,7 @@ describe("authorize.general.test.ts", function () {
       types.forEach((type) => {
         methods.forEach((method) => {
           const context = makeContext(method, type);
-          markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
+          markHookForSkip("checkBasicPermission", "all", context);
           const promise = assert.rejects(
             authorize()(context),
             (err: Error) => err.name === "Forbidden",
@@ -125,7 +124,7 @@ describe("authorize.general.test.ts", function () {
         methods.forEach((method) => {
           const context = makeContext(method, type);
 
-          markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
+          markHookForSkip("checkBasicPermission", "all", context);
           const query = Object.assign({}, context.params.query);
 
           const promise = authorize({
@@ -219,7 +218,7 @@ describe("authorize.general.test.ts", function () {
         methods.forEach((method) => {
           const context = makeContext(method, type);
 
-          markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
+          markHookForSkip("checkBasicPermission", "all", context);
           const query = Object.assign({}, context.params.query);
 
           const promise = authorize({ availableFields: undefined })(
@@ -265,7 +264,7 @@ describe("authorize.general.test.ts", function () {
         methods.forEach((method) => {
           const context = makeContext(method, type);
 
-          markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
+          markHookForSkip("checkBasicPermission", "all", context);
           const query = Object.assign({}, context.params.query);
 
           const promise = authorize()(context).then((result) => {
@@ -308,7 +307,7 @@ describe("authorize.general.test.ts", function () {
         methods.forEach((method) => {
           const context = makeContext(method, type);
 
-          markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
+          markHookForSkip("checkBasicPermission", "all", context);
           const query = Object.assign({}, context.params.query);
 
           const promise = authorize({ modelName: undefined })(context).then(
@@ -384,7 +383,7 @@ describe("authorize.general.test.ts", function () {
           },
         } as unknown as HookContext;
 
-        markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
+        markHookForSkip("checkBasicPermission", "all", context);
 
         await assert.doesNotReject(
           authorize()(context),
@@ -427,7 +426,7 @@ describe("authorize.general.test.ts", function () {
           },
         } as unknown as HookContext;
 
-        markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
+        markHookForSkip("checkBasicPermission", "all", context);
 
         await assert.doesNotReject(
           authorize({ availableFields: ["id", "userId", "test"] })(context),
@@ -470,7 +469,7 @@ describe("authorize.general.test.ts", function () {
           },
         } as unknown as HookContext;
 
-        markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
+        markHookForSkip("checkBasicPermission", "all", context);
 
         await assert.rejects(
           authorize({ checkMultiActions: true })(context),
@@ -500,7 +499,7 @@ describe("authorize.general.test.ts", function () {
           },
         } as unknown as HookContext;
 
-        markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
+        markHookForSkip("checkBasicPermission", "all", context);
 
         await assert.rejects(
           authorize()(context),
@@ -543,7 +542,7 @@ describe("authorize.general.test.ts", function () {
           },
         } as unknown as HookContext;
 
-        markHookForSkip(HOOKNAME_CHECKBASICPERMISSION, "all", context);
+        markHookForSkip("checkBasicPermission", "all", context);
 
         await assert.rejects(
           authorize()(context),

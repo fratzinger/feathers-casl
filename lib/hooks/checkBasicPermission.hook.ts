@@ -4,7 +4,7 @@ import type { HookContext } from "@feathersjs/feathers";
 import type { CheckBasicPermissionHookOptions } from "../types";
 import { checkBasicPermissionUtil } from "../utils";
 
-export const HOOKNAME = "checkBasicPermission";
+const HOOKNAME = "checkBasicPermission";
 
 export const checkBasicPermission = (
   _options?: Partial<CheckBasicPermissionHookOptions>

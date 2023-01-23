@@ -14,8 +14,6 @@ import type {
   CheckBasicPermissionHookOptionsExclusive,
 } from "../types";
 
-export const HOOKNAME = "checkBasicPermission";
-
 const defaultOptions: CheckBasicPermissionHookOptionsExclusive = {
   checkCreateForData: false,
   storeAbilityForAuthorize: false,
