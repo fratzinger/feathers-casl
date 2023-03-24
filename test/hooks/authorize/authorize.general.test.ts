@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { authorize } from "../../../lib";
+import { authorize } from "../../../src";
 import { createAliasResolver, defineAbility } from "@casl/ability";
 import _cloneDeep from "lodash/cloneDeep.js";
 import { filterArray, filterObject, markHookForSkip } from "feathers-utils";

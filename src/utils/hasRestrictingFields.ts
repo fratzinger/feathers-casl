@@ -28,14 +28,14 @@ export const hasRestrictingFields = (
       action,
       subject as Record<string, unknown>,
       {
-        availableFields: options.availableFields,
+        availableFields: options?.availableFields,
         checkCan: false,
       }
     );
   } else {
     const permittedFieldsOfOptions: PermittedFieldsOptions<AnyAbility> = {
       fieldsFrom: (rule) => {
-        return rule.fields || options.availableFields || [];
+        return rule.fields || options?.availableFields || [];
       },
     };
 
@@ -47,15 +47,16 @@ export const hasRestrictingFields = (
     );
   }
 
-  if (fields.length === 0 && !options.availableFields) {
+  if (fields.length === 0 && !options?.availableFields) {
     return false;
   }
 
   if (fields.length > 0) {
     // check if fields is restricting at all or just complete array
     if (
-      options.availableFields === fields ||
-      (options.availableFields && areSameArray(fields, options.availableFields))
+      options?.availableFields === fields ||
+      (options?.availableFields &&
+        areSameArray(fields, options?.availableFields))
     ) {
       // arrays are the same -> no restrictions
       return false;

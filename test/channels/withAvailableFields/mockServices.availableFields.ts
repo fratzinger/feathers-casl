@@ -2,7 +2,7 @@ import type { Application, HookContext } from "@feathersjs/feathers";
 import { AuthenticationService, JWTStrategy } from "@feathersjs/authentication";
 import { LocalStrategy } from "@feathersjs/authentication-local";
 
-import type { ServiceCaslOptions } from "../../../lib";
+import type { ServiceCaslOptions } from "../../../src";
 import { MemoryService } from "@feathersjs/memory";
 import hashPassword from "@feathersjs/authentication-local/lib/hooks/hash-password";
 import protect from "@feathersjs/authentication-local/lib/hooks/protect";

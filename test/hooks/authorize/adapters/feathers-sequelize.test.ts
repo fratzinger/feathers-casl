@@ -3,7 +3,7 @@ import makeTests from "./makeTests";
 import { SequelizeService } from "feathers-sequelize";
 import { getItemsIsArray, filterArray } from "feathers-utils";
 import path from "node:path";
-import type { ServiceCaslOptions } from "../../../../lib";
+import type { ServiceCaslOptions } from "../../../../src";
 import type { HookContext } from "@feathersjs/feathers";
 
 const sequelize = new Sequelize("sqlite::memory:", {

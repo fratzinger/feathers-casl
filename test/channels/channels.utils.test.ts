@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { getEventName, makeDefaultOptions } from "../../lib";
+import { getEventName, makeDefaultOptions } from "../../src";
 
 describe("channels.utils.test.ts", function () {
   it("defaultOptions", function () {

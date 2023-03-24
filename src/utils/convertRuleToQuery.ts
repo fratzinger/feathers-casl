@@ -22,7 +22,7 @@ const supportedOperators = Object.keys(invertedMap);
 const invertedProp = (
   prop: Record<string, unknown>,
   name: string
-): Record<string, unknown> | string => {
+): Record<string, unknown> | string | undefined => {
   const map = invertedMap[name];
   if (typeof map === "string") {
     return { [map]: prop[name] };
@@ -35,7 +35,7 @@ export const convertRuleToQuery = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   rule: SubjectRawRule<any, any, MongoQuery<AnyObject>> | ClaimRawRule<any>,
   options?: GetConditionalQueryOptions
-): Query => {
+): Query | undefined => {
   const { conditions, inverted } = rule;
   if (!conditions) {
     if (inverted && options?.actionOnForbidden) {

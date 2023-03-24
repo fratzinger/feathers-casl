@@ -2,7 +2,7 @@ import assert from "node:assert";
 
 import { defineAbility, subject } from "@casl/ability";
 
-import { hasRestrictingFields } from "../../lib";
+import { hasRestrictingFields } from "../../src";
 
 const methods = ["find", "get", "create", "update", "patch", "remove"];
 

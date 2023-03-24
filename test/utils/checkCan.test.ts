@@ -4,7 +4,7 @@ import { feathers } from "@feathersjs/feathers";
 import { MemoryService } from "@feathersjs/memory";
 import { defineAbility } from "@casl/ability";
 
-import { checkCan } from "../../lib";
+import { checkCan } from "../../src";
 
 describe("utils - checkCan", function () {
   let app: Application, service, service2;

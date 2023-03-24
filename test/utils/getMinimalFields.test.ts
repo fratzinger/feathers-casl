@@ -2,7 +2,7 @@ import assert from "node:assert";
 
 import { defineAbility, subject } from "@casl/ability";
 
-import { getMinimalFields } from "../../lib";
+import { getMinimalFields } from "../../src";
 
 const methods = ["find", "get", "create", "update", "patch", "remove"];
 

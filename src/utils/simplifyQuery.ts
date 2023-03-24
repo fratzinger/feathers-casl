@@ -28,7 +28,7 @@ export const simplifyQuery = (
   }*/
 
   if (result.$and) {
-    const $and = [];
+    const $and: any[] = [];
     result.$and.forEach((q) => {
       q = simplifyQuery(q, true, true);
       if ($and.some((x) => _isEqual(x, q))) return;
@@ -41,7 +41,7 @@ export const simplifyQuery = (
     }
   }
   if (result.$or) {
-    const $or = [];
+    const $or: any[] = [];
     result.$or.forEach((q) => {
       q = simplifyQuery(q, true, true);
       if ($or.some((x) => _isEqual(x, q))) return;

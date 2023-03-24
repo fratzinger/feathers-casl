@@ -2,7 +2,7 @@ import { defineBuildConfig } from "unbuild";
 import pkg from "./package.json";
 
 export default defineBuildConfig({
-  entries: ["./lib/index"],
+  entries: ["./src/index"],
   outDir: "./dist",
   declaration: true,
   externals: [

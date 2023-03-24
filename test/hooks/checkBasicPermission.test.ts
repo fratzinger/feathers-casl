@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { createAliasResolver, defineAbility } from "@casl/ability";
-import { checkBasicPermission } from "../../lib";
+import { checkBasicPermission } from "../../src";
 import type { HookContext } from "@feathersjs/feathers";
 import { markHookForSkip } from "feathers-utils";
 import { resolveAction } from "../test-utils";

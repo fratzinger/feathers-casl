@@ -2,7 +2,7 @@
 import assert from "node:assert";
 import { createAliasResolver, defineAbility } from "@casl/ability";
 import { feathers } from "@feathersjs/feathers";
-import { authorize } from "../../../lib";
+import { authorize } from "../../../src";
 import { MemoryService } from "@feathersjs/memory";
 import { joinQuery } from "feathers-fletching";
 import { filterArray } from "feathers-utils";

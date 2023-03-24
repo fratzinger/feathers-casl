@@ -4,7 +4,7 @@ import { KnexService } from "@feathersjs/knex";
 import { filterArray, getItemsIsArray } from "feathers-utils";
 import path from "node:path";
 import type { HookContext } from "@feathersjs/feathers";
-import type { Adapter, ServiceCaslOptions } from "../../../../../lib";
+import type { Adapter, ServiceCaslOptions } from "../../../../../src";
 
 declare module "@feathersjs/knex" {
   interface KnexAdapterOptions {

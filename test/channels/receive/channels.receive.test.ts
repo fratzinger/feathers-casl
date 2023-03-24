@@ -5,7 +5,7 @@ import socketio from "@feathersjs/socketio-client";
 import type { Server } from "node:http";
 import { io } from "socket.io-client";
 
-import mockServer from "../.mockServer";
+import { mockServer } from "../.mockServer";
 import channels1 from "./mockChannels.receive";
 import services1 from "./mockServices.receive";
 import getPort from "get-port";
@@ -44,6 +44,7 @@ describe("channels.receive.test.ts", function () {
       const client = feathers();
       client.configure(socketio(socket));
       clients.push(client);
+
       await client.service("authentication").create({
         strategy: "local",
         email: user.email,
@@ -93,7 +94,7 @@ describe("channels.receive.test.ts", function () {
         promiseTimeout(
           100,
           fulFill,
-          `'client${i}:${servicePath}:${methodName}': timeout`
+          `'client${i}:${servicePath}:${methodName}': does not receive message`
         ).finally(() => {
           clients[i].service(servicePath).removeAllListeners(event);
         }),
@@ -102,9 +103,9 @@ describe("channels.receive.test.ts", function () {
     } else {
       await assert.rejects(
         promiseTimeout(
-          80,
+          100,
           fulFill,
-          `'client${i}:${servicePath}:${methodName}': timeout`
+          `'client${i}:${servicePath}:${methodName}': does not receive message`
         ).finally(() => {
           clients[i].service(servicePath).removeAllListeners(event);
         }),

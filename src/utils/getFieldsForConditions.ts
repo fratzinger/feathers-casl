@@ -6,7 +6,7 @@ export const getFieldsForConditions = (
   modelName: string
 ): string[] => {
   const rules = ability.possibleRulesFor(action, modelName);
-  const allFields = [];
+  const allFields: string[] = [];
   for (const rule of rules) {
     if (!rule.conditions) {
       continue;

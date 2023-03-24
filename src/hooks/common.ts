@@ -50,7 +50,7 @@ export const checkCreatePerItem = (
   }
 
   // we have all information we need (maybe we need populated data?)
-  const { items } = getItemsIsArray(context);
+  const { items } = getItemsIsArray(context, { from: "data" });
 
   for (let i = 0, n = items.length; i < n; i++) {
     throwUnlessCan(

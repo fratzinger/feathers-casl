@@ -2,9 +2,9 @@ import assert from "node:assert";
 import type { Application, HookContext } from "@feathersjs/feathers";
 import { feathers } from "@feathersjs/feathers";
 import { MemoryService } from "@feathersjs/memory";
-import casl, { authorize } from "../../lib";
+import casl, { authorize } from "../../src";
 import type { RealTimeConnection } from "@feathersjs/transport-commons";
-import type { InitOptions } from "../../lib";
+import type { InitOptions } from "../../src";
 import { defineAbility } from "@casl/ability";
 
 const mockApp = () => {

@@ -4,8 +4,8 @@ import { createAliasResolver, defineAbility } from "@casl/ability";
 
 import type { Application } from "@feathersjs/feathers";
 
-import { authorize } from "../../../../../lib";
-import type { Adapter, AuthorizeHookOptions } from "../../../../../lib";
+import { authorize } from "../../../../../src";
+import type { Adapter, AuthorizeHookOptions } from "../../../../../src";
 import { resolveAction } from "../../../../test-utils";
 import type { MakeTestsOptions } from "./_makeTests.types";
 

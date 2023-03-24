@@ -1,6 +1,6 @@
 import { defineAbility } from "@casl/ability";
 import assert from "node:assert";
-import { getFieldsForConditions } from "../../lib";
+import { getFieldsForConditions } from "../../src";
 
 describe("utils - getFieldsForConditions", function () {
   it("returns empty array for no conditions", function () {

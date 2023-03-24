@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import helmet from "helmet";
 import cors from "cors";
 
@@ -11,11 +11,11 @@ import type { MemoryService } from "@feathersjs/memory";
 process.env["NODE_CONFIG_DIR"] = path.join(__dirname, "config/");
 import configuration from "@feathersjs/configuration";
 
-import casl from "../../../lib";
+import casl from "../../../src";
 
 interface MockServerOptions {
   channels: (app: Application) => void;
-  services: (aüü: Application) => void;
+  services: (app: Application) => void;
 }
 
 type Application = ExpressFeathers<{
@@ -24,7 +24,7 @@ type Application = ExpressFeathers<{
   users: MemoryService;
 }>;
 
-const mockServer = (options: MockServerOptions) => {
+export const mockServer = (options: MockServerOptions) => {
   const { channels, services } = options;
   const app: Application = express(feathers());
 
@@ -64,5 +64,3 @@ const mockServer = (options: MockServerOptions) => {
     users,
   };
 };
-
-export default mockServer;

@@ -9,7 +9,7 @@ import makePatchDataTests from "./patch-data";
 import makePatchMultiTests from "./patch-multi";
 import makeRemoveTests from "./remove";
 import makeRemoveMultiTests from "./remove-multi";
-import type { Adapter, AuthorizeHookOptions } from "../../../../../lib";
+import type { Adapter, AuthorizeHookOptions } from "../../../../../src";
 import type { MakeTestsOptions } from "./_makeTests.types";
 
 export default async function (

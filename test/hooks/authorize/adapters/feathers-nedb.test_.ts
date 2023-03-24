@@ -2,7 +2,7 @@ import NeDB from "@seald-io/nedb";
 import { Service } from "feathers-nedb";
 import makeTests from "./makeTests";
 import path from "node:path";
-import type { ServiceCaslOptions } from "../../../../lib";
+import type { ServiceCaslOptions } from "../../../../src";
 
 // Create a NeDB instance
 const Model = new NeDB({

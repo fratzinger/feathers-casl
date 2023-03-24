@@ -6,8 +6,8 @@ export default defineConfig({
     coverage: {
       provider: "c8",
       reporter: ["text", "lcov"],
-      include: ["lib/**/*.{js,ts}"],
-      exclude: ["**/*.test.{js,ts}", "lib/types.ts"],
+      include: ["src/**/*.{js,ts}"],
+      exclude: ["**/*.test.{js,ts}", "src/types.ts"],
       lines: 90,
       functions: 90,
       branches: 90,

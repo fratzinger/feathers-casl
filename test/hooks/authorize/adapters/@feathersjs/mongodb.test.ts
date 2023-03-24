@@ -3,7 +3,7 @@ import { MongoClient } from "mongodb";
 import { MongoDBService } from "@feathersjs/mongodb";
 
 import makeTests from "../makeTests";
-import type { Adapter, ServiceCaslOptions } from "../../../../../lib";
+import type { Adapter, ServiceCaslOptions } from "../../../../../src";
 import { filterArray, filterObject } from "feathers-utils";
 
 let Model;

@@ -3,10 +3,10 @@ import index, {
   authorize,
   checkBasicPermission,
   getChannelsWithReadAbility,
-} from "../lib";
+} from "../src";
 import { feathers } from "@feathersjs/feathers";
 
-import type { ServiceCaslOptions } from "../lib";
+import type { ServiceCaslOptions } from "../src";
 
 declare module "@feathersjs/feathers" {
   interface Application {

@@ -4,8 +4,8 @@ import { feathers } from "@feathersjs/feathers";
 import { createAliasResolver, defineAbility } from "@casl/ability";
 import _sortBy from "lodash/sortBy.js";
 
-import { authorize } from "../../../../../lib";
-import type { Adapter, AuthorizeHookOptions } from "../../../../../lib";
+import { authorize } from "../../../../../src";
+import type { Adapter, AuthorizeHookOptions } from "../../../../../src";
 import { resolveAction } from "../../../../test-utils";
 import type { MakeTestsOptions } from "./_makeTests.types";
 

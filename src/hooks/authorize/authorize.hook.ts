@@ -10,8 +10,7 @@ import type { AuthorizeHookOptions } from "../../types";
 
 export const authorize = <H extends HookContext = HookContext>(
   _options?: Partial<AuthorizeHookOptions>
-) => {
-  return async (context: H, next?: NextFunction) => {
+) => async (context: H, next?: NextFunction) => {
     if (
       shouldSkip(HOOKNAME, context, _options) ||
       !context.params ||
@@ -34,4 +33,3 @@ export const authorize = <H extends HookContext = HookContext>(
       ? await authorizeBefore(context, options)
       : await authorizeAfter(context, options);
   };
-};

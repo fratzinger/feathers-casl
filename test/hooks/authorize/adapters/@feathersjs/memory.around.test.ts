@@ -1,6 +1,6 @@
 import { MemoryService } from "@feathersjs/memory";
 import { filterArray, filterObject } from "feathers-utils";
-import type { Adapter, ServiceCaslOptions } from "../../../../../lib";
+import type { Adapter, ServiceCaslOptions } from "../../../../../src";
 import makeTests from "../makeTests";
 
 declare module "@feathersjs/memory" {

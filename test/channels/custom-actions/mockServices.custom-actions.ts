@@ -5,7 +5,7 @@ import { LocalStrategy } from "@feathersjs/authentication-local";
 import { MemoryService } from "@feathersjs/memory";
 import hashPassword from "@feathersjs/authentication-local/lib/hooks/hash-password";
 import protect from "@feathersjs/authentication-local/lib/hooks/protect";
-import type { ServiceCaslOptions } from "../../../lib";
+import type { ServiceCaslOptions } from "../../../src";
 import { createAliasResolver, defineAbility } from "@casl/ability";
 
 const resolveAction = createAliasResolver({

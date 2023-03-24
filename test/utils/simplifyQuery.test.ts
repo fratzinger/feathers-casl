@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { simplifyQuery } from "../../lib";
+import { simplifyQuery } from "../../src";
 
 describe("utils - simplifyQuery", function () {
   it("makes $and simpler", function () {

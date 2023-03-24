@@ -4,7 +4,7 @@ import { Service } from "feathers-objection";
 import { getItemsIsArray } from "feathers-utils";
 import { knex } from "knex";
 import path from "node:path";
-import type { ServiceCaslOptions } from "../../../../lib";
+import type { ServiceCaslOptions } from "../../../../src";
 import type { HookContext } from "@feathersjs/feathers";
 
 const db = knex({

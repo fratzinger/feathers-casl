@@ -15,15 +15,14 @@ export const makeChannelOptions = (
   return Object.assign({}, defaultOptions, getAppOptions(app), options);
 };
 
-const defaultOptions: ChannelOptions = {
+const defaultOptions: Omit<ChannelOptions, "channels"> = {
   activated: true,
   channelOnError: ["authenticated"],
-  channels: undefined,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ability: (
     app: Application,
     connection: RealTimeConnection,
-    data: Record<string, any>,
+    data: any,
     context: HookContext
   ): Ability => {
     return connection.ability;

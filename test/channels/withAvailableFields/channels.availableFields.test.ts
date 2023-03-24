@@ -5,7 +5,7 @@ import socketio from "@feathersjs/socketio-client";
 import type { Server } from "node:http";
 import { io } from "socket.io-client";
 
-import mockServer from "../.mockServer";
+import { mockServer } from "../.mockServer";
 import channels1 from "./mockChannels.availableFields";
 import services1 from "./mockServices.availableFields";
 import getPort from "get-port";

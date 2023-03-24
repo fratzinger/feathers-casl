@@ -150,7 +150,7 @@ export const refetchItems = async (
   if (!context.result) {
     return;
   }
-  const { items } = getItemsIsArray(context);
+  const { items } = getItemsIsArray(context, { from: "result" });
 
   if (!items) {
     return;

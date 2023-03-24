@@ -1,7 +1,7 @@
 import type { HookContext } from "@feathersjs/feathers";
 import assert from "node:assert";
 
-import { getModelName } from "../../lib";
+import { getModelName } from "../../src";
 
 describe("utils - getModelName", function () {
   it("as undefined", function () {

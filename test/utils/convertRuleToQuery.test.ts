@@ -1,6 +1,6 @@
 import { defineAbility } from "@casl/ability";
 import assert from "node:assert";
-import { convertRuleToQuery } from "../../lib";
+import { convertRuleToQuery } from "../../src";
 
 describe("utils - convertRuleToQuery", function () {
   it("", function () {

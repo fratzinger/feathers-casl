@@ -1,4 +1,3 @@
-!lib
 test/.data/**
 
 # Logs
@@ -116,7 +115,10 @@ $RECYCLE.BIN/
 # dot_env
 .env.*
 
-dist
+# dist
+dist/**
+
+docs/.vitepress/dist
 
 .cache
 .temp

@@ -6,7 +6,7 @@ import type {
   RealTimeConnection,
 } from "@feathersjs/feathers";
 
-import { getChannelsWithReadAbility, makeChannelOptions } from "../../../lib";
+import { getChannelsWithReadAbility, makeChannelOptions } from "../../../src";
 import type { Application } from "@feathersjs/express";
 
 export default function (app: Application): void {

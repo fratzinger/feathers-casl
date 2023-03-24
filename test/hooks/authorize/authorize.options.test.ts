@@ -6,7 +6,7 @@ import { createAliasResolver, defineAbility } from "@casl/ability";
 
 import type { Application, HookContext } from "@feathersjs/feathers";
 
-import { authorize } from "../../../lib";
+import { authorize } from "../../../src";
 import { resolveAction } from "../../test-utils";
 
 declare module "@feathersjs/adapter-commons" {

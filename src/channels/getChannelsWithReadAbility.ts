@@ -64,7 +64,8 @@ export const getChannelsWithReadAbility = (
     result = channels.map((channel) => {
       return channel.filter((conn) => {
         const ability = getAbility(app, data, conn, context, options);
-        return ability && ability.can(method, dataToTest);
+        const can = ability && ability.can(method, dataToTest);
+        return can;
       });
     });
   } else {
