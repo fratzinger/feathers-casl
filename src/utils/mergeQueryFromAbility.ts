@@ -34,66 +34,66 @@ export const mergeQueryFromAbility = <T>(
   service: AdapterBase<T>,
   options: Pick<AuthorizeHookOptions, "adapter">
 ): Query => {
-  if (hasRestrictingConditions(ability, method, modelName)) {
-    const adapter = getAdapter(app, options);
-
-    let query: Query;
-    if (adaptersFor$not.includes(adapter)) {
-      // nedb
-      query = rulesToQuery(ability, method, modelName, (rule) => {
-        const { conditions } = rule;
-        return rule.inverted ? { $not: conditions } : conditions;
-      });
-      query = simplifyQuery(query);
-    } else if (adaptersFor$notAsArray.includes(adapter)) {
-      // objection, sequelize
-      query = rulesToQuery(ability, method, modelName, (rule) => {
-        const { conditions } = rule;
-        return rule.inverted ? { $not: [conditions] } : conditions;
-      });
-      query = simplifyQuery(query);
-    } else if (adaptersFor$nor.includes(adapter)) {
-      // memory, mongoose, mongodb
-      query = rulesToQuery(ability, method, modelName, (rule) => {
-        const { conditions } = rule;
-        return rule.inverted ? { $nor: [conditions] } : conditions;
-      });
-      query = simplifyQuery(query);
-    } else {
-      query = rulesToQuery(ability, method, modelName, (rule) => {
-        const { conditions } = rule;
-        return rule.inverted ? convertRuleToQuery(rule) : conditions;
-      });
-      query = simplifyQuery(query);
-      if (query.$and) {
-        const { $and } = query;
-        delete query.$and;
-        $and.forEach((q) => {
-          query = mergeQuery(query, q, {
-            defaultHandle: "intersect",
-            operators: service.options?.operators,
-            filters: service.options?.filters,
-            useLogicalConjunction: true,
-          });
-        });
-      }
-    }
-
-    if (_isEmpty(query)) {
-      return originalQuery;
-    }
-
-    if (!originalQuery) {
-      return query;
-    } else {
-      return mergeQuery(originalQuery, query, {
-        defaultHandle: "intersect",
-        operators: service.options?.operators,
-        filters: service.options?.filters,
-        useLogicalConjunction: true,
-      });
-    }
-  } else {
+  if (!hasRestrictingConditions(ability, method, modelName)) {
     return originalQuery;
+  }
+
+  const adapter = getAdapter(app, options);
+
+  let query: Query | null;
+  if (adaptersFor$not.includes(adapter)) {
+    // nedb
+    query = rulesToQuery(ability, method, modelName, (rule) => {
+      const { conditions } = rule;
+      return rule.inverted ? { $not: conditions } : conditions;
+    });
+    query = simplifyQuery(query);
+  } else if (adaptersFor$notAsArray.includes(adapter)) {
+    // objection, sequelize
+    query = rulesToQuery(ability, method, modelName, (rule) => {
+      const { conditions } = rule;
+      return rule.inverted ? { $not: [conditions] } : conditions;
+    });
+    query = simplifyQuery(query);
+  } else if (adaptersFor$nor.includes(adapter)) {
+    // memory, mongoose, mongodb
+    query = rulesToQuery(ability, method, modelName, (rule) => {
+      const { conditions } = rule;
+      return rule.inverted ? { $nor: [conditions] } : conditions;
+    });
+    query = simplifyQuery(query);
+  } else {
+    query = rulesToQuery(ability, method, modelName, (rule) => {
+      const { conditions } = rule;
+      return rule.inverted ? convertRuleToQuery(rule) : conditions;
+    });
+    query = simplifyQuery(query);
+    if (query?.$and) {
+      const { $and } = query;
+      delete query.$and;
+      $and.forEach((q) => {
+        query = mergeQuery(query, q, {
+          defaultHandle: "intersect",
+          operators: service.options?.operators,
+          filters: service.options?.filters,
+          useLogicalConjunction: true,
+        });
+      });
+    }
+  }
+
+  if (_isEmpty(query)) {
+    return originalQuery;
+  }
+
+  if (!originalQuery) {
+    return query;
+  } else {
+    return mergeQuery(originalQuery, query, {
+      defaultHandle: "intersect",
+      operators: service.options?.operators,
+      filters: service.options?.filters,
+      useLogicalConjunction: true,
+    });
   }
 };

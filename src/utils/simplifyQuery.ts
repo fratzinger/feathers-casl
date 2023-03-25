@@ -3,11 +3,14 @@ import _cloneDeep from "lodash/cloneDeep.js";
 
 import type { Query } from "@feathersjs/feathers";
 
-export const simplifyQuery = (
-  query: Query,
+export const simplifyQuery = <Q extends Query | null>(
+  query: Q,
   replaceAnd = true,
   replaceOr = true
-): Query => {
+): Q => {
+  if (!query) {
+    return query;
+  }
   if (!query.$and && !query.$or) {
     return query;
   }

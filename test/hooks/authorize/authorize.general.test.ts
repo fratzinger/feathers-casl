@@ -355,7 +355,7 @@ describe("authorize.general.test.ts", function () {
       const context = makeContext("find", "before");
       await authorize({ availableFields: undefined })(context);
       assert.deepStrictEqual(context.params.query, {
-        $and: [{ userId: 1 }],
+        userId: 1,
         test: true,
       });
     });

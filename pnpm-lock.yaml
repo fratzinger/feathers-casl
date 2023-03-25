@@ -37,7 +37,7 @@ specifiers:
   feathers-nedb: ^6.0.0
   feathers-objection: ^7.5.4
   feathers-sequelize: ^7.0.0
-  feathers-utils: ^2.0.0
+  feathers-utils: ^2.1.0
   get-port: ^6.1.2
   helmet: ^6.0.1
   knex: ^2.4.2
@@ -63,7 +63,7 @@ dependencies:
   '@feathersjs/feathers': 5.0.1
   '@feathersjs/transport-commons': 5.0.1
   feathers-hooks-common: 7.0.1
-  feathers-utils: 2.0.0
+  feathers-utils: 2.1.0
   lodash: 4.17.21
 
 devDependencies:
@@ -1614,6 +1614,7 @@ packages:
   /@feathersjs/commons/5.0.0:
     resolution: {integrity: sha512-WTUQag+cIhkJ+Y7kS1lEy2T8i2AF7bO2qvIXdKM9jb4d92GCl5ZX2LrAlEgKY2Y8GUqm3EVfYXEqHq9ZUqdI8A==}
     engines: {node: '>= 12'}
+    dev: true
 
   /@feathersjs/commons/5.0.1:
     resolution: {integrity: sha512-SNnWoUx/FPiEw8B+2kYLOCKxPRBQ08m5nv1VU80nEMIxURD1z079XsTJBJYKuaqjr5V3LvMrpdmisJ8CLKfJCA==}
@@ -4230,6 +4231,11 @@ packages:
     resolution: {integrity: sha512-xJuoT5+L99XlZ8twedaRf6Ax2TgQVxvgZOYoPKqZufmJib0tL2tegPBOZb1pVNgIhlqDlA0eO0c3wBvQcmzx4w==}
     dev: true
 
+  /fast-equals/5.0.1:
+    resolution: {integrity: sha512-WF1Wi8PwwSY7/6Kx0vKXtw8RwuSGoM1bvDaJbu7MxDlR1vovZjIAKrnzyrThgAjm6JDTu0fVgWXDlMGspodfoQ==}
+    engines: {node: '>=6.0.0'}
+    dev: false
+
   /fast-glob/3.2.12:
     resolution: {integrity: sha512-DVj4CQIYYow0BlaelwK1pHl5n5cRSJfM60UA0zK891sVInoPri2Ekj7+e1CT3/3qxXenpI+nBBmQAcJPJgaj4w==}
     engines: {node: '>=8.6.0'}
@@ -4368,14 +4374,15 @@ packages:
       '@feathersjs/errors': 5.0.1
     dev: true
 
-  /feathers-utils/2.0.0:
-    resolution: {integrity: sha512-ZjCEygi4e5V0f75nKNcgdTksyhUjYyLBsmqeYf99Ru9Gd3nNazLToy7H/Sodhniwo1VmZpVUJfKkueCq3lfN2A==}
+  /feathers-utils/2.1.0:
+    resolution: {integrity: sha512-pb6cNhvJsMNZy7SsMQ8b6GNYz/nnVblQ+JcgV3rnUA/d3ql0Db8xeVcIv3wopK4UCsYzUJ8MgXavIGNlctzeIQ==}
     engines: {node: '>= 16'}
     dependencies:
       '@feathersjs/adapter-commons': 5.0.0
-      '@feathersjs/commons': 5.0.0
+      '@feathersjs/commons': 5.0.1
       '@feathersjs/errors': 5.0.0
       '@feathersjs/feathers': 5.0.0
+      fast-equals: 5.0.1
       feathers-hooks-common: 7.0.1
       lodash: 4.17.21
     transitivePeerDependencies:
