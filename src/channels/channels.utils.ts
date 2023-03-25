@@ -29,7 +29,7 @@ const defaultOptions: Omit<ChannelOptions, "channels"> = {
   },
   modelName: (context) => context.path,
   restrictFields: true,
-  availableFields: (context: HookContext): string[] => {
+  availableFields: (context: HookContext): string[] | undefined => {
     const availableFields: string[] | ((context: HookContext) => string[]) =
       context.service.options?.casl?.availableFields;
     return getAvailableFields(context, { availableFields });
@@ -66,7 +66,7 @@ export const getAbility = (
   }
 };
 
-export const getEventName = (method: string): EventName => {
+export const getEventName = (method: string): EventName | undefined => {
   if (method === "create") {
     return "created";
   } else if (method === "update") {

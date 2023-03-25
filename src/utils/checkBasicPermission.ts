@@ -26,10 +26,10 @@ const makeOptions = (
   return Object.assign(makeDefaultBaseOptions(), defaultOptions, options);
 };
 
-export const checkBasicPermissionUtil = async (
-  context: HookContext,
+export const checkBasicPermissionUtil = async <H extends HookContext>(
+  context: H,
   _options?: Partial<CheckBasicPermissionUtilsOptions>
-): Promise<HookContext> => {
+): Promise<H> => {
   const options = makeOptions(_options);
 
   const { method } = context;

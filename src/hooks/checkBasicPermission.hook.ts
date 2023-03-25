@@ -6,10 +6,10 @@ import { checkBasicPermissionUtil } from "../utils";
 
 const HOOKNAME = "checkBasicPermission";
 
-export const checkBasicPermission = (
+export const checkBasicPermission = <H extends HookContext>(
   _options?: Partial<CheckBasicPermissionHookOptions>
-): ((context: HookContext) => Promise<HookContext>) => {
-  return async (context: HookContext): Promise<HookContext> => {
+): ((context: H) => Promise<H>) => {
+  return async (context: H): Promise<H> => {
     if (
       !_options?.notSkippable &&
       (shouldSkip(HOOKNAME, context) ||

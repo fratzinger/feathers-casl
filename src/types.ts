@@ -58,7 +58,8 @@ export type CheckBasicPermissionHookOptionsExclusive<
 
 export type AvailableFieldsOption<H extends HookContext = HookContext> =
   | string[]
-  | ((context: H) => string[]);
+  | ((context: H) => string[] | undefined)
+  | undefined;
 
 export interface AuthorizeChannelCommonsOptions<
   H extends HookContext = HookContext
@@ -100,7 +101,7 @@ export interface ChannelOptions extends AuthorizeChannelCommonsOptions {
   /** Channel that's used when there occurs an error, default: `['authenticated']` */
   channelOnError: string[];
   /** Prefiltered channels, default: `app.channel(app.channels)` */
-  channels: Channel | Channel[];
+  channels?: Channel | Channel[];
   modelName: GetModelName;
   restrictFields: boolean;
   /** change action to use for events. For example: `'receive'`, default: `'get'` */
@@ -112,7 +113,7 @@ export interface GetConditionalQueryOptions {
 }
 
 export interface HasRestrictingFieldsOptions {
-  availableFields: string[];
+  availableFields: string[] | undefined;
 }
 
 export interface InitOptions<H extends HookContext = HookContext> {

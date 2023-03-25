@@ -23,6 +23,7 @@ const invertedProp = (
   prop: Record<string, unknown>,
   name: string
 ): Record<string, unknown> | string | undefined => {
+  // @ts-expect-error `name` maybe is not in `invertedMap`
   const map = invertedMap[name];
   if (typeof map === "string") {
     return { [map]: prop[name] };

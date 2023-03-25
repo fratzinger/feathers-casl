@@ -8,16 +8,16 @@ import type { Id, Service } from "@feathersjs/feathers";
 import type { UtilCheckCanOptions } from "../types";
 
 const makeOptions = (
-  providedOptions: Partial<UtilCheckCanOptions>
+  providedOptions?: Partial<UtilCheckCanOptions>
 ): UtilCheckCanOptions => {
-  const defaultOptions: UtilCheckCanOptions = {
+  return {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     actionOnForbidden: () => {},
     checkGeneral: true,
     skipThrow: false,
     useConditionalSelect: true,
+    ...providedOptions,
   };
-  return Object.assign(defaultOptions, providedOptions || {});
 };
 
 export const checkCan = async <S>(
@@ -47,6 +47,7 @@ export const checkCan = async <S>(
   //@ts-expect-error _get is not exposed
   const getMethod = service._get ? "_get" : "get";
 
+  // @ts-expect-error _get is not exposed
   const item = await service[getMethod](id, params);
 
   const can = throwUnlessCan(

@@ -71,8 +71,8 @@ export const mergeQueryFromAbility = <T>(
     if (query?.$and) {
       const { $and } = query;
       delete query.$and;
-      $and.forEach((q) => {
-        query = mergeQuery(query, q, {
+      $and.forEach((q: any) => {
+        query = mergeQuery(query as Query, q, {
           defaultHandle: "intersect",
           operators: service.options?.operators,
           filters: service.options?.filters,

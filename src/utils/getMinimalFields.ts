@@ -22,7 +22,7 @@ export const getMinimalFields = (
   if (rules.length === 0) {
     return options.availableFields || [];
   }
-  let fields: string[];
+  let fields: string[] | undefined;
   if (options.availableFields) {
     fields = options.availableFields;
   } else {
@@ -34,7 +34,7 @@ export const getMinimalFields = (
 
   rules.forEach((rule) => {
     if (rule.inverted) {
-      fields = fields.filter((x) => !rule.fields.includes(x));
+      fields = fields?.filter((x) => !rule.fields?.includes(x));
     } else {
       fields = mergeArrays(fields, rule.fields, "intersect");
     }

@@ -37,7 +37,7 @@ specifiers:
   feathers-nedb: ^6.0.0
   feathers-objection: ^7.5.4
   feathers-sequelize: ^7.0.0
-  feathers-utils: ^2.1.0
+  feathers-utils: ^2.1.2
   get-port: ^6.1.2
   helmet: ^6.0.1
   knex: ^2.4.2
@@ -63,7 +63,7 @@ dependencies:
   '@feathersjs/feathers': 5.0.1
   '@feathersjs/transport-commons': 5.0.1
   feathers-hooks-common: 7.0.1
-  feathers-utils: 2.1.0
+  feathers-utils: 2.1.2
   lodash: 4.17.21
 
 devDependencies:
@@ -1559,15 +1559,6 @@ packages:
       - supports-color
     dev: true
 
-  /@feathersjs/adapter-commons/5.0.0:
-    resolution: {integrity: sha512-FHI82BgTMbKFy/v3HGTPFxf2048I1usU1CSUwkXK6udHIsKiJessqTok0FiV0IkGRT7RR/jo02xcq/NPSd0wvg==}
-    engines: {node: '>= 12'}
-    dependencies:
-      '@feathersjs/commons': 5.0.1
-      '@feathersjs/errors': 5.0.1
-      '@feathersjs/feathers': 5.0.1
-    dev: false
-
   /@feathersjs/adapter-commons/5.0.1:
     resolution: {integrity: sha512-s1ERoHP6tR1gUQIma4Wd6xSdHHHPfsm2H86KHiLy6rrIjtgwgMysxgD8cFjdSgUfp1QzyY8W2G9pqY7kClqjhQ==}
     engines: {node: '>= 12'}
@@ -1575,7 +1566,6 @@ packages:
       '@feathersjs/commons': 5.0.1
       '@feathersjs/errors': 5.0.1
       '@feathersjs/feathers': 5.0.1
-    dev: true
 
   /@feathersjs/authentication-local/5.0.1:
     resolution: {integrity: sha512-Y8IViT88KS6buXrrNSqyBxv99XUawe2/iPz1DamKCfTfmxIWJFB6gSbYL79YywKF8XvDwhR9l2OUyYd5V7v0bA==}
@@ -1640,11 +1630,6 @@ packages:
       - supports-color
     dev: true
 
-  /@feathersjs/errors/5.0.0:
-    resolution: {integrity: sha512-bVir0nomgk8BSnpe5zcJ8JT2ly5xVsdH5KrMgA5f+E00NMu/2S8QoC3YF4WesYQ7WYg3uS6VulhPDj3MV6xLgw==}
-    engines: {node: '>= 12'}
-    dev: false
-
   /@feathersjs/errors/5.0.1:
     resolution: {integrity: sha512-SOJ9a9VpWn5w0o3cqYTmS1EG0h7w0uLQI9k556Z2qLatdrgH7Lt6aO2FIeIV842iqLheiXA62KDKCpDTKTAHzA==}
     engines: {node: '>= 12'}
@@ -1679,15 +1664,6 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
-
-  /@feathersjs/feathers/5.0.0:
-    resolution: {integrity: sha512-21rrKf4jFYEUHxMM/FeBiZODeXERSEMBVLTUbwCX9gtrbEH1okROz/u2piWS4LeYpeptiLu4i+S0xdvUe53H/Q==}
-    engines: {node: '>= 12'}
-    dependencies:
-      '@feathersjs/commons': 5.0.1
-      '@feathersjs/hooks': 0.8.1
-      events: 3.3.0
-    dev: false
 
   /@feathersjs/feathers/5.0.1:
     resolution: {integrity: sha512-9eQsmcN8SoRt+APtrB/Dfjo9zSvibuMNjkidHhqTu93UCEd7TysTv7Q3IRwXGoJCialnwwVIgoK9NOhjKe45ug==}
@@ -4374,14 +4350,14 @@ packages:
       '@feathersjs/errors': 5.0.1
     dev: true
 
-  /feathers-utils/2.1.0:
-    resolution: {integrity: sha512-pb6cNhvJsMNZy7SsMQ8b6GNYz/nnVblQ+JcgV3rnUA/d3ql0Db8xeVcIv3wopK4UCsYzUJ8MgXavIGNlctzeIQ==}
+  /feathers-utils/2.1.2:
+    resolution: {integrity: sha512-QOIi0dEFsUR3FUcVsM5TGJbcAOmwfe1WQZngEo5dX6qvj0gi68xcz0LUsCW24WSKwimGwlG9HPFLKg4T1A21Kg==}
     engines: {node: '>= 16'}
     dependencies:
-      '@feathersjs/adapter-commons': 5.0.0
+      '@feathersjs/adapter-commons': 5.0.1
       '@feathersjs/commons': 5.0.1
-      '@feathersjs/errors': 5.0.0
-      '@feathersjs/feathers': 5.0.0
+      '@feathersjs/errors': 5.0.1
+      '@feathersjs/feathers': 5.0.1
       fast-equals: 5.0.1
       feathers-hooks-common: 7.0.1
       lodash: 4.17.21

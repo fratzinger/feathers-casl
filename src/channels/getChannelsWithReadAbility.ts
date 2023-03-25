@@ -52,7 +52,7 @@ export const getChannelsWithReadAbility = (
   } else {
     const eventName = getEventName(context.method);
     if (eventName && options.useActionName[eventName]) {
-      method = options.useActionName[eventName];
+      method = options.useActionName[eventName] as string;
     }
   }
 
@@ -62,9 +62,9 @@ export const getChannelsWithReadAbility = (
     // return all fields for allowed
 
     result = channels.map((channel) => {
-      return channel.filter((conn) => {
+      return channel.filter((conn: any) => {
         const ability = getAbility(app, data, conn, context, options);
-        const can = ability && ability.can(method, dataToTest);
+        const can = !!ability && ability.can(method, dataToTest);
         return can;
       });
     });
