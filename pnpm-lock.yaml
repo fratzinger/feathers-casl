@@ -37,7 +37,7 @@ specifiers:
   feathers-nedb: ^6.0.0
   feathers-objection: ^7.5.4
   feathers-sequelize: ^7.0.0
-  feathers-utils: ^2.1.2
+  feathers-utils: ^2.1.3
   get-port: ^6.1.2
   helmet: ^6.0.1
   knex: ^2.4.2
@@ -63,7 +63,7 @@ dependencies:
   '@feathersjs/feathers': 5.0.1
   '@feathersjs/transport-commons': 5.0.1
   feathers-hooks-common: 7.0.1
-  feathers-utils: 2.1.2
+  feathers-utils: 2.1.3
   lodash: 4.17.21
 
 devDependencies:
@@ -4350,8 +4350,8 @@ packages:
       '@feathersjs/errors': 5.0.1
     dev: true
 
-  /feathers-utils/2.1.2:
-    resolution: {integrity: sha512-QOIi0dEFsUR3FUcVsM5TGJbcAOmwfe1WQZngEo5dX6qvj0gi68xcz0LUsCW24WSKwimGwlG9HPFLKg4T1A21Kg==}
+  /feathers-utils/2.1.3:
+    resolution: {integrity: sha512-IEyUiWUIOB4vjCFQ19PKT+hfZRO92wVEC+si/Ya7JjZHZGXEsNsRTJn3exSHrPw2goMPUHsAaPKXteznv69nIA==}
     engines: {node: '>= 16'}
     dependencies:
       '@feathersjs/adapter-commons': 5.0.1
