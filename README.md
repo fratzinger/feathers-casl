@@ -21,15 +21,15 @@ This project is built for [FeathersJS](http://feathersjs.com). An open source we
 It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CASL** in feathers.js.
 
 ## Features
+
 - Fully powered by Feathers 4 & CASL 5
-- Written in TypeScript
 - Allows permissions for all methods `create`, `find`, `get`, `update`, `patch`, `remove`, or `create`, `read`, `update`, `delete`
 - Define permissions not based on methods: `can('view', 'Settings')` (Bring your custom logic)
 - Restrict by conditions: `can('create', 'Task', { userId: user.id })`
 - Restrict by individual fields: `cannot('update', 'User', ['roleId'])`
 - Native support for restrictive `$select`: `can('read', 'User', ['id', 'username'])` -> `$select: ['id', 'username']`
 - Support to define abilities for anything (providers, users, roles, 3rd party apps, ...)
-- Fully supported adapters: `feathers-knex`, `feathers-memory`, `feathers-mongodb`, `feathers-mongoose`, `feathers-nedb`, `feathers-objection`, `feathers-sequelize`
+- Fully supported adapters: `@feathersjs/knex`, `@feathersjs/memory`, `@feathersjs/mongodb`, `feathers-sequelize`, not supported: `feathers-mongoose`, `feathers-nedb`, `feathers-objection`
 - Support for dynamic rules stored in your database (Bring your own implementation ;) )
 - hooks:
   - `checkBasicPermission` hook for client side usage as a before-hook
@@ -44,6 +44,7 @@ It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CA
 - Baked in support for `@casl/angular`, `@casl/react`, `@casl/vue` and `@casl/aurelia`
 
 ## Documentation
+
 You need more information? Please have a look:
 https://feathers-casl.netlify.app/
 
@@ -55,7 +56,7 @@ npm i feathers-casl
 
 ## Testing
 
-Simply run `npm test` and all your tests in the `test/` directory will be run. It has full support for *Visual Studio Code*. You can use the debugger to set breakpoints.
+Simply run `npm test` and all your tests in the `test/` directory will be run. It has full support for _Visual Studio Code_. You can use the debugger to set breakpoints.
 
 ## Help
 

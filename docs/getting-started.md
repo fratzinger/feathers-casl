@@ -21,15 +21,15 @@ This project is built for [FeathersJS](http://feathersjs.com). An open source we
 It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CASL** in your feathers.js-project. Supported versions: `@casl/ability^5` and `@feathersjs/feathers^4`.
 
 ## Features
-- Fully powered by Feathers 4 & CASL 5
-- Written in TypeScript
+
+- Fully powered by Feathers 5 & CASL 5
 - Allows permissions for all methods `create`, `find`, `get`, `update`, `patch`, `remove`, or `create`, `read`, `update`, `delete`
 - Define permissions not based on methods: `can('view', 'Settings')` (Bring your custom logic)
 - Restrict by conditions: `can('create', 'Task', { userId: user.id })`
 - Restrict by individual fields: `cannot('update', 'User', ['roleId'])`
 - Native support for restrictive `$select`: `can('read', 'User', ['id', 'username'])` -> `$select: ['id', 'username']`
 - Support to define abilities for anything (providers, users, roles, 3rd party apps, ...)
-- Fully supported adapters: `feathers-knex`, `feathers-memory`, `feathers-mongodb`, `feathers-mongoose`, `feathers-nedb`, `feathers-objection`, `feathers-sequelize`
+- Fully supported adapters: `@feathersjs/knex`, `@feathersjs/memory`, `@feathersjs/mongodb`, `feathers-sequelize`, not supported: `feathers-mongoose`, `feathers-nedb`, `feathers-objection`
 - Support for dynamic rules stored in your database (Bring your own implementation ;) )
 - hooks:
   - `checkBasicPermission` hook for client side usage as a before-hook
@@ -57,7 +57,7 @@ yarn add feathers-casl
 
 ```js
 // app.js
-const casl = require('feathers-casl');
+const casl = require("feathers-casl");
 
 app.configure(casl());
 ```
@@ -70,36 +70,40 @@ For most cases we want to define rules per user (or per user-role). So we first 
 
 ```js
 // src/services/authentication/authentication.abilities.js
-const { AbilityBuilder, createAliasResolver, makeAbilityFromRules } = require('feathers-casl');
+const {
+  AbilityBuilder,
+  createAliasResolver,
+  makeAbilityFromRules
+} = require("feathers-casl");
 
 // don't forget this, as `read` is used internally
 const resolveAction = createAliasResolver({
-  update: 'patch',       // define the same rules for update & patch
-  read: ['get', 'find'], // use 'read' as a equivalent for 'get' & 'find'
-  delete: 'remove'       // use 'delete' or 'remove'
+  update: "patch", // define the same rules for update & patch
+  read: ["get", "find"], // use 'read' as a equivalent for 'get' & 'find'
+  delete: "remove" // use 'delete' or 'remove'
 });
 
 const defineRulesFor = (user) => {
   // also see https://casl.js.org/v5/en/guide/define-rules
   const { can, cannot, rules } = new AbilityBuilder();
 
-  if (user.role && user.role.name === 'SuperAdmin') {
+  if (user.role && user.role.name === "SuperAdmin") {
     // SuperAdmin can do evil
-    can('manage', 'all');
+    can("manage", "all");
     return rules;
   }
 
-  if (user.role && user.role.name === 'Admin') {
-    can('create', 'users');
+  if (user.role && user.role.name === "Admin") {
+    can("create", "users");
   }
 
-  can('read', 'users');
-  can('update', 'users', { id: user.id });
-  cannot('update', 'users', ['roleId'], { id: user.id });
-  cannot('delete', 'users', { id: user.id });
+  can("read", "users");
+  can("update", "users", { id: user.id });
+  cannot("update", "users", ["roleId"], { id: user.id });
+  cannot("delete", "users", { id: user.id });
 
-  can('manage', 'tasks', { userId: user.id });
-  can('create-multi', 'posts', { userId: user.id })
+  can("manage", "tasks", { userId: user.id });
+  can("create-multi", "posts", { userId: user.id });
 
   return rules;
 };
@@ -114,53 +118,52 @@ module.exports = {
   defineRulesFor,
   defineAbilitiesFor
 };
-
 ```
+
 Typescript version of the code:
 
 ```js
 // src/services/authentication/authentication.abilities.ts
-import { createAliasResolver, makeAbilityFromRules } from 'feathers-casl';
-import { AbilityBuilder, Ability } from '@casl/ability';
+import { createAliasResolver, makeAbilityFromRules } from "feathers-casl";
+import { AbilityBuilder, Ability } from "@casl/ability";
 
 // don't forget this, as `read` is used internally
 const resolveAction = createAliasResolver({
-    update: 'patch',       // define the same rules for update & patch
-    read: ['get', 'find'], // use 'read' as a equivalent for 'get' & 'find'
-    delete: 'remove'       // use 'delete' or 'remove'
+  update: "patch", // define the same rules for update & patch
+  read: ["get", "find"], // use 'read' as a equivalent for 'get' & 'find'
+  delete: "remove" // use 'delete' or 'remove'
 });
 
 export const defineRulesFor = (user: any) => {
-    // also see https://casl.js.org/v5/en/guide/define-rules
-    const { can, cannot, rules } = new AbilityBuilder(Ability);
+  // also see https://casl.js.org/v5/en/guide/define-rules
+  const { can, cannot, rules } = new AbilityBuilder(Ability);
 
-    if (user.role && user.role.name === 'SuperAdmin') {
-        // SuperAdmin can do evil
-        can('manage', 'all');
-        return rules;
-    }
-
-    if (user.role && user.role.name === 'Admin') {
-        can('create', 'users');
-    }
-
-    can('read', 'users');
-    can('update', 'users', { id: user.id });
-    cannot('update', 'users', ['roleId'], { id: user.id });
-    cannot('delete', 'users', { id: user.id });
-
-    can('manage', 'tasks', { userId: user.id });
-    can('create-multi', 'posts', { userId: user.id });
-
+  if (user.role && user.role.name === "SuperAdmin") {
+    // SuperAdmin can do evil
+    can("manage", "all");
     return rules;
+  }
+
+  if (user.role && user.role.name === "Admin") {
+    can("create", "users");
+  }
+
+  can("read", "users");
+  can("update", "users", { id: user.id });
+  cannot("update", "users", ["roleId"], { id: user.id });
+  cannot("delete", "users", { id: user.id });
+
+  can("manage", "tasks", { userId: user.id });
+  can("create-multi", "posts", { userId: user.id });
+
+  return rules;
 };
 
 export const defineAbilitiesFor = (user: any) => {
-    const rules = defineRulesFor(user);
+  const rules = defineRulesFor(user);
 
-    return makeAbilityFromRules(rules, { resolveAction });
+  return makeAbilityFromRules(rules, { resolveAction });
 };
-
 ```
 
 ### Add abilities to hooks context
@@ -221,37 +224,37 @@ The `authorize`-hook can be used for all methods and has support for `multi: tru
 ```js{5-6,12,15,18,21,24,27,33}
 // src/services/tasks/tasks.hooks.js
 const { authenticate } = require('@feathersjs/authentication').hooks;
-const { authorize } = require('feathers-casl').hooks;
+const { authorize } = require('feathers-casl');
 
-// CAUTION! Make sure the adapter name fits your adapter (e.g. feathers-mongodb, feathers-sequelize, feathers-objection, feathers-knex, ...)!
+// CAUTION! Make sure the adapter name fits your adapter (e.g. @feathersjs/mongodb, @feathersjs/knex, feathers-sequelize, ...)!
 // You'll want to have the `authorize` as an early before-hook (right after the `authenticate` hook) and as a late after hook, since it could modify the result based on the ability of the requesting user
 
 module.exports = {
   before: {
     all: [authenticate('jwt')],
     find: [
-      authorize({ adapter: 'feathers-mongoose' })
+      authorize({ adapter: '@feathersjs/mongodb' })
     ],
     get: [
-      authorize({ adapter: 'feathers-mongoose' })
+      authorize({ adapter: '@feathersjs/mongodb' })
     ],
     create: [
-      authorize({ adapter: 'feathers-mongoose' })
+      authorize({ adapter: '@feathersjs/mongodb' })
     ],
     update: [
-      authorize({ adapter: 'feathers-mongoose' })
+      authorize({ adapter: '@feathersjs/mongodb' })
     ],
     patch: [
-      authorize({ adapter: 'feathers-mongoose' })
+      authorize({ adapter: '@feathersjs/mongodb' })
     ],
     remove: [
-      authorize({ adapter: 'feathers-mongoose' })
+      authorize({ adapter: '@feathersjs/mongodb' })
     ]
   },
 
   after: {
     all: [
-      authorize({ adapter: 'feathers-mongoose' })
+      authorize({ adapter: '@feathersjs/mongodb' })
     ],
     find: [],
     get: [],
@@ -274,32 +277,35 @@ module.exports = {
 
 ```
 
-### Whitelist operators
+### Filters / Operators
 
 For `feathers-casl` to work properly, you have to whitelist some operators in your service options.
-Also make sure to set the adapter option in your `authorize` hook like: `authorize({ adapter: 'feathers-mongoose' })`
+Also make sure to set the adapter option in your `authorize` hook like: `authorize({ adapter: '@feathersjs/mongodb' })`
 
-- **feathers-memory**: `app.use('...', new Service({ whitelist: ['$nor', '$and'] }))`
-- **feathers-nedb**: `app.use'...', new Service({ whitelist: ['$not', '$and'] }))`
-- **feathers-mongodb**: `app.use("...', new Service({ whitelist: ['$nor', $and'] }))`
-- **feathers-mongoose**: `app.use("...", new Service({ whitelist: ['$nor', '$and'] }))`
-- **feathers-knex**: `app.use("...", new Service({ whitelist: ["$not"] }))`
-- **feathers-objection**: *nothing to do* :)
+- **@feathersjs/memory**: `app.use('...', new Service({ filters: { $nor: true }, operators: ["$nor"] }))`
+- **@feathersjs/mongodb**: `app.use("...', new Service({ filters: { $nor: true }, operators: ["$nor"] ))`
+- **@feathersjs/knex**: nothing special to configure :)
 - **feathers-sequelize**: This one is a little bit different than the others. See the following:
-```js{2,8-11}
-const { Service } = require("feathers-sequelize");
+
+```js
+const { SequelizeService } = require("feathers-sequelize");
 const { Op } = require("sequelize");
 
 // ...
 
-app.use('...', new Service({
-  Model,
-  operators: {
-    $not: Op.not
-  },
-  whitelist: ["$not"]
-}))
-
+app.use(
+  "...",
+  new SequelizeService({
+    Model,
+    operatorMap: {
+      $not: Op.not
+    },
+    filters: {
+      $not: true
+    },
+    operators: ["$not"]
+  })
+);
 ```
 
 ### Add CASL to channels
@@ -337,27 +343,26 @@ In case you are not using sockets and want to use `feathers-casl` with the Expre
 module.exports = {
   before: {
     all: [
-      authenticate('jwt'),
-      
+      authenticate("jwt"),
+
       // Add this to set abilities, if a user exists
-      context => {
-        const { user } = context.params
-        if (user) context.params.ability = defineAbilitiesFor(user)
-        return context
+      (context) => {
+        const { user } = context.params;
+        if (user) context.params.ability = defineAbilitiesFor(user);
+        return context;
       }
     ]
 
     // ...
-  },
+  }
 
   // ...
 };
-
 ```
 
 ## Testing
 
-Simply run `npm test` and all your tests in the `test/` directory will be run. The project has full support for *Visual Studio Code*. You can use the debugger to set breakpoints.
+Simply run `npm test` and all your tests in the `test/` directory will be run. The project has full support for _Visual Studio Code_. You can use the debugger to set breakpoints.
 
 ## Help
 

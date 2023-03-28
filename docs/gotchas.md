@@ -49,3 +49,33 @@ const ability = defineAbility((can, cannot) => {
   can("read", "users", { id: user.id });
 });
 ```
+
+## You're not allowed to get on 'users'
+
+To prevent the error `You're not allowed to get on 'users'`, you need to define the abilities right after your `authenticate()` hook and before the `authorize()` hook for the `get` method of the user service.
+
+```js
+// src/services/users/users.hooks.js
+
+module.exports = {
+  before: {
+    get: [
+      authenticate('jwt'),
+
+      // Add this to set abilities, if a user exists
+      context => {
+        if (context.params.ability) { return context; }
+        const { user } = context.params
+        if (user) context.params.ability = defineAbilitiesFor(user)
+        return context
+      }
+
+      authorize({ adapter: '@feathersjs/mongodb' }),
+    ]
+
+    // ...
+  },
+
+  // ...
+};
+```

@@ -2,7 +2,6 @@ import { Sequelize, DataTypes, Op } from "sequelize";
 import makeTests from "./makeTests";
 import { SequelizeService } from "feathers-sequelize";
 import { getItemsIsArray, filterArray } from "feathers-utils";
-import path from "node:path";
 import type { ServiceCaslOptions } from "../../../../src";
 import type { HookContext } from "@feathersjs/feathers";
 
@@ -49,12 +48,11 @@ const makeService = () => {
     multi: true,
     operatorMap: {
       $not: Op.not,
-      $and: Op.and,
     },
     filters: {
-      ...filterArray("$not", "$and"),
+      ...filterArray("$not"),
     },
-    operators: ["$not", "$and"],
+    operators: ["$not"],
     casl: {
       availableFields: [
         "id",

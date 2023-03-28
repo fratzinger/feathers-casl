@@ -29,7 +29,11 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md",
+    "src/**",
+    "dist/**"
   ],
   "engines": {
     "node": ">= 16.0.0"
@@ -80,11 +84,9 @@
     "eslint-import-resolver-typescript": "^3.5.3",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-security": "^1.7.1",
     "eslint-plugin-unicorn": "^46.0.0",
     "feathers-fletching": "^1.20.5",
     "feathers-knex": "^8.0.1",
-    "feathers-memory": "^4.1.0",
     "feathers-mongoose": "^8.5.1",
     "feathers-nedb": "^6.0.0",
     "feathers-objection": "^7.5.4",

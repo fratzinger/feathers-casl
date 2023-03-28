@@ -4,7 +4,7 @@ import { MongoDBService } from "@feathersjs/mongodb";
 
 import makeTests from "../makeTests";
 import type { Adapter, ServiceCaslOptions } from "../../../../../src";
-import { filterArray, filterObject } from "feathers-utils";
+import { filterObject } from "feathers-utils";
 
 let Model;
 
@@ -18,9 +18,8 @@ const makeService = () => {
   return new MongoDBService({
     Model,
     multi: true,
-    operators: ["$and", "$nor"],
+    operators: ["$nor"],
     filters: {
-      ...filterArray("$and"),
       ...filterObject("$nor"),
     },
     casl: {

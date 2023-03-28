@@ -1,8 +1,7 @@
 import { knex } from "knex";
 import makeTests from "../makeTests";
 import { KnexService } from "@feathersjs/knex";
-import { filterArray, getItemsIsArray } from "feathers-utils";
-import path from "node:path";
+import { getItemsIsArray } from "feathers-utils";
 import type { HookContext } from "@feathersjs/feathers";
 import type { Adapter, ServiceCaslOptions } from "../../../../../src";
 
@@ -32,10 +31,6 @@ const makeService = () => {
     Model: db,
     name: "tests",
     multi: true,
-    filters: {
-      ...filterArray("$not", "$and"),
-    },
-    operators: ["$and", "$not"],
     casl: {
       availableFields: [
         "id",
