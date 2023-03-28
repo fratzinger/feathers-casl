@@ -4,9 +4,9 @@
 
 Does a complex permission check and transforms data if necessary.
 
-| before | after | methods | multi | details                                                                                                 |
-| ------ | ----- | ------- | ----- | ------------------------------------------------------------------------------------------------------- |
-| yes    | yes   | all     | yes   | [source](https://github.com/fratzinger/feathers-casl/blob/master/src/hooks/authorize/authorize.hook.ts) |
+| before | after | methods | multi | details                                                                                               |
+| ------ | ----- | ------- | ----- | ----------------------------------------------------------------------------------------------------- |
+| yes    | yes   | all     | yes   | [source](https://github.com/fratzinger/feathers-casl/blob/main/src/hooks/authorize/authorize.hook.ts) |
 
 ### Options
 
