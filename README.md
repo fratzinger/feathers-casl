@@ -13,6 +13,8 @@
 [![GitHub license](https://img.shields.io/github/license/fratzinger/feathers-casl)](https://github.com/fratzinger/feathers-casl/blob/main/LICENSE)
 [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/qa8kez8QBx)
 
+> NOTE: This is the version for Feathers v5. For Feathers v4 use [feathers-casl v0](https://github.com/fratzinger/feathers-casl/tree/crow)
+
 ## About
 
 Add access control with CASL to your feathers application.
