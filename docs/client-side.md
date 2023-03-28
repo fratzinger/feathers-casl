@@ -16,7 +16,7 @@ npm install @casl/angular @casl/ability
 yarn add @casl/angular @casl/ability
 ```
 
-You're interested how it works for `angular`? Sorry, I can't help with that, since I just use it with `Vue`. As a starting point, see [#Feathers client](#feathers-client) and [@casl/angular](https://casl.js.org/v5/en/package/casl-angular). That will get you closer to the goal. If you got a working example anyway, I would be curious, how it works. Please create a issue or pull request and let me know.
+You're interested how it works for `angular`? Sorry, I can't help with that, since I just use it with `Vue`. As a starting point, see [#Feathers client](#feathers-client) and [@casl/angular](https://casl.js.org/v6/en/package/casl-angular). That will get you closer to the goal. If you got a working example anyway, I would be curious, how it works. Please create a issue or pull request and let me know.
 
 ## React
 
@@ -26,7 +26,7 @@ npm install @casl/react @casl/ability
 yarn add @casl/react @casl/ability
 ```
 
-You're interested how it works for `react`? Sorry, I can't help with that, since I just use it with `Vue`. As a starting point, see [#Feathers client](#feathers-client) and [@casl/react](https://casl.js.org/v5/en/package/casl-react). That will get you closer to the goal. If you got a working example anyway, I would be curious, how it works. Please create a issue or pull request and let me know.
+You're interested how it works for `react`? Sorry, I can't help with that, since I just use it with `Vue`. As a starting point, see [#Feathers client](#feathers-client) and [@casl/react](https://casl.js.org/v6/en/package/casl-react). That will get you closer to the goal. If you got a working example anyway, I would be curious, how it works. Please create a issue or pull request and let me know.
 
 ## FeathersVuex
 
@@ -124,7 +124,7 @@ export const store = new Vuex.Store({
 
 #### register the @casl/vue plugin
 
-Now it's more like conventional `@casl/vue` work and we're almost done. It's mostly like the [Getting started of @casl/vue](https://casl.js.org/v5/en/package/casl-vue#getting-started)
+Now it's more like conventional `@casl/vue` work and we're almost done. It's mostly like the [Getting started of @casl/vue](https://casl.js.org/v6/en/package/casl-vue#getting-started)
 
 ```ts
 // main.ts
@@ -138,7 +138,7 @@ Vue.use(abilitiesPlugin, store.state.casl.ability);
 
 ### Just use it
 
-From here on, just follow the instructions at [@casl/vue](https://casl.js.org/v5/en/package/casl-vue#check-permissions-in-templates). For example:
+From here on, just follow the instructions at [@casl/vue](https://casl.js.org/v6/en/package/casl-vue#getting-started). For example:
 
 ```vue
 <template>
@@ -169,7 +169,7 @@ npm install @casl/aurelia @casl/ability
 yarn add @casl/aurelia @casl/ability
 ```
 
-You're interested how it works for `aurelia`? Sorry, I can't help with that, since I just use it with `Vue`. As a starting point, see [#Feathers client](#feathers-client) and [@casl/aurelia](https://casl.js.org/v5/en/package/casl-aurelia). That will get you closer to the goal. If you got a working example anyway, I would be curious, how it works. Please create a issue or pull request and let me know.
+You're interested how it works for `aurelia`? Sorry, I can't help with that, since I just use it with `Vue`. As a starting point, see [#Feathers client](#feathers-client) and [@casl/aurelia](https://casl.js.org/v6/en/package/casl-aurelia). That will get you closer to the goal. If you got a working example anyway, I would be curious, how it works. Please create a issue or pull request and let me know.
 
 ## Others
 
