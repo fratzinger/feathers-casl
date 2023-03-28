@@ -5,12 +5,12 @@
 </p>
 
 [![npm](https://img.shields.io/npm/v/feathers-casl)](https://www.npmjs.com/package/feathers-casl)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/fratzinger/feathers-casl/Node.js%20CI)](https://github.com/fratzinger/feathers-casl/actions/workflows/node.js.yml?query=branch%3Amaster)
+[![Github CI](https://github.com/fratzinger/feathers-casl/actions/workflows/node.js.yml/badge.svg)](https://github.com/fratzinger/feathers-casl/actions)
 [![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/fratzinger/feathers-casl)](https://codeclimate.com/github/fratzinger/feathers-casl)
 [![Code Climate coverage](https://img.shields.io/codeclimate/coverage/fratzinger/feathers-casl)](https://codeclimate.com/github/fratzinger/feathers-casl)
 [![libraries.io](https://img.shields.io/librariesio/release/npm/feathers-casl)](https://libraries.io/npm/feathers-casl)
 [![npm](https://img.shields.io/npm/dm/feathers-casl)](https://www.npmjs.com/package/feathers-casl)
-[![GitHub license](https://img.shields.io/github/license/fratzinger/feathers-casl)](https://github.com/fratzinger/feathers-casl/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/fratzinger/feathers-casl)](https://github.com/fratzinger/feathers-casl/blob/main/LICENSE)
 [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/qa8kez8QBx)
 
 ## About
