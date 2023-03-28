@@ -1,16 +1,12 @@
 {
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "esModuleInterop": true,
-    "outDir": "dist",
-    "moduleResolution": "node",
-    "target": "es2015",
-    "module": "commonjs",
-    "downlevelIteration": true,
-    "sourceMap": false,
-    "declaration": true
+    "strict": true,
+    "types": ["vitest/globals"]
   },
-  "include": ["lib/**/*"],
-  "exclude": ["node_modules", "**/*.test.js"]
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules"]
 }
-  

@@ -1,47 +1,48 @@
-import path from "path";
+import path from "node:path";
 import helmet from "helmet";
 import cors from "cors";
 
-import feathers from "@feathersjs/feathers";
-import express, { Application } from "@feathersjs/express";
+import { feathers } from "@feathersjs/feathers";
+import type { Application as ExpressFeathers } from "@feathersjs/express";
+import express, { json, urlencoded, rest } from "@feathersjs/express";
 import socketio from "@feathersjs/socketio";
-import { Service } from "feathers-memory";
+import type { MemoryService } from "@feathersjs/memory";
 
 process.env["NODE_CONFIG_DIR"] = path.join(__dirname, "config/");
 import configuration from "@feathersjs/configuration";
 
-import casl from "../../../lib";
-
+import casl from "../../../src";
 
 interface MockServerOptions {
-  channels: ((app: Application) => void)
-  services: ((aüü: Application) => void)
+  channels: (app: Application) => void;
+  services: (app: Application) => void;
 }
 
-interface ExportMockServer {
-  app: Application
-  articles: Service
-  comments: Service
-  users: Service
-}
+type Application = ExpressFeathers<{
+  articles: MemoryService;
+  comments: MemoryService;
+  users: MemoryService;
+}>;
 
-const mockServer = (options: MockServerOptions): ExportMockServer => {
-  const { channels, services } = options;  
+export const mockServer = (options: MockServerOptions) => {
+  const { channels, services } = options;
   const app: Application = express(feathers());
 
   // Load app configuration
   app.configure(configuration());
 
   // Enable security, CORS, compression, favicon and body parsing
-  app.use(helmet({
-    contentSecurityPolicy: false
-  }));
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+    })
+  );
   app.use(cors());
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+  app.use(json());
+  app.use(urlencoded({ extended: true }));
 
   // Set up Plugins and providers
-  app.configure(express.rest());
+  app.configure(rest());
   app.configure(socketio());
 
   app.configure(services);
@@ -60,9 +61,6 @@ const mockServer = (options: MockServerOptions): ExportMockServer => {
     app: app,
     articles,
     comments,
-    users
+    users,
   };
 };
-
-
-export default mockServer;

@@ -9,28 +9,100 @@ import makePatchDataTests from "./patch-data";
 import makePatchMultiTests from "./patch-multi";
 import makeRemoveTests from "./remove";
 import makeRemoveMultiTests from "./remove-multi";
-import type { Adapter, AuthorizeHookOptions } from "../../../../../lib/types";
+import type { Adapter, AuthorizeHookOptions } from "../../../../../src";
+import type { MakeTestsOptions } from "./_makeTests.types";
 
-export default async function(
-  adapterName: Adapter,
+export default async function (
+  name: Adapter | string,
   makeService: () => unknown,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
-  afterHooks?: unknown[],
-  actionBefore?: () => Promise<void>
+  makeTestsOptions: MakeTestsOptions = {
+    around: false,
+    afterHooks: [],
+    actionBefore: () => {},
+  }
 ): Promise<void> {
-  describe(`authorize-hook '${adapterName}'`, function() {
-    if (actionBefore) { before(actionBefore); }
-    makeFindTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
-    makeGetTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
-    makeCreateTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
-    makeCreateMultiTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
-    makeUpdateTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
-    makeUpdateDataTests(adapterName, makeService, clean, Object.assign({ useUpdateData: true }, authorizeHookOptions), afterHooks);
-    makePatchTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
-    makePatchDataTests(adapterName, makeService, clean, Object.assign({ usePatchData: true }, authorizeHookOptions), afterHooks);
-    makePatchMultiTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
-    makeRemoveTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
-    makeRemoveMultiTests(adapterName, makeService, clean, authorizeHookOptions, afterHooks);
+  describe(`authorize-hook '${name}'`, function () {
+    if (makeTestsOptions.actionBefore) {
+      beforeAll(makeTestsOptions.actionBefore);
+    }
+    makeFindTests(
+      name,
+      makeService,
+      clean,
+      authorizeHookOptions,
+      makeTestsOptions
+    );
+    makeGetTests(
+      name,
+      makeService,
+      clean,
+      authorizeHookOptions,
+      makeTestsOptions
+    );
+    makeCreateTests(
+      name,
+      makeService,
+      clean,
+      authorizeHookOptions,
+      makeTestsOptions
+    );
+    makeCreateMultiTests(
+      name,
+      makeService,
+      clean,
+      authorizeHookOptions,
+      makeTestsOptions
+    );
+    makeUpdateTests(
+      name,
+      makeService,
+      clean,
+      authorizeHookOptions,
+      makeTestsOptions
+    );
+    makeUpdateDataTests(
+      name,
+      makeService,
+      clean,
+      Object.assign({ useUpdateData: true }, authorizeHookOptions),
+      makeTestsOptions
+    );
+    makePatchTests(
+      name,
+      makeService,
+      clean,
+      authorizeHookOptions,
+      makeTestsOptions
+    );
+    makePatchDataTests(
+      name,
+      makeService,
+      clean,
+      Object.assign({ usePatchData: true }, authorizeHookOptions),
+      makeTestsOptions
+    );
+    makePatchMultiTests(
+      name,
+      makeService,
+      clean,
+      authorizeHookOptions,
+      makeTestsOptions
+    );
+    makeRemoveTests(
+      name,
+      makeService,
+      clean,
+      authorizeHookOptions,
+      makeTestsOptions
+    );
+    makeRemoveMultiTests(
+      name,
+      makeService,
+      clean,
+      authorizeHookOptions,
+      makeTestsOptions
+    );
   });
 }

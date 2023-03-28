@@ -1,9 +1,9 @@
 import { defineAbility } from "@casl/ability";
-import assert from "assert";
-import convertRuleToQuery from "../../lib/utils/convertRuleToQuery";
+import assert from "node:assert";
+import { convertRuleToQuery } from "../../src";
 
-describe("utils - convertRuleToQuery", function() {
-  it("", function() {
+describe("utils - convertRuleToQuery", function () {
+  it("", function () {
     const ability = defineAbility((can, cannot) => {
       can("create", "tests", { id: 1, test: true });
 
@@ -43,7 +43,7 @@ describe("utils - convertRuleToQuery", function() {
       { id: { $in: [1] } },
       { id: { $nin: [1] } },
       { id: { $ne: 1 } },
-      
+
       { id: { $ne: 1 } },
       { id: { $lte: 1 } },
       { id: { $lt: 1 } },
@@ -58,7 +58,7 @@ describe("utils - convertRuleToQuery", function() {
 
       { $sort: { id: 1 } },
       {},
-      {}
+      {},
     ];
     const { rules } = ability;
 
@@ -71,12 +71,16 @@ describe("utils - convertRuleToQuery", function() {
     });
   });
 
-  it("calls actionOnForbidden", function() {
+  it("calls actionOnForbidden", function () {
     let actionOnForbiddenCalled = false;
     const [rule] = defineAbility((can, cannot) => {
       cannot("create", "tests");
     }).rules;
-    convertRuleToQuery(rule, { actionOnForbidden: () => { actionOnForbiddenCalled = true; } });
+    convertRuleToQuery(rule, {
+      actionOnForbidden: () => {
+        actionOnForbiddenCalled = true;
+      },
+    });
 
     assert.ok(actionOnForbiddenCalled);
   });
