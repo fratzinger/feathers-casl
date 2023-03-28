@@ -119,6 +119,7 @@ $RECYCLE.BIN/
 dist/**
 
 docs/.vitepress/dist
+docs/.vitepress/cache
 
 .cache
 .temp

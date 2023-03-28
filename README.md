@@ -22,7 +22,7 @@ It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CA
 
 ## Features
 
-- Fully powered by Feathers 4 & CASL 5
+- Fully powered by Feathers 4 & CASL 6
 - Allows permissions for all methods `create`, `find`, `get`, `update`, `patch`, `remove`, or `create`, `read`, `update`, `delete`
 - Define permissions not based on methods: `can('view', 'Settings')` (Bring your custom logic)
 - Restrict by conditions: `can('create', 'Task', { userId: user.id })`
@@ -51,7 +51,7 @@ https://feathers-casl.netlify.app/
 ## Installation
 
 ```bash
-npm i feathers-casl
+npm i feathers-casl @casl/ability
 ```
 
 ## Testing

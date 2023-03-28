@@ -4,7 +4,7 @@
 
 ### feathers-sequelize
 
-```js
+```ts
 availableFields(context) {
   const { rawAttributes } = context.service.Model;
   return Object.keys(rawAttributes);

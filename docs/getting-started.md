@@ -46,18 +46,21 @@ It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CA
 ## Installation
 
 ```bash
-npm i feathers-casl
-# or
-yarn add feathers-casl
+# npm
+npm i feathers-casl @casl/ability
+# yarn
+yarn add feathers-casl @casl/ability
+# pnpm
+pnpm i feathers-casl @casl/ability
 ```
 
 ## Getting Started
 
 ### Provide app wide `feathers-casl` options
 
-```js
-// app.js
-const casl = require("feathers-casl");
+```ts
+// app.ts
+import casl from "feathers-casl";
 
 app.configure(casl());
 ```
@@ -68,13 +71,14 @@ The `casl()` function can be configured, to provide app wide options to `feather
 
 For most cases we want to define rules per user (or per user-role). So we first add a function which returns an `ability` from `@casl/ability` with these rules:
 
-```js
-// src/services/authentication/authentication.abilities.js
-const {
+```ts
+// src/services/authentication/authentication.abilities.ts
+import {
+  Ability,
   AbilityBuilder,
   createAliasResolver,
   makeAbilityFromRules
-} = require("feathers-casl");
+} from "@casl/ability";
 
 // don't forget this, as `read` is used internally
 const resolveAction = createAliasResolver({
@@ -83,58 +87,7 @@ const resolveAction = createAliasResolver({
   delete: "remove" // use 'delete' or 'remove'
 });
 
-const defineRulesFor = (user) => {
-  // also see https://casl.js.org/v5/en/guide/define-rules
-  const { can, cannot, rules } = new AbilityBuilder();
-
-  if (user.role && user.role.name === "SuperAdmin") {
-    // SuperAdmin can do evil
-    can("manage", "all");
-    return rules;
-  }
-
-  if (user.role && user.role.name === "Admin") {
-    can("create", "users");
-  }
-
-  can("read", "users");
-  can("update", "users", { id: user.id });
-  cannot("update", "users", ["roleId"], { id: user.id });
-  cannot("delete", "users", { id: user.id });
-
-  can("manage", "tasks", { userId: user.id });
-  can("create-multi", "posts", { userId: user.id });
-
-  return rules;
-};
-
-const defineAbilitiesFor = (user) => {
-  const rules = defineRulesFor(user);
-
-  return makeAbilityFromRules(rules, { resolveAction });
-};
-
-module.exports = {
-  defineRulesFor,
-  defineAbilitiesFor
-};
-```
-
-Typescript version of the code:
-
-```js
-// src/services/authentication/authentication.abilities.ts
-import { createAliasResolver, makeAbilityFromRules } from "feathers-casl";
-import { AbilityBuilder, Ability } from "@casl/ability";
-
-// don't forget this, as `read` is used internally
-const resolveAction = createAliasResolver({
-  update: "patch", // define the same rules for update & patch
-  read: ["get", "find"], // use 'read' as a equivalent for 'get' & 'find'
-  delete: "remove" // use 'delete' or 'remove'
-});
-
-export const defineRulesFor = (user: any) => {
+export const defineRulesFor = (user) => {
   // also see https://casl.js.org/v5/en/guide/define-rules
   const { can, cannot, rules } = new AbilityBuilder(Ability);
 
@@ -159,10 +112,10 @@ export const defineRulesFor = (user: any) => {
   return rules;
 };
 
-export const defineAbilitiesFor = (user: any) => {
+export const defineAbilitiesFor = (user) => {
   const rules = defineRulesFor(user);
 
-  return makeAbilityFromRules(rules, { resolveAction });
+  return new Ability(rules, { resolveAction });
 };
 ```
 
@@ -171,11 +124,11 @@ export const defineAbilitiesFor = (user: any) => {
 `feathers-casl` by default looks for `context.params.ability` in the `authorize`-hook and `connection.ability` in the channels. You want to `authorize` users who are `authenticated` first with `@feathers/authentication`. We can add hooks to the `/authentication` service to populate things to `context.params` and `connection` under the hood. We use this here to put `ability` on these objects, which makes it available to all hooks after the `authenticate(...)`-hook. This way we can define rules in just one place:
 ``
 
-```js{19-27}
-// src/services/authentication/authentication.hooks.js
-const { defineAbilitiesFor } = require('./abilities');
+```ts
+// src/services/authentication/authentication.hooks.ts
+import { defineAbilitiesFor } from "./abilities";
 
-module.exports = {
+export default {
   before: {
     all: [],
     find: [],
@@ -190,7 +143,7 @@ module.exports = {
     find: [],
     get: [],
     create: [
-      context => {
+      (context) => {
         const { user } = context.result;
         if (!user) return context;
         const ability = defineAbilitiesFor(user);
@@ -214,48 +167,35 @@ module.exports = {
     remove: []
   }
 };
-
 ```
 
 ### Add the authorize-hook to the services
 
 The `authorize`-hook can be used for all methods and has support for `multi: true`. You should use it as a `before` **AND** a `after` hook at the same time. For more information, see: [authorize hook](/hooks.html#authorize)
 
-```js{5-6,12,15,18,21,24,27,33}
-// src/services/tasks/tasks.hooks.js
-const { authenticate } = require('@feathersjs/authentication').hooks;
-const { authorize } = require('feathers-casl');
+```ts
+// src/services/tasks/tasks.hooks.ts
+import { authenticate } from "@feathersjs/authentication";
+import { authorize } from "feathers-casl";
 
 // CAUTION! Make sure the adapter name fits your adapter (e.g. @feathersjs/mongodb, @feathersjs/knex, feathers-sequelize, ...)!
 // You'll want to have the `authorize` as an early before-hook (right after the `authenticate` hook) and as a late after hook, since it could modify the result based on the ability of the requesting user
 
-module.exports = {
+const authorizeHook = authorize({ adapter: "@feathersjs/mongodb" });
+
+export default {
   before: {
-    all: [authenticate('jwt')],
-    find: [
-      authorize({ adapter: '@feathersjs/mongodb' })
-    ],
-    get: [
-      authorize({ adapter: '@feathersjs/mongodb' })
-    ],
-    create: [
-      authorize({ adapter: '@feathersjs/mongodb' })
-    ],
-    update: [
-      authorize({ adapter: '@feathersjs/mongodb' })
-    ],
-    patch: [
-      authorize({ adapter: '@feathersjs/mongodb' })
-    ],
-    remove: [
-      authorize({ adapter: '@feathersjs/mongodb' })
-    ]
+    all: [authenticate("jwt")],
+    find: [authorizeHook],
+    get: [authorizeHook],
+    create: [authorizeHook],
+    update: [authorizeHook],
+    patch: [authorizeHook],
+    remove: [authorizeHook]
   },
 
   after: {
-    all: [
-      authorize({ adapter: '@feathersjs/mongodb' })
-    ],
+    all: [authorizeHook],
     find: [],
     get: [],
     create: [],
@@ -274,7 +214,6 @@ module.exports = {
     remove: []
   }
 };
-
 ```
 
 ### Filters / Operators
@@ -287,9 +226,9 @@ Also make sure to set the adapter option in your `authorize` hook like: `authori
 - **@feathersjs/knex**: nothing special to configure :)
 - **feathers-sequelize**: This one is a little bit different than the others. See the following:
 
-```js
-const { SequelizeService } = require("feathers-sequelize");
-const { Op } = require("sequelize");
+```ts
+import { SequelizeService } from "feathers-sequelize";
+import { Op } from "sequelize";
 
 // ...
 
@@ -312,35 +251,32 @@ app.use(
 
 To unleash the full power of `feathers-casl` you want to add it to your `channels.js` so every user just gets updates only to items they can really read. It's as simple as the following example. For more information see: [channels](/channels.html)
 
-```js{2-5,13,16}
-// src/channels.js
-const {
-  getChannelsWithReadAbility,
-  makeOptions
-} = require('feathers-casl').channels;
+```ts
+// src/channels.ts
+import { getChannelsWithReadAbility, makeChannelOptions } from "feathers-casl";
 
-module.exports = function (app) {
-  if (typeof app.channel !== 'function') {
+export default function (app) {
+  if (typeof app.channel !== "function") {
     // If no real-time functionality has been configured just return
     return;
   }
 
-  const caslOptions = makeOptions(app);
+  const caslOptions = makeChannelOptions(app);
 
   app.publish((data, context) => {
     return getChannelsWithReadAbility(app, data, context, caslOptions);
   });
-};
+}
 ```
 
 ### Using CASL with the REST (Express.js) transport
 
 In case you are not using sockets and want to use `feathers-casl` with the Express transport, you need to define the abilities right after your `authenticate()` hook and before the `authorize()` hook for each service relying on CASL.
 
-```js
-// src/services/tasks/tasks.hooks.js
+```ts
+// src/services/tasks/tasks.hooks.ts
 
-module.exports = {
+export default {
   before: {
     all: [
       authenticate("jwt"),

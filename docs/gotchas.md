@@ -8,7 +8,7 @@ Here is the place for common mistakes for defined rules and unexpected behavior.
 
 The following example results in an error, because all rules will be considered in the given order. Rules overwrite/specify the rules before.
 
-```js
+```ts
 const ability = defineAbility((can, cannot) => {
   can("read", "users");
   cannot("read", "users");
@@ -19,7 +19,7 @@ const ability = defineAbility((can, cannot) => {
 
 ### Conditional subset
 
-```js
+```ts
 const user = { id: 1 };
 
 const ability = defineAbility((can, cannot) => {
@@ -41,7 +41,7 @@ Do you think it results in `{ $select: ["id", "name", "email", "password"] }` fo
 
 With the following configuration you only get `["id", "name", "email"]` for all other users and the complete user item for the current user.
 
-```js
+```ts
 const user = { id: 1 };
 
 const ability = defineAbility((can, cannot) => {
@@ -54,10 +54,10 @@ const ability = defineAbility((can, cannot) => {
 
 To prevent the error `You're not allowed to get on 'users'`, you need to define the abilities right after your `authenticate()` hook and before the `authorize()` hook for the `get` method of the user service.
 
-```js
+```ts
 // src/services/users/users.hooks.js
 
-module.exports = {
+export default {
   before: {
     get: [
       authenticate('jwt'),
