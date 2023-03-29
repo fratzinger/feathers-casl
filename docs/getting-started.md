@@ -260,6 +260,21 @@ export default function (app) {
     // If no real-time functionality has been configured just return
     return;
   }
+  // ...
+
+  app.on("login", (authResult: any, { connection }) => {
+    if (connection) {
+      // this is needed to map the ability from the authentication hook to the connection so it gets available in the HookContext as `params.ability` automatically
+      if (authResult.ability) {
+        connection.ability = authResult.ability;
+        connection.rules = authResult.rules;
+      }
+
+      // ...
+    }
+  });
+
+  // ...
 
   const caslOptions = makeChannelOptions(app);
 
