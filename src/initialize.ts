@@ -10,7 +10,7 @@ import type {
   InitOptions,
 } from "./types";
 
-export default (
+export const initialize = (
   options?: PartialDeep<InitOptions>
 ): ((app: Application) => void) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
