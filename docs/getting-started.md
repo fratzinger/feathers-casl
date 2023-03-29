@@ -60,12 +60,12 @@ pnpm i feathers-casl @casl/ability
 
 ```ts
 // app.ts
-import casl from "feathers-casl";
+import { feathersCasl } from "feathers-casl";
 
-app.configure(casl());
+app.configure(feathersCasl());
 ```
 
-The `casl()` function can be configured, to provide app wide options to `feathers-casl`
+The `feathersCasl()` function can be configured, to provide app wide options to `feathers-casl`
 
 ### Define static rules
 

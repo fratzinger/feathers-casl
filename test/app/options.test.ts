@@ -2,7 +2,7 @@ import assert from "node:assert";
 import type { Application, HookContext } from "@feathersjs/feathers";
 import { feathers } from "@feathersjs/feathers";
 import { MemoryService } from "@feathersjs/memory";
-import casl, { authorize } from "../../src";
+import { feathersCasl, authorize } from "../../src";
 import type { RealTimeConnection } from "@feathersjs/transport-commons";
 import type { InitOptions } from "../../src";
 import { defineAbility } from "@casl/ability";
@@ -59,7 +59,7 @@ describe("app-options / service-options", function () {
       let calledChannelAbility = false;
       let calledChannelModelName = false;
       app.configure(
-        casl({
+        feathersCasl({
           authorizeHook: {
             actionOnForbidden: () => {
               calledActionOnForbidden = true;
@@ -155,7 +155,7 @@ describe("app-options / service-options", function () {
       });
 
       app.configure(
-        casl({
+        feathersCasl({
           authorizeHook: {
             actionOnForbidden: () => {
               appCalled.calledActionOnForbidden = true;

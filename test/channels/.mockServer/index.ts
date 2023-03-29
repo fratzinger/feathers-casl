@@ -11,7 +11,7 @@ import type { MemoryService } from "@feathersjs/memory";
 process.env["NODE_CONFIG_DIR"] = path.join(__dirname, "config/");
 import configuration from "@feathersjs/configuration";
 
-import casl from "../../../src";
+import { feathersCasl } from "../../../src";
 
 interface MockServerOptions {
   channels: (app: Application) => void;
@@ -56,7 +56,7 @@ export const mockServer = (options: MockServerOptions) => {
   const comments = app.service("comments");
   const users = app.service("users");
 
-  app.configure(casl());
+  app.configure(feathersCasl());
   return {
     app: app,
     articles,

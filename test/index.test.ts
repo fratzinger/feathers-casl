@@ -1,8 +1,12 @@
 import assert from "node:assert";
-import index, {
+import {
+  feathersCasl,
   authorize,
   checkBasicPermission,
   getChannelsWithReadAbility,
+  checkBasicPermissionUtil,
+  checkCan,
+  makeChannelOptions,
 } from "../src";
 import { feathers } from "@feathersjs/feathers";
 
@@ -18,7 +22,7 @@ describe("index", function () {
   it("default is initialize", function () {
     const app = feathers();
     assert.ok(!app.get("casl"), "casl is not set");
-    index()(app);
+    feathersCasl()(app);
     assert.ok(app.get("casl"), "casl is set");
   });
 
@@ -26,5 +30,8 @@ describe("index", function () {
     assert.ok(authorize, "authorize is ok");
     assert.ok(checkBasicPermission, "checkBasicPermission is ok");
     assert.ok(getChannelsWithReadAbility, "getChannelsWithReadAbility is ok");
+    assert.ok(checkCan);
+    assert.ok(checkBasicPermissionUtil);
+    assert.ok(makeChannelOptions);
   });
 });
