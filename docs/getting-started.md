@@ -73,12 +73,7 @@ For most cases we want to define rules per user (or per user-role). So we first 
 
 ```ts
 // src/services/authentication/authentication.abilities.ts
-import {
-  Ability,
-  AbilityBuilder,
-  createAliasResolver,
-  makeAbilityFromRules
-} from "@casl/ability";
+import { Ability, AbilityBuilder, createAliasResolver } from "@casl/ability";
 
 // don't forget this, as `read` is used internally
 const resolveAction = createAliasResolver({
