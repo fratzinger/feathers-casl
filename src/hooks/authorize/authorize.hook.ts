@@ -8,9 +8,11 @@ import type { HookContext, NextFunction } from "@feathersjs/feathers";
 
 import type { AuthorizeHookOptions } from "../../types";
 
-export const authorize = <H extends HookContext = HookContext>(
-  _options?: Partial<AuthorizeHookOptions>
-) => async (context: H, next?: NextFunction) => {
+export const authorize =
+  <H extends HookContext = HookContext>(
+    _options?: Partial<AuthorizeHookOptions>
+  ) =>
+  async (context: H, next?: NextFunction) => {
     if (
       shouldSkip(HOOKNAME, context, _options) ||
       !context.params ||
