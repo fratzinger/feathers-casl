@@ -13,6 +13,7 @@ import type {
   CheckBasicPermissionUtilsOptions,
   CheckBasicPermissionHookOptionsExclusive,
 } from "../types";
+import { log, makeLog } from "./utils.internal";
 
 const defaultOptions: CheckBasicPermissionHookOptionsExclusive = {
   checkCreateForData: false,
@@ -32,9 +33,12 @@ export const checkBasicPermissionUtil = async <H extends HookContext>(
 ): Promise<H> => {
   const options = makeOptions(_options);
 
+  const log = makeLog(options.debug, context);
+
   const { method } = context;
 
   if (!options.modelName) {
+    log("modelName is not defined", "ignoring checkBasicPermission");
     return context;
   }
 
@@ -44,12 +48,14 @@ export const checkBasicPermissionUtil = async <H extends HookContext>(
       : options.modelName(context);
 
   if (!modelName) {
+    log("modelName is not defined", "ignoring checkBasicPermission");
     return context;
   }
 
   const ability = await getAbility(context, options);
   if (!ability) {
     // Ignore internal or not authenticated requests
+    log("ability is not defined", "ignoring checkBasicPermission");
     return context;
   }
 
