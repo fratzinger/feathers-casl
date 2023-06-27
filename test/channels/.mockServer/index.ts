@@ -45,6 +45,17 @@ export const mockServer = (options: MockServerOptions) => {
   app.configure(rest());
   app.configure(socketio());
 
+  app.set("authentication", {
+    entity: "user",
+    service: "users",
+    secret: "123",
+    authStrategies: ["jwt", "local"],
+    local: {
+      usernameField: "email",
+      passwordField: "password",
+    },
+  });
+
   app.configure(services);
 
   // Set up event channels (see channels.ts)
