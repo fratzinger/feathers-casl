@@ -13,6 +13,7 @@ import type {
   CheckBasicPermissionUtilsOptions,
   CheckBasicPermissionHookOptionsExclusive,
 } from "../types";
+import { getMethodName } from "./getMethodName";
 
 const defaultOptions: CheckBasicPermissionHookOptionsExclusive = {
   checkCreateForData: false,
@@ -30,9 +31,14 @@ export const checkBasicPermissionUtil = async <H extends HookContext>(
   context: H,
   _options?: Partial<CheckBasicPermissionUtilsOptions>
 ): Promise<H> => {
-  const options = makeOptions(_options);
+  let options = makeOptions(_options);
 
-  const { method } = context;
+  const method = getMethodName(context, options);
+
+  options = {
+    ...options,
+    method,
+  };
 
   if (!options.modelName) {
     return context;

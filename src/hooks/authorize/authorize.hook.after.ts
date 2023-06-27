@@ -27,6 +27,7 @@ import type {
   AuthorizeHookOptions,
   HasRestrictingFieldsOptions,
 } from "../../types";
+import { getMethodName } from "../../utils/getMethodName";
 
 export const authorizeAfter = async <H extends HookContext = HookContext>(
   context: H,
@@ -82,7 +83,9 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
 
   const $select: string[] | undefined = params.query?.$select;
 
-  if (context.method !== "remove") {
+  const method = getMethodName(context, options);
+
+  if (method !== "remove") {
     const $newSelect = getConditionalSelect(
       $select,
       ability,
@@ -139,11 +142,9 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
     }
   } else {
     result = pickFieldsForItem(items[0]);
-    if (context.method === "get" && _isEmpty(result)) {
+    if (method === "get" && _isEmpty(result)) {
       if (options.actionOnForbidden) options.actionOnForbidden();
-      throw new Forbidden(
-        `You're not allowed to ${context.method} ${modelName}`
-      );
+      throw new Forbidden(`You're not allowed to ${method} ${modelName}`);
     }
   }
 
