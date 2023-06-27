@@ -10,6 +10,7 @@ import type {
   HookBaseOptions,
   ThrowUnlessCanOptions,
 } from "../types";
+import { getMethodName } from "../utils/getMethodName";
 
 const defaultOptions: HookBaseOptions = {
   ability: undefined,
@@ -33,9 +34,11 @@ export const checkCreatePerItem = (
   options: Partial<
     Pick<ThrowUnlessCanOptions, "actionOnForbidden" | "skipThrow">
   > &
-    Partial<Pick<CheckBasicPermissionHookOptions, "checkCreateForData">>
+    Partial<
+      Pick<CheckBasicPermissionHookOptions, "checkCreateForData" | "method">
+    >
 ): HookContext => {
-  const { method } = context;
+  const method = getMethodName(context, options);
   if (method !== "create" || !options.checkCreateForData) {
     return context;
   }

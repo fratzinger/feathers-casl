@@ -21,6 +21,7 @@ import type {
   ThrowUnlessCanOptions,
 } from "../../types";
 import type { Promisable } from "type-fest";
+import { getMethodName } from "../../utils/getMethodName";
 
 declare module "@feathersjs/feathers" {
   interface Params {
@@ -85,8 +86,13 @@ export const getAdapter = (
 
 export const getAbility = (
   context: HookContext,
-  options?: Pick<HookBaseOptions, "ability" | "checkAbilityForInternal">
+  options?: Pick<
+    HookBaseOptions,
+    "ability" | "checkAbilityForInternal" | "method"
+  >
 ): Promise<AnyAbility | undefined> => {
+  const method = getMethodName(context, options);
+
   // if params.ability is set, return it over options.ability
   if (context?.params?.ability) {
     if (typeof context.params.ability === "function") {
@@ -108,7 +114,7 @@ export const getAbility = (
     }
   }
 
-  if (!options.checkAbilityForInternal && !context.params?.provider) {
+  if (!options?.checkAbilityForInternal && !context.params?.provider) {
     return Promise.resolve(undefined);
   }
 
@@ -121,9 +127,7 @@ export const getAbility = (
     }
   }
 
-  throw new Forbidden(
-    `You're not allowed to ${context.method} on '${context.path}'`
-  );
+  throw new Forbidden(`You're not allowed to ${method} on '${context.path}'`);
 };
 
 export const throwUnlessCan = <T extends ForcedSubject<string>>(
@@ -195,9 +199,9 @@ export const checkMulti = (
   context: HookContext,
   ability: AnyAbility,
   modelName: string,
-  options?: Pick<AuthorizeHookOptions, "actionOnForbidden">
+  options?: Pick<AuthorizeHookOptions, "actionOnForbidden" | "method">
 ): boolean => {
-  const { method } = context;
+  const method = getMethodName(context, options);
   const currentIsMulti = isMulti(context);
   if (!currentIsMulti) {
     return true;

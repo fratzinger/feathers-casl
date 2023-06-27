@@ -36,6 +36,7 @@ export interface HookBaseOptions<H extends HookContext = HookContext> {
   checkMultiActions: boolean;
   modelName: GetModelName;
   notSkippable: boolean;
+  method?: string | ((context: H) => string);
 }
 
 export interface CheckBasicPermissionHookOptions<

@@ -29,6 +29,7 @@ import { mergeQueryFromAbility } from "../../utils/mergeQueryFromAbility";
 import type { HookContext } from "@feathersjs/feathers";
 
 import type { AuthorizeHookOptions } from "../../types";
+import { getMethodName } from "../../utils/getMethodName";
 
 export const authorizeBefore = async <H extends HookContext = HookContext>(
   context: H,
@@ -37,6 +38,8 @@ export const authorizeBefore = async <H extends HookContext = HookContext>(
   if (shouldSkip(HOOKNAME, context, options) || !context.params) {
     return context;
   }
+
+  const method = getMethodName(context, options);
 
   if (!getPersistedConfig(context, "madeBasicCheck")) {
     const basicCheck = checkBasicPermission({
@@ -48,6 +51,7 @@ export const authorizeBefore = async <H extends HookContext = HookContext>(
       checkMultiActions: options.checkMultiActions,
       modelName: options.modelName,
       storeAbilityForAuthorize: true,
+      method,
     });
     await basicCheck(context);
   }
@@ -70,7 +74,7 @@ export const authorizeBefore = async <H extends HookContext = HookContext>(
     return context;
   }
 
-  const multi = isMulti(context);
+  const multi = method === "find" || isMulti(context);
 
   // if context is with multiple items, there's a change that we need to handle each item separately
   if (multi) {
@@ -80,14 +84,19 @@ export const authorizeBefore = async <H extends HookContext = HookContext>(
     }
   }
 
+  options = {
+    ...options,
+    method,
+  };
+
   if (
-    ["find", "get"].includes(context.method) ||
-    (isMulti && !hasRestrictingConditions(ability, "find", modelName))
+    ["find", "get"].includes(method) ||
+    (multi && !hasRestrictingConditions(ability, "find", modelName))
   ) {
     setPersistedConfig(context, "skipRestrictingRead.conditions", true);
   }
 
-  const { method, id } = context;
+  const { id } = context;
   const availableFields = getAvailableFields(context, options);
 
   if (["get", "patch", "update", "remove"].includes(method) && id != null) {
@@ -123,7 +132,14 @@ const handleSingle = async <H extends HookContext = HookContext>(
   // -> initial 'get' and 'remove' have no data at all
   // -> initial 'patch' maybe has just partial data
   // -> initial 'update' maybe has completely changed data, for what the check could pass but not for initial data
-  const { params, method, service, id } = context;
+  const method = getMethodName(context, options);
+
+  options = {
+    ...options,
+    method,
+  };
+
+  const { params, service, id } = context;
 
   const query = mergeQueryFromAbility(
     context.app,
@@ -206,18 +222,20 @@ const checkData = <H extends HookContext = HookContext>(
   data: Record<string, unknown>,
   options: Pick<
     AuthorizeHookOptions,
-    "actionOnForbidden" | "usePatchData" | "useUpdateData"
+    "actionOnForbidden" | "usePatchData" | "useUpdateData" | "method"
   >
 ): void => {
+  const method = getMethodName(context, options);
+
   if (
-    (context.method === "patch" && !options.usePatchData) ||
-    (context.method === "update" && !options.useUpdateData)
+    (method === "patch" && !options.usePatchData) ||
+    (method === "update" && !options.useUpdateData)
   ) {
     return;
   }
   throwUnlessCan(
     ability,
-    `${context.method}-data`,
+    `${method}-data`,
     subject(modelName, data),
     modelName,
     options
@@ -231,7 +249,8 @@ const handleMulti = async <H extends HookContext = HookContext>(
   availableFields: string[] | undefined,
   options: AuthorizeHookOptions
 ): Promise<H> => {
-  const { method } = context;
+  const method = getMethodName(context, options);
+
   // multi: find | patch | remove
 
   if (method === "patch") {
