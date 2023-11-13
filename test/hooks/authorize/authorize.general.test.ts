@@ -896,5 +896,53 @@ describe("authorize.general.test.ts", function () {
       });
       await Promise.all(promises);
     });
+
+    it("after - passes multi with 'pagination' with 'find' rule", async function () {
+      const expectedResult = {
+        "total": 1,
+        "limit": 10,
+        "skip": 0,
+        "data": [{ id: 1, userId: 1, test: true }]
+      };
+      const makeContext = (method, type) => {
+        return {
+          service: {},
+          path: "tests",
+          method,
+          type,
+          result: _cloneDeep(expectedResult),
+          id: null,
+          params: {
+            ability: defineAbility(
+              (can) => {
+                can(["find", "create", "patch", "remove"], "all");
+              },
+              { resolveAction }
+            ),
+            query: {},
+          },
+        } as unknown as HookContext;
+      };
+  
+      const types = ["after"];
+      const methods = ["find"];
+      const promises: Promise<any>[] = [];
+      types.forEach((type) => {
+        methods.forEach((method) => {
+          const context = makeContext(method, type);
+          const promise = authorize({ availableFields: undefined })(
+            context
+          ).then(({ result }) => {
+            assert.deepStrictEqual(
+              result,
+              expectedResult,
+              `returns complete object for '${type}:${method}'`
+            );
+          });
+          promises.push(promise);
+        });
+      });
+      await Promise.all(promises);
+    });
   });
 });
