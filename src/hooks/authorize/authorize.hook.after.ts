@@ -38,7 +38,7 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
   }
 
   // eslint-disable-next-line prefer-const
-  let { isArray, items } = getItemsIsArray(context, { from: "result" });
+  let { isArray, items } = getItemsIsArray(context, { from: "automatic" });
   if (!items.length) {
     return context;
   }
