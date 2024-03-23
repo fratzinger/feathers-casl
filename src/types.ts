@@ -35,7 +35,6 @@ export interface HookBaseOptions<H extends HookContext = HookContext> {
   checkAbilityForInternal: boolean;
   checkMultiActions: boolean;
   modelName: GetModelName;
-  idField: string;
   notSkippable: boolean;
   method?: string | ((context: H) => string);
 }
@@ -74,7 +73,7 @@ export interface AuthorizeHookOptions<H extends HookContext = HookContext>
     AuthorizeChannelCommonsOptions<H> {
   adapter: Adapter;
   checkRequestData: boolean;
-  checkRequestDataSameRules: boolean;
+  idField: string;
 }
 
 export type AuthorizeHookOptionsExclusive<H extends HookContext = HookContext> =
