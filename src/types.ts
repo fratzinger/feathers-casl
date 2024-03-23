@@ -73,6 +73,7 @@ export interface AuthorizeHookOptions<H extends HookContext = HookContext>
     AuthorizeChannelCommonsOptions<H> {
   adapter: Adapter;
   checkRequestData: boolean;
+  checkRequestDataSameRules: boolean;
 }
 
 export type AuthorizeHookOptionsExclusive<H extends HookContext = HookContext> =

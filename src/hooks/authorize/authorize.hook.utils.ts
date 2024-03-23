@@ -52,6 +52,7 @@ const defaultOptions: AuthorizeHookOptionsExclusive<HookContext> = {
     return getAvailableFields(context, { availableFields });
   },
   checkRequestData: false,
+  checkRequestDataSameRules: false,
 };
 
 export const makeDefaultOptions = (

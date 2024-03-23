@@ -222,7 +222,10 @@ const checkData = <H extends HookContext = HookContext>(
   data: Record<string, unknown>,
   options: Pick<
     AuthorizeHookOptions,
-    "actionOnForbidden" | "checkRequestData" | "method"
+    | "actionOnForbidden"
+    | "checkRequestData"
+    | "checkRequestDataSameRules"
+    | "method"
   >
 ): void => {
   const method = getMethodName(context, options);
@@ -230,14 +233,15 @@ const checkData = <H extends HookContext = HookContext>(
   if (
     !options.checkRequestData ||
     ["get", "remove", "find"].includes(method) ||
-    !ability.possibleRulesFor(`${method}-data`, modelName).length
+    (!options.checkRequestDataSameRules &&
+      !ability.possibleRulesFor(`${method}-data`, modelName).length)
   ) {
     return;
   }
 
   throwUnlessCan(
     ability,
-    `${method}-data`,
+    options.checkRequestDataSameRules ? method : `${method}-data`,
     subject(modelName, data),
     modelName,
     options
