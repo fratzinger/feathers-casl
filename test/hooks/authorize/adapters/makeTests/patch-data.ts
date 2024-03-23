@@ -101,34 +101,6 @@ export default (
       }
     });
 
-    it("fails with no 'patch-data' rule", async function () {
-      const readMethod = ["read", "get"];
-
-      for (const read of readMethod) {
-        await clean(app, service);
-        const item = await service.create({ test: true, userId: 1 });
-        let rejected = false;
-        try {
-          await service.patch(
-            item[id],
-            { test: false },
-            {
-              ability: defineAbility(
-                (can) => {
-                  can("patch", "tests");
-                  can(read, "tests");
-                },
-                { resolveAction }
-              ),
-            }
-          );
-        } catch (err) {
-          rejected = true;
-        }
-        assert.ok(rejected, "rejected");
-      }
-    });
-
     it("basic cannot 'patch-data'", async function () {
       const readMethod = ["read", "get"];
 

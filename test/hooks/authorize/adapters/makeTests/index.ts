@@ -66,7 +66,7 @@ export default async function (
       name,
       makeService,
       clean,
-      Object.assign({ useUpdateData: true }, authorizeHookOptions),
+      Object.assign({ checkRequestData: true }, authorizeHookOptions),
       makeTestsOptions
     );
     makePatchTests(
@@ -80,7 +80,7 @@ export default async function (
       name,
       makeService,
       clean,
-      Object.assign({ usePatchData: true }, authorizeHookOptions),
+      Object.assign({ checkRequestData: true }, authorizeHookOptions),
       makeTestsOptions
     );
     makePatchMultiTests(
