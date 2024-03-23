@@ -154,7 +154,7 @@ const handleSingle = async <H extends HookContext = HookContext>(
   _set(context, "params.query", query);
 
   // ensure that only allowed data gets changed
-  if (["update", "patch"].includes(method)) {
+  if (!["get", "remove", "find"].includes(method)) {
     const queryGet = Object.assign({}, params.query || {});
     if (queryGet.$select) {
       delete queryGet.$select;
