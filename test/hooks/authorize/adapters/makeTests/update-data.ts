@@ -101,7 +101,7 @@ export default (
       }
     });
 
-    it("basic cannot 'update-data'", async function () {
+    it("basic cannot 'update'", async function () {
       const readMethod = ["read", "get"];
 
       for (const read of readMethod) {
@@ -115,9 +115,7 @@ export default (
             {
               ability: defineAbility(
                 (can, cannot) => {
-                  can("update", "tests");
-                  can("update-data", "tests");
-                  cannot("update-data", "tests", { test: false });
+                  cannot("update", "tests", { test: false });
                   can(read, "tests");
                 },
                 { resolveAction }
@@ -131,7 +129,7 @@ export default (
       }
     });
 
-    it("basic can 'update-data' with fail", async function () {
+    it("basic can 'update' with fail", async function () {
       const readMethod = ["read", "get"];
 
       for (const read of readMethod) {
@@ -144,9 +142,7 @@ export default (
             {
               ability: defineAbility(
                 (can) => {
-                  can("update", "tests");
-                  can("update-data", "tests");
-                  can("update-data", "tests", { test: true });
+                  can("update", "tests", { test: true });
                   can(read, "tests");
                 },
                 { resolveAction }
@@ -160,7 +156,7 @@ export default (
       }
     });
 
-    it("basic can 'update-data'", async function () {
+    it("basic can 'update'", async function () {
       const readMethod = ["read", "get"];
 
       for (const read of readMethod) {
@@ -172,9 +168,7 @@ export default (
           {
             ability: defineAbility(
               (can) => {
-                can("update", "tests");
-                can("update-data", "tests");
-                can("update-data", "tests", { test: false });
+                can("update", "tests", { userId: 1 });
                 can(read, "tests");
               },
               { resolveAction }

@@ -53,6 +53,7 @@ const defaultOptions: AuthorizeHookOptionsExclusive<HookContext> = {
   },
   checkRequestData: false,
   checkRequestDataSameRules: false,
+  idField: "_id",
 };
 
 export const makeDefaultOptions = (

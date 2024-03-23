@@ -115,7 +115,7 @@ export const authorizeBefore = async <H extends HookContext = HookContext>(
       checkCreateForData: true,
     });
   } else if (context.data) {
-    checkData(context, ability, modelName, context.data, options);
+    checkData(context, ability, modelName, { ...context.data }, options);
   }
 
   return context;
@@ -191,7 +191,13 @@ const handleSingle = async <H extends HookContext = HookContext>(
       ? context.data
       : _pick(context.data, restrictingFields as string[]);
 
-    checkData(context, ability, modelName, data, options);
+    checkData(
+      context,
+      ability,
+      modelName,
+      _isEmpty(data) ? data : { ...data, [options.idField]: id },
+      options
+    );
 
     if (!restrictingFields) {
       return context;
@@ -226,10 +232,7 @@ const checkData = <H extends HookContext = HookContext>(
   data: Record<string, unknown>,
   options: Pick<
     AuthorizeHookOptions,
-    | "actionOnForbidden"
-    | "checkRequestData"
-    | "checkRequestDataSameRules"
-    | "method"
+    "actionOnForbidden" | "idField" | "checkRequestData" | "method"
   >
 ): void => {
   const method = getMethodName(context, options);
@@ -237,19 +240,12 @@ const checkData = <H extends HookContext = HookContext>(
   if (
     !options.checkRequestData ||
     ["get", "remove", "find"].includes(method) ||
-    (!options.checkRequestDataSameRules &&
-      !ability.possibleRulesFor(`${method}-data`, modelName).length)
+    !ability.possibleRulesFor(method, modelName).length
   ) {
     return;
   }
 
-  throwUnlessCan(
-    ability,
-    options.checkRequestDataSameRules ? method : `${method}-data`,
-    subject(modelName, data),
-    modelName,
-    options
-  );
+  throwUnlessCan(ability, method, subject(modelName, data), modelName, options);
 };
 
 const handleMulti = async <H extends HookContext = HookContext>(

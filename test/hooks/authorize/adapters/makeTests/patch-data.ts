@@ -115,9 +115,7 @@ export default (
             {
               ability: defineAbility(
                 (can, cannot) => {
-                  can("patch", "tests");
-                  can("patch-data", "tests");
-                  cannot("patch-data", "tests", { test: false });
+                  cannot("patch", "tests", { test: false });
                   can(read, "tests");
                 },
                 { resolveAction }
@@ -131,7 +129,7 @@ export default (
       }
     });
 
-    it("basic can 'patch-data' with fail", async function () {
+    it("basic can 'patch' with fail", async function () {
       const readMethod = ["read", "get"];
 
       for (const read of readMethod) {
@@ -144,9 +142,7 @@ export default (
             {
               ability: defineAbility(
                 (can) => {
-                  can("patch", "tests");
-                  can("patch-data", "tests");
-                  can("patch-data", "tests", { test: true });
+                  can("patch", "tests", { test: true });
                   can(read, "tests");
                 },
                 { resolveAction }
@@ -160,7 +156,7 @@ export default (
       }
     });
 
-    it("basic can 'patch-data'", async function () {
+    it("basic can 'patch'", async function () {
       const readMethod = ["read", "get"];
 
       for (const read of readMethod) {
@@ -168,13 +164,11 @@ export default (
         const item = await service.create({ test: true, userId: 1 });
         const patchedItem = await service.patch(
           item[id],
-          { test: false },
+          { test: false, userId: 1 },
           {
             ability: defineAbility(
               (can) => {
-                can("patch", "tests");
-                can("patch-data", "tests");
-                can("patch-data", "tests", { test: false });
+                can("patch", "tests", { userId: 1 });
                 can(read, "tests");
               },
               { resolveAction }
