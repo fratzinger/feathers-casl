@@ -165,7 +165,9 @@ const handleSingle = async <H extends HookContext = HookContext>(
 
     const getMethod = service._get ? "_get" : "get";
 
-    const item = await service[getMethod](id, paramsGet);
+    const item = service[getMethod]
+      ? await service[getMethod](id, paramsGet)
+      : {};
 
     const restrictingFields = hasRestrictingFields(
       ability,
