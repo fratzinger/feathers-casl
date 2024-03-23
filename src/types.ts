@@ -72,8 +72,8 @@ export interface AuthorizeHookOptions<H extends HookContext = HookContext>
   extends HookBaseOptions<H>,
     AuthorizeChannelCommonsOptions<H> {
   adapter: Adapter;
-  useUpdateData: boolean;
-  usePatchData: boolean;
+  checkRequestData: boolean;
+  idField: string;
 }
 
 export type AuthorizeHookOptionsExclusive<H extends HookContext = HookContext> =
