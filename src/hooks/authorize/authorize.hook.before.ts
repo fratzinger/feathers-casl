@@ -114,6 +114,8 @@ export const authorizeBefore = async <H extends HookContext = HookContext>(
       actionOnForbidden: options.actionOnForbidden,
       checkCreateForData: true,
     });
+  } else if (context.data) {
+    checkData(context, ability, modelName, context.data, options);
   }
 
   return context;
@@ -154,7 +156,7 @@ const handleSingle = async <H extends HookContext = HookContext>(
   _set(context, "params.query", query);
 
   // ensure that only allowed data gets changed
-  if (!["get", "remove", "find"].includes(method)) {
+  if (["update", "patch"].includes(method)) {
     const queryGet = Object.assign({}, params.query || {});
     if (queryGet.$select) {
       delete queryGet.$select;
