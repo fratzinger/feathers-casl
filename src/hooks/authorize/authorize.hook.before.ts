@@ -114,6 +114,8 @@ export const authorizeBefore = async <H extends HookContext = HookContext>(
       actionOnForbidden: options.actionOnForbidden,
       checkCreateForData: true,
     });
+  } else if (context.data) {
+    checkData(context, ability, modelName, context.data, options);
   }
 
   return context;
