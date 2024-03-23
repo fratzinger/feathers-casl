@@ -114,6 +114,8 @@ export const authorizeBefore = async <H extends HookContext = HookContext>(
       actionOnForbidden: options.actionOnForbidden,
       checkCreateForData: true,
     });
+  } else if (context.data) {
+    checkData(context, ability, modelName, context.data, options);
   }
 
   return context;
@@ -165,7 +167,9 @@ const handleSingle = async <H extends HookContext = HookContext>(
 
     const getMethod = service._get ? "_get" : "get";
 
-    const item = await service[getMethod](id, paramsGet);
+    const item = service[getMethod]
+      ? await service[getMethod](id, paramsGet)
+      : {};
 
     const restrictingFields = hasRestrictingFields(
       ability,
@@ -222,17 +226,19 @@ const checkData = <H extends HookContext = HookContext>(
   data: Record<string, unknown>,
   options: Pick<
     AuthorizeHookOptions,
-    "actionOnForbidden" | "usePatchData" | "useUpdateData" | "method"
+    "actionOnForbidden" | "checkRequestData" | "method"
   >
 ): void => {
   const method = getMethodName(context, options);
 
   if (
-    (method === "patch" && !options.usePatchData) ||
-    (method === "update" && !options.useUpdateData)
+    !options.checkRequestData ||
+    ["get", "remove", "find"].includes(method) ||
+    !ability.possibleRulesFor(`${method}-data`, modelName).length
   ) {
     return;
   }
+
   throwUnlessCan(
     ability,
     `${method}-data`,
