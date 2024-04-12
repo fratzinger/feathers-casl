@@ -79,7 +79,7 @@
     "@types/node": "^20.12.7",
     "@typescript-eslint/eslint-plugin": "^5.60.1",
     "@typescript-eslint/parser": "^5.60.1",
-    "@vitest/coverage-c8": "^0.32.2",
+    "@vitest/coverage-v8": "^1.5.0",
     "cors": "^2.8.5",
     "eslint": "^8.43.0",
     "eslint-config-prettier": "^8.8.0",
