@@ -58,7 +58,7 @@ export default defineConfig({
     ],
     footer: {
       message: "Released under the MIT License.",
-      copyright: "Copyright © 2020-present Frederik Schmatz<br />This site is powered by Netlify",
+      copyright: "Copyright © 2020-present Frederik Schmatz<br />This site is powered by <a href=\"https://www.netlify.com\" target=\"blank\">Netlify</a>",
     },
     algolia: {
       appId: "XJKV0V1N7U",
