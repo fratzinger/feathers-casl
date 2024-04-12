@@ -67,3 +67,5 @@ For more information on all the things you can do, visit [FeathersJS](http://doc
 ## License
 
 Licensed under the [MIT license](LICENSE).
+
+<a href="https://www.netlify.com"> <img src="https://www.netlify.com/v3/img/components/netlify-color-accent.svg" alt="Deploys by Netlify" /> </a>
