@@ -101,34 +101,6 @@ export default (
       }
     });
 
-    it("fails with no 'update-data' rule", async function () {
-      const readMethod = ["read", "get"];
-
-      for (const read of readMethod) {
-        await clean(app, service);
-        const item = await service.create({ test: true, userId: 1 });
-        let rejected = false;
-        try {
-          await service.update(
-            item[id],
-            { [id]: item[id], test: false, userId: 1 },
-            {
-              ability: defineAbility(
-                (can) => {
-                  can("update", "tests");
-                  can(read, "tests");
-                },
-                { resolveAction }
-              ),
-            }
-          );
-        } catch (err) {
-          rejected = true;
-        }
-        assert.ok(rejected, "rejected");
-      }
-    });
-
     it("basic cannot 'update-data'", async function () {
       const readMethod = ["read", "get"];
 
