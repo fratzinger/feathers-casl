@@ -66,7 +66,7 @@ const eventNameMap = {
   update: "updated",
   patch: "patched",
   remove: "removed",
-};
+} satisfies Record<string, EventName>;
 
 export const getEventName = (method: string): EventName | undefined =>
-  eventNameMap[method];
+  (eventNameMap as any)[method];
