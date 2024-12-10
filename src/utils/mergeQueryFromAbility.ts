@@ -74,8 +74,6 @@ export const mergeQueryFromAbility = <T>(
       $and.forEach((q: any) => {
         query = mergeQuery(query as Query, q, {
           defaultHandle: "intersect",
-          operators: service.options?.operators,
-          filters: service.options?.filters,
           useLogicalConjunction: true,
         });
       });
@@ -91,8 +89,6 @@ export const mergeQueryFromAbility = <T>(
   } else {
     return mergeQuery(originalQuery, query, {
       defaultHandle: "intersect",
-      operators: service.options?.operators,
-      filters: service.options?.filters,
       useLogicalConjunction: true,
     });
   }
