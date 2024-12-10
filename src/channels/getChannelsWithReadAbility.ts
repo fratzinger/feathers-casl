@@ -23,7 +23,7 @@ export const getChannelsWithReadAbility = (
   app: Application,
   data: AnyData,
   context: HookContext,
-  _options?: Partial<ChannelOptions>
+  _options?: Partial<ChannelOptions>,
 ): undefined | Channel | Channel[] => {
   if (!_options?.channels && !app.channels.length) {
     return undefined;
@@ -93,7 +93,7 @@ export const getChannelsWithReadAbility = (
           continue;
         }
         const connField = connectionsPerFields.find((x) =>
-          _isEqual(x.fields, fields)
+          _isEqual(x.fields, fields),
         );
         if (connField) {
           if (connField.connections.indexOf(connection) !== -1) {

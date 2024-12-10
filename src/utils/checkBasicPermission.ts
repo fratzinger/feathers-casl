@@ -21,7 +21,7 @@ const defaultOptions: CheckBasicPermissionHookOptionsExclusive = {
 };
 
 const makeOptions = (
-  options?: Partial<CheckBasicPermissionUtilsOptions>
+  options?: Partial<CheckBasicPermissionUtilsOptions>,
 ): CheckBasicPermissionUtilsOptions => {
   options = options || {};
   return Object.assign(makeDefaultBaseOptions(), defaultOptions, options);
@@ -29,7 +29,7 @@ const makeOptions = (
 
 export const checkBasicPermissionUtil = async <H extends HookContext>(
   context: H,
-  _options?: Partial<CheckBasicPermissionUtilsOptions>
+  _options?: Partial<CheckBasicPermissionUtilsOptions>,
 ): Promise<H> => {
   let options = makeOptions(_options);
 

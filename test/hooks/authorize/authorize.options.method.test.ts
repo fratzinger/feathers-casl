@@ -1,6 +1,6 @@
 import { MemoryService } from "@feathersjs/memory";
-import { filterObject, filterArray } from "feathers-utils";
-import { authorize, type Adapter, type ServiceCaslOptions } from "../../../src";
+import { filterArray } from "feathers-utils";
+import { authorize, type ServiceCaslOptions } from "../../../src";
 import { feathers } from "@feathersjs/feathers";
 import { defineAbility } from "@casl/ability";
 import { resolveAction } from "../../test-utils";
@@ -53,7 +53,7 @@ describe("authorize.options.method", () => {
       }),
       {
         methods: ["find", "get", "create", "update", "patch", "remove", "sum"],
-      }
+      },
     );
 
     const hook = authorize({
@@ -83,7 +83,7 @@ describe("authorize.options.method", () => {
         (can) => {
           can("read", "tests", { userId: 1 });
         },
-        { resolveAction }
+        { resolveAction },
       ),
       paginate: false,
     })) as any as any[];
@@ -91,7 +91,7 @@ describe("authorize.options.method", () => {
     assert.deepStrictEqual(
       returnedItems,
       [{ [id]: item1[id], test: true, userId: 1 }],
-      "just returned one item"
+      "just returned one item",
     );
   });
 });

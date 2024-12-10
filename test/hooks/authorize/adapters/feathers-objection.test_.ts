@@ -2,7 +2,7 @@ import { Model } from "objection";
 import makeTests from "./makeTests";
 import { Service } from "feathers-objection";
 import { getItemsIsArray } from "feathers-utils";
-import { knex } from "knex";
+import knex from "knex";
 import path from "node:path";
 import type { ServiceCaslOptions } from "../../../../src";
 import type { HookContext } from "@feathersjs/feathers";
@@ -111,5 +111,5 @@ makeTests(
     });
   },
   { adapter: "feathers-objection" },
-  afterHooks
+  afterHooks,
 );

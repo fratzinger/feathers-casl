@@ -8,7 +8,7 @@ export const getMinimalFields = (
   ability: AnyAbility,
   action: string,
   subject: Record<string, unknown>,
-  options: GetMinimalFieldsOptions
+  options: GetMinimalFieldsOptions,
 ): string[] => {
   if (options.checkCan && !ability.can(action, subject)) {
     return [];

@@ -6,7 +6,7 @@ import type { Query } from "@feathersjs/feathers";
 export const simplifyQuery = <Q extends Query | null>(
   query: Q,
   replaceAnd = true,
-  replaceOr = true
+  replaceOr = true,
 ): Q => {
   if (!query) {
     return query;

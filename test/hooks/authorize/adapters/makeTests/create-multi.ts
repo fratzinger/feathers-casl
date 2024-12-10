@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { feathers } from "@feathersjs/feathers";
-import { createAliasResolver, defineAbility } from "@casl/ability";
+import { defineAbility } from "@casl/ability";
 import _sortBy from "lodash/sortBy.js";
 
 import type { Application } from "@feathersjs/feathers";
@@ -15,19 +15,19 @@ export default (
   makeService: () => any,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
-  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] }
+  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] },
 ): void => {
   let app: Application;
   let service;
   let id;
 
-  const itSkip = (adapterToTest: string | string[]) => {
-    const condition =
-      typeof adapterToTest === "string"
-        ? adapterName === adapterToTest
-        : adapterToTest.includes(adapterName);
-    return condition ? it.skip : it;
-  };
+  // const itSkip = (adapterToTest: string | string[]) => {
+  //   const condition =
+  //     typeof adapterToTest === "string"
+  //       ? adapterName === adapterToTest
+  //       : adapterToTest.includes(adapterName);
+  //   return condition ? it.skip : it;
+  // };
 
   describe(`${adapterName}: beforeAndAfter - create:multi`, function () {
     beforeEach(async function () {
@@ -35,7 +35,6 @@ export default (
       app.use("tests", makeService());
       service = app.service("tests");
 
-      // eslint-disable-next-line prefer-destructuring
       id = service.options.id;
 
       const options = Object.assign(
@@ -50,14 +49,14 @@ export default (
             "hidden",
           ],
         },
-        authorizeHookOptions
+        authorizeHookOptions,
       );
 
       afterHooks = Array.isArray(afterHooks)
         ? afterHooks
         : afterHooks
-        ? [afterHooks]
-        : [];
+          ? [afterHooks]
+          : [];
 
       if (around) {
         service.hooks({
@@ -97,7 +96,7 @@ export default (
           (can) => {
             can("create", "tests", { userId: 1 });
           },
-          { resolveAction }
+          { resolveAction },
         ),
       });
 
@@ -112,7 +111,7 @@ export default (
         assert.strictEqual(
           allItems.length,
           0,
-          `has no items before for read: '${read}'`
+          `has no items before for read: '${read}'`,
         );
         const itemsArr = [
           { test: true, hi: "1", userId: 1 },
@@ -125,7 +124,7 @@ export default (
               can("create", "tests", { userId: 1 });
               can(read, "tests");
             },
-            { resolveAction }
+            { resolveAction },
           ),
         });
 
@@ -136,7 +135,7 @@ export default (
         assert.deepStrictEqual(
           _sortBy(items, id),
           _sortBy(expectedItems, id),
-          `created items for read: '${read}'`
+          `created items for read: '${read}'`,
         );
       }
     });
@@ -152,14 +151,14 @@ export default (
           (can) => {
             can("create", "tests", { userId: 1 });
           },
-          { resolveAction }
+          { resolveAction },
         ),
       });
 
       await assert.rejects(
         promise,
         (err: Error) => err.name === "Forbidden",
-        "rejects because different userId"
+        "rejects because different userId",
       );
     });
 
@@ -172,12 +171,12 @@ export default (
       const items = await service.create(itemsArr, {
         ability: defineAbility(
           (can) => {
-            can("create", "tests"),
-              can("read", "tests"),
-              can("read", "tests", [id], { userId: 2 }),
-              can("read", "tests", [id, "userId"], { hi: "3" });
+            can("create", "tests");
+            can("read", "tests");
+            can("read", "tests", [id], { userId: 2 });
+            can("read", "tests", [id, "userId"], { hi: "3" });
           },
-          { resolveAction }
+          { resolveAction },
         ),
       });
 

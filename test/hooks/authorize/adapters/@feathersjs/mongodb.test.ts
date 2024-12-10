@@ -56,5 +56,5 @@ makeTests(
   async (app, service) => {
     await service.remove(null);
   },
-  { adapter }
+  { adapter },
 );

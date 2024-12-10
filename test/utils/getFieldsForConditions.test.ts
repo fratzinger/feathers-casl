@@ -4,7 +4,6 @@ import { getFieldsForConditions } from "../../src";
 
 describe("utils - getFieldsForConditions", function () {
   it("returns empty array for no conditions", function () {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     const ability = defineAbility(() => {});
     const fields = getFieldsForConditions(ability, "find", "tests");
     assert.deepStrictEqual(fields, [], "empty fields");
@@ -23,13 +22,13 @@ describe("utils - getFieldsForConditions", function () {
     assert.deepStrictEqual(
       fieldsTests1.sort(),
       ["special", "userId", "test", "hi", "testsId"].sort(),
-      "found right fields for tests1"
+      "found right fields for tests1",
     );
     const fieldsTests2 = getFieldsForConditions(ability, "find", "tests2");
     assert.deepStrictEqual(
       fieldsTests2.sort(),
       ["commentId"].sort(),
-      "found right fields for tests2"
+      "found right fields for tests2",
     );
   });
 });

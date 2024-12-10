@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { feathers } from "@feathersjs/feathers";
-import { createAliasResolver, defineAbility } from "@casl/ability";
+import { defineAbility } from "@casl/ability";
 
 import type { Application } from "@feathersjs/feathers";
 
@@ -14,19 +14,19 @@ export default (
   makeService: () => any,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
-  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] }
+  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] },
 ): void => {
   let app: Application;
   let service;
   let id;
 
-  const itSkip = (adapterToTest: string | string[]) => {
-    const condition =
-      typeof adapterToTest === "string"
-        ? adapterName === adapterToTest
-        : adapterToTest.includes(adapterName);
-    return condition ? it.skip : it;
-  };
+  // const itSkip = (adapterToTest: string | string[]) => {
+  //   const condition =
+  //     typeof adapterToTest === "string"
+  //       ? adapterName === adapterToTest
+  //       : adapterToTest.includes(adapterName);
+  //   return condition ? it.skip : it;
+  // };
 
   describe(`${adapterName}: beforeAndAfter - remove:single`, function () {
     beforeEach(async function () {
@@ -34,7 +34,6 @@ export default (
       app.use("tests", makeService());
       service = app.service("tests");
 
-      // eslint-disable-next-line prefer-destructuring
       id = service.options.id;
 
       const options = Object.assign(
@@ -49,14 +48,14 @@ export default (
             "hidden",
           ],
         },
-        authorizeHookOptions
+        authorizeHookOptions,
       );
 
       afterHooks = Array.isArray(afterHooks)
         ? afterHooks
         : afterHooks
-        ? [afterHooks]
-        : [];
+          ? [afterHooks]
+          : [];
 
       if (around) {
         service.hooks({
@@ -89,14 +88,14 @@ export default (
           (can) => {
             can("remove", "tests");
           },
-          { resolveAction }
+          { resolveAction },
         ),
       });
 
       assert.deepStrictEqual(
         updatedItem,
         undefined,
-        "removed item is undefined"
+        "removed item is undefined",
       );
 
       const realItems = (await service.find({ paginate: false })) as unknown[];
@@ -115,14 +114,14 @@ export default (
               can("remove", "tests");
               can(read, "tests");
             },
-            { resolveAction }
+            { resolveAction },
           ),
         });
 
         assert.deepStrictEqual(
           removedItem,
           { [id]: item[id], test: true, userId: 1 },
-          `removed item correctly for read: '${read}'`
+          `removed item correctly for read: '${read}'`,
         );
 
         const realItems = (await service.find({
@@ -141,14 +140,14 @@ export default (
             can("remove", "tests");
             cannot("remove", "tests", { userId: 1 });
           },
-          { resolveAction }
+          { resolveAction },
         ),
       });
 
       await assert.rejects(
         promise,
         (err: Error) => err.name === "NotFound",
-        "cannot remove item"
+        "cannot remove item",
       );
     });
 
@@ -163,18 +162,18 @@ export default (
             can("read", "tests", ["test", "userId"]);
             can(["create", "remove"], "tests");
           },
-          { resolveAction }
+          { resolveAction },
         ),
       });
       assert.deepStrictEqual(
         result,
         {},
-        "returned item is empty because of $select and restricting fields"
+        "returned item is empty because of $select and restricting fields",
       );
       await assert.rejects(
         service.get(item[id]),
         (err: Error) => err.name === "NotFound",
-        "item was deleted"
+        "item was deleted",
       );
     });
   });

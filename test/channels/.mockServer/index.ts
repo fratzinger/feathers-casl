@@ -35,7 +35,7 @@ export const mockServer = (options: MockServerOptions) => {
   app.use(
     helmet({
       contentSecurityPolicy: false,
-    })
+    }),
   );
   app.use(cors());
   app.use(json());

@@ -31,7 +31,7 @@ import { getMethodName } from "../../utils/getMethodName";
 
 export const authorizeAfter = async <H extends HookContext = HookContext>(
   context: H,
-  options: AuthorizeHookOptions
+  options: AuthorizeHookOptions,
 ) => {
   if (shouldSkip(HOOKNAME, context, options) || !context.params) {
     return context;
@@ -52,11 +52,11 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
 
   const skipCheckConditions = getPersistedConfig(
     context,
-    "skipRestrictingRead.conditions"
+    "skipRestrictingRead.conditions",
   );
   const skipCheckFields = getPersistedConfig(
     context,
-    "skipRestrictingRead.fields"
+    "skipRestrictingRead.fields",
   );
 
   if (skipCheckConditions && skipCheckFields) {
@@ -90,7 +90,7 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
       $select,
       ability,
       getOrFind,
-      modelName
+      modelName,
     );
     if ($newSelect) {
       const _items = await refetchItems(context);
@@ -112,7 +112,7 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
       ability,
       getOrFind,
       subject(modelName, item),
-      hasRestrictingFieldsOptions
+      hasRestrictingFieldsOptions,
     );
 
     if (fields === true) {

@@ -36,31 +36,31 @@ describe("utils - checkCan", function () {
     });
     await assert.doesNotReject(
       () => checkCan(ability, 0, "get", "tests", service),
-      "'get:0' does not reject"
+      "'get:0' does not reject",
     );
     await assert.doesNotReject(
       () => checkCan(ability, 0, "update", "tests", service),
-      "'update:0' does not reject"
+      "'update:0' does not reject",
     );
     await assert.doesNotReject(
       () => checkCan(ability, 0, "remove", "tests", service),
-      "'update:0' does not reject"
+      "'update:0' does not reject",
     );
     await assert.rejects(
       () => checkCan(ability, 1, "remove", "tests", service),
-      "'remove:1' rejects"
+      "'remove:1' rejects",
     );
     await assert.rejects(
       () => checkCan(ability, 2, "update", "tests", service),
-      "'update:2' rejects"
+      "'update:2' rejects",
     );
     await assert.rejects(
       () => checkCan(ability, 0, "patch", "tests", service),
-      "'patch:0' rejects"
+      "'patch:0' rejects",
     );
     await assert.rejects(
       () => checkCan(ability, 0, "update", "another-tests", service),
-      "'patch:0' rejects"
+      "'patch:0' rejects",
     );
   });
 

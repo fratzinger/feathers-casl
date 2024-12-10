@@ -3,7 +3,7 @@ import { createAliasResolver } from "@casl/ability";
 export const promiseTimeout = function (
   ms: number,
   promise: Promise<unknown>,
-  rejectMessage?: string
+  rejectMessage?: string,
 ): Promise<unknown> {
   // Create a promise that rejects in <ms> milliseconds
   const timeout = new Promise((resolve, reject) => {

@@ -62,7 +62,7 @@ describe("utils - hasRestrictingFields", function () {
       assert.deepStrictEqual(
         result,
         ["id"],
-        `is subset for method '${method}'`
+        `is subset for method '${method}'`,
       );
     });
   });
@@ -86,7 +86,7 @@ describe("utils - hasRestrictingFields", function () {
       assert.deepStrictEqual(
         result,
         ["id"],
-        `is subset for method '${method}'`
+        `is subset for method '${method}'`,
       );
     });
   });

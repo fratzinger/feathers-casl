@@ -9,7 +9,7 @@ import type { ChannelOptions, EventName, InitOptions } from "../types";
 
 export const makeChannelOptions = (
   app: Application,
-  options?: Partial<ChannelOptions>
+  options?: Partial<ChannelOptions>,
 ): ChannelOptions => {
   options = options || {};
   return Object.assign({}, defaultOptions, getAppOptions(app), options);
@@ -18,13 +18,8 @@ export const makeChannelOptions = (
 const defaultOptions: Omit<ChannelOptions, "channels"> = {
   activated: true,
   channelOnError: ["authenticated"],
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ability: (
-    app: Application,
-    connection: RealTimeConnection,
-    data: any,
-    context: HookContext
-  ): Ability => {
+
+  ability: (app: Application, connection: RealTimeConnection): Ability => {
     return connection.ability;
   },
   modelName: (context) => context.path,
@@ -38,13 +33,13 @@ const defaultOptions: Omit<ChannelOptions, "channels"> = {
 };
 
 export const makeDefaultOptions = (
-  options?: Partial<ChannelOptions>
+  options?: Partial<ChannelOptions>,
 ): ChannelOptions => {
   return Object.assign({}, defaultOptions, options);
 };
 
 const getAppOptions = (
-  app: Application
+  app: Application,
 ): ChannelOptions | Record<string, never> => {
   const caslOptions: InitOptions = app?.get("casl");
   return caslOptions && caslOptions.channels ? caslOptions.channels : {};
@@ -55,7 +50,7 @@ export const getAbility = (
   data: Record<string, unknown>,
   connection: RealTimeConnection,
   context: HookContext,
-  options: Partial<ChannelOptions>
+  options: Partial<ChannelOptions>,
 ): undefined | AnyAbility => {
   if (options.ability) {
     return typeof options.ability === "function"
@@ -66,15 +61,12 @@ export const getAbility = (
   }
 };
 
-export const getEventName = (method: string): EventName | undefined => {
-  if (method === "create") {
-    return "created";
-  } else if (method === "update") {
-    return "updated";
-  } else if (method === "patch") {
-    return "patched";
-  } else if (method === "remove") {
-    return "removed";
-  }
-  return undefined;
-};
+const eventNameMap = {
+  create: "created",
+  update: "updated",
+  patch: "patched",
+  remove: "removed",
+} satisfies Record<string, EventName>;
+
+export const getEventName = (method: string): EventName | undefined =>
+  (eventNameMap as any)[method];

@@ -21,7 +21,7 @@ export default async function (
     around: false,
     afterHooks: [],
     actionBefore: () => {},
-  }
+  },
 ): Promise<void> {
   describe(`authorize-hook '${name}'`, function () {
     if (makeTestsOptions.actionBefore) {
@@ -32,77 +32,77 @@ export default async function (
       makeService,
       clean,
       authorizeHookOptions,
-      makeTestsOptions
+      makeTestsOptions,
     );
     makeGetTests(
       name,
       makeService,
       clean,
       authorizeHookOptions,
-      makeTestsOptions
+      makeTestsOptions,
     );
     makeCreateTests(
       name,
       makeService,
       clean,
       authorizeHookOptions,
-      makeTestsOptions
+      makeTestsOptions,
     );
     makeCreateMultiTests(
       name,
       makeService,
       clean,
       authorizeHookOptions,
-      makeTestsOptions
+      makeTestsOptions,
     );
     makeUpdateTests(
       name,
       makeService,
       clean,
       authorizeHookOptions,
-      makeTestsOptions
+      makeTestsOptions,
     );
     makeUpdateDataTests(
       name,
       makeService,
       clean,
       Object.assign({ useUpdateData: true }, authorizeHookOptions),
-      makeTestsOptions
+      makeTestsOptions,
     );
     makePatchTests(
       name,
       makeService,
       clean,
       authorizeHookOptions,
-      makeTestsOptions
+      makeTestsOptions,
     );
     makePatchDataTests(
       name,
       makeService,
       clean,
       Object.assign({ usePatchData: true }, authorizeHookOptions),
-      makeTestsOptions
+      makeTestsOptions,
     );
     makePatchMultiTests(
       name,
       makeService,
       clean,
       authorizeHookOptions,
-      makeTestsOptions
+      makeTestsOptions,
     );
     makeRemoveTests(
       name,
       makeService,
       clean,
       authorizeHookOptions,
-      makeTestsOptions
+      makeTestsOptions,
     );
     makeRemoveMultiTests(
       name,
       makeService,
       clean,
       authorizeHookOptions,
-      makeTestsOptions
+      makeTestsOptions,
     );
   });
 }

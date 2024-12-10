@@ -33,7 +33,7 @@ const Model = sequelize.define(
   },
   {
     timestamps: false,
-  }
+  },
 );
 
 declare module "feathers-sequelize" {
@@ -85,7 +85,7 @@ const afterHooks = [
           delete item[key];
           return;
         }
-        // @ts-ignore
+
         if (field.type instanceof DataTypes.BOOLEAN) {
           item[key] = !!item[key];
         }
@@ -101,5 +101,5 @@ makeTests(
     await Model.sync({ force: true });
   },
   { adapter: "feathers-sequelize" },
-  { afterHooks }
+  { afterHooks },
 );

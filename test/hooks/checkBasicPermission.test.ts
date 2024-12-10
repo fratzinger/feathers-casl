@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { createAliasResolver, defineAbility } from "@casl/ability";
+import { defineAbility } from "@casl/ability";
 import { checkBasicPermission } from "../../src";
 import type { HookContext } from "@feathersjs/feathers";
 import { markHookForSkip } from "feathers-utils";
@@ -38,7 +38,7 @@ describe("checkBasicPermission.test.ts", function () {
             assert.deepStrictEqual(
               result.params.query,
               query,
-              `'${type}:${method}': does not change query object`
+              `'${type}:${method}': does not change query object`,
             );
           });
           promises.push(promise);
@@ -66,7 +66,6 @@ describe("checkBasicPermission.test.ts", function () {
             test: true,
           },
           params: {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             ability: defineAbility(() => {}, { resolveAction }),
             query: {},
           },
@@ -82,7 +81,7 @@ describe("checkBasicPermission.test.ts", function () {
           const promise = assert.rejects(
             checkBasicPermission()(context),
             (err: Error) => err.name === "Forbidden",
-            `'${type}:${method}': with no permissions returns 'Forbidden' error`
+            `'${type}:${method}': with no permissions returns 'Forbidden' error`,
           );
           promises.push(promise);
         });
@@ -109,7 +108,7 @@ describe("checkBasicPermission.test.ts", function () {
               (can) => {
                 can("manage", "all");
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {},
           },
@@ -127,7 +126,7 @@ describe("checkBasicPermission.test.ts", function () {
             assert.deepStrictEqual(
               result.params.query,
               query,
-              "does not change query object"
+              "does not change query object",
             );
           });
           promises.push(promise);
@@ -156,7 +155,7 @@ describe("checkBasicPermission.test.ts", function () {
               (can) => {
                 can(method, path);
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {},
           },
@@ -174,7 +173,7 @@ describe("checkBasicPermission.test.ts", function () {
             assert.deepStrictEqual(
               result.params.query,
               query,
-              "does not change query object"
+              "does not change query object",
             );
           });
           promises.push(promise);
@@ -198,7 +197,6 @@ describe("checkBasicPermission.test.ts", function () {
             test: true,
           },
           params: {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             ability: defineAbility(() => {}, { resolveAction }),
             skipHooks: ["checkBasicPermission"],
             query: {},
@@ -219,7 +217,7 @@ describe("checkBasicPermission.test.ts", function () {
             assert.deepStrictEqual(
               result.params.query,
               query,
-              `'${type}:${method}': does not change query object`
+              `'${type}:${method}': does not change query object`,
             );
           });
           promises.push(promise);
@@ -248,7 +246,7 @@ describe("checkBasicPermission.test.ts", function () {
             (can) => {
               can("create", "tests", { userId: 2 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {},
         },
@@ -256,7 +254,7 @@ describe("checkBasicPermission.test.ts", function () {
 
       await assert.doesNotReject(
         checkBasicPermission()(context),
-        "passes checkBasicPermission hook"
+        "passes checkBasicPermission hook",
       );
     });
 
@@ -290,7 +288,7 @@ describe("checkBasicPermission.test.ts", function () {
             (can) => {
               can("create", "tests", { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {},
         },
@@ -298,7 +296,7 @@ describe("checkBasicPermission.test.ts", function () {
 
       await assert.doesNotReject(
         checkBasicPermission()(context),
-        "passes checkBasicPermission hook"
+        "passes checkBasicPermission hook",
       );
     });
 
@@ -332,7 +330,7 @@ describe("checkBasicPermission.test.ts", function () {
             (can) => {
               can("create", "tests", { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {},
         },
@@ -340,7 +338,7 @@ describe("checkBasicPermission.test.ts", function () {
 
       await assert.rejects(
         checkBasicPermission({ checkMultiActions: true })(context),
-        "checkBasicPermission hook rejects"
+        "checkBasicPermission hook rejects",
       );
     });
 
@@ -362,7 +360,7 @@ describe("checkBasicPermission.test.ts", function () {
             (can) => {
               can("create", "tests", { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {},
         },
@@ -371,7 +369,7 @@ describe("checkBasicPermission.test.ts", function () {
       await assert.rejects(
         checkBasicPermission({ checkCreateForData: true })(context),
         (err: Error) => err.name === "Forbidden",
-        "rejects with 'Forbidden' error"
+        "rejects with 'Forbidden' error",
       );
     });
 
@@ -405,7 +403,7 @@ describe("checkBasicPermission.test.ts", function () {
             (can) => {
               can("create", "tests", { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {},
         },
@@ -414,7 +412,7 @@ describe("checkBasicPermission.test.ts", function () {
       await assert.rejects(
         checkBasicPermission({ checkCreateForData: true })(context),
         (err: Error) => err.name === "Forbidden",
-        "rejects with 'Forbidden' error"
+        "rejects with 'Forbidden' error",
       );
     });
 
@@ -436,7 +434,7 @@ describe("checkBasicPermission.test.ts", function () {
             (can) => {
               can("create", "tests", { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {},
         },
@@ -445,7 +443,7 @@ describe("checkBasicPermission.test.ts", function () {
       await assert.doesNotReject(
         checkBasicPermission({ checkCreateForData: false })(context),
         (err: Error) => err.name === "Forbidden",
-        "does not reject"
+        "does not reject",
       );
     });
 
@@ -479,7 +477,7 @@ describe("checkBasicPermission.test.ts", function () {
             (can) => {
               can("create", "tests", { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {},
         },
@@ -488,7 +486,7 @@ describe("checkBasicPermission.test.ts", function () {
       await assert.doesNotReject(
         checkBasicPermission({ checkCreateForData: false })(context),
         (err: Error) => err.name === "Forbidden",
-        "does not reject"
+        "does not reject",
       );
     });
   });
@@ -509,7 +507,7 @@ describe("checkBasicPermission.test.ts", function () {
             (can) => {
               can("patch-multi", "tests");
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {},
         },
@@ -517,7 +515,7 @@ describe("checkBasicPermission.test.ts", function () {
 
       await assert.rejects(
         checkBasicPermission({ checkMultiActions: true })(context),
-        "checkBasicPermission rejects"
+        "checkBasicPermission rejects",
       );
     });
 
@@ -536,7 +534,7 @@ describe("checkBasicPermission.test.ts", function () {
             (can) => {
               can("patch", "tests");
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {},
         },
@@ -544,7 +542,7 @@ describe("checkBasicPermission.test.ts", function () {
 
       await assert.rejects(
         checkBasicPermission({ checkMultiActions: true })(context),
-        "checkBasicPermission rejects"
+        "checkBasicPermission rejects",
       );
     });
   });
@@ -564,7 +562,7 @@ describe("checkBasicPermission.test.ts", function () {
             (can) => {
               can("remove-multi", "tests");
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {},
         },
@@ -572,7 +570,7 @@ describe("checkBasicPermission.test.ts", function () {
 
       await assert.rejects(
         checkBasicPermission({ checkMultiActions: true })(context),
-        "checkBasicPermission rejects"
+        "checkBasicPermission rejects",
       );
     });
 
@@ -590,7 +588,7 @@ describe("checkBasicPermission.test.ts", function () {
             (can) => {
               can("remove", "tests");
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {},
         },
@@ -598,7 +596,7 @@ describe("checkBasicPermission.test.ts", function () {
 
       await assert.rejects(
         checkBasicPermission({ checkMultiActions: true })(context),
-        "checkBasicPermission rejects"
+        "checkBasicPermission rejects",
       );
     });
   });

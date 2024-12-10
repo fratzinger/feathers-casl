@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import assert from "node:assert";
-import { createAliasResolver, defineAbility } from "@casl/ability";
+import { defineAbility } from "@casl/ability";
 import { feathers } from "@feathersjs/feathers";
 import { authorize } from "../../../src";
 import { MemoryService } from "@feathersjs/memory";
@@ -20,7 +19,7 @@ describe("authorize.relations", function () {
         filters: {
           ...filterArray("$and"),
         },
-      })
+      }),
     );
     app.use(
       "albums",
@@ -31,7 +30,7 @@ describe("authorize.relations", function () {
         filters: {
           ...filterArray("$and"),
         },
-      })
+      }),
     );
 
     const serviceArtists = app.service("artists");
@@ -126,22 +125,27 @@ describe("authorize.relations", function () {
         date: 2016,
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const killer = await serviceAlbums.create({
         name: "All Killer No Filler",
         artistId: sum41.id,
         date: 2001,
       });
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const hero = await serviceAlbums.create({
         name: "Underclass Hero",
         artistId: sum41.id,
         date: 2007,
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const believe = await serviceAlbums.create({
         name: "Believe",
         artistId: justinBieber.id,
         date: 2012,
       });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const purpose = await serviceAlbums.create({
         name: "Purpose",
         artistId: justinBieber.id,
@@ -154,12 +158,12 @@ describe("authorize.relations", function () {
       assert.deepStrictEqual(
         albumsOfBlink.sort(),
         [enemaOfTheState, pantsAndJacket, california].sort(),
-        "found all albums of blink182"
+        "found all albums of blink182",
       );
     });
 
     it("basic example with ability", async function () {
-      const { app, serviceAlbums, serviceArtists } = mock();
+      const { serviceAlbums, serviceArtists } = mock();
       const blink182 = await serviceArtists.create({ name: "Blink182" });
       const sum41 = await serviceArtists.create({ name: "Sum 41" });
       const justinBieber = await serviceArtists.create({
@@ -182,22 +186,27 @@ describe("authorize.relations", function () {
         date: 2016,
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const killer = await serviceAlbums.create({
         name: "All Killer No Filler",
         artistId: sum41.id,
         date: 2001,
       });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const hero = await serviceAlbums.create({
         name: "Underclass Hero",
         artistId: sum41.id,
         date: 2007,
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const believe = await serviceAlbums.create({
         name: "Believe",
         artistId: justinBieber.id,
         date: 2012,
       });
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const purpose = await serviceAlbums.create({
         name: "Purpose",
         artistId: justinBieber.id,
@@ -211,7 +220,7 @@ describe("authorize.relations", function () {
             can("read", "albums");
             can("read", "artists", { name: "Justin Bieber" });
           },
-          { resolveAction }
+          { resolveAction },
         ),
       });
 
@@ -224,19 +233,19 @@ describe("authorize.relations", function () {
             can("read", "albums");
             can("read", "artists", { name: "Blink182" });
           },
-          { resolveAction }
+          { resolveAction },
         ),
       });
 
       assert.deepStrictEqual(
         albumsOfBlink.sort(),
         [enemaOfTheState, pantsAndJacket, california].sort(),
-        "found all albums of blink182"
+        "found all albums of blink182",
       );
     });
 
     it("basic example with ability with $select", async function () {
-      const { app, serviceAlbums, serviceArtists } = mock();
+      const { serviceAlbums, serviceArtists } = mock();
       const blink182 = await serviceArtists.create({ name: "Blink182" });
       const sum41 = await serviceArtists.create({ name: "Sum 41" });
       const justinBieber = await serviceArtists.create({
@@ -259,22 +268,28 @@ describe("authorize.relations", function () {
         date: 2016,
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const killer = await serviceAlbums.create({
         name: "All Killer No Filler",
         artistId: sum41.id,
         date: 2001,
       });
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const hero = await serviceAlbums.create({
         name: "Underclass Hero",
         artistId: sum41.id,
         date: 2007,
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const believe = await serviceAlbums.create({
         name: "Believe",
         artistId: justinBieber.id,
         date: 2012,
       });
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const purpose = await serviceAlbums.create({
         name: "Purpose",
         artistId: justinBieber.id,
@@ -288,7 +303,7 @@ describe("authorize.relations", function () {
             can("read", "albums");
             can("read", "artists", { name: "Justin Bieber" });
           },
-          { resolveAction }
+          { resolveAction },
         ),
       });
 
@@ -301,7 +316,7 @@ describe("authorize.relations", function () {
             can("read", "albums");
             can("read", "artists", { name: "Blink182" });
           },
-          { resolveAction }
+          { resolveAction },
         ),
       });
 
@@ -312,12 +327,12 @@ describe("authorize.relations", function () {
           { id: pantsAndJacket.id },
           { id: california.id },
         ].sort(),
-        "found all albums of blink182"
+        "found all albums of blink182",
       );
     });
 
     it("dot.notation in ability", async function () {
-      const { app, serviceAlbums, serviceArtists } = mock();
+      const { serviceAlbums, serviceArtists } = mock();
       const blink182 = await serviceArtists.create({ name: "Blink182" });
       const sum41 = await serviceArtists.create({ name: "Sum 41" });
       const justinBieber = await serviceArtists.create({
@@ -340,22 +355,26 @@ describe("authorize.relations", function () {
         date: 2016,
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const killer = await serviceAlbums.create({
         name: "All Killer No Filler",
         artistId: sum41.id,
         date: 2001,
       });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const hero = await serviceAlbums.create({
         name: "Underclass Hero",
         artistId: sum41.id,
         date: 2007,
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const believe = await serviceAlbums.create({
         name: "Believe",
         artistId: justinBieber.id,
         date: 2012,
       });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const purpose = await serviceAlbums.create({
         name: "Purpose",
         artistId: justinBieber.id,
@@ -369,21 +388,21 @@ describe("authorize.relations", function () {
             can("read", "albums", { "artist.name": "Blink182" });
             can("read", "artists");
           },
-          { resolveAction }
+          { resolveAction },
         ),
       });
 
       assert.deepStrictEqual(
         albumsOfBlink.sort(),
         [enemaOfTheState, pantsAndJacket, california].sort(),
-        "only can read albums of blink182"
+        "only can read albums of blink182",
       );
     });
   });
 
   describe("patch", function () {
     it("dot.notation in ability", async function () {
-      const { app, serviceAlbums, serviceArtists } = mock();
+      const { serviceAlbums, serviceArtists } = mock();
       const blink182 = await serviceArtists.create({ name: "Blink182" });
       const sum41 = await serviceArtists.create({ name: "Sum 41" });
       const justinBieber = await serviceArtists.create({
@@ -406,22 +425,26 @@ describe("authorize.relations", function () {
         date: 2016,
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const killer = await serviceAlbums.create({
         name: "All Killer No Filler",
         artistId: sum41.id,
         date: 2001,
       });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const hero = await serviceAlbums.create({
         name: "Underclass Hero",
         artistId: sum41.id,
         date: 2007,
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const believe = await serviceAlbums.create({
         name: "Believe",
         artistId: justinBieber.id,
         date: 2012,
       });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const purpose = await serviceAlbums.create({
         name: "Purpose",
         artistId: justinBieber.id,
@@ -441,9 +464,9 @@ describe("authorize.relations", function () {
               can(["update"], "albums", { "artist.name": "Blink182" });
               can("read", "artists");
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       assert.deepStrictEqual(
@@ -453,33 +476,32 @@ describe("authorize.relations", function () {
           { ...pantsAndJacket, stars: 5 },
           { ...california, stars: 5 },
         ],
-        "only updated Albums of Blink182"
+        "only updated Albums of Blink182",
       );
 
       const otherAlbums = await serviceAlbums.find({
         query: {
           "artist.name": { $ne: "Blink182" },
         },
-        // @ts-ignore
         paginate: false,
       });
 
       assert.strictEqual(
         otherAlbums.length,
         4,
-        "albums not from Blink182 are four"
+        "albums not from Blink182 are four",
       );
 
       assert.ok(
         otherAlbums.every((x) => !x.stars),
-        "none of other albums has stars"
+        "none of other albums has stars",
       );
     });
   });
 
   describe.skip("remove", function () {
     it("dot.notation in ability", async function () {
-      const { app, serviceAlbums, serviceArtists } = mock();
+      const { serviceAlbums, serviceArtists } = mock();
       const blink182 = await serviceArtists.create({ name: "Blink182" });
       const sum41 = await serviceArtists.create({ name: "Sum 41" });
       const justinBieber = await serviceArtists.create({
@@ -502,22 +524,28 @@ describe("authorize.relations", function () {
         date: 2016,
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const killer = await serviceAlbums.create({
         name: "All Killer No Filler",
         artistId: sum41.id,
         date: 2001,
       });
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const hero = await serviceAlbums.create({
         name: "Underclass Hero",
         artistId: sum41.id,
         date: 2007,
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const believe = await serviceAlbums.create({
         name: "Believe",
         artistId: justinBieber.id,
         date: 2012,
       });
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const purpose = await serviceAlbums.create({
         name: "Purpose",
         artistId: justinBieber.id,
@@ -537,9 +565,9 @@ describe("authorize.relations", function () {
               can(["update"], "albums", { "artist.name": "Blink182" });
               can("read", "artists");
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       assert.deepStrictEqual(
@@ -549,26 +577,25 @@ describe("authorize.relations", function () {
           { ...pantsAndJacket, stars: 5 },
           { ...california, stars: 5 },
         ],
-        "only updated Albums of Blink182"
+        "only updated Albums of Blink182",
       );
 
       const otherAlbums = await serviceAlbums.find({
         query: {
           "artist.name": { $ne: "Blink182" },
         },
-        // @ts-ignore
         paginate: false,
       });
 
       assert.strictEqual(
         otherAlbums.length,
         4,
-        "albums not from Blink182 are four"
+        "albums not from Blink182 are four",
       );
 
       assert.ok(
         otherAlbums.every((x) => !x.stars),
-        "none of other albums has stars"
+        "none of other albums has stars",
       );
     });
   });

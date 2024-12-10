@@ -44,5 +44,5 @@ makeTests(
   async (app, service) => {
     await service.remove(null);
   },
-  { adapter: adapter }
+  { adapter: adapter },
 );

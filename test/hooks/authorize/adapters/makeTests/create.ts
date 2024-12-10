@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { feathers } from "@feathersjs/feathers";
-import { createAliasResolver, defineAbility } from "@casl/ability";
+import { defineAbility } from "@casl/ability";
 
 import type { Application } from "@feathersjs/feathers";
 
@@ -14,19 +14,19 @@ export default (
   makeService: () => any,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
-  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] }
+  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] },
 ): void => {
   let app: Application;
   let service;
   let id;
 
-  const itSkip = (adapterToTest: string | string[]) => {
-    const condition =
-      typeof adapterToTest === "string"
-        ? adapterName === adapterToTest
-        : adapterToTest.includes(adapterName);
-    return condition ? it.skip : it;
-  };
+  // const itSkip = (adapterToTest: string | string[]) => {
+  //   const condition =
+  //     typeof adapterToTest === "string"
+  //       ? adapterName === adapterToTest
+  //       : adapterToTest.includes(adapterName);
+  //   return condition ? it.skip : it;
+  // };
 
   describe(`${adapterName}: beforeAndAfter - create:single`, function () {
     beforeEach(async function () {
@@ -34,7 +34,6 @@ export default (
       app.use("tests", makeService());
       service = app.service("tests");
 
-      // eslint-disable-next-line prefer-destructuring
       id = service.options.id;
 
       const options = Object.assign(
@@ -49,14 +48,14 @@ export default (
             "hidden",
           ],
         },
-        authorizeHookOptions
+        authorizeHookOptions,
       );
 
       afterHooks = Array.isArray(afterHooks)
         ? afterHooks
         : afterHooks
-        ? [afterHooks]
-        : [];
+          ? [afterHooks]
+          : [];
 
       if (around) {
         service.hooks({
@@ -91,9 +90,9 @@ export default (
             (can) => {
               can("create", "tests", { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       assert.deepStrictEqual(item, undefined, "created item is undefined");
@@ -102,7 +101,7 @@ export default (
       assert.deepStrictEqual(
         realItem,
         { [id]: realItem[id], test: true, userId: 1 },
-        "created item"
+        "created item",
       );
     });
 
@@ -114,17 +113,18 @@ export default (
         {
           ability: defineAbility(
             (can) => {
-              can("create", "tests", { userId: 1 }), can("read", "tests");
+              can("create", "tests", { userId: 1 });
+              can("read", "tests");
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       assert.deepStrictEqual(
         item,
         { [id]: item[id], test: true, userId: 1 },
-        "created item with all properties"
+        "created item with all properties",
       );
     });
 
@@ -136,15 +136,15 @@ export default (
             (can) => {
               can("create", "tests", { userId: 2 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       await assert.rejects(
         promise,
         (err: Error) => err.name === "Forbidden",
-        "rejects"
+        "rejects",
       );
     });
 
@@ -154,12 +154,12 @@ export default (
         {
           ability: defineAbility(
             (can) => {
-              can("create", "tests", { userId: 1 }),
-                can("read", "tests", [id], { userId: 1 });
+              can("create", "tests", { userId: 1 });
+              can("read", "tests", [id], { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       assert.deepStrictEqual(item, { [id]: item[id] }, "just returns with id");
@@ -175,12 +175,12 @@ export default (
                 can("create", "tests");
                 cannot("create", "tests", { userId: 1 });
               },
-              { resolveAction }
+              { resolveAction },
             ),
-          }
+          },
         ),
         (err: Error) => err.name === "Forbidden",
-        "cannot create item"
+        "cannot create item",
       );
 
       await assert.doesNotReject(
@@ -192,11 +192,11 @@ export default (
                 can("create", "tests");
                 cannot("create", "tests", { userId: 1 });
               },
-              { resolveAction }
+              { resolveAction },
             ),
-          }
+          },
         ),
-        "can create 'userId:2'"
+        "can create 'userId:2'",
       );
     });
 
@@ -209,16 +209,16 @@ export default (
             can("read", "tests", ["test", "userId"]);
             can("create", "tests");
           },
-          { resolveAction }
+          { resolveAction },
         ),
       });
       [item] = await service.find({ paginate: false });
       assert.deepStrictEqual(
         result,
         {},
-        "returned item is empty because of $select and restricting fields"
+        "returned item is empty because of $select and restricting fields",
       );
-      // @ts-ignore
+
       const itemInDb = await service.get(item[id]);
       assert.deepStrictEqual(itemInDb, item, "item in db is complete");
     });

@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import type { Paginated, Application } from "@feathersjs/feathers";
 import { feathers } from "@feathersjs/feathers";
-import { createAliasResolver, defineAbility } from "@casl/ability";
+import { defineAbility } from "@casl/ability";
 import _sortBy from "lodash/sortBy.js";
 
 import { authorize } from "../../../../../src";
@@ -14,19 +14,19 @@ export default (
   makeService: () => any,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
-  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] }
+  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] },
 ): void => {
   let app: Application;
   let service;
   let id;
 
-  const itSkip = (adapterToTest: string | string[]) => {
-    const condition =
-      typeof adapterToTest === "string"
-        ? name === adapterToTest
-        : adapterToTest.includes(name);
-    return condition ? it.skip : it;
-  };
+  // const itSkip = (adapterToTest: string | string[]) => {
+  //   const condition =
+  //     typeof adapterToTest === "string"
+  //       ? name === adapterToTest
+  //       : adapterToTest.includes(name);
+  //   return condition ? it.skip : it;
+  // };
 
   describe(`${name}: beforeAndAfter - find`, function () {
     beforeEach(async function () {
@@ -34,7 +34,6 @@ export default (
       app.use("tests", makeService());
       service = app.service("tests");
 
-      // eslint-disable-next-line prefer-destructuring
       id = service.options.id;
 
       const options = Object.assign(
@@ -49,14 +48,14 @@ export default (
             "hidden",
           ],
         },
-        authorizeHookOptions
+        authorizeHookOptions,
       );
 
       afterHooks = Array.isArray(afterHooks)
         ? afterHooks
         : afterHooks
-        ? [afterHooks]
-        : [];
+          ? [afterHooks]
+          : [];
 
       if (around) {
         service.hooks({
@@ -95,7 +94,7 @@ export default (
           assert.strictEqual(
             items.length,
             3,
-            `has three items for read: '${read}'`
+            `has three items for read: '${read}'`,
           );
 
           const returnedItems = await service.find({
@@ -103,7 +102,7 @@ export default (
               (can) => {
                 can(read, "tests");
               },
-              { resolveAction }
+              { resolveAction },
             ),
             paginate: false,
           });
@@ -111,7 +110,7 @@ export default (
           assert.deepStrictEqual(
             returnedItems,
             items,
-            `items are the same for read: '${read}'`
+            `items are the same for read: '${read}'`,
           );
         }
       });
@@ -128,7 +127,7 @@ export default (
             (can) => {
               can("read", "tests", { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           paginate: false,
         })) as Paginated<unknown>;
@@ -136,7 +135,7 @@ export default (
         assert.deepStrictEqual(
           returnedItems,
           [{ [id]: item1[id], test: true, userId: 1 }],
-          "just returned one item"
+          "just returned one item",
         );
       });
 
@@ -150,10 +149,10 @@ export default (
         const returnedItems = await service.find({
           ability: defineAbility(
             (can) => {
-              can("read", "tests", { userId: 1 }),
-                can("read", "tests", [id], { userId: 2 });
+              can("read", "tests", { userId: 1 });
+              can("read", "tests", [id], { userId: 2 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           paginate: false,
         });
@@ -162,9 +161,9 @@ export default (
           _sortBy(returnedItems, id),
           _sortBy(
             [{ [id]: item1[id], test: true, userId: 1 }, { [id]: item2[id] }],
-            id
+            id,
           ),
-          "just returned one item"
+          "just returned one item",
         );
       });
 
@@ -181,7 +180,7 @@ export default (
               can("read", "tests");
               cannot("read", "tests", { userId: 3 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           paginate: false,
         })) as Paginated<unknown>;
@@ -193,9 +192,9 @@ export default (
               { [id]: item1[id], test: true, userId: 1 },
               { [id]: item2[id], test: true, userId: 2 },
             ],
-            id
+            id,
           ),
-          "just returned two items without userId: 3"
+          "just returned two items without userId: 3",
         );
       });
 
@@ -207,7 +206,6 @@ export default (
         assert.strictEqual(items.length, 3, "has three items");
 
         const returnedItems = service.find({
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
           ability: defineAbility(() => {}, { resolveAction }),
           paginate: false,
         });
@@ -215,7 +213,7 @@ export default (
         await assert.rejects(
           returnedItems,
           (err: Error) => err.name === "Forbidden",
-          "throws on find"
+          "throws on find",
         );
       });
 
@@ -231,7 +229,7 @@ export default (
             (can, cannot) => {
               cannot("read", "tests");
             },
-            { resolveAction }
+            { resolveAction },
           ),
           paginate: false,
         });
@@ -239,7 +237,7 @@ export default (
         await assert.rejects(
           returnedItems,
           (err: Error) => err.name === "Forbidden",
-          "throws on find"
+          "throws on find",
         );
       });
 
@@ -256,7 +254,7 @@ export default (
               can("read", "tests", { userId: 1 });
               can("manage", "all");
             },
-            { resolveAction }
+            { resolveAction },
           ),
           paginate: false,
         })) as Paginated<unknown>;
@@ -264,7 +262,7 @@ export default (
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
           _sortBy(items, id),
-          "returns all items"
+          "returns all items",
         );
       });
 
@@ -281,7 +279,7 @@ export default (
               can("manage", "all");
               can("read", "tests", { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           paginate: false,
         })) as Paginated<unknown>;
@@ -289,7 +287,7 @@ export default (
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
           _sortBy(items, id),
-          "returns all items"
+          "returns all items",
         );
       });
 
@@ -307,7 +305,7 @@ export default (
               cannot("read", "tests", { userId: 1 });
               cannot("read", "tests", ["test", "userId"], { userId: 2 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           paginate: false,
         })) as Paginated<unknown>;
@@ -315,7 +313,7 @@ export default (
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
           _sortBy([{ [id]: item2[id] }, item3], id),
-          "returns subset of items"
+          "returns subset of items",
         );
       });
 
@@ -341,7 +339,7 @@ export default (
               can("read", "tests", { published: true });
               can("read", "tests", { userId: { $in: [1] } });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           paginate: false,
         });
@@ -349,7 +347,7 @@ export default (
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
           _sortBy([item1, item2], id),
-          "returns all items"
+          "returns all items",
         );
       });
     });
@@ -369,7 +367,7 @@ export default (
             (can) => {
               can("read", "tests", { userId: 3 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {
             test: false,
@@ -380,7 +378,7 @@ export default (
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
           _sortBy([item4], id),
-          "just returned one item"
+          "just returned one item",
         );
       });
 
@@ -394,10 +392,10 @@ export default (
         const returnedItems = await service.find({
           ability: defineAbility(
             (can) => {
-              can("read", "tests", { userId: 1 }),
-                can("read", "tests", [id], { userId: 2 });
+              can("read", "tests", { userId: 1 });
+              can("read", "tests", [id], { userId: 2 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {
             $select: [id, "test"],
@@ -408,7 +406,7 @@ export default (
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
           _sortBy([{ [id]: item1[id], test: true }, { [id]: item2[id] }], id),
-          "just returned one item"
+          "just returned one item",
         );
       });
 
@@ -427,7 +425,7 @@ export default (
               can("read", "tests", { userId: 2 });
               cannot("read", "tests", { userId: 4 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {
             $or: [
@@ -448,7 +446,7 @@ export default (
         assert.deepStrictEqual(
           returnedItems,
           [{ [id]: item1[id], test: true, userId: 1 }],
-          "just returned one item"
+          "just returned one item",
         );
       });
 
@@ -467,7 +465,7 @@ export default (
               can("read", "tests", { userId: 2 });
               cannot("read", "tests", { userId: 4 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {
             $and: [
@@ -482,14 +480,16 @@ export default (
         assert.deepStrictEqual(
           _sortBy(returnedItems, id),
           _sortBy([item1, item2], id),
-          "just returned two items"
+          "just returned two items",
         );
       });
 
       it("returns only allowed items with '$in' query", async function () {
         const item1 = await service.create({ test: true, userId: 1 });
+
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const item2 = await service.create({ test: true, userId: 2 });
+
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const item3 = await service.create({ test: true, userId: 3 });
         const items = (await service.find({ paginate: false })) as unknown[];
@@ -500,7 +500,7 @@ export default (
             (can) => {
               can("read", "tests", { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {
             userId: {
@@ -513,7 +513,7 @@ export default (
         assert.deepStrictEqual(
           returnedItems,
           [{ [id]: item1[id], test: true, userId: 1 }],
-          "just returned one item"
+          "just returned one item",
         );
       });
 
@@ -529,7 +529,7 @@ export default (
             (can) => {
               can("read", "tests", { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {
             userId: {
@@ -542,7 +542,7 @@ export default (
         assert.deepStrictEqual(
           returnedItems,
           [{ [id]: item1[id], test: true, userId: 1 }],
-          "just returned one item"
+          "just returned one item",
         );
       });
 
@@ -587,7 +587,7 @@ export default (
               can("read", "tests", { userId: 1 });
               can("read", "tests", { userId: { $ne: 1 }, published: true });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {
             $or: [{ userId: 1 }, { userId: { $ne: 1 }, published: true }],
@@ -596,8 +596,6 @@ export default (
           },
           paginate: false,
         })) as any[];
-
-        const hallo = "";
 
         assert.deepEqual(returnedItems.length, 2);
       });

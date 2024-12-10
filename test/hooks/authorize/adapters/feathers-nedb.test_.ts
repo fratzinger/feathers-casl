@@ -45,5 +45,5 @@ makeTests(
   async (app, service) => {
     await service.remove(null);
   },
-  { adapter: "feathers-nedb" }
+  { adapter: "feathers-nedb" },
 );

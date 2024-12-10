@@ -66,7 +66,7 @@ describe("utils - convertRuleToQuery", function () {
       assert.deepStrictEqual(
         convertRuleToQuery(rule),
         expected[i],
-        `${i}: expected result for rule is: '${JSON.stringify(expected[i])}'`
+        `${i}: expected result for rule is: '${JSON.stringify(expected[i])}'`,
       );
     });
   });

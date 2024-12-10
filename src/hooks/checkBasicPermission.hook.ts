@@ -7,7 +7,7 @@ import { checkBasicPermissionUtil } from "../utils";
 const HOOKNAME = "checkBasicPermission";
 
 export const checkBasicPermission = <H extends HookContext>(
-  _options?: Partial<CheckBasicPermissionHookOptions>
+  _options?: Partial<CheckBasicPermissionHookOptions>,
 ): ((context: H) => Promise<H>) => {
   return async (context: H): Promise<H> => {
     if (

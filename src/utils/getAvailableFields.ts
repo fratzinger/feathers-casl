@@ -3,11 +3,11 @@ import type { AuthorizeChannelCommonsOptions } from "../types";
 
 export const getAvailableFields = (
   context: HookContext,
-  options?: Partial<Pick<AuthorizeChannelCommonsOptions, "availableFields">>
+  options?: Partial<Pick<AuthorizeChannelCommonsOptions, "availableFields">>,
 ): undefined | string[] => {
   return !options?.availableFields
     ? undefined
     : typeof options.availableFields === "function"
-    ? options.availableFields(context)
-    : options.availableFields;
+      ? options.availableFields(context)
+      : options.availableFields;
 };

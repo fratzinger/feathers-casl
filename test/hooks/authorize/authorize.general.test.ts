@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { authorize } from "../../../src";
-import { createAliasResolver, defineAbility } from "@casl/ability";
+import { defineAbility } from "@casl/ability";
 import _cloneDeep from "lodash/cloneDeep.js";
 import { filterArray, filterObject, markHookForSkip } from "feathers-utils";
 import type { HookContext } from "@feathersjs/feathers";
@@ -41,7 +41,7 @@ describe("authorize.general.test.ts", function () {
             assert.deepStrictEqual(
               result.params.query,
               query,
-              `'${type}:${method}': does not change query object`
+              `'${type}:${method}': does not change query object`,
             );
           });
           promises.push(promise);
@@ -68,7 +68,6 @@ describe("authorize.general.test.ts", function () {
             test: true,
           },
           params: {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             ability: defineAbility(() => {}, { resolveAction }),
             query: {},
           },
@@ -85,7 +84,7 @@ describe("authorize.general.test.ts", function () {
           const promise = assert.rejects(
             authorize()(context),
             (err: Error) => err.name === "Forbidden",
-            `'${type}:${method}': with no permissions returns 'Forbidden' error`
+            `'${type}:${method}': with no permissions returns 'Forbidden' error`,
           );
           promises.push(promise);
         });
@@ -110,7 +109,7 @@ describe("authorize.general.test.ts", function () {
               (can) => {
                 can("manage", "all");
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {},
           },
@@ -133,7 +132,7 @@ describe("authorize.general.test.ts", function () {
             assert.deepStrictEqual(
               result.params.query,
               query,
-              "does not change query object"
+              "does not change query object",
             );
           });
           promises.push(promise);
@@ -160,7 +159,7 @@ describe("authorize.general.test.ts", function () {
               (can) => {
                 can(method, path);
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {},
           },
@@ -178,7 +177,7 @@ describe("authorize.general.test.ts", function () {
             assert.deepStrictEqual(
               result.params.query,
               query,
-              "does not change query object"
+              "does not change query object",
             );
           });
           promises.push(promise);
@@ -204,7 +203,7 @@ describe("authorize.general.test.ts", function () {
               (can) => {
                 can("manage", "all");
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {},
           },
@@ -222,12 +221,12 @@ describe("authorize.general.test.ts", function () {
           const query = Object.assign({}, context.params.query);
 
           const promise = authorize({ availableFields: undefined })(
-            context
+            context,
           ).then((result) => {
             assert.deepStrictEqual(
               result.params.query,
               query,
-              "does not change query object"
+              "does not change query object",
             );
           });
           promises.push(promise);
@@ -249,7 +248,6 @@ describe("authorize.general.test.ts", function () {
             test: true,
           },
           params: {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             ability: defineAbility(() => {}, { resolveAction }),
             skipHooks: ["authorize"],
             query: {},
@@ -271,7 +269,7 @@ describe("authorize.general.test.ts", function () {
             assert.deepStrictEqual(
               result.params.query,
               query,
-              `'${type}:${method}': does not change query object`
+              `'${type}:${method}': does not change query object`,
             );
           });
           promises.push(promise);
@@ -293,7 +291,6 @@ describe("authorize.general.test.ts", function () {
             test: true,
           },
           params: {
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
             ability: defineAbility(() => {}, { resolveAction }),
             query: {},
           },
@@ -315,9 +312,9 @@ describe("authorize.general.test.ts", function () {
               assert.deepStrictEqual(
                 result.params.query,
                 query,
-                `'${type}:${method}': does not change query object`
+                `'${type}:${method}': does not change query object`,
               );
-            }
+            },
           );
           promises.push(promise);
         });
@@ -343,7 +340,7 @@ describe("authorize.general.test.ts", function () {
                 can(["find"], "tests", { userId: 1 });
                 can(["find"], "tests", { userId: 1 });
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {
               test: true,
@@ -377,7 +374,7 @@ describe("authorize.general.test.ts", function () {
               (can) => {
                 can("create", "tests", { userId: 1 });
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {},
           },
@@ -387,7 +384,7 @@ describe("authorize.general.test.ts", function () {
 
         await assert.doesNotReject(
           authorize()(context),
-          "passes authorize hook"
+          "passes authorize hook",
         );
       });
 
@@ -420,7 +417,7 @@ describe("authorize.general.test.ts", function () {
                 can("create", "tests", { userId: 1 });
                 can("read", "tests");
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {},
           },
@@ -430,7 +427,7 @@ describe("authorize.general.test.ts", function () {
 
         await assert.doesNotReject(
           authorize({ availableFields: ["id", "userId", "test"] })(context),
-          "passes authorize hook"
+          "passes authorize hook",
         );
       });
 
@@ -463,7 +460,7 @@ describe("authorize.general.test.ts", function () {
                 can("create", "tests", { userId: 1 });
                 can("read", "tests");
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {},
           },
@@ -473,7 +470,7 @@ describe("authorize.general.test.ts", function () {
 
         await assert.rejects(
           authorize({ checkMultiActions: true })(context),
-          "passes authorize hook"
+          "passes authorize hook",
         );
       });
 
@@ -493,7 +490,7 @@ describe("authorize.general.test.ts", function () {
               (can) => {
                 can("create", "tests", { userId: 1 });
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {},
           },
@@ -504,7 +501,7 @@ describe("authorize.general.test.ts", function () {
         await assert.rejects(
           authorize()(context),
           (err: Error) => err.name === "Forbidden",
-          "rejects with 'Forbidden' error"
+          "rejects with 'Forbidden' error",
         );
       });
 
@@ -536,7 +533,7 @@ describe("authorize.general.test.ts", function () {
               (can) => {
                 can("create", "tests", { userId: 1 });
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {},
           },
@@ -547,7 +544,7 @@ describe("authorize.general.test.ts", function () {
         await assert.rejects(
           authorize()(context),
           (err: Error) => err.name === "Forbidden",
-          "rejects with 'Forbidden' error"
+          "rejects with 'Forbidden' error",
         );
       });
 
@@ -618,7 +615,7 @@ describe("authorize.general.test.ts", function () {
                     cannot("update", "tests", condition);
                     cannot("remove", "tests", condition);
                   },
-                  { resolveAction }
+                  { resolveAction },
                 ),
                 query: {},
               },
@@ -635,7 +632,7 @@ describe("authorize.general.test.ts", function () {
               assert.deepStrictEqual(
                 query,
                 {},
-                `'${type}:${method}': query is empty`
+                `'${type}:${method}': query is empty`,
               );
 
               const promise = authorize()(context).then((result) => {
@@ -643,8 +640,8 @@ describe("authorize.general.test.ts", function () {
                   result.params.query,
                   inverted,
                   `'${type}:${method}': for condition: '${JSON.stringify(
-                    condition
-                  )}' the inverted is: ${JSON.stringify(result.params.query)}`
+                    condition,
+                  )}' the inverted is: ${JSON.stringify(result.params.query)}`,
                 );
               });
               promises.push(promise);
@@ -669,7 +666,7 @@ describe("authorize.general.test.ts", function () {
               (can) => {
                 can("patch-multi", "tests");
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {},
           },
@@ -677,7 +674,7 @@ describe("authorize.general.test.ts", function () {
 
         await assert.rejects(
           authorize({ checkMultiActions: true })(context),
-          "authorize rejects"
+          "authorize rejects",
         );
       });
 
@@ -694,7 +691,7 @@ describe("authorize.general.test.ts", function () {
               (can) => {
                 can("patch", "tests");
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {},
           },
@@ -702,7 +699,7 @@ describe("authorize.general.test.ts", function () {
 
         await assert.rejects(
           authorize({ checkMultiActions: true })(context),
-          "authorize rejects"
+          "authorize rejects",
         );
       });
     });
@@ -720,7 +717,7 @@ describe("authorize.general.test.ts", function () {
               (can) => {
                 can("remove-multi", "tests");
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {},
           },
@@ -728,7 +725,7 @@ describe("authorize.general.test.ts", function () {
 
         await assert.rejects(
           authorize({ checkMultiActions: true })(context),
-          "authorize rejects"
+          "authorize rejects",
         );
       });
 
@@ -744,7 +741,7 @@ describe("authorize.general.test.ts", function () {
               (can) => {
                 can("remove", "tests");
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {},
           },
@@ -752,7 +749,7 @@ describe("authorize.general.test.ts", function () {
 
         await assert.rejects(
           authorize({ checkMultiActions: true })(context),
-          "authorize rejects"
+          "authorize rejects",
         );
       });
     });
@@ -774,7 +771,7 @@ describe("authorize.general.test.ts", function () {
               (can) => {
                 can(["get", "create", "update", "patch", "remove"], "all");
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {},
           },
@@ -788,12 +785,12 @@ describe("authorize.general.test.ts", function () {
         methods.forEach((method) => {
           const context = makeContext(method, type);
           const promise = authorize({ availableFields: undefined })(
-            context
+            context,
           ).then(({ result }) => {
             assert.deepStrictEqual(
               result,
               expectedResult,
-              `returns complete object for '${type}:${method}'`
+              `returns complete object for '${type}:${method}'`,
             );
           });
           promises.push(promise);
@@ -826,7 +823,7 @@ describe("authorize.general.test.ts", function () {
                 (can) => {
                   can(["get", "create", "update", "patch", "remove"], "all");
                 },
-                { resolveAction }
+                { resolveAction },
               ),
               query: {},
             },
@@ -838,12 +835,12 @@ describe("authorize.general.test.ts", function () {
           methods.forEach((method) => {
             const context = makeContext(method, type);
             const promise = authorize({ availableFields: undefined })(
-              context
+              context,
             ).then(({ result }) => {
               assert.deepStrictEqual(
                 result,
                 val,
-                `returns complete object for '${type}:${method}'`
+                `returns complete object for '${type}:${method}'`,
               );
             });
             promises.push(promise);
@@ -869,7 +866,7 @@ describe("authorize.general.test.ts", function () {
               (can) => {
                 can(["find", "create", "patch", "remove"], "all");
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {},
           },
@@ -883,12 +880,12 @@ describe("authorize.general.test.ts", function () {
         methods.forEach((method) => {
           const context = makeContext(method, type);
           const promise = authorize({ availableFields: undefined })(
-            context
+            context,
           ).then(({ result }) => {
             assert.deepStrictEqual(
               result,
               expectedResult,
-              `returns complete object for '${type}:${method}'`
+              `returns complete object for '${type}:${method}'`,
             );
           });
           promises.push(promise);
@@ -899,10 +896,10 @@ describe("authorize.general.test.ts", function () {
 
     it("after - passes multi with 'pagination' with 'find' rule", async function () {
       const expectedResult = {
-        "total": 1,
-        "limit": 10,
-        "skip": 0,
-        "data": [{ id: 1, userId: 1, test: true }]
+        total: 1,
+        limit: 10,
+        skip: 0,
+        data: [{ id: 1, userId: 1, test: true }],
       };
       const makeContext = (method, type) => {
         return {
@@ -917,13 +914,13 @@ describe("authorize.general.test.ts", function () {
               (can) => {
                 can(["find", "create", "patch", "remove"], "all");
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {},
           },
         } as unknown as HookContext;
       };
-  
+
       const types = ["after"];
       const methods = ["find"];
       const promises: Promise<any>[] = [];
@@ -931,12 +928,12 @@ describe("authorize.general.test.ts", function () {
         methods.forEach((method) => {
           const context = makeContext(method, type);
           const promise = authorize({ availableFields: undefined })(
-            context
+            context,
           ).then(({ result }) => {
             assert.deepStrictEqual(
               result,
               expectedResult,
-              `returns complete object for '${type}:${method}'`
+              `returns complete object for '${type}:${method}'`,
             );
           });
           promises.push(promise);
