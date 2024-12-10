@@ -69,7 +69,6 @@ describe("channels.default.test.ts", function () {
       } else if (i === 2) {
         client3 = client;
 
-        user3 = user;
         const promise = client3.service("authentication").create({
           strategy: "local",
           email: "3",

@@ -21,6 +21,7 @@ describe("channels.availableFields.test.ts", function () {
   let client4: Application;
   let user1: Record<string, unknown>;
   let user2: Record<string, unknown>;
+
   let users = [
     { id: 0, email: "1", password: "1" },
     { id: 1, email: "2", password: "2" },
@@ -72,7 +73,6 @@ describe("channels.availableFields.test.ts", function () {
       } else if (i === 2) {
         client3 = client;
 
-        user3 = user;
         const promise = client3.service("authentication").create({
           strategy: "local",
           email: "3",
