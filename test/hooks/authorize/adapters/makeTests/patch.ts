@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { feathers } from "@feathersjs/feathers";
-import { createAliasResolver, defineAbility } from "@casl/ability";
+import { defineAbility } from "@casl/ability";
 
 import type { Application } from "@feathersjs/feathers";
 
@@ -14,19 +14,19 @@ export default (
   makeService: () => any,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
-  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] }
+  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] },
 ): void => {
   let app: Application;
   let service;
   let id;
 
-  const itSkip = (adapterToTest: string | string[]) => {
-    const condition =
-      typeof adapterToTest === "string"
-        ? adapterName === adapterToTest
-        : adapterToTest.includes(adapterName);
-    return condition ? it.skip : it;
-  };
+  // const itSkip = (adapterToTest: string | string[]) => {
+  //   const condition =
+  //     typeof adapterToTest === "string"
+  //       ? adapterName === adapterToTest
+  //       : adapterToTest.includes(adapterName);
+  //   return condition ? it.skip : it;
+  // };
 
   describe(`${adapterName}: beforeAndAfter - patch:single`, function () {
     beforeEach(async function () {
@@ -34,7 +34,6 @@ export default (
       app.use("tests", makeService());
       service = app.service("tests");
 
-      // eslint-disable-next-line prefer-destructuring
       id = service.options.id;
 
       const options = Object.assign(
@@ -49,14 +48,14 @@ export default (
             "hidden",
           ],
         },
-        authorizeHookOptions
+        authorizeHookOptions,
       );
 
       afterHooks = Array.isArray(afterHooks)
         ? afterHooks
         : afterHooks
-        ? [afterHooks]
-        : [];
+          ? [afterHooks]
+          : [];
 
       if (around) {
         service.hooks({
@@ -92,22 +91,22 @@ export default (
             (can) => {
               can("patch", "tests");
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       assert.deepStrictEqual(
         patchedItem,
         undefined,
-        "patched item is undefined"
+        "patched item is undefined",
       );
 
       const realItem = await service.get(item[id]);
       assert.deepStrictEqual(
         realItem,
         { [id]: item[id], test: false, userId: 1 },
-        "patched item correctly"
+        "patched item correctly",
       );
     });
 
@@ -126,15 +125,15 @@ export default (
                 can("patch", "tests");
                 can(read, "tests");
               },
-              { resolveAction }
+              { resolveAction },
             ),
-          }
+          },
         );
 
         assert.deepStrictEqual(
           patchedItem,
           { [id]: item[id], test: false, userId: 1 },
-          `patched item correctly for read: '${read}'`
+          `patched item correctly for read: '${read}'`,
         );
       }
     });
@@ -151,15 +150,15 @@ export default (
               can("patch", "tests");
               cannot("patch", "tests", ["test"]);
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       await assert.rejects(
         promise,
         (err: Error) => err.name === "Forbidden",
-        "rejects request"
+        "rejects request",
       );
     });
 
@@ -175,9 +174,9 @@ export default (
               can("patch", "tests", ["test"], { userId: 1 });
               can("read", "tests");
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       const realItem = await service.get(item[id]);
@@ -187,7 +186,7 @@ export default (
       assert.deepStrictEqual(
         patchedItem,
         realItem,
-        "result of patch is real item"
+        "result of patch is real item",
       );
     });
 
@@ -205,15 +204,15 @@ export default (
               can("patch", "tests");
               cannot("patch", "tests", { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       await assert.rejects(
         promise,
         (err: Error) => err.name === "NotFound",
-        "cannot patch item"
+        "cannot patch item",
       );
 
       const patchedItem2 = await service.patch(
@@ -226,15 +225,15 @@ export default (
               can("patch", "tests");
               cannot("patch", "tests", { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       assert.deepStrictEqual(
         patchedItem2,
         { [id]: item2[id], test: false, userId: 2 },
-        "patched item correctly"
+        "patched item correctly",
       );
     });
 
@@ -253,14 +252,14 @@ export default (
               can("read", "tests", ["test", "userId"]);
               can(["create", "update"], "tests");
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
       assert.deepStrictEqual(
         result,
         {},
-        "returned item is empty because of $select and restricting fields"
+        "returned item is empty because of $select and restricting fields",
       );
       const itemInDb = await service.get(item[id]);
 

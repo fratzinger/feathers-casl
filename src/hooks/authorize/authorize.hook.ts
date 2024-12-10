@@ -10,7 +10,7 @@ import type { AuthorizeHookOptions } from "../../types";
 
 export const authorize =
   <H extends HookContext = HookContext>(
-    _options?: Partial<AuthorizeHookOptions>
+    _options?: Partial<AuthorizeHookOptions>,
   ) =>
   async (context: H, next?: NextFunction) => {
     if (

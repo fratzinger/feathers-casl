@@ -33,7 +33,7 @@ import { getMethodName } from "../../utils/getMethodName";
 
 export const authorizeBefore = async <H extends HookContext = HookContext>(
   context: H,
-  options: AuthorizeHookOptions
+  options: AuthorizeHookOptions,
 ) => {
   if (shouldSkip(HOOKNAME, context, options) || !context.params) {
     return context;
@@ -124,7 +124,7 @@ const handleSingle = async <H extends HookContext = HookContext>(
   ability: AnyAbility,
   modelName: string,
   availableFields: string[] | undefined,
-  options: AuthorizeHookOptions
+  options: AuthorizeHookOptions,
 ) => {
   // single: get | patch | update | remove
 
@@ -148,7 +148,7 @@ const handleSingle = async <H extends HookContext = HookContext>(
     modelName,
     context.params?.query,
     context.service,
-    options
+    options,
   );
 
   _set(context, "params.query", query);
@@ -171,7 +171,7 @@ const handleSingle = async <H extends HookContext = HookContext>(
       ability,
       method,
       subject(modelName, item),
-      { availableFields }
+      { availableFields },
     );
     if (
       restrictingFields &&
@@ -223,7 +223,7 @@ const checkData = <H extends HookContext = HookContext>(
   options: Pick<
     AuthorizeHookOptions,
     "actionOnForbidden" | "usePatchData" | "useUpdateData" | "method"
-  >
+  >,
 ): void => {
   const method = getMethodName(context, options);
 
@@ -238,7 +238,7 @@ const checkData = <H extends HookContext = HookContext>(
     `${method}-data`,
     subject(modelName, data),
     modelName,
-    options
+    options,
   );
 };
 
@@ -247,7 +247,7 @@ const handleMulti = async <H extends HookContext = HookContext>(
   ability: AnyAbility,
   modelName: string,
   availableFields: string[] | undefined,
-  options: AuthorizeHookOptions
+  options: AuthorizeHookOptions,
 ): Promise<H> => {
   const method = getMethodName(context, options);
 
@@ -276,7 +276,7 @@ const handleMulti = async <H extends HookContext = HookContext>(
     modelName,
     context.params?.query,
     context.service,
-    options
+    options,
   );
 
   _set(context, "params.query", query);

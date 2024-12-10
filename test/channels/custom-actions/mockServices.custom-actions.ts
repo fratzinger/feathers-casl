@@ -22,7 +22,7 @@ declare module "@feathersjs/memory" {
 
 const defineAbilitiesFor = (user) => {
   return defineAbility(
-    (can, cannot) => {
+    (can) => {
       if (user.id === 0) {
         can("manage", "all");
       } else if (user.id === 1) {
@@ -44,13 +44,13 @@ const defineAbilitiesFor = (user) => {
             "receive-patched",
             "receive-removed",
           ],
-          "all"
+          "all",
         );
       } else if (user.id === 4) {
         can("receive-created", "comments", ["id"], { userId: user.id });
       }
     },
-    { resolveAction }
+    { resolveAction },
   );
 };
 
@@ -94,7 +94,7 @@ export default function (app: Application): void {
         availableFields: ["id", "test", "published", "test"],
       },
       //paginate:
-    })
+    }),
   );
 
   //#endregion
@@ -109,7 +109,7 @@ export default function (app: Application): void {
         availableFields: ["id", "title", "userId", "test"],
       },
       //paginate:
-    })
+    }),
   );
 
   //#endregion
@@ -123,7 +123,7 @@ export default function (app: Application): void {
         availableFields: ["id", "email", "password"],
       },
       //paginate:
-    })
+    }),
   );
 
   const users = app.service("users");

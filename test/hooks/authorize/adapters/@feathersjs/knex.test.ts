@@ -94,5 +94,5 @@ makeTests(
     });
   },
   { adapter },
-  { afterHooks }
+  { afterHooks },
 );

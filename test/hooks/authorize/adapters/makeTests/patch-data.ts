@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { feathers } from "@feathersjs/feathers";
-import { createAliasResolver, defineAbility } from "@casl/ability";
+import { defineAbility } from "@casl/ability";
 
 import type { Application } from "@feathersjs/feathers";
 
@@ -14,7 +14,7 @@ export default (
   makeService: () => any,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
-  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] }
+  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] },
 ): void => {
   let app: Application;
   let service;
@@ -26,7 +26,6 @@ export default (
       app.use("tests", makeService());
       service = app.service("tests");
 
-      // eslint-disable-next-line prefer-destructuring
       id = service.options.id;
 
       const options = Object.assign(
@@ -41,14 +40,14 @@ export default (
             "hidden",
           ],
         },
-        authorizeHookOptions
+        authorizeHookOptions,
       );
 
       afterHooks = Array.isArray(afterHooks)
         ? afterHooks
         : afterHooks
-        ? [afterHooks]
-        : [];
+          ? [afterHooks]
+          : [];
 
       if (around) {
         service.hooks({
@@ -89,9 +88,9 @@ export default (
                 can("patch-data", "tests");
                 can(read, "tests");
               },
-              { resolveAction }
+              { resolveAction },
             ),
-          }
+          },
         );
         assert.deepStrictEqual(result, {
           [id]: item[id],
@@ -118,11 +117,11 @@ export default (
                   can("patch", "tests");
                   can(read, "tests");
                 },
-                { resolveAction }
+                { resolveAction },
               ),
-            }
+            },
           );
-        } catch (err) {
+        } catch {
           rejected = true;
         }
         assert.ok(rejected, "rejected");
@@ -148,11 +147,11 @@ export default (
                   cannot("patch-data", "tests", { test: false });
                   can(read, "tests");
                 },
-                { resolveAction }
+                { resolveAction },
               ),
-            }
+            },
           );
-        } catch (err) {
+        } catch {
           rejected = true;
         }
         assert.ok(rejected, "rejected");
@@ -177,9 +176,9 @@ export default (
                   can("patch-data", "tests", { test: true });
                   can(read, "tests");
                 },
-                { resolveAction }
+                { resolveAction },
               ),
-            }
+            },
           );
           assert.fail("should not get here");
         } catch (err) {
@@ -205,15 +204,15 @@ export default (
                 can("patch-data", "tests", { test: false });
                 can(read, "tests");
               },
-              { resolveAction }
+              { resolveAction },
             ),
-          }
+          },
         );
 
         assert.deepStrictEqual(
           patchedItem,
           { [id]: item[id], test: false, userId: 1 },
-          `patched item correctly for read: '${read}'`
+          `patched item correctly for read: '${read}'`,
         );
       }
     });

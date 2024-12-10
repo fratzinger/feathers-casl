@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { feathers } from "@feathersjs/feathers";
-import { createAliasResolver, defineAbility } from "@casl/ability";
+import { defineAbility } from "@casl/ability";
 import _sortBy from "lodash/sortBy.js";
 
 import type { Application } from "@feathersjs/feathers";
@@ -15,19 +15,19 @@ export default (
   makeService: () => any,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
-  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] }
+  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] },
 ): void => {
   let app: Application;
   let service;
   let id;
 
-  const itSkip = (adapterToTest: string | string[]) => {
-    const condition =
-      typeof adapterToTest === "string"
-        ? adapterName === adapterToTest
-        : adapterToTest.includes(adapterName);
-    return condition ? it.skip : it;
-  };
+  // const itSkip = (adapterToTest: string | string[]) => {
+  //   const condition =
+  //     typeof adapterToTest === "string"
+  //       ? adapterName === adapterToTest
+  //       : adapterToTest.includes(adapterName);
+  //   return condition ? it.skip : it;
+  // };
 
   describe(`${adapterName}: beforeAndAfter - remove:multiple`, function () {
     beforeEach(async function () {
@@ -35,7 +35,6 @@ export default (
       app.use("tests", makeService());
       service = app.service("tests");
 
-      // eslint-disable-next-line prefer-destructuring
       id = service.options.id;
 
       const options = Object.assign(
@@ -50,14 +49,14 @@ export default (
             "hidden",
           ],
         },
-        authorizeHookOptions
+        authorizeHookOptions,
       );
 
       afterHooks = Array.isArray(afterHooks)
         ? afterHooks
         : afterHooks
-        ? [afterHooks]
-        : [];
+          ? [afterHooks]
+          : [];
 
       if (around) {
         service.hooks({
@@ -86,6 +85,7 @@ export default (
     it("can remove multiple items and returns [] for not allowed read", async function () {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const item1 = await service.create({ test: true, userId: 1 });
+
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const item2 = await service.create({ test: true, userId: 1 });
       const item3 = await service.create({ test: true, userId: 2 });
@@ -95,7 +95,7 @@ export default (
           (can) => {
             can("remove", "tests");
           },
-          { resolveAction }
+          { resolveAction },
         ),
         query: {
           userId: 1,
@@ -124,7 +124,7 @@ export default (
               can("remove", "tests");
               can(read, "tests");
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {
             userId: 1,
@@ -139,7 +139,7 @@ export default (
         assert.deepStrictEqual(
           _sortBy(removedItems, id),
           _sortBy(expectedResult, id),
-          `result is right array for read: '${read}'`
+          `result is right array for read: '${read}'`,
         );
 
         const realItems = await service.find({ paginate: false });
@@ -147,7 +147,7 @@ export default (
         assert.deepStrictEqual(
           realItems,
           expected,
-          `removed items correctly for read: '${read}'`
+          `removed items correctly for read: '${read}'`,
         );
       }
     });
@@ -163,7 +163,7 @@ export default (
             can("remove", "tests", { userId: 1 });
             can("read", "tests");
           },
-          { resolveAction }
+          { resolveAction },
         ),
         query: {},
       });
@@ -176,7 +176,7 @@ export default (
       assert.deepStrictEqual(
         _sortBy(removedItems, id),
         _sortBy(expectedResult, id),
-        "result is right array"
+        "result is right array",
       );
 
       const realItems = await service.find({ paginate: false });
@@ -184,7 +184,7 @@ export default (
       assert.deepStrictEqual(
         _sortBy(realItems, id),
         _sortBy(expected, id),
-        "removed items correctly"
+        "removed items correctly",
       );
     });
 
@@ -217,7 +217,7 @@ export default (
             can("remove", "tests", { userId: 1 });
             can("read", "tests", { published: true });
           },
-          { resolveAction }
+          { resolveAction },
         ),
         query: {},
       });
@@ -229,7 +229,7 @@ export default (
       assert.deepStrictEqual(
         removedItems,
         expectedResult,
-        "result is right array"
+        "result is right array",
       );
 
       const realItems = await service.find({ paginate: false });
@@ -241,7 +241,7 @@ export default (
       assert.deepStrictEqual(
         _sortBy(realItems, id),
         _sortBy(expected, id),
-        "removed items correctly"
+        "removed items correctly",
       );
     });
 
@@ -262,7 +262,7 @@ export default (
             can("read", "tests", [id], { published: false });
             can("read", "tests", { published: true });
           },
-          { resolveAction }
+          { resolveAction },
         ),
       });
 
@@ -274,7 +274,7 @@ export default (
       assert.deepStrictEqual(
         _sortBy(removedItems, id),
         _sortBy(expectedResult, id),
-        "result is right array"
+        "result is right array",
       );
 
       const realItems = await service.find({ paginate: false });
@@ -286,7 +286,7 @@ export default (
       assert.deepStrictEqual(
         _sortBy(realItems, id),
         _sortBy(expected, id),
-        "removed items correctly"
+        "removed items correctly",
       );
     });
   });

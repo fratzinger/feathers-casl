@@ -1,9 +1,7 @@
 import assert from "node:assert";
-import type { Application, HookContext } from "@feathersjs/feathers";
 import { feathers } from "@feathersjs/feathers";
 import { MemoryService } from "@feathersjs/memory";
 import { feathersCasl, authorize } from "../../src";
-import type { RealTimeConnection } from "@feathersjs/transport-commons";
 import type { InitOptions } from "../../src";
 import { defineAbility } from "@casl/ability";
 
@@ -17,7 +15,7 @@ const mockApp = () => {
         default: 10,
         max: 50,
       },
-    })
+    }),
   );
   const service = app.service("users");
   service.hooks({
@@ -56,8 +54,6 @@ describe("app-options / service-options", function () {
       let calledAbility = false;
       let calledModelName = false;
 
-      let calledChannelAbility = false;
-      let calledChannelModelName = false;
       app.configure(
         feathersCasl({
           authorizeHook: {
@@ -65,11 +61,11 @@ describe("app-options / service-options", function () {
               calledActionOnForbidden = true;
             },
             checkMultiActions: true,
-            ability: (context: HookContext) => {
+            ability: () => {
               calledAbility = true;
               return defineAbility(() => {});
             },
-            modelName: (context: HookContext): string => {
+            modelName: (): string => {
               calledModelName = true;
               return "Test";
             },
@@ -78,22 +74,17 @@ describe("app-options / service-options", function () {
           channels: {
             activated: false,
             channelOnError: ["Test"],
-            ability: (
-              app: Application,
-              connection: RealTimeConnection,
-              data: unknown,
-              context: HookContext
-            ) => {
+            ability: () => {
               calledChannelAbility = true;
               return defineAbility(() => {});
             },
-            modelName: (context: HookContext): string => {
+            modelName: (): string => {
               calledChannelModelName = true;
               return "Test";
             },
             restrictFields: false,
           },
-        })
+        }),
       );
 
       const caslOptions: InitOptions = app.get("casl");
@@ -106,7 +97,7 @@ describe("app-options / service-options", function () {
           query: {},
         }),
         (err: Error) => err.name === "Forbidden",
-        "throws Forbidden for no ability"
+        "throws Forbidden for no ability",
       );
 
       assert.ok(calledAbility, "called ability function");
@@ -127,7 +118,7 @@ describe("app-options / service-options", function () {
             default: 10,
             max: 50,
           },
-        })
+        }),
       );
       const appCalled: CalledOptions = {};
       const serviceCalled: CalledOptions = {};
@@ -141,11 +132,11 @@ describe("app-options / service-options", function () {
                 serviceCalled.calledActionOnForbidden = true;
               },
               checkMultiActions: true,
-              ability: (context: HookContext) => {
+              ability: () => {
                 serviceCalled.calledAbility = true;
                 return defineAbility(() => {});
               },
-              modelName: (context: HookContext): string => {
+              modelName: (): string => {
                 serviceCalled.calledModelName = true;
                 return "Test";
               },
@@ -162,16 +153,16 @@ describe("app-options / service-options", function () {
             },
             checkAbilityForInternal: true,
             checkMultiActions: true,
-            ability: (context: HookContext) => {
+            ability: () => {
               appCalled.calledAbility = true;
               return defineAbility(() => {});
             },
-            modelName: (context: HookContext): string => {
+            modelName: (): string => {
               appCalled.calledModelName = true;
               return "Test";
             },
           },
-        })
+        }),
       );
 
       await assert.rejects(
@@ -179,33 +170,33 @@ describe("app-options / service-options", function () {
           query: {},
         }),
         (err: Error) => err.name === "Forbidden",
-        "throws Forbidden for no ability"
+        "throws Forbidden for no ability",
       );
 
       assert.ok(
         serviceCalled.calledAbility,
-        "called ability function from service options"
+        "called ability function from service options",
       );
       assert.ok(
         serviceCalled.calledActionOnForbidden,
-        "called actionOnForbidden function from service options"
+        "called actionOnForbidden function from service options",
       );
       assert.ok(
         serviceCalled.calledModelName,
-        "called modelName function from service options"
+        "called modelName function from service options",
       );
 
       assert.ok(
         !appCalled.calledAbility,
-        "not called ability function from app options"
+        "not called ability function from app options",
       );
       assert.ok(
         !appCalled.calledActionOnForbidden,
-        "not called actionOnForbidden function from app options"
+        "not called actionOnForbidden function from app options",
       );
       assert.ok(
         !appCalled.calledModelName,
-        "not called modelName function from app options"
+        "not called modelName function from app options",
       );
 
       //assert.ok(calledChannelAbility, "called ability function on channels");

@@ -76,12 +76,12 @@ makeTests(
       },
       {
         timestamps: false,
-      }
+      },
     );
 
     if (client.modelNames().includes("tests")) {
       client.deleteModel("tests");
     }
     Model = client.model("tests", schema);
-  }
+  },
 );

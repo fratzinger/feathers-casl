@@ -40,7 +40,6 @@ export default function (app: Application): void {
     },
   });
 
-  //@ts-ignore
   const fields = caslOptions.availableFields({
     service: app.service("users"),
   });
@@ -48,16 +47,15 @@ export default function (app: Application): void {
   assert.deepStrictEqual(
     fields,
     ["id", "email", "password"],
-    "gets availableFields from service correctly"
+    "gets availableFields from service correctly",
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.publish((data: unknown, context: HookContext) => {
     const result = getChannelsWithReadAbility(
       app,
       data as Record<string, unknown>,
       context,
-      caslOptions
+      caslOptions,
     );
 
     // e.g. to publish all service events to all authenticated users use

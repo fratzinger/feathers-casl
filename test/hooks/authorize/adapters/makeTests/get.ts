@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { feathers } from "@feathersjs/feathers";
-import { createAliasResolver, defineAbility } from "@casl/ability";
+import { defineAbility } from "@casl/ability";
 
 import type { Application } from "@feathersjs/feathers";
 
@@ -14,20 +14,19 @@ export default (
   makeService: () => any,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
-  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] }
+  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] },
 ): void => {
   let app: Application;
   let service;
   let id;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const itSkip = (adapterToTest: string | string[]) => {
-    const condition =
-      typeof adapterToTest === "string"
-        ? adapterName === adapterToTest
-        : adapterToTest.includes(adapterName);
-    return condition ? it.skip : it;
-  };
+  // const itSkip = (adapterToTest: string | string[]) => {
+  //   const condition =
+  //     typeof adapterToTest === "string"
+  //       ? adapterName === adapterToTest
+  //       : adapterToTest.includes(adapterName);
+  //   return condition ? it.skip : it;
+  // };
 
   describe(`${adapterName}: beforeAndAfter - get`, function () {
     beforeEach(async function () {
@@ -35,7 +34,6 @@ export default (
       app.use("tests", makeService());
       service = app.service("tests");
 
-      // eslint-disable-next-line prefer-destructuring
       id = service.options.id;
 
       const options = Object.assign(
@@ -50,14 +48,14 @@ export default (
             "hidden",
           ],
         },
-        authorizeHookOptions
+        authorizeHookOptions,
       );
 
       afterHooks = Array.isArray(afterHooks)
         ? afterHooks
         : afterHooks
-        ? [afterHooks]
-        : [];
+          ? [afterHooks]
+          : [];
 
       if (around) {
         service.hooks({
@@ -92,13 +90,13 @@ export default (
             (can) => {
               can(read, "tests", { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
         });
         assert.deepStrictEqual(
           returnedItem,
           item,
-          `'create' and 'get' item are the same for read: '${read}'`
+          `'create' and 'get' item are the same for read: '${read}'`,
         );
       }
     });
@@ -111,13 +109,13 @@ export default (
           (can) => {
             can("read", "tests", [id], { userId: 1 });
           },
-          { resolveAction }
+          { resolveAction },
         ),
       });
       assert.deepStrictEqual(
         returnedItem,
         { [id]: item[id] },
-        "'get' returns only [id]"
+        "'get' returns only [id]",
       );
     });
 
@@ -133,7 +131,7 @@ export default (
           (can) => {
             can("read", "tests", [id], { userId: 1 });
           },
-          { resolveAction }
+          { resolveAction },
         ),
         query: {
           $select: [id, "userId"],
@@ -142,11 +140,10 @@ export default (
       assert.deepStrictEqual(
         returnedItem,
         { [id]: item[id] },
-        "'get' returns only [id]"
+        "'get' returns only [id]",
       );
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     it.skip("returns subset of fields with inverted fields", async function () {});
 
     it("throws 'NotFound' for not 'can'", async function () {
@@ -157,7 +154,7 @@ export default (
           (can) => {
             can("read", "tests", { userId: 2 });
           },
-          { resolveAction }
+          { resolveAction },
         ),
       });
       // rejects with 'NotFound' because it's handled by feathers itself
@@ -166,7 +163,7 @@ export default (
       await assert.rejects(
         returnedItem,
         (err: Error) => err.name === "NotFound",
-        "rejects for id not allowed"
+        "rejects for id not allowed",
       );
     });
 
@@ -179,7 +176,7 @@ export default (
             can("read", "tests");
             cannot("read", "tests", { userId: 1 });
           },
-          { resolveAction }
+          { resolveAction },
         ),
       });
       // rejects with 'NotFound' because it's handled by feathers itself
@@ -188,7 +185,7 @@ export default (
       await assert.rejects(
         returnedItem,
         (err: Error) => err.name === "NotFound",
-        "rejects for id not allowed"
+        "rejects for id not allowed",
       );
     });
 
@@ -207,7 +204,7 @@ export default (
           (can) => {
             can("read", "tests", ["test", "userId"]);
           },
-          { resolveAction }
+          { resolveAction },
         ),
       });
       // rejects with 'Forbidden' which is handled by the after-hook
@@ -217,7 +214,7 @@ export default (
       await assert.rejects(
         promise,
         (err: Error) => err.name === "Forbidden",
-        "rejects for id not allowed"
+        "rejects for id not allowed",
       );
     });
   });

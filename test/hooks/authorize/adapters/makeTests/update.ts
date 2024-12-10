@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { feathers } from "@feathersjs/feathers";
-import { createAliasResolver, defineAbility } from "@casl/ability";
+import { defineAbility } from "@casl/ability";
 
 import type { Application } from "@feathersjs/feathers";
 
@@ -14,7 +14,7 @@ export default (
   makeService: () => any,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
-  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] }
+  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] },
 ): void => {
   let app: Application;
   let service;
@@ -34,7 +34,6 @@ export default (
       app.use("tests", makeService());
       service = app.service("tests");
 
-      // eslint-disable-next-line prefer-destructuring
       id = service.options.id;
 
       const options = Object.assign(
@@ -49,14 +48,14 @@ export default (
             "hidden",
           ],
         },
-        authorizeHookOptions
+        authorizeHookOptions,
       );
 
       afterHooks = Array.isArray(afterHooks)
         ? afterHooks
         : afterHooks
-        ? [afterHooks]
-        : [];
+          ? [afterHooks]
+          : [];
 
       if (around) {
         service.hooks({
@@ -92,22 +91,22 @@ export default (
             (can) => {
               can("update", "tests");
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       assert.deepStrictEqual(
         updatedItem,
         undefined,
-        "updated item is undefined"
+        "updated item is undefined",
       );
 
       const realItem = await service.get(item[id]);
       assert.deepStrictEqual(
         realItem,
         { [id]: item[id], test: false, userId: 1 },
-        "updated item correctly"
+        "updated item correctly",
       );
     });
 
@@ -126,15 +125,15 @@ export default (
                 can("update", "tests");
                 can(read, "tests");
               },
-              { resolveAction }
+              { resolveAction },
             ),
-          }
+          },
         );
 
         assert.deepStrictEqual(
           updatedItem,
           { [id]: item[id], test: false, userId: 1 },
-          `updated item correctly for read: '${read}'`
+          `updated item correctly for read: '${read}'`,
         );
       }
     });
@@ -151,15 +150,15 @@ export default (
               can("update", "tests");
               cannot("update", "tests", { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       await assert.rejects(
         promise,
         (err: Error) => err.name === "NotFound",
-        "cannot update item"
+        "cannot update item",
       );
     });
 
@@ -176,9 +175,9 @@ export default (
               can("update", "tests");
               cannot("update", "tests", { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       await assert.doesNotReject(promise, "can update item");
@@ -197,15 +196,15 @@ export default (
               can("update", "tests");
               cannot("update", "tests", ["test"]);
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       await assert.rejects(
         promise,
         (err: Error) => err.name === "Forbidden",
-        "rejects request"
+        "rejects request",
       );
     });
 
@@ -221,9 +220,9 @@ export default (
               can("update", "tests", ["test"], { userId: 1 });
               can("read", "tests");
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       const realItem = await service.get(item[id]);
@@ -233,7 +232,7 @@ export default (
       assert.deepStrictEqual(
         updatedItem,
         realItem,
-        "result of update is real item"
+        "result of update is real item",
       );
     });
 
@@ -251,15 +250,15 @@ export default (
               can("update", "tests");
               cannot("update", "tests", { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       await assert.rejects(
         promise,
         (err: Error) => err.name === "NotFound",
-        "cannot update item"
+        "cannot update item",
       );
 
       // TODO: Does not work with `userId: 1` for knex, memory, mongodb and nedb ?!
@@ -273,15 +272,15 @@ export default (
               can("update", "tests");
               cannot("update", "tests", { userId: 1 });
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       assert.deepStrictEqual(
         updatedItem2,
         { [id]: item2[id], test: false, userId: 3 },
-        "updated item correctly"
+        "updated item correctly",
       );
     });
 
@@ -308,19 +307,19 @@ export default (
               can("read", "tests", ["test", "userId"]);
               can(["create", "update"], "tests");
             },
-            { resolveAction }
+            { resolveAction },
           ),
         });
         assert.deepStrictEqual(
           result,
           {},
-          "returned item is empty because of $select and restricting fields"
+          "returned item is empty because of $select and restricting fields",
         );
 
         const itemInDb = await service.get(item[id]);
 
         assert.deepStrictEqual(itemInDb, updatedItem, "item in db is complete");
-      }
+      },
     );
   });
 };

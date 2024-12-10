@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import { feathers } from "@feathersjs/feathers";
-import { createAliasResolver, defineAbility } from "@casl/ability";
+import { defineAbility } from "@casl/ability";
 import _sortBy from "lodash/sortBy.js";
 import _isEqual from "lodash/isEqual.js";
 
@@ -16,19 +16,19 @@ export default (
   makeService: () => any,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
-  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] }
+  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] },
 ): void => {
   let app: Application;
   let service;
   let id;
 
-  const itSkip = (adapterToTest: string | string[]) => {
-    const condition =
-      typeof adapterToTest === "string"
-        ? adapterName === adapterToTest
-        : adapterToTest.includes(adapterName);
-    return condition ? it.skip : it;
-  };
+  // const itSkip = (adapterToTest: string | string[]) => {
+  //   const condition =
+  //     typeof adapterToTest === "string"
+  //       ? adapterName === adapterToTest
+  //       : adapterToTest.includes(adapterName);
+  //   return condition ? it.skip : it;
+  // };
 
   describe(`${adapterName}: beforeAndAfter - patch:multiple`, function () {
     beforeEach(async function () {
@@ -36,7 +36,6 @@ export default (
       app.use("tests", makeService());
       service = app.service("tests");
 
-      // eslint-disable-next-line prefer-destructuring
       id = service.options.id;
 
       const options = Object.assign(
@@ -51,14 +50,14 @@ export default (
             "hidden",
           ],
         },
-        authorizeHookOptions
+        authorizeHookOptions,
       );
 
       afterHooks = Array.isArray(afterHooks)
         ? afterHooks
         : afterHooks
-        ? [afterHooks]
-        : [];
+          ? [afterHooks]
+          : [];
 
       if (around) {
         service.hooks({
@@ -96,12 +95,12 @@ export default (
             (can) => {
               can("patch", "tests");
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {
             userId: 1,
           },
-        }
+        },
       );
 
       assert.deepStrictEqual(patchedItems, [], "result is empty array");
@@ -115,7 +114,7 @@ export default (
       assert.deepStrictEqual(
         _sortBy(realItems, id),
         _sortBy(expected, id),
-        "patched items correctly"
+        "patched items correctly",
       );
     });
 
@@ -137,12 +136,12 @@ export default (
                 can("patch", "tests");
                 can(read, "tests");
               },
-              { resolveAction }
+              { resolveAction },
             ),
             query: {
               userId: 1,
             },
-          }
+          },
         );
 
         const expectedResult = [
@@ -153,7 +152,7 @@ export default (
         assert.deepStrictEqual(
           _sortBy(patchedItems, id),
           _sortBy(expectedResult, id),
-          `result is right array for read: '${read}'`
+          `result is right array for read: '${read}'`,
         );
 
         const realItems = await service.find({ paginate: false });
@@ -165,7 +164,7 @@ export default (
         assert.deepStrictEqual(
           _sortBy(realItems, id),
           _sortBy(expected, id),
-          "patched items correctly"
+          "patched items correctly",
         );
       }
     });
@@ -184,9 +183,9 @@ export default (
               can("patch", "tests", ["test"], { userId: 1 });
               can("read", "tests");
             },
-            { resolveAction }
+            { resolveAction },
           ),
-        }
+        },
       );
 
       const realItems = await service.find({ paginate: false });
@@ -195,13 +194,13 @@ export default (
       assert.deepStrictEqual(
         _sortBy(realItems, id),
         _sortBy(expected, id),
-        "patched item correctly"
+        "patched item correctly",
       );
 
       assert.deepStrictEqual(
         _sortBy(patchedItems, id),
         realItems.filter((x) => _isEqual(x[id], item1[id])),
-        "result of patch is real item"
+        "result of patch is real item",
       );
     });
 
@@ -219,10 +218,10 @@ export default (
               can("patch", "tests", { userId: 1 });
               can("read", "tests");
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {},
-        }
+        },
       );
 
       const expectedResult = [
@@ -233,7 +232,7 @@ export default (
       assert.deepStrictEqual(
         _sortBy(patchedItems, id),
         _sortBy(expectedResult, id),
-        "result is right array"
+        "result is right array",
       );
 
       const realItems = await service.find({ paginate: false });
@@ -245,7 +244,7 @@ export default (
       assert.deepStrictEqual(
         _sortBy(realItems, id),
         _sortBy(expected, id),
-        "patched items correctly"
+        "patched items correctly",
       );
     });
 
@@ -268,10 +267,10 @@ export default (
               can("patch", "tests", { userId: 1 });
               can("read", "tests", { published: true });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {},
-        }
+        },
       );
 
       const expectedResult = [
@@ -281,7 +280,7 @@ export default (
       assert.deepStrictEqual(
         patchedItems,
         expectedResult,
-        "result is right array"
+        "result is right array",
       );
 
       const realItems = await service.find({ paginate: false });
@@ -295,7 +294,7 @@ export default (
       assert.deepStrictEqual(
         _sortBy(realItems, id),
         _sortBy(expected, id),
-        "patched items correctly"
+        "patched items correctly",
       );
     });
 
@@ -319,10 +318,10 @@ export default (
               can("read", "tests", [id], { published: false });
               can("read", "tests", { published: true });
             },
-            { resolveAction }
+            { resolveAction },
           ),
           query: {},
-        }
+        },
       );
 
       const expectedResult = [
@@ -333,7 +332,7 @@ export default (
       assert.deepStrictEqual(
         _sortBy(patchedItems, id),
         _sortBy(expectedResult, id),
-        "result is right array"
+        "result is right array",
       );
 
       const realItems = await service.find({ paginate: false });
@@ -347,7 +346,7 @@ export default (
       assert.deepStrictEqual(
         _sortBy(realItems, id),
         _sortBy(expected, id),
-        "patched items correctly"
+        "patched items correctly",
       );
     });
   });

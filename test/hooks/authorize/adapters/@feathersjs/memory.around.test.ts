@@ -45,5 +45,5 @@ makeTests(
     await service._remove(null);
   },
   { adapter: adapter },
-  { around: true }
+  { around: true },
 );

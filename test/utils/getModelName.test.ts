@@ -10,7 +10,7 @@ describe("utils - getModelName", function () {
     assert.strictEqual(
       getModelName(modelName, context),
       context.path,
-      "returns context.path"
+      "returns context.path",
     );
   });
 
@@ -20,7 +20,7 @@ describe("utils - getModelName", function () {
     assert.strictEqual(
       getModelName(modelName, context),
       modelName,
-      "just returns modelName"
+      "just returns modelName",
     );
   });
 
@@ -32,7 +32,7 @@ describe("utils - getModelName", function () {
     assert.strictEqual(
       getModelName((c) => c.method, context),
       context.method,
-      "returns custom modelName"
+      "returns custom modelName",
     );
   });
 
@@ -47,7 +47,7 @@ describe("utils - getModelName", function () {
       assert.throws(
         //@ts-expect-error val is not string, function or undefined
         () => getModelName(val, context),
-        `throws on val: '${val}''`
+        `throws on val: '${val}''`,
       );
     });
   });

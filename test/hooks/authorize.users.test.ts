@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { createAliasResolver, defineAbility } from "@casl/ability";
+import { defineAbility } from "@casl/ability";
 import { Sequelize, Op, DataTypes } from "sequelize";
 import { feathers } from "@feathersjs/feathers";
 import { SequelizeService } from "feathers-sequelize";
@@ -20,7 +20,7 @@ describe("authorize.users.test.ts", function () {
       },
       {
         resolveAction,
-      }
+      },
     );
     return ability;
   }
@@ -57,7 +57,7 @@ describe("authorize.users.test.ts", function () {
           $not: Op.not,
         },
         operators: ["$not"],
-      })
+      }),
     );
 
     const service = app.service("users");
@@ -118,7 +118,7 @@ describe("authorize.users.test.ts", function () {
     const user2Patched: Record<string, any> = await service.patch(
       user2.id,
       { roleId: 3 },
-      { ability }
+      { ability },
     );
     assert.deepStrictEqual(user2Patched.roleId, 3);
     assert.ok(hadAbility);

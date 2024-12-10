@@ -12,20 +12,20 @@ describe("utils - getMinimalFields", function () {
       can("manage", "all");
     });
     const availableFields = ["id", "test"];
-    methods.forEach((method) => {
+    for (const method of methods) {
       const record: Record<string, unknown> = { id: 1, test: true };
       const fields = getMinimalFields(
         ability,
         method,
         subject("tests", record),
-        { availableFields }
+        { availableFields },
       );
       assert.deepStrictEqual(
         fields,
         ["id", "test"],
-        `full array for method '${method}'`
+        `full array for method '${method}'`,
       );
-    });
+    }
   });
 
   it("returns subset of array", function () {
@@ -33,20 +33,20 @@ describe("utils - getMinimalFields", function () {
       can("manage", "all", ["id"]);
     });
     const availableFields = ["id", "test"];
-    methods.forEach((method) => {
+    for (const method of methods) {
       const record: Record<string, unknown> = { id: 1, test: true };
       const fields = getMinimalFields(
         ability,
         method,
         subject("tests", record),
-        { availableFields }
+        { availableFields },
       );
       assert.deepStrictEqual(
         fields,
         ["id"],
-        `subset of array for method '${method}'`
+        `subset of array for method '${method}'`,
       );
-    });
+    }
   });
 
   it("returns subset of array with availableFields: undefined", function () {
@@ -54,20 +54,20 @@ describe("utils - getMinimalFields", function () {
       can("manage", "all", ["id"]);
     });
     const availableFields = undefined;
-    methods.forEach((method) => {
+    for (const method of methods) {
       const record: Record<string, unknown> = { id: 1, test: true };
       const fields = getMinimalFields(
         ability,
         method,
         subject("tests", record),
-        { availableFields }
+        { availableFields },
       );
       assert.deepStrictEqual(
         fields,
         ["id"],
-        `subset of array for method '${method}'`
+        `subset of array for method '${method}'`,
       );
-    });
+    }
   });
 
   it("returns empty array with availableFields: []", function () {
@@ -75,16 +75,16 @@ describe("utils - getMinimalFields", function () {
       can("manage", "all", ["id"]);
     });
     const availableFields = [];
-    methods.forEach((method) => {
+    for (const method of methods) {
       const record: Record<string, unknown> = { id: 1, test: true };
       const fields = getMinimalFields(
         ability,
         method,
         subject("tests", record),
-        { availableFields }
+        { availableFields },
       );
       assert.deepStrictEqual(fields, [], `empty array for method '${method}'`);
-    });
+    }
   });
 
   it("returns empty array when not allowed", function () {
@@ -92,16 +92,16 @@ describe("utils - getMinimalFields", function () {
       cannot("manage", "all");
     });
 
-    methods.forEach((method) => {
+    for (const method of methods) {
       const record: Record<string, unknown> = { id: 1, test: true };
       const fields = getMinimalFields(
         ability,
         method,
         subject("tests", record),
-        { checkCan: true }
+        { checkCan: true },
       );
       assert.deepStrictEqual(fields, [], `empty array for method '${method}'`);
-    });
+    }
   });
 
   it("returns subset of array for more complex rules", function () {
@@ -129,20 +129,20 @@ describe("utils - getMinimalFields", function () {
         expected: ["id", "name", "email"],
       },
     ];
-    pairs.forEach((pair, i) => {
-      methods.forEach((method) => {
+    for (const [index, pair] of pairs.entries()) {
+      for (const method of methods) {
         const fields = getMinimalFields(
           ability,
           method,
           subject("tests", pair.input),
-          { availableFields }
+          { availableFields },
         );
         assert.deepStrictEqual(
           fields,
           pair.expected,
-          `result for input '${i}' and method '${method}' is correct`
+          `result for input '${index}' and method '${method}' is correct`,
         );
-      });
-    });
+      }
+    }
   });
 });

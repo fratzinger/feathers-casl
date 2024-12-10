@@ -11,23 +11,23 @@ import type {
 } from "./types";
 
 export const initialize = (
-  options?: PartialDeep<InitOptions>
+  options?: PartialDeep<InitOptions>,
 ): ((app: Application) => void) => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
   if (options?.version) {
     // asserts that you call app.configure(casl({})) instead of app.configure(casl)
     throw new Error(
-      "You passed 'feathers-casl' to app.configure() without a function. You probably wanted to call app.configure(casl({}))!"
+      "You passed 'feathers-casl' to app.configure() without a function. You probably wanted to call app.configure(casl({}))!",
     );
   }
   options = {
     defaultAdapter: options?.defaultAdapter || "@feathersjs/memory",
     authorizeHook: makeDefaultAuthorizeHookOptions(
-      options?.authorizeHook as undefined | Partial<AuthorizeHookOptions>
+      options?.authorizeHook as undefined | Partial<AuthorizeHookOptions>,
     ),
     channels: makeDefaultChannelsOptions(
-      options?.channels as undefined | Partial<ChannelOptions>
+      options?.channels as undefined | Partial<ChannelOptions>,
     ),
   };
   return (app: Application): void => {

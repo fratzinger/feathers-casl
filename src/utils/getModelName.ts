@@ -2,7 +2,7 @@ import type { HookContext } from "@feathersjs/feathers";
 
 export const getModelName = (
   modelName: string | ((context: HookContext) => string),
-  context: HookContext
+  context: HookContext,
 ): string => {
   if (modelName === undefined) {
     return context.path;

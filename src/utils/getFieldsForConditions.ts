@@ -3,7 +3,7 @@ import type { AnyAbility } from "@casl/ability";
 export const getFieldsForConditions = (
   ability: AnyAbility,
   action: string,
-  modelName: string
+  modelName: string,
 ): string[] => {
   const rules = ability.possibleRulesFor(action, modelName);
   const allFields: string[] = [];

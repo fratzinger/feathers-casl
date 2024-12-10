@@ -9,17 +9,17 @@ describe("channels.utils.test.ts", function () {
     assert.deepStrictEqual(
       options.channelOnError,
       ["authenticated"],
-      "returns 'authenticated' by default"
+      "returns 'authenticated' by default",
     );
     assert.strictEqual(
       options.restrictFields,
       true,
-      "restrict Fields by default"
+      "restrict Fields by default",
     );
     assert.strictEqual(
       options.useActionName,
       "get",
-      "use native eventName by default"
+      "use native eventName by default",
     );
   });
 

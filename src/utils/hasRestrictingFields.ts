@@ -19,7 +19,7 @@ export const hasRestrictingFields = (
   ability: AnyAbility,
   action: string,
   subject: Subject,
-  options?: HasRestrictingFieldsOptions
+  options?: HasRestrictingFieldsOptions,
 ): boolean | string[] => {
   let fields: string[];
   if (typeof subject !== "string") {
@@ -30,7 +30,7 @@ export const hasRestrictingFields = (
       {
         availableFields: options?.availableFields,
         checkCan: false,
-      }
+      },
     );
   } else {
     const permittedFieldsOfOptions: PermittedFieldsOptions<AnyAbility> = {
@@ -43,7 +43,7 @@ export const hasRestrictingFields = (
       ability,
       action,
       subject,
-      permittedFieldsOfOptions
+      permittedFieldsOfOptions,
     );
   }
 

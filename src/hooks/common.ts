@@ -36,7 +36,7 @@ export const checkCreatePerItem = (
   > &
     Partial<
       Pick<CheckBasicPermissionHookOptions, "checkCreateForData" | "method">
-    >
+    >,
 ): HookContext => {
   const method = getMethodName(context, options);
   if (method !== "create" || !options.checkCreateForData) {
@@ -61,7 +61,7 @@ export const checkCreatePerItem = (
       method,
       subject(modelName, items[i]),
       modelName,
-      options
+      options,
     );
   }
 

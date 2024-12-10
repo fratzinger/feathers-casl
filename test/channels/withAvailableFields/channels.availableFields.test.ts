@@ -21,7 +21,6 @@ describe("channels.availableFields.test.ts", function () {
   let client4: Application;
   let user1: Record<string, unknown>;
   let user2: Record<string, unknown>;
-  let user3: Record<string, unknown>;
   let users = [
     { id: 0, email: "1", password: "1" },
     { id: 1, email: "2", password: "2" },
@@ -33,7 +32,7 @@ describe("channels.availableFields.test.ts", function () {
       channels: channels1,
       services: services1,
     });
-    // eslint-disable-next-line prefer-destructuring
+
     app = mock.app;
 
     const port = await getPort();
@@ -72,7 +71,7 @@ describe("channels.availableFields.test.ts", function () {
         promises.push(promise);
       } else if (i === 2) {
         client3 = client;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
         user3 = user;
         const promise = client3.service("authentication").create({
           strategy: "local",
@@ -130,7 +129,7 @@ describe("channels.availableFields.test.ts", function () {
             assert.deepStrictEqual(result, expected, "result is full");
             resolve(result);
           });
-          //@ts-ignore
+
           service[methodName](...params);
         });
 
@@ -138,11 +137,11 @@ describe("channels.availableFields.test.ts", function () {
           promiseTimeout(
             100,
             fulFill,
-            `timeout - '${servicePath}:${methodName}'`
+            `timeout - '${servicePath}:${methodName}'`,
           ).finally(() => {
             client1.service(servicePath).removeAllListeners(event);
           }),
-          "client1 receives message"
+          "client1 receives message",
         );
       }
     }
@@ -191,7 +190,6 @@ describe("channels.availableFields.test.ts", function () {
           client2.service(servicePath).on(event, resolve);
         });
 
-        //@ts-ignore
         service[methodName](...params);
 
         await Promise.all([
@@ -199,22 +197,22 @@ describe("channels.availableFields.test.ts", function () {
             promiseTimeout(
               60,
               fulFill1,
-              `timeout '${servicePath}:${methodName}'`
+              `timeout '${servicePath}:${methodName}'`,
             ).finally(() => {
               client1.service(servicePath).removeAllListeners(event);
             }),
-            "client1 receives message"
+            "client1 receives message",
           ),
           assert.rejects(
             promiseTimeout(
               60,
               fulFill2,
-              `timeout '${servicePath}:${methodName}'`
+              `timeout '${servicePath}:${methodName}'`,
             ).finally(() => {
               client2.service(servicePath).removeAllListeners(event);
             }),
             () => true,
-            "client2 does not receive message"
+            "client2 does not receive message",
           ),
         ]);
       }
@@ -261,19 +259,18 @@ describe("channels.availableFields.test.ts", function () {
           });
         });
 
-        //@ts-ignore
         service[methodName](...params);
 
         await assert.doesNotReject(
           promiseTimeout(
             100,
             fulFill2,
-            `timeout '${servicePath}:${methodName}'`
+            `timeout '${servicePath}:${methodName}'`,
           ).finally(() => {
             client1.service(servicePath).removeAllListeners(event);
           }),
           () => true,
-          "client2 receives message"
+          "client2 receives message",
         );
       }
     }
@@ -321,7 +318,7 @@ describe("channels.availableFields.test.ts", function () {
             assert.deepStrictEqual(
               result,
               user1Expected,
-              `user1 with id '${user1.id}' with receives full comment for '${servicePath}:${methodName}'`
+              `user1 with id '${user1.id}' with receives full comment for '${servicePath}:${methodName}'`,
             );
             resolve(result);
           });
@@ -332,13 +329,12 @@ describe("channels.availableFields.test.ts", function () {
             assert.deepStrictEqual(
               result,
               user2Expected,
-              `user2 with id '${user2.id}' receives subset for '${servicePath}:${methodName}'`
+              `user2 with id '${user2.id}' receives subset for '${servicePath}:${methodName}'`,
             );
             resolve(result);
           });
         });
 
-        //@ts-ignore
         service[methodName](...params);
 
         await Promise.all([
@@ -346,21 +342,21 @@ describe("channels.availableFields.test.ts", function () {
             promiseTimeout(
               100,
               fulFill1,
-              `timeout '${servicePath}:${methodName}'`
+              `timeout '${servicePath}:${methodName}'`,
             ).finally(() => {
               client1.service(servicePath).removeAllListeners(event);
             }),
-            "client1 receives event"
+            "client1 receives event",
           ),
           assert.doesNotReject(
             promiseTimeout(
               100,
               fulFill2,
-              `timeout '${servicePath}:${methodName}'`
+              `timeout '${servicePath}:${methodName}'`,
             ).finally(() => {
               client2.service(servicePath).removeAllListeners(event);
             }),
-            "client2 receives event"
+            "client2 receives event",
           ),
         ]);
       }

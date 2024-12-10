@@ -6,7 +6,6 @@ import type {
   RealTimeConnection,
 } from "@feathersjs/transport-commons";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyData = Record<string, any>;
 
 export type Adapter =
@@ -40,18 +39,18 @@ export interface HookBaseOptions<H extends HookContext = HookContext> {
 }
 
 export interface CheckBasicPermissionHookOptions<
-  H extends HookContext = HookContext
+  H extends HookContext = HookContext,
 > extends HookBaseOptions<H> {
   checkCreateForData: boolean | ((context: H) => boolean);
   storeAbilityForAuthorize: boolean;
 }
 
 export type CheckBasicPermissionUtilsOptions<
-  H extends HookContext = HookContext
+  H extends HookContext = HookContext,
 > = Omit<CheckBasicPermissionHookOptions<H>, "notSkippable">;
 
 export type CheckBasicPermissionHookOptionsExclusive<
-  H extends HookContext = HookContext
+  H extends HookContext = HookContext,
 > = Pick<
   CheckBasicPermissionHookOptions<H>,
   Exclude<keyof CheckBasicPermissionHookOptions, keyof HookBaseOptions>
@@ -63,7 +62,7 @@ export type AvailableFieldsOption<H extends HookContext = HookContext> =
   | undefined;
 
 export interface AuthorizeChannelCommonsOptions<
-  H extends HookContext = HookContext
+  H extends HookContext = HookContext,
 > {
   availableFields: AvailableFieldsOption<H>;
 }
@@ -95,7 +94,7 @@ export interface ChannelOptions extends AuthorizeChannelCommonsOptions {
         app: Application,
         connection: RealTimeConnection,
         data: unknown,
-        context: HookContext
+        context: HookContext,
       ) => AnyAbility);
   /** Easy way to disable filtering, default: `false` */
   activated: boolean;

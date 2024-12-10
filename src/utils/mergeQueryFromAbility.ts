@@ -32,7 +32,7 @@ export const mergeQueryFromAbility = <T>(
   modelName: string,
   originalQuery: Query,
   service: AdapterBase<T>,
-  options: Pick<AuthorizeHookOptions, "adapter">
+  options: Pick<AuthorizeHookOptions, "adapter">,
 ): Query => {
   if (!hasRestrictingConditions(ability, method, modelName)) {
     return originalQuery;

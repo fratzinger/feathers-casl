@@ -8,10 +8,9 @@ import type { Id, Service } from "@feathersjs/feathers";
 import type { UtilCheckCanOptions } from "../types";
 
 const makeOptions = (
-  providedOptions?: Partial<UtilCheckCanOptions>
+  providedOptions?: Partial<UtilCheckCanOptions>,
 ): UtilCheckCanOptions => {
   return {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     actionOnForbidden: () => {},
     checkGeneral: true,
     skipThrow: false,
@@ -26,7 +25,7 @@ export const checkCan = async <S>(
   method: string,
   modelName: string,
   service: Service<S>,
-  providedOptions?: Partial<UtilCheckCanOptions>
+  providedOptions?: Partial<UtilCheckCanOptions>,
 ): Promise<boolean> => {
   const options = makeOptions(providedOptions);
   if (options.checkGeneral) {
@@ -55,7 +54,7 @@ export const checkCan = async <S>(
     method,
     subject(modelName, item),
     modelName,
-    options
+    options,
   );
 
   return can;

@@ -33,14 +33,14 @@ export const HOOKNAME = "authorize";
 
 export const makeOptions = <A extends Application = Application>(
   app: A,
-  options?: Partial<AuthorizeHookOptions>
+  options?: Partial<AuthorizeHookOptions>,
 ): AuthorizeHookOptions => {
   options = options || {};
   return Object.assign(
     makeDefaultBaseOptions(),
     defaultOptions,
     getAppOptions(app),
-    options
+    options,
   );
 };
 
@@ -56,13 +56,13 @@ const defaultOptions: AuthorizeHookOptionsExclusive<HookContext> = {
 };
 
 export const makeDefaultOptions = (
-  options?: Partial<AuthorizeHookOptions>
+  options?: Partial<AuthorizeHookOptions>,
 ): AuthorizeHookOptions => {
   return Object.assign(makeDefaultBaseOptions(), defaultOptions, options);
 };
 
 const getAppOptions = (
-  app: Application
+  app: Application,
 ): AuthorizeHookOptions | Record<string, never> => {
   const caslOptions: InitOptions = app?.get("casl");
   return caslOptions && caslOptions.authorizeHook
@@ -72,7 +72,7 @@ const getAppOptions = (
 
 export const getAdapter = (
   app: Application,
-  options: Pick<AuthorizeHookOptions, "adapter">
+  options: Pick<AuthorizeHookOptions, "adapter">,
 ): Adapter => {
   if (options.adapter) {
     return options.adapter;
@@ -89,7 +89,7 @@ export const getAbility = (
   options?: Pick<
     HookBaseOptions,
     "ability" | "checkAbilityForInternal" | "method"
-  >
+  >,
 ): Promise<AnyAbility | undefined> => {
   const method = getMethodName(context, options);
 
@@ -135,7 +135,7 @@ export const throwUnlessCan = <T extends ForcedSubject<string>>(
   method: string,
   resource: string | T,
   modelName: string,
-  options: Partial<ThrowUnlessCanOptions>
+  options: Partial<ThrowUnlessCanOptions>,
 ): boolean => {
   if (ability.cannot(method, resource)) {
     if (options.actionOnForbidden) options.actionOnForbidden();
@@ -149,7 +149,7 @@ export const throwUnlessCan = <T extends ForcedSubject<string>>(
 
 export const refetchItems = async (
   context: HookContext,
-  params?: Params
+  params?: Params,
 ): Promise<unknown[] | undefined> => {
   if (!context.result) {
     return;
@@ -178,7 +178,7 @@ export const getConditionalSelect = (
   $select: string[],
   ability: AnyAbility,
   method: string,
-  modelName: string
+  modelName: string,
 ): undefined | string[] => {
   if (!$select?.length) {
     return undefined;
@@ -199,7 +199,7 @@ export const checkMulti = (
   context: HookContext,
   ability: AnyAbility,
   modelName: string,
-  options?: Pick<AuthorizeHookOptions, "actionOnForbidden" | "method">
+  options?: Pick<AuthorizeHookOptions, "actionOnForbidden" | "method">,
 ): boolean => {
   const method = getMethodName(context, options);
   const currentIsMulti = isMulti(context);
@@ -220,31 +220,31 @@ export const checkMulti = (
 export const setPersistedConfig = (
   context: HookContext,
   key: Path,
-  val: unknown
+  val: unknown,
 ): HookContext => {
   return _set(context, `params.casl.${key}`, val);
 };
 
 export function getPersistedConfig(
   context: HookContext,
-  key: "ability"
+  key: "ability",
 ):
   | AnyAbility
   | ((context: HookContext) => Promisable<AnyAbility | undefined>)
   | undefined;
 export function getPersistedConfig(
   context: HookContext,
-  key: "skipRestrictingRead.conditions"
+  key: "skipRestrictingRead.conditions",
 ): boolean;
 export function getPersistedConfig(
   context: HookContext,
-  key: "skipRestrictingRead.fields"
+  key: "skipRestrictingRead.fields",
 ): boolean;
 export function getPersistedConfig(
   context: HookContext,
-  key: "madeBasicCheck"
+  key: "madeBasicCheck",
 ): boolean;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export function getPersistedConfig(context: HookContext, key: Path): any {
   return _get(context, `params.casl.${key}`);
 }

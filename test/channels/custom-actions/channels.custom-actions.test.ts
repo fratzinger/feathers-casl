@@ -29,7 +29,7 @@ describe("channels.custom-actions.test.ts", function () {
       channels: channels1,
       services: services1,
     });
-    // eslint-disable-next-line prefer-destructuring
+
     app = mock.app;
 
     const port = await getPort();
@@ -71,11 +71,11 @@ describe("channels.custom-actions.test.ts", function () {
     methodName: string,
     event: string,
     expectedPerClient: unknown,
-    i: number
+    i: number,
   ) => {
     assert.ok(
       Object.prototype.hasOwnProperty.call(expectedPerClient, i),
-      `client${i} has expected value`
+      `client${i} has expected value`,
     );
     const expected = expectedPerClient[i];
     const fulFill = new Promise((resolve) => {
@@ -84,7 +84,7 @@ describe("channels.custom-actions.test.ts", function () {
           assert.deepStrictEqual(
             result,
             expected,
-            `'client${i}:${servicePath}:${methodName}': result is expected`
+            `'client${i}:${servicePath}:${methodName}': result is expected`,
           );
         }
         resolve(result);
@@ -96,23 +96,23 @@ describe("channels.custom-actions.test.ts", function () {
         promiseTimeout(
           100,
           fulFill,
-          `'client${i}:${servicePath}:${methodName}': timeout`
+          `'client${i}:${servicePath}:${methodName}': timeout`,
         ).finally(() => {
           clients[i].service(servicePath).removeAllListeners(event);
         }),
-        `'client${i}:${servicePath}:${methodName}': receives message`
+        `'client${i}:${servicePath}:${methodName}': receives message`,
       );
     } else {
       await assert.rejects(
         promiseTimeout(
           80,
           fulFill,
-          `'client${i}:${servicePath}:${methodName}': timeout`
+          `'client${i}:${servicePath}:${methodName}': timeout`,
         ).finally(() => {
           clients[i].service(servicePath).removeAllListeners(event);
         }),
         () => true,
-        `'client${i}:${servicePath}:${methodName}': does not receive message`
+        `'client${i}:${servicePath}:${methodName}': does not receive message`,
       );
     }
   };
@@ -191,7 +191,7 @@ describe("channels.custom-actions.test.ts", function () {
         const { event, params, expectedPerClient } = method;
 
         const promises = clients.map((client, i) =>
-          checkClient(servicePath, methodName, event, expectedPerClient, i)
+          checkClient(servicePath, methodName, event, expectedPerClient, i),
         );
 
         service[methodName](...params);
