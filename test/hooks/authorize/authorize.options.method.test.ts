@@ -1,5 +1,5 @@
 import { MemoryService } from "@feathersjs/memory";
-import { filterObject } from "feathers-utils";
+import { filterObject, filterArray } from "feathers-utils";
 import { authorize, type Adapter, type ServiceCaslOptions } from "../../../src";
 import { feathers } from "@feathersjs/feathers";
 import { defineAbility } from "@casl/ability";
@@ -32,7 +32,7 @@ describe("authorize.options.method", () => {
         multi: true,
         startId: 1,
         filters: {
-          ...filterObject("$nor"),
+          ...filterArray("$nor"),
         },
         operators: ["$nor"],
         casl: {

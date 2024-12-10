@@ -1,5 +1,5 @@
 import { MemoryService } from "@feathersjs/memory";
-import { filterObject } from "feathers-utils";
+import { filterArray } from "feathers-utils";
 import type { Adapter, ServiceCaslOptions } from "../../../../../src";
 import makeTests from "../makeTests";
 
@@ -13,7 +13,7 @@ const makeService = () => {
   const service = new MemoryService({
     multi: true,
     filters: {
-      ...filterObject("$nor"),
+      ...filterArray("$nor"),
     },
     operators: ["$nor"],
     casl: {
