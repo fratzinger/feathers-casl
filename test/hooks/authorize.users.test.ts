@@ -1,38 +1,40 @@
-import assert from "node:assert";
-import { defineAbility } from "@casl/ability";
-import { Sequelize, Op, DataTypes } from "sequelize";
-import { feathers } from "@feathersjs/feathers";
-import { SequelizeService } from "feathers-sequelize";
-import { authorize } from "../../src";
-import path from "node:path";
-import { resolveAction } from "../test-utils";
+import assert from 'node:assert'
+import { defineAbility } from '@casl/ability'
+import { Sequelize, Op, DataTypes } from 'sequelize'
+import { feathers } from '@feathersjs/feathers'
+import { SequelizeService } from 'feathers-sequelize'
+import { authorize } from '../../src/index.js'
+import path from 'node:path'
+import { resolveAction } from '../test-utils.js'
 
-describe("authorize.users.test.ts", function () {
+describe('authorize.users.test.ts', function () {
   function mockAbility(user) {
     const ability = defineAbility(
       (can, cannot) => {
-        can("manage", "all", { companyId: 1 });
-        can("manage", "all", { companyId: 2 });
-        cannot(["create", "update", "patch", "remove"], "users", { roleId: 0 });
-        cannot("remove", "users", { id: user.id });
-        cannot(["update", "patch"], "users", ["roleId"], { id: user.id });
-        cannot(["update", "patch"], "users", ["companyId"]);
+        can('manage', 'all', { companyId: 1 })
+        can('manage', 'all', { companyId: 2 })
+        cannot(['create', 'update', 'patch', 'remove'], 'users', { roleId: 0 })
+        cannot('remove', 'users', { id: user.id })
+        cannot(['update', 'patch'], 'users', ['roleId'], { id: user.id })
+        cannot(['update', 'patch'], 'users', ['companyId'])
       },
       {
         resolveAction,
       },
-    );
-    return ability;
+    )
+    return ability
   }
 
   async function mockApp(hook) {
-    const sequelize = new Sequelize("sequelize", "", "", {
-      dialect: "sqlite",
-      storage: path.join(__dirname, "../.data/db2.sqlite"),
-      logging: false,
-    });
+    const __dirname = import.meta.dirname
 
-    const UserModel = sequelize.define("users", {
+    const sequelize = new Sequelize('sequelize', '', '', {
+      dialect: 'sqlite',
+      storage: path.join(__dirname, '../.data/db2.sqlite'),
+      logging: false,
+    })
+
+    const UserModel = sequelize.define('users', {
       companyId: {
         type: DataTypes.INTEGER,
       },
@@ -42,31 +44,31 @@ describe("authorize.users.test.ts", function () {
       roleId: {
         type: DataTypes.INTEGER,
       },
-    });
+    })
 
-    await sequelize.sync();
+    await sequelize.sync()
 
-    const app = feathers();
+    const app = feathers()
 
     app.use(
-      "/users",
+      '/users',
       new SequelizeService({
         Model: UserModel,
         multi: true,
         operatorMap: {
           $not: Op.not,
         },
-        operators: ["$not"],
+        operators: ['$not'],
       }),
-    );
+    )
 
-    const service = app.service("users");
+    const service = app.service('users')
 
     service.hooks({
       before: {
         all: [
           authorize({
-            adapter: "feathers-sequelize",
+            adapter: 'feathers-sequelize',
           }),
           hook,
         ],
@@ -80,7 +82,7 @@ describe("authorize.users.test.ts", function () {
       after: {
         all: [
           authorize({
-            adapter: "feathers-sequelize",
+            adapter: 'feathers-sequelize',
           }),
         ],
         find: [],
@@ -90,37 +92,37 @@ describe("authorize.users.test.ts", function () {
         patch: [],
         remove: [],
       },
-    });
+    })
 
-    return { service };
+    return { service }
   }
 
-  it("user can update user", async function () {
-    let hadAbility = false;
+  it('user can update user', async function () {
+    let hadAbility = false
     const { service } = await mockApp((context) => {
       if (!context.params.ability) {
-        return context;
+        return context
       }
-      hadAbility = true;
-    });
+      hadAbility = true
+    })
     const admin = await service.create({
-      name: "user1",
+      name: 'user1',
       roleId: 1,
       companyId: 1,
-    });
+    })
     const user2 = await service.create({
-      name: "user2",
+      name: 'user2',
       roleId: 2,
       companyId: 1,
-    });
-    const ability = mockAbility(admin);
+    })
+    const ability = mockAbility(admin)
 
     const user2Patched: Record<string, any> = await service.patch(
       user2.id,
       { roleId: 3 },
       { ability },
-    );
-    assert.deepStrictEqual(user2Patched.roleId, 3);
-    assert.ok(hadAbility);
-  });
-});
+    )
+    assert.deepStrictEqual(user2Patched.roleId, 3)
+    assert.ok(hadAbility)
+  })
+})

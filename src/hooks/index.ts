@@ -1,2 +1,2 @@
-export { authorize } from "./authorize/authorize.hook";
-export { checkBasicPermission } from "./checkBasicPermission.hook";
+export { authorize } from './authorize/authorize.hook.js'
+export { checkBasicPermission } from './checkBasicPermission.hook.js'

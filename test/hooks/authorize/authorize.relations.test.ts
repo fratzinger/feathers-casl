@@ -1,55 +1,55 @@
-import assert from "node:assert";
-import { defineAbility } from "@casl/ability";
-import { feathers } from "@feathersjs/feathers";
-import { authorize } from "../../../src";
-import { MemoryService } from "@feathersjs/memory";
-import { joinQuery } from "feathers-fletching";
-import { filterArray } from "feathers-utils";
-import { resolveAction } from "../../test-utils";
+import assert from 'node:assert'
+import { defineAbility } from '@casl/ability'
+import { feathers } from '@feathersjs/feathers'
+import { authorize } from '../../../src/index.js'
+import { MemoryService } from '@feathersjs/memory'
+import { joinQuery } from 'feathers-fletching'
+import { filterArray } from 'feathers-utils'
+import { resolveAction } from '../../test-utils.js'
 
-describe("authorize.relations", function () {
+describe('authorize.relations', function () {
   const mock = () => {
-    const app = feathers();
+    const app = feathers()
     app.use(
-      "artists",
+      'artists',
       new MemoryService({
         multi: true,
         startId: 1,
         // whitelist: ["$not", "$and"],
         filters: {
-          ...filterArray("$and"),
+          ...filterArray('$and'),
         },
       }),
-    );
+    )
     app.use(
-      "albums",
+      'albums',
       new MemoryService({
         multi: true,
         startId: 1,
         // whitelist: ["$not", "$and"],
         filters: {
-          ...filterArray("$and"),
+          ...filterArray('$and'),
         },
       }),
-    );
+    )
 
-    const serviceArtists = app.service("artists");
-    const serviceAlbums = app.service("albums");
+    const serviceArtists = app.service('artists')
+    const serviceAlbums = app.service('albums')
 
     const joinQueriesAlbums = joinQuery({
       artist: {
-        service: "artists",
-        foreignKey: "artistId",
-        targetKey: "id",
+        service: 'artists',
+        foreignKey: 'artistId',
+        targetKey: 'id',
         makeParams: (params, context) => {
           return {
             ...params,
             user: context.params.user,
             ability: context.params.ability,
-          };
+          }
         },
       },
-    });
+    })
 
     serviceArtists.hooks({
       before: {
@@ -70,7 +70,7 @@ describe("authorize.relations", function () {
         patch: [],
         remove: [],
       },
-    });
+    })
 
     serviceAlbums.hooks({
       before: {
@@ -91,234 +91,224 @@ describe("authorize.relations", function () {
         patch: [],
         remove: [],
       },
-    });
+    })
 
     return {
       app,
       serviceAlbums,
       serviceArtists,
-    };
-  };
+    }
+  }
 
-  describe("find", function () {
-    it("basic example without ability", async function () {
-      const { serviceAlbums, serviceArtists } = mock();
-      const blink182 = await serviceArtists.create({ name: "Blink182" });
-      const sum41 = await serviceArtists.create({ name: "Sum 41" });
+  describe('find', function () {
+    it('basic example without ability', async function () {
+      const { serviceAlbums, serviceArtists } = mock()
+      const blink182 = await serviceArtists.create({ name: 'Blink182' })
+      const sum41 = await serviceArtists.create({ name: 'Sum 41' })
       const justinBieber = await serviceArtists.create({
-        name: "Justin Bieber",
-      });
+        name: 'Justin Bieber',
+      })
 
       const enemaOfTheState = await serviceAlbums.create({
-        name: "Enema of the State",
+        name: 'Enema of the State',
         artistId: blink182.id,
         date: 1999,
-      });
+      })
       const pantsAndJacket = await serviceAlbums.create({
-        name: "Take Off Your Pants and Jacket",
+        name: 'Take Off Your Pants and Jacket',
         artistId: blink182.id,
         date: 2001,
-      });
+      })
       const california = await serviceAlbums.create({
-        name: "California",
+        name: 'California',
         artistId: blink182.id,
         date: 2016,
-      });
+      })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const killer = await serviceAlbums.create({
-        name: "All Killer No Filler",
+        name: 'All Killer No Filler',
         artistId: sum41.id,
         date: 2001,
-      });
+      })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const hero = await serviceAlbums.create({
-        name: "Underclass Hero",
+        name: 'Underclass Hero',
         artistId: sum41.id,
         date: 2007,
-      });
+      })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const believe = await serviceAlbums.create({
-        name: "Believe",
+        name: 'Believe',
         artistId: justinBieber.id,
         date: 2012,
-      });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      })
+
       const purpose = await serviceAlbums.create({
-        name: "Purpose",
+        name: 'Purpose',
         artistId: justinBieber.id,
         date: 2020,
-      });
+      })
 
       const albumsOfBlink = await serviceAlbums.find({
-        query: { "artist.name": "Blink182" },
-      });
+        query: { 'artist.name': 'Blink182' },
+      })
       assert.deepStrictEqual(
         albumsOfBlink.sort(),
         [enemaOfTheState, pantsAndJacket, california].sort(),
-        "found all albums of blink182",
-      );
-    });
+        'found all albums of blink182',
+      )
+    })
 
-    it("basic example with ability", async function () {
-      const { serviceAlbums, serviceArtists } = mock();
-      const blink182 = await serviceArtists.create({ name: "Blink182" });
-      const sum41 = await serviceArtists.create({ name: "Sum 41" });
+    it('basic example with ability', async function () {
+      const { serviceAlbums, serviceArtists } = mock()
+      const blink182 = await serviceArtists.create({ name: 'Blink182' })
+      const sum41 = await serviceArtists.create({ name: 'Sum 41' })
       const justinBieber = await serviceArtists.create({
-        name: "Justin Bieber",
-      });
+        name: 'Justin Bieber',
+      })
 
       const enemaOfTheState = await serviceAlbums.create({
-        name: "Enema of the State",
+        name: 'Enema of the State',
         artistId: blink182.id,
         date: 1999,
-      });
+      })
       const pantsAndJacket = await serviceAlbums.create({
-        name: "Take Off Your Pants and Jacket",
+        name: 'Take Off Your Pants and Jacket',
         artistId: blink182.id,
         date: 2001,
-      });
+      })
       const california = await serviceAlbums.create({
-        name: "California",
+        name: 'California',
         artistId: blink182.id,
         date: 2016,
-      });
+      })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const killer = await serviceAlbums.create({
-        name: "All Killer No Filler",
+        name: 'All Killer No Filler',
         artistId: sum41.id,
         date: 2001,
-      });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      })
+
       const hero = await serviceAlbums.create({
-        name: "Underclass Hero",
+        name: 'Underclass Hero',
         artistId: sum41.id,
         date: 2007,
-      });
+      })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const believe = await serviceAlbums.create({
-        name: "Believe",
+        name: 'Believe',
         artistId: justinBieber.id,
         date: 2012,
-      });
+      })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const purpose = await serviceAlbums.create({
-        name: "Purpose",
+        name: 'Purpose',
         artistId: justinBieber.id,
         date: 2020,
-      });
+      })
 
       const noAlbums = await serviceAlbums.find({
-        query: { "artist.name": "Blink182" },
+        query: { 'artist.name': 'Blink182' },
         ability: defineAbility(
           (can) => {
-            can("read", "albums");
-            can("read", "artists", { name: "Justin Bieber" });
+            can('read', 'albums')
+            can('read', 'artists', { name: 'Justin Bieber' })
           },
           { resolveAction },
         ),
-      });
+      })
 
-      assert.strictEqual(noAlbums.length, 0, "found no albums");
+      assert.strictEqual(noAlbums.length, 0, 'found no albums')
 
       const albumsOfBlink = await serviceAlbums.find({
-        query: { "artist.name": "Blink182" },
+        query: { 'artist.name': 'Blink182' },
         ability: defineAbility(
           (can) => {
-            can("read", "albums");
-            can("read", "artists", { name: "Blink182" });
+            can('read', 'albums')
+            can('read', 'artists', { name: 'Blink182' })
           },
           { resolveAction },
         ),
-      });
+      })
 
       assert.deepStrictEqual(
         albumsOfBlink.sort(),
         [enemaOfTheState, pantsAndJacket, california].sort(),
-        "found all albums of blink182",
-      );
-    });
+        'found all albums of blink182',
+      )
+    })
 
-    it("basic example with ability with $select", async function () {
-      const { serviceAlbums, serviceArtists } = mock();
-      const blink182 = await serviceArtists.create({ name: "Blink182" });
-      const sum41 = await serviceArtists.create({ name: "Sum 41" });
+    it('basic example with ability with $select', async function () {
+      const { serviceAlbums, serviceArtists } = mock()
+      const blink182 = await serviceArtists.create({ name: 'Blink182' })
+      const sum41 = await serviceArtists.create({ name: 'Sum 41' })
       const justinBieber = await serviceArtists.create({
-        name: "Justin Bieber",
-      });
+        name: 'Justin Bieber',
+      })
 
       const enemaOfTheState = await serviceAlbums.create({
-        name: "Enema of the State",
+        name: 'Enema of the State',
         artistId: blink182.id,
         date: 1999,
-      });
+      })
       const pantsAndJacket = await serviceAlbums.create({
-        name: "Take Off Your Pants and Jacket",
+        name: 'Take Off Your Pants and Jacket',
         artistId: blink182.id,
         date: 2001,
-      });
+      })
       const california = await serviceAlbums.create({
-        name: "California",
+        name: 'California',
         artistId: blink182.id,
         date: 2016,
-      });
+      })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const killer = await serviceAlbums.create({
-        name: "All Killer No Filler",
+        name: 'All Killer No Filler',
         artistId: sum41.id,
         date: 2001,
-      });
+      })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const hero = await serviceAlbums.create({
-        name: "Underclass Hero",
+        name: 'Underclass Hero',
         artistId: sum41.id,
         date: 2007,
-      });
+      })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const believe = await serviceAlbums.create({
-        name: "Believe",
+        name: 'Believe',
         artistId: justinBieber.id,
         date: 2012,
-      });
+      })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const purpose = await serviceAlbums.create({
-        name: "Purpose",
+        name: 'Purpose',
         artistId: justinBieber.id,
         date: 2020,
-      });
+      })
 
       const noAlbums = await serviceAlbums.find({
-        query: { "artist.name": "Blink182", $select: ["id"] },
+        query: { 'artist.name': 'Blink182', $select: ['id'] },
         ability: defineAbility(
           (can) => {
-            can("read", "albums");
-            can("read", "artists", { name: "Justin Bieber" });
+            can('read', 'albums')
+            can('read', 'artists', { name: 'Justin Bieber' })
           },
           { resolveAction },
         ),
-      });
+      })
 
-      assert.strictEqual(noAlbums.length, 0, "found no albums");
+      assert.strictEqual(noAlbums.length, 0, 'found no albums')
 
       const albumsOfBlink = await serviceAlbums.find({
-        query: { "artist.name": "Blink182", $select: ["id"] },
+        query: { 'artist.name': 'Blink182', $select: ['id'] },
         ability: defineAbility(
           (can) => {
-            can("read", "albums");
-            can("read", "artists", { name: "Blink182" });
+            can('read', 'albums')
+            can('read', 'artists', { name: 'Blink182' })
           },
           { resolveAction },
         ),
-      });
+      })
 
       assert.deepStrictEqual(
         albumsOfBlink.sort(),
@@ -327,129 +317,125 @@ describe("authorize.relations", function () {
           { id: pantsAndJacket.id },
           { id: california.id },
         ].sort(),
-        "found all albums of blink182",
-      );
-    });
+        'found all albums of blink182',
+      )
+    })
 
-    it("dot.notation in ability", async function () {
-      const { serviceAlbums, serviceArtists } = mock();
-      const blink182 = await serviceArtists.create({ name: "Blink182" });
-      const sum41 = await serviceArtists.create({ name: "Sum 41" });
+    it('dot.notation in ability', async function () {
+      const { serviceAlbums, serviceArtists } = mock()
+      const blink182 = await serviceArtists.create({ name: 'Blink182' })
+      const sum41 = await serviceArtists.create({ name: 'Sum 41' })
       const justinBieber = await serviceArtists.create({
-        name: "Justin Bieber",
-      });
+        name: 'Justin Bieber',
+      })
 
       const enemaOfTheState = await serviceAlbums.create({
-        name: "Enema of the State",
+        name: 'Enema of the State',
         artistId: blink182.id,
         date: 1999,
-      });
+      })
       const pantsAndJacket = await serviceAlbums.create({
-        name: "Take Off Your Pants and Jacket",
+        name: 'Take Off Your Pants and Jacket',
         artistId: blink182.id,
         date: 2001,
-      });
+      })
       const california = await serviceAlbums.create({
-        name: "California",
+        name: 'California',
         artistId: blink182.id,
         date: 2016,
-      });
+      })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const killer = await serviceAlbums.create({
-        name: "All Killer No Filler",
+        name: 'All Killer No Filler',
         artistId: sum41.id,
         date: 2001,
-      });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      })
+
       const hero = await serviceAlbums.create({
-        name: "Underclass Hero",
+        name: 'Underclass Hero',
         artistId: sum41.id,
         date: 2007,
-      });
+      })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const believe = await serviceAlbums.create({
-        name: "Believe",
+        name: 'Believe',
         artistId: justinBieber.id,
         date: 2012,
-      });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      })
+
       const purpose = await serviceAlbums.create({
-        name: "Purpose",
+        name: 'Purpose',
         artistId: justinBieber.id,
         date: 2020,
-      });
+      })
 
       const albumsOfBlink = await serviceAlbums.find({
         query: {},
         ability: defineAbility(
           (can) => {
-            can("read", "albums", { "artist.name": "Blink182" });
-            can("read", "artists");
+            can('read', 'albums', { 'artist.name': 'Blink182' })
+            can('read', 'artists')
           },
           { resolveAction },
         ),
-      });
+      })
 
       assert.deepStrictEqual(
         albumsOfBlink.sort(),
         [enemaOfTheState, pantsAndJacket, california].sort(),
-        "only can read albums of blink182",
-      );
-    });
-  });
+        'only can read albums of blink182',
+      )
+    })
+  })
 
-  describe("patch", function () {
-    it("dot.notation in ability", async function () {
-      const { serviceAlbums, serviceArtists } = mock();
-      const blink182 = await serviceArtists.create({ name: "Blink182" });
-      const sum41 = await serviceArtists.create({ name: "Sum 41" });
+  describe('patch', function () {
+    it('dot.notation in ability', async function () {
+      const { serviceAlbums, serviceArtists } = mock()
+      const blink182 = await serviceArtists.create({ name: 'Blink182' })
+      const sum41 = await serviceArtists.create({ name: 'Sum 41' })
       const justinBieber = await serviceArtists.create({
-        name: "Justin Bieber",
-      });
+        name: 'Justin Bieber',
+      })
 
       const enemaOfTheState = await serviceAlbums.create({
-        name: "Enema of the State",
+        name: 'Enema of the State',
         artistId: blink182.id,
         date: 1999,
-      });
+      })
       const pantsAndJacket = await serviceAlbums.create({
-        name: "Take Off Your Pants and Jacket",
+        name: 'Take Off Your Pants and Jacket',
         artistId: blink182.id,
         date: 2001,
-      });
+      })
       const california = await serviceAlbums.create({
-        name: "California",
+        name: 'California',
         artistId: blink182.id,
         date: 2016,
-      });
+      })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const killer = await serviceAlbums.create({
-        name: "All Killer No Filler",
+        name: 'All Killer No Filler',
         artistId: sum41.id,
         date: 2001,
-      });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      })
+
       const hero = await serviceAlbums.create({
-        name: "Underclass Hero",
+        name: 'Underclass Hero',
         artistId: sum41.id,
         date: 2007,
-      });
+      })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const believe = await serviceAlbums.create({
-        name: "Believe",
+        name: 'Believe',
         artistId: justinBieber.id,
         date: 2012,
-      });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      })
+
       const purpose = await serviceAlbums.create({
-        name: "Purpose",
+        name: 'Purpose',
         artistId: justinBieber.id,
         date: 2020,
-      });
+      })
 
       const albumsOfBlink = await serviceAlbums.patch(
         null,
@@ -460,14 +446,14 @@ describe("authorize.relations", function () {
           query: {},
           ability: defineAbility(
             (can) => {
-              can("read", "albums");
-              can(["update"], "albums", { "artist.name": "Blink182" });
-              can("read", "artists");
+              can('read', 'albums')
+              can(['update'], 'albums', { 'artist.name': 'Blink182' })
+              can('read', 'artists')
             },
             { resolveAction },
           ),
         },
-      );
+      )
 
       assert.deepStrictEqual(
         albumsOfBlink,
@@ -476,81 +462,77 @@ describe("authorize.relations", function () {
           { ...pantsAndJacket, stars: 5 },
           { ...california, stars: 5 },
         ],
-        "only updated Albums of Blink182",
-      );
+        'only updated Albums of Blink182',
+      )
 
       const otherAlbums = await serviceAlbums.find({
         query: {
-          "artist.name": { $ne: "Blink182" },
+          'artist.name': { $ne: 'Blink182' },
         },
         paginate: false,
-      });
+      })
 
       assert.strictEqual(
         otherAlbums.length,
         4,
-        "albums not from Blink182 are four",
-      );
+        'albums not from Blink182 are four',
+      )
 
       assert.ok(
         otherAlbums.every((x) => !x.stars),
-        "none of other albums has stars",
-      );
-    });
-  });
+        'none of other albums has stars',
+      )
+    })
+  })
 
-  describe.skip("remove", function () {
-    it("dot.notation in ability", async function () {
-      const { serviceAlbums, serviceArtists } = mock();
-      const blink182 = await serviceArtists.create({ name: "Blink182" });
-      const sum41 = await serviceArtists.create({ name: "Sum 41" });
+  describe.skip('remove', function () {
+    it('dot.notation in ability', async function () {
+      const { serviceAlbums, serviceArtists } = mock()
+      const blink182 = await serviceArtists.create({ name: 'Blink182' })
+      const sum41 = await serviceArtists.create({ name: 'Sum 41' })
       const justinBieber = await serviceArtists.create({
-        name: "Justin Bieber",
-      });
+        name: 'Justin Bieber',
+      })
 
       const enemaOfTheState = await serviceAlbums.create({
-        name: "Enema of the State",
+        name: 'Enema of the State',
         artistId: blink182.id,
         date: 1999,
-      });
+      })
       const pantsAndJacket = await serviceAlbums.create({
-        name: "Take Off Your Pants and Jacket",
+        name: 'Take Off Your Pants and Jacket',
         artistId: blink182.id,
         date: 2001,
-      });
+      })
       const california = await serviceAlbums.create({
-        name: "California",
+        name: 'California',
         artistId: blink182.id,
         date: 2016,
-      });
+      })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const killer = await serviceAlbums.create({
-        name: "All Killer No Filler",
+        name: 'All Killer No Filler',
         artistId: sum41.id,
         date: 2001,
-      });
+      })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const hero = await serviceAlbums.create({
-        name: "Underclass Hero",
+        name: 'Underclass Hero',
         artistId: sum41.id,
         date: 2007,
-      });
+      })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const believe = await serviceAlbums.create({
-        name: "Believe",
+        name: 'Believe',
         artistId: justinBieber.id,
         date: 2012,
-      });
+      })
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const purpose = await serviceAlbums.create({
-        name: "Purpose",
+        name: 'Purpose',
         artistId: justinBieber.id,
         date: 2020,
-      });
+      })
 
       const albumsOfBlink = await serviceAlbums.patch(
         null,
@@ -561,14 +543,14 @@ describe("authorize.relations", function () {
           query: {},
           ability: defineAbility(
             (can) => {
-              can("read", "albums");
-              can(["update"], "albums", { "artist.name": "Blink182" });
-              can("read", "artists");
+              can('read', 'albums')
+              can(['update'], 'albums', { 'artist.name': 'Blink182' })
+              can('read', 'artists')
             },
             { resolveAction },
           ),
         },
-      );
+      )
 
       assert.deepStrictEqual(
         albumsOfBlink,
@@ -577,26 +559,26 @@ describe("authorize.relations", function () {
           { ...pantsAndJacket, stars: 5 },
           { ...california, stars: 5 },
         ],
-        "only updated Albums of Blink182",
-      );
+        'only updated Albums of Blink182',
+      )
 
       const otherAlbums = await serviceAlbums.find({
         query: {
-          "artist.name": { $ne: "Blink182" },
+          'artist.name': { $ne: 'Blink182' },
         },
         paginate: false,
-      });
+      })
 
       assert.strictEqual(
         otherAlbums.length,
         4,
-        "albums not from Blink182 are four",
-      );
+        'albums not from Blink182 are four',
+      )
 
       assert.ok(
         otherAlbums.every((x) => !x.stars),
-        "none of other albums has stars",
-      );
-    });
-  });
-});
+        'none of other albums has stars',
+      )
+    })
+  })
+})

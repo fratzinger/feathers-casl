@@ -1,13 +1,13 @@
-import assert from "node:assert";
-import { feathers } from "@feathersjs/feathers";
-import { defineAbility } from "@casl/ability";
+import assert from 'node:assert'
+import { feathers } from '@feathersjs/feathers'
+import { defineAbility } from '@casl/ability'
 
-import type { Application } from "@feathersjs/feathers";
+import type { Application } from '@feathersjs/feathers'
 
-import { authorize } from "../../../../../src";
-import type { Adapter, AuthorizeHookOptions } from "../../../../../src";
-import { resolveAction } from "../../../../test-utils";
-import type { MakeTestsOptions } from "./_makeTests.types";
+import { authorize } from '../../../../../src/index.js'
+import type { Adapter, AuthorizeHookOptions } from '../../../../../src/index.js'
+import { resolveAction } from '../../../../test-utils.js'
+import type { MakeTestsOptions } from './_makeTests.types.js'
 
 export default (
   adapterName: Adapter | string,
@@ -16,38 +16,38 @@ export default (
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
   { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] },
 ): void => {
-  let app: Application;
-  let service;
-  let id;
+  let app: Application
+  let service
+  let id
 
   describe(`${adapterName}: beforeAndAfter - update-data`, function () {
     beforeEach(async function () {
-      app = feathers();
-      app.use("tests", makeService());
-      service = app.service("tests");
+      app = feathers()
+      app.use('tests', makeService())
+      service = app.service('tests')
 
-      id = service.options.id;
+      id = service.options.id
 
       const options = Object.assign(
         {
           availableFields: [
             id,
-            "userId",
-            "hi",
-            "test",
-            "published",
-            "supersecret",
-            "hidden",
+            'userId',
+            'hi',
+            'test',
+            'published',
+            'supersecret',
+            'hidden',
           ],
         },
         authorizeHookOptions,
-      );
+      )
 
       afterHooks = Array.isArray(afterHooks)
         ? afterHooks
         : afterHooks
           ? [afterHooks]
-          : [];
+          : []
 
       if (around) {
         service.hooks({
@@ -57,7 +57,7 @@ export default (
           after: {
             all: afterHooks,
           },
-        });
+        })
       } else {
         service.hooks({
           before: {
@@ -66,47 +66,47 @@ export default (
           after: {
             all: [...afterHooks, authorize(options)],
           },
-        });
+        })
       }
 
-      await clean(app, service);
-    });
+      await clean(app, service)
+    })
 
     it("passes with general 'update-data' rule", async function () {
-      const readMethod = ["read", "get"];
+      const readMethod = ['read', 'get']
 
       for (const read of readMethod) {
-        await clean(app, service);
-        const item = await service.create({ test: true, userId: 1 });
+        await clean(app, service)
+        const item = await service.create({ test: true, userId: 1 })
         const result = await service.update(
           item[id],
           { [id]: item[id], test: false, userId: 1 },
           {
             ability: defineAbility(
               (can) => {
-                can("update", "tests");
-                can("update-data", "tests");
-                can(read, "tests");
+                can('update', 'tests')
+                can('update-data', 'tests')
+                can(read, 'tests')
               },
               { resolveAction },
             ),
           },
-        );
+        )
         assert.deepStrictEqual(result, {
           [id]: item[id],
           test: false,
           userId: 1,
-        });
+        })
       }
-    });
+    })
 
     it("fails with no 'update-data' rule", async function () {
-      const readMethod = ["read", "get"];
+      const readMethod = ['read', 'get']
 
       for (const read of readMethod) {
-        await clean(app, service);
-        const item = await service.create({ test: true, userId: 1 });
-        let rejected = false;
+        await clean(app, service)
+        const item = await service.create({ test: true, userId: 1 })
+        let rejected = false
         try {
           await service.update(
             item[id],
@@ -114,27 +114,27 @@ export default (
             {
               ability: defineAbility(
                 (can) => {
-                  can("update", "tests");
-                  can(read, "tests");
+                  can('update', 'tests')
+                  can(read, 'tests')
                 },
                 { resolveAction },
               ),
             },
-          );
+          )
         } catch {
-          rejected = true;
+          rejected = true
         }
-        assert.ok(rejected, "rejected");
+        assert.ok(rejected, 'rejected')
       }
-    });
+    })
 
     it("basic cannot 'update-data'", async function () {
-      const readMethod = ["read", "get"];
+      const readMethod = ['read', 'get']
 
       for (const read of readMethod) {
-        await clean(app, service);
-        const item = await service.create({ test: true, userId: 1 });
-        let rejected = false;
+        await clean(app, service)
+        const item = await service.create({ test: true, userId: 1 })
+        let rejected = false
         try {
           await service.update(
             item[id],
@@ -142,28 +142,28 @@ export default (
             {
               ability: defineAbility(
                 (can, cannot) => {
-                  can("update", "tests");
-                  can("update-data", "tests");
-                  cannot("update-data", "tests", { test: false });
-                  can(read, "tests");
+                  can('update', 'tests')
+                  can('update-data', 'tests')
+                  cannot('update-data', 'tests', { test: false })
+                  can(read, 'tests')
                 },
                 { resolveAction },
               ),
             },
-          );
+          )
         } catch {
-          rejected = true;
+          rejected = true
         }
-        assert.ok(rejected, "rejected");
+        assert.ok(rejected, 'rejected')
       }
-    });
+    })
 
     it("basic can 'update-data' with fail", async function () {
-      const readMethod = ["read", "get"];
+      const readMethod = ['read', 'get']
 
       for (const read of readMethod) {
-        await clean(app, service);
-        const item = await service.create({ test: true, userId: 1 });
+        await clean(app, service)
+        const item = await service.create({ test: true, userId: 1 })
         try {
           await service.update(
             item[id],
@@ -171,50 +171,50 @@ export default (
             {
               ability: defineAbility(
                 (can) => {
-                  can("update", "tests");
-                  can("update-data", "tests");
-                  can("update-data", "tests", { test: true });
-                  can(read, "tests");
+                  can('update', 'tests')
+                  can('update-data', 'tests')
+                  can('update-data', 'tests', { test: true })
+                  can(read, 'tests')
                 },
                 { resolveAction },
               ),
             },
-          );
-          assert.fail("should not get here");
+          )
+          assert.fail('should not get here')
         } catch (err) {
-          assert.ok(err, "should get here");
+          assert.ok(err, 'should get here')
         }
       }
-    });
+    })
 
     it("basic can 'update-data'", async function () {
-      const readMethod = ["read", "get"];
+      const readMethod = ['read', 'get']
 
       for (const read of readMethod) {
-        await clean(app, service);
-        const item = await service.create({ test: true, userId: 1 });
+        await clean(app, service)
+        const item = await service.create({ test: true, userId: 1 })
         const UpdatedItem = await service.update(
           item[id],
           { test: false, userId: 1 },
           {
             ability: defineAbility(
               (can) => {
-                can("update", "tests");
-                can("update-data", "tests");
-                can("update-data", "tests", { test: false });
-                can(read, "tests");
+                can('update', 'tests')
+                can('update-data', 'tests')
+                can('update-data', 'tests', { test: false })
+                can(read, 'tests')
               },
               { resolveAction },
             ),
           },
-        );
+        )
 
         assert.deepStrictEqual(
           UpdatedItem,
           { [id]: item[id], test: false, userId: 1 },
           `updated item correctly for read: '${read}'`,
-        );
+        )
       }
-    });
-  });
-};
+    })
+  })
+}

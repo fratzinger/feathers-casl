@@ -1,15 +1,18 @@
-import _get from "lodash/get.js";
-import _set from "lodash/set.js";
+import _get from 'lodash/get.js'
+import _set from 'lodash/set.js'
 
-import { Forbidden } from "@feathersjs/errors";
+import { Forbidden } from '@feathersjs/errors'
 
-import { getFieldsForConditions, getAvailableFields } from "../../utils";
-import { makeDefaultBaseOptions } from "../common";
+import {
+  getFieldsForConditions,
+  getAvailableFields,
+} from '../../utils/index.js'
+import { makeDefaultBaseOptions } from '../common.js'
 
-import { getItemsIsArray, isMulti, markHookForSkip } from "feathers-utils";
+import { getItemsIsArray, isMulti, markHookForSkip } from 'feathers-utils'
 
-import type { AnyAbility, ForcedSubject } from "@casl/ability";
-import type { Application, HookContext, Params } from "@feathersjs/feathers";
+import type { AnyAbility, ForcedSubject } from '@casl/ability'
+import type { Application, HookContext, Params } from '@feathersjs/feathers'
 
 import type {
   Adapter,
@@ -19,116 +22,116 @@ import type {
   InitOptions,
   Path,
   ThrowUnlessCanOptions,
-} from "../../types";
-import type { Promisable } from "type-fest";
-import { getMethodName } from "../../utils/getMethodName";
+} from '../../types.js'
+import type { Promisable } from 'type-fest'
+import { getMethodName } from '../../utils/getMethodName'
 
-declare module "@feathersjs/feathers" {
+declare module '@feathersjs/feathers' {
   interface Params {
-    ability?: AnyAbility;
+    ability?: AnyAbility
   }
 }
 
-export const HOOKNAME = "authorize";
+export const HOOKNAME = 'authorize'
 
 export const makeOptions = <A extends Application = Application>(
   app: A,
   options?: Partial<AuthorizeHookOptions>,
 ): AuthorizeHookOptions => {
-  options = options || {};
+  options = options || {}
   return Object.assign(
     makeDefaultBaseOptions(),
     defaultOptions,
     getAppOptions(app),
     options,
-  );
-};
+  )
+}
 
 const defaultOptions: AuthorizeHookOptionsExclusive<HookContext> = {
   adapter: undefined,
   availableFields: (context): string[] => {
     const availableFields: string[] | ((context: HookContext) => string[]) =
-      context.service.options?.casl?.availableFields;
-    return getAvailableFields(context, { availableFields });
+      context.service.options?.casl?.availableFields
+    return getAvailableFields(context, { availableFields })
   },
   usePatchData: false,
   useUpdateData: false,
-};
+}
 
 export const makeDefaultOptions = (
   options?: Partial<AuthorizeHookOptions>,
 ): AuthorizeHookOptions => {
-  return Object.assign(makeDefaultBaseOptions(), defaultOptions, options);
-};
+  return Object.assign(makeDefaultBaseOptions(), defaultOptions, options)
+}
 
 const getAppOptions = (
   app: Application,
 ): AuthorizeHookOptions | Record<string, never> => {
-  const caslOptions: InitOptions = app?.get("casl");
+  const caslOptions: InitOptions = app?.get('casl')
   return caslOptions && caslOptions.authorizeHook
     ? caslOptions.authorizeHook
-    : {};
-};
+    : {}
+}
 
 export const getAdapter = (
   app: Application,
-  options: Pick<AuthorizeHookOptions, "adapter">,
+  options: Pick<AuthorizeHookOptions, 'adapter'>,
 ): Adapter => {
   if (options.adapter) {
-    return options.adapter;
+    return options.adapter
   }
-  const caslAppOptions = app?.get("casl") as InitOptions;
+  const caslAppOptions = app?.get('casl') as InitOptions
   if (caslAppOptions?.defaultAdapter) {
-    return caslAppOptions.defaultAdapter;
+    return caslAppOptions.defaultAdapter
   }
-  return "@feathersjs/memory";
-};
+  return '@feathersjs/memory'
+}
 
 export const getAbility = (
   context: HookContext,
   options?: Pick<
     HookBaseOptions,
-    "ability" | "checkAbilityForInternal" | "method"
+    'ability' | 'checkAbilityForInternal' | 'method'
   >,
 ): Promise<AnyAbility | undefined> => {
-  const method = getMethodName(context, options);
+  const method = getMethodName(context, options)
 
   // if params.ability is set, return it over options.ability
   if (context?.params?.ability) {
-    if (typeof context.params.ability === "function") {
-      const ability = context.params.ability(context);
-      return Promise.resolve(ability);
+    if (typeof context.params.ability === 'function') {
+      const ability = context.params.ability(context)
+      return Promise.resolve(ability)
     } else {
-      return Promise.resolve(context.params.ability);
+      return Promise.resolve(context.params.ability)
     }
   }
 
-  const persistedAbility = getPersistedConfig(context, "ability");
+  const persistedAbility = getPersistedConfig(context, 'ability')
 
   if (persistedAbility) {
-    if (typeof persistedAbility === "function") {
-      const ability = persistedAbility(context);
-      return Promise.resolve(ability);
+    if (typeof persistedAbility === 'function') {
+      const ability = persistedAbility(context)
+      return Promise.resolve(ability)
     } else {
-      return Promise.resolve(persistedAbility);
+      return Promise.resolve(persistedAbility)
     }
   }
 
   if (!options?.checkAbilityForInternal && !context.params?.provider) {
-    return Promise.resolve(undefined);
+    return Promise.resolve(undefined)
   }
 
   if (options?.ability) {
-    if (typeof options.ability === "function") {
-      const ability = options.ability(context);
-      return Promise.resolve(ability);
+    if (typeof options.ability === 'function') {
+      const ability = options.ability(context)
+      return Promise.resolve(ability)
     } else {
-      return Promise.resolve(options.ability);
+      return Promise.resolve(options.ability)
     }
   }
 
-  throw new Forbidden(`You're not allowed to ${method} on '${context.path}'`);
-};
+  throw new Forbidden(`You're not allowed to ${method} on '${context.path}'`)
+}
 
 export const throwUnlessCan = <T extends ForcedSubject<string>>(
   ability: AnyAbility,
@@ -138,41 +141,41 @@ export const throwUnlessCan = <T extends ForcedSubject<string>>(
   options: Partial<ThrowUnlessCanOptions>,
 ): boolean => {
   if (ability.cannot(method, resource)) {
-    if (options.actionOnForbidden) options.actionOnForbidden();
+    if (options.actionOnForbidden) options.actionOnForbidden()
     if (!options.skipThrow) {
-      throw new Forbidden(`You are not allowed to ${method} ${modelName}`);
+      throw new Forbidden(`You are not allowed to ${method} ${modelName}`)
     }
-    return false;
+    return false
   }
-  return true;
-};
+  return true
+}
 
 export const refetchItems = async (
   context: HookContext,
   params?: Params,
 ): Promise<unknown[] | undefined> => {
   if (!context.result) {
-    return;
+    return
   }
-  const { items } = getItemsIsArray(context, { from: "result" });
+  const { items } = getItemsIsArray(context, { from: 'result' })
 
   if (!items) {
-    return;
+    return
   }
 
-  const idField = context.service.options?.id;
-  const ids = items.map((item) => item[idField]);
+  const idField = context.service.options?.id
+  const ids = items.map((item) => item[idField])
 
-  params = Object.assign({}, params, { paginate: false });
+  params = Object.assign({}, params, { paginate: false })
 
-  markHookForSkip(HOOKNAME, "all", { params } as any);
-  delete params.ability;
+  markHookForSkip(HOOKNAME, 'all', { params } as any)
+  delete params.ability
 
-  const query = Object.assign({}, params.query, { [idField]: { $in: ids } });
-  params = Object.assign({}, params, { query });
+  const query = Object.assign({}, params.query, { [idField]: { $in: ids } })
+  params = Object.assign({}, params, { query })
 
-  return await context.service.find(params);
-};
+  return await context.service.find(params)
+}
 
 export const getConditionalSelect = (
   $select: string[],
@@ -181,70 +184,70 @@ export const getConditionalSelect = (
   modelName: string,
 ): undefined | string[] => {
   if (!$select?.length) {
-    return undefined;
+    return undefined
   }
-  const fields = getFieldsForConditions(ability, method, modelName);
+  const fields = getFieldsForConditions(ability, method, modelName)
   if (!fields.length) {
-    return undefined;
+    return undefined
   }
 
-  const fieldsToAdd = fields.filter((field) => !$select.includes(field));
+  const fieldsToAdd = fields.filter((field) => !$select.includes(field))
   if (!fieldsToAdd.length) {
-    return undefined;
+    return undefined
   }
-  return [...$select, ...fieldsToAdd];
-};
+  return [...$select, ...fieldsToAdd]
+}
 
 export const checkMulti = (
   context: HookContext,
   ability: AnyAbility,
   modelName: string,
-  options?: Pick<AuthorizeHookOptions, "actionOnForbidden" | "method">,
+  options?: Pick<AuthorizeHookOptions, 'actionOnForbidden' | 'method'>,
 ): boolean => {
-  const method = getMethodName(context, options);
-  const currentIsMulti = isMulti(context);
+  const method = getMethodName(context, options)
+  const currentIsMulti = isMulti(context)
   if (!currentIsMulti) {
-    return true;
+    return true
   }
   if (
-    (method === "find" && ability.can(method, modelName)) ||
+    (method === 'find' && ability.can(method, modelName)) ||
     ability.can(`${method}-multi`, modelName)
   ) {
-    return true;
+    return true
   }
 
-  if (options?.actionOnForbidden) options.actionOnForbidden();
-  throw new Forbidden(`You're not allowed to multi-${method} ${modelName}`);
-};
+  if (options?.actionOnForbidden) options.actionOnForbidden()
+  throw new Forbidden(`You're not allowed to multi-${method} ${modelName}`)
+}
 
 export const setPersistedConfig = (
   context: HookContext,
   key: Path,
   val: unknown,
 ): HookContext => {
-  return _set(context, `params.casl.${key}`, val);
-};
+  return _set(context, `params.casl.${key}`, val)
+}
 
 export function getPersistedConfig(
   context: HookContext,
-  key: "ability",
+  key: 'ability',
 ):
   | AnyAbility
   | ((context: HookContext) => Promisable<AnyAbility | undefined>)
-  | undefined;
+  | undefined
 export function getPersistedConfig(
   context: HookContext,
-  key: "skipRestrictingRead.conditions",
-): boolean;
+  key: 'skipRestrictingRead.conditions',
+): boolean
 export function getPersistedConfig(
   context: HookContext,
-  key: "skipRestrictingRead.fields",
-): boolean;
+  key: 'skipRestrictingRead.fields',
+): boolean
 export function getPersistedConfig(
   context: HookContext,
-  key: "madeBasicCheck",
-): boolean;
+  key: 'madeBasicCheck',
+): boolean
 
 export function getPersistedConfig(context: HookContext, key: Path): any {
-  return _get(context, `params.casl.${key}`);
+  return _get(context, `params.casl.${key}`)
 }

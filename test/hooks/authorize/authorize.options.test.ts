@@ -1,33 +1,33 @@
-import assert from "node:assert";
-import { feathers } from "@feathersjs/feathers";
-import { MemoryService } from "@feathersjs/memory";
-import type { AnyMongoAbility } from "@casl/ability";
-import { defineAbility } from "@casl/ability";
+import assert from 'node:assert'
+import { feathers } from '@feathersjs/feathers'
+import { MemoryService } from '@feathersjs/memory'
+import type { AnyMongoAbility } from '@casl/ability'
+import { defineAbility } from '@casl/ability'
 
-import type { Application, HookContext } from "@feathersjs/feathers";
+import type { Application, HookContext } from '@feathersjs/feathers'
 
-import { authorize } from "../../../src";
-import { resolveAction } from "../../test-utils";
+import { authorize } from '../../../src/index.js'
+import { resolveAction } from '../../test-utils.js'
 
-declare module "@feathersjs/adapter-commons" {
+declare module '@feathersjs/adapter-commons' {
   interface AdapterParams {
-    ability?: AnyMongoAbility;
+    ability?: AnyMongoAbility
     casl?: {
-      ability: AnyMongoAbility | (() => AnyMongoAbility);
-    };
+      ability: AnyMongoAbility | (() => AnyMongoAbility)
+    }
   }
 }
 
-describe("authorize.options.test.ts", function () {
-  type TestApplication = Application<{ tests: MemoryService }>;
-  let app: TestApplication;
-  let service: MemoryService;
+describe('authorize.options.test.ts', function () {
+  type TestApplication = Application<{ tests: MemoryService }>
+  let app: TestApplication
+  let service: MemoryService
 
-  describe("checkMultiActions", function () {
+  describe('checkMultiActions', function () {
     beforeEach(function () {
-      app = feathers();
+      app = feathers()
       app.use(
-        "tests",
+        'tests',
         new MemoryService({
           multi: true,
           paginate: {
@@ -35,8 +35,8 @@ describe("authorize.options.test.ts", function () {
             max: 50,
           },
         }),
-      );
-      service = app.service("tests");
+      )
+      service = app.service('tests')
 
       service.hooks({
         before: {
@@ -45,19 +45,19 @@ describe("authorize.options.test.ts", function () {
         after: {
           all: [authorize({ checkMultiActions: true })],
         },
-      });
-    });
+      })
+    })
 
-    it("passes multi if explicitly defined", async function () {
+    it('passes multi if explicitly defined', async function () {
       const methods = [
         {
-          method: "create",
+          method: 'create',
           params: [
             [{ id: 0 }, { id: 1 }],
             {
               ability: defineAbility(
                 (can) => {
-                  can(["create-multi", "create"], "tests");
+                  can(['create-multi', 'create'], 'tests')
                 },
                 { resolveAction },
               ),
@@ -65,7 +65,7 @@ describe("authorize.options.test.ts", function () {
           ],
         },
         {
-          method: "patch",
+          method: 'patch',
           params: [
             null,
             { test: true },
@@ -73,7 +73,7 @@ describe("authorize.options.test.ts", function () {
               query: { userId: 1 },
               ability: defineAbility(
                 (can) => {
-                  can(["patch-multi", "patch"], "tests");
+                  can(['patch-multi', 'patch'], 'tests')
                 },
                 { resolveAction },
               ),
@@ -81,37 +81,37 @@ describe("authorize.options.test.ts", function () {
           ],
         },
         {
-          method: "remove",
+          method: 'remove',
           params: [
             null,
             {
               query: { userId: 1 },
               ability: defineAbility(
                 (can) => {
-                  can(["remove-multi", "remove"], "tests");
+                  can(['remove-multi', 'remove'], 'tests')
                 },
                 { resolveAction },
               ),
             },
           ],
         },
-      ];
+      ]
       methods.forEach(async ({ method, params }) => {
-        const result = await service[method](...params);
-        assert.ok(result, "passes request");
-      });
-    });
+        const result = await service[method](...params)
+        assert.ok(result, 'passes request')
+      })
+    })
 
-    it("rejects multi if not defined", async function () {
+    it('rejects multi if not defined', async function () {
       const methods = [
         {
-          method: "create",
+          method: 'create',
           params: [
             [{ id: 0 }, { id: 1 }],
             {
               ability: defineAbility(
                 (can) => {
-                  can(["create"], "tests");
+                  can(['create'], 'tests')
                 },
                 { resolveAction },
               ),
@@ -119,7 +119,7 @@ describe("authorize.options.test.ts", function () {
           ],
         },
         {
-          method: "patch",
+          method: 'patch',
           params: [
             null,
             { test: true },
@@ -127,7 +127,7 @@ describe("authorize.options.test.ts", function () {
               query: { userId: 1 },
               ability: defineAbility(
                 (can) => {
-                  can(["patch"], "tests");
+                  can(['patch'], 'tests')
                 },
                 { resolveAction },
               ),
@@ -135,37 +135,37 @@ describe("authorize.options.test.ts", function () {
           ],
         },
         {
-          method: "remove",
+          method: 'remove',
           params: [
             null,
             {
               query: { userId: 1 },
               ability: defineAbility(
                 (can) => {
-                  can(["remove"], "tests");
+                  can(['remove'], 'tests')
                 },
                 { resolveAction },
               ),
             },
           ],
         },
-      ];
+      ]
       methods.forEach(async ({ method, params }) => {
-        const promise = service[method](...params);
+        const promise = service[method](...params)
         await assert.rejects(
           promise,
-          (err: Error) => err.name === "Forbidden",
+          (err: Error) => err.name === 'Forbidden',
           "rejects because 'method-multi' not defined",
-        );
-      });
-    });
-  });
+        )
+      })
+    })
+  })
 
-  describe("modelName", function () {
-    it("use service.modelName with string", async function () {
-      const app: TestApplication = feathers();
+  describe('modelName', function () {
+    it('use service.modelName with string', async function () {
+      const app: TestApplication = feathers()
       app.use(
-        "tests",
+        'tests',
         new MemoryService({
           multi: true,
           paginate: {
@@ -173,10 +173,10 @@ describe("authorize.options.test.ts", function () {
             max: 50,
           },
         }),
-      );
-      service = app.service("tests");
+      )
+      service = app.service('tests')
 
-      service.modelName = "Test";
+      service.modelName = 'Test'
 
       service.hooks({
         before: {
@@ -184,32 +184,32 @@ describe("authorize.options.test.ts", function () {
             authorize({
               ability: defineAbility(
                 (can) => {
-                  can("create", "Test");
+                  can('create', 'Test')
                 },
                 { resolveAction },
               ),
-              modelName: "Test",
+              modelName: 'Test',
               checkAbilityForInternal: true,
             }),
           ],
         },
-      });
+      })
 
-      const result = await service.create({ id: 0, test: true });
-      assert.ok(result);
+      const result = await service.create({ id: 0, test: true })
+      assert.ok(result)
       await assert.rejects(
         () => {
-          return service.update(0, { test: false });
+          return service.update(0, { test: false })
         },
-        (err: Error) => err.name === "Forbidden",
-        "update throws Forbidden",
-      );
-    });
+        (err: Error) => err.name === 'Forbidden',
+        'update throws Forbidden',
+      )
+    })
 
-    it("use service.modelName with function", async function () {
-      const app: TestApplication = feathers();
+    it('use service.modelName with function', async function () {
+      const app: TestApplication = feathers()
       app.use(
-        "tests",
+        'tests',
         new MemoryService({
           multi: true,
           paginate: {
@@ -217,10 +217,10 @@ describe("authorize.options.test.ts", function () {
             max: 50,
           },
         }),
-      );
-      service = app.service("tests");
+      )
+      service = app.service('tests')
 
-      service.modelName = "Test";
+      service.modelName = 'Test'
 
       service.hooks({
         before: {
@@ -228,7 +228,7 @@ describe("authorize.options.test.ts", function () {
             authorize({
               ability: defineAbility(
                 (can) => {
-                  can("create", "Test");
+                  can('create', 'Test')
                 },
                 { resolveAction },
               ),
@@ -237,25 +237,25 @@ describe("authorize.options.test.ts", function () {
             }),
           ],
         },
-      });
+      })
 
-      const result = await service.create({ id: 0, test: true });
-      assert.ok(result);
+      const result = await service.create({ id: 0, test: true })
+      assert.ok(result)
       await assert.rejects(
         () => {
-          return service.update(0, { test: false });
+          return service.update(0, { test: false })
         },
-        (err: Error) => err.name === "Forbidden",
-        "update throws Forbidden",
-      );
-    });
-  });
+        (err: Error) => err.name === 'Forbidden',
+        'update throws Forbidden',
+      )
+    })
+  })
 
-  describe("ability", function () {
-    it("works if no ability is set at all", async function () {
-      const app: TestApplication = feathers();
+  describe('ability', function () {
+    it('works if no ability is set at all', async function () {
+      const app: TestApplication = feathers()
       app.use(
-        "tests",
+        'tests',
         new MemoryService({
           multi: true,
           paginate: {
@@ -263,23 +263,23 @@ describe("authorize.options.test.ts", function () {
             max: 50,
           },
         }),
-      );
-      service = app.service("tests");
+      )
+      service = app.service('tests')
 
       service.hooks({
         before: {
           all: [authorize()],
         },
-      });
+      })
 
-      const item = await service.create({ test: true });
-      assert.ok(item.test, "item was created");
-    });
+      const item = await service.create({ test: true })
+      assert.ok(item.test, 'item was created')
+    })
 
-    it("uses ability in options", async function () {
-      const app: TestApplication = feathers();
+    it('uses ability in options', async function () {
+      const app: TestApplication = feathers()
       app.use(
-        "tests",
+        'tests',
         new MemoryService({
           multi: true,
           paginate: {
@@ -287,8 +287,8 @@ describe("authorize.options.test.ts", function () {
             max: 50,
           },
         }),
-      );
-      service = app.service("tests");
+      )
+      service = app.service('tests')
 
       service.hooks({
         before: {
@@ -299,19 +299,19 @@ describe("authorize.options.test.ts", function () {
             }),
           ],
         },
-      });
+      })
 
       await assert.rejects(
         service.create({ test: true }),
-        (err: Error) => err.name === "Forbidden",
-        "throws even if no ability is set in params",
-      );
-    });
+        (err: Error) => err.name === 'Forbidden',
+        'throws even if no ability is set in params',
+      )
+    })
 
-    it("uses params.ability over options.ability", async function () {
-      const app: TestApplication = feathers();
+    it('uses params.ability over options.ability', async function () {
+      const app: TestApplication = feathers()
       app.use(
-        "tests",
+        'tests',
         new MemoryService({
           multi: true,
           paginate: {
@@ -319,8 +319,8 @@ describe("authorize.options.test.ts", function () {
             max: 50,
           },
         }),
-      );
-      service = app.service("tests");
+      )
+      service = app.service('tests')
 
       service.hooks({
         before: {
@@ -330,25 +330,25 @@ describe("authorize.options.test.ts", function () {
             }),
           ],
         },
-      });
+      })
 
       const params = {
         ability: defineAbility(
           (can) => {
-            can("manage", "all");
+            can('manage', 'all')
           },
           { resolveAction },
         ),
-      };
+      }
 
-      const result = await service.create({ test: true }, params);
-      assert.ok(result);
-    });
+      const result = await service.create({ test: true }, params)
+      assert.ok(result)
+    })
 
-    it("uses ability as Promise", async function () {
-      const app: TestApplication = feathers();
+    it('uses ability as Promise', async function () {
+      const app: TestApplication = feathers()
       app.use(
-        "tests",
+        'tests',
         new MemoryService({
           multi: true,
           paginate: {
@@ -356,8 +356,8 @@ describe("authorize.options.test.ts", function () {
             max: 50,
           },
         }),
-      );
-      service = app.service("tests");
+      )
+      service = app.service('tests')
 
       service.hooks({
         before: {
@@ -366,7 +366,7 @@ describe("authorize.options.test.ts", function () {
               ability: Promise.resolve(
                 defineAbility(
                   (can) => {
-                    can("manage", "all");
+                    can('manage', 'all')
                   },
                   { resolveAction },
                 ),
@@ -374,16 +374,16 @@ describe("authorize.options.test.ts", function () {
             }),
           ],
         },
-      });
+      })
 
-      const result = await service.create({ test: true });
-      assert.ok(result);
-    });
+      const result = await service.create({ test: true })
+      assert.ok(result)
+    })
 
-    it("uses ability as function", async function () {
-      const app: TestApplication = feathers();
+    it('uses ability as function', async function () {
+      const app: TestApplication = feathers()
       app.use(
-        "tests",
+        'tests',
         new MemoryService({
           multi: true,
           paginate: {
@@ -391,8 +391,8 @@ describe("authorize.options.test.ts", function () {
             max: 50,
           },
         }),
-      );
-      service = app.service("tests");
+      )
+      service = app.service('tests')
 
       service.hooks({
         before: {
@@ -401,23 +401,23 @@ describe("authorize.options.test.ts", function () {
               ability: () =>
                 defineAbility(
                   (can) => {
-                    can("manage", "all");
+                    can('manage', 'all')
                   },
                   { resolveAction },
                 ),
             }),
           ],
         },
-      });
+      })
 
-      const result = await service.create({ test: true });
-      assert.ok(result);
-    });
+      const result = await service.create({ test: true })
+      assert.ok(result)
+    })
 
-    it("uses ability as Promise", async function () {
-      const app: TestApplication = feathers();
+    it('uses ability as Promise', async function () {
+      const app: TestApplication = feathers()
       app.use(
-        "tests",
+        'tests',
         new MemoryService({
           multi: true,
           paginate: {
@@ -425,8 +425,8 @@ describe("authorize.options.test.ts", function () {
             max: 50,
           },
         }),
-      );
-      service = app.service("tests");
+      )
+      service = app.service('tests')
 
       service.hooks({
         before: {
@@ -436,25 +436,25 @@ describe("authorize.options.test.ts", function () {
                 return Promise.resolve(
                   defineAbility(
                     (can) => {
-                      can("manage", "all");
+                      can('manage', 'all')
                     },
                     { resolveAction },
                   ),
-                );
+                )
               },
             }),
           ],
         },
-      });
+      })
 
-      const result = await service.create({ test: true });
-      assert.ok(result);
-    });
+      const result = await service.create({ test: true })
+      assert.ok(result)
+    })
 
     it("uses persisted ability from 'context.params.casl.ability'", async function () {
-      const app = feathers();
+      const app = feathers()
       app.use(
-        "tests",
+        'tests',
         new MemoryService({
           multi: true,
           paginate: {
@@ -462,17 +462,17 @@ describe("authorize.options.test.ts", function () {
             max: 50,
           },
         }),
-      );
+      )
 
-      service = app.service("tests");
+      service = app.service('tests')
 
       service.hooks({
         before: {
           all: [authorize()],
         },
-      });
+      })
 
-      await assert.doesNotReject(service.create({ test: true }));
+      await assert.doesNotReject(service.create({ test: true }))
 
       await assert.rejects(
         service.create(
@@ -483,15 +483,15 @@ describe("authorize.options.test.ts", function () {
             },
           },
         ),
-        (err: Error) => err.name === "Forbidden",
-        "throws Forbidden",
-      );
-    });
+        (err: Error) => err.name === 'Forbidden',
+        'throws Forbidden',
+      )
+    })
 
     it("uses persisted ability as function from 'context.params.casl.ability'", async function () {
-      const app = feathers();
+      const app = feathers()
       app.use(
-        "tests",
+        'tests',
         new MemoryService({
           multi: true,
           paginate: {
@@ -499,17 +499,17 @@ describe("authorize.options.test.ts", function () {
             max: 50,
           },
         }),
-      );
+      )
 
-      service = app.service("tests");
+      service = app.service('tests')
 
       service.hooks({
         before: {
           all: [authorize()],
         },
-      });
+      })
 
-      await assert.doesNotReject(service.create({ test: true }));
+      await assert.doesNotReject(service.create({ test: true }))
 
       await assert.rejects(
         service.create(
@@ -520,15 +520,15 @@ describe("authorize.options.test.ts", function () {
             },
           },
         ),
-        (err: Error) => err.name === "Forbidden",
-        "throws Forbidden",
-      );
-    });
+        (err: Error) => err.name === 'Forbidden',
+        'throws Forbidden',
+      )
+    })
 
-    it("fails for empty ability in options", async function () {
+    it('fails for empty ability in options', async function () {
       const makeContext = (method, type) => {
         return {
-          path: "tests",
+          path: 'tests',
           method,
           type,
           data: {
@@ -539,39 +539,39 @@ describe("authorize.options.test.ts", function () {
           params: {
             query: {},
           },
-        };
-      };
+        }
+      }
 
-      const types = ["before"];
-      const methods = ["find", "get", "create", "update", "patch", "remove"];
-      const promises: Promise<any>[] = [];
+      const types = ['before']
+      const methods = ['find', 'get', 'create', 'update', 'patch', 'remove']
+      const promises: Promise<any>[] = []
       types.forEach((type) => {
         methods.forEach((method) => {
-          const context = makeContext(method, type);
+          const context = makeContext(method, type)
 
           const promise = assert.rejects(
             authorize({
-              availableFields: ["id", "userId", "test"],
+              availableFields: ['id', 'userId', 'test'],
 
               ability: () => defineAbility(() => {}, { resolveAction }),
               checkAbilityForInternal: true,
             })(context),
-            (err: Error) => err.name === "Forbidden",
+            (err: Error) => err.name === 'Forbidden',
             `'${type}:${method}' throws Forbidden`,
-          );
-          promises.push(promise);
-        });
-      });
-      await Promise.all(promises);
-    });
+          )
+          promises.push(promise)
+        })
+      })
+      await Promise.all(promises)
+    })
 
-    it("fails for not defined ability on external", async function () {
+    it('fails for not defined ability on external', async function () {
       const makeContext = (
-        method: "find" | "get" | "create" | "update" | "patch" | "remove",
-        type: "before" | "after",
+        method: 'find' | 'get' | 'create' | 'update' | 'patch' | 'remove',
+        type: 'before' | 'after',
       ): HookContext => {
         return {
-          path: "tests",
+          path: 'tests',
           method,
           type,
           data: {
@@ -580,43 +580,43 @@ describe("authorize.options.test.ts", function () {
             test: true,
           },
           params: {
-            provider: "rest",
+            provider: 'rest',
             query: {},
           },
-        } as unknown as HookContext;
-      };
+        } as unknown as HookContext
+      }
 
-      const types: ("before" | "after")[] = ["before"];
+      const types: ('before' | 'after')[] = ['before']
       const methods: (
-        | "find"
-        | "get"
-        | "create"
-        | "update"
-        | "patch"
-        | "remove"
-      )[] = ["find", "get", "create", "update", "patch", "remove"];
-      const promises: Promise<any>[] = [];
+        | 'find'
+        | 'get'
+        | 'create'
+        | 'update'
+        | 'patch'
+        | 'remove'
+      )[] = ['find', 'get', 'create', 'update', 'patch', 'remove']
+      const promises: Promise<any>[] = []
       types.forEach((type) => {
         methods.forEach((method) => {
-          const context = makeContext(method, type);
+          const context = makeContext(method, type)
 
           const promise = assert.rejects(
             authorize()(context),
-            (err: Error) => err.name === "Forbidden",
+            (err: Error) => err.name === 'Forbidden',
             `'${type}:${method}' throws Forbidden`,
-          );
-          promises.push(promise);
-        });
-      });
-      await Promise.all(promises);
-    });
-  });
+          )
+          promises.push(promise)
+        })
+      })
+      await Promise.all(promises)
+    })
+  })
 
-  describe("checkAbilityForInternal", function () {
-    it("passes for internal call without params.ability and not allowed options.params by default", async function () {
-      const app: TestApplication = feathers();
+  describe('checkAbilityForInternal', function () {
+    it('passes for internal call without params.ability and not allowed options.params by default', async function () {
+      const app: TestApplication = feathers()
       app.use(
-        "tests",
+        'tests',
         new MemoryService({
           multi: true,
           paginate: {
@@ -624,8 +624,8 @@ describe("authorize.options.test.ts", function () {
             max: 50,
           },
         }),
-      );
-      service = app.service("tests");
+      )
+      service = app.service('tests')
 
       service.hooks({
         before: {
@@ -635,18 +635,18 @@ describe("authorize.options.test.ts", function () {
             }),
           ],
         },
-      });
+      })
 
       await assert.doesNotReject(
         service.create({ test: true }),
-        "does not throw Forbidden",
-      );
-    });
+        'does not throw Forbidden',
+      )
+    })
 
-    it("throws for external call without params.ability and not allowed options.params by default", async function () {
-      const app: TestApplication = feathers();
+    it('throws for external call without params.ability and not allowed options.params by default', async function () {
+      const app: TestApplication = feathers()
       app.use(
-        "tests",
+        'tests',
         new MemoryService({
           multi: true,
           paginate: {
@@ -654,8 +654,8 @@ describe("authorize.options.test.ts", function () {
             max: 50,
           },
         }),
-      );
-      service = app.service("tests");
+      )
+      service = app.service('tests')
 
       service.hooks({
         before: {
@@ -665,19 +665,19 @@ describe("authorize.options.test.ts", function () {
             }),
           ],
         },
-      });
+      })
 
       await assert.rejects(
-        service.create({ test: true }, { provider: "rest" }),
-        (err: Error) => err.name === "Forbidden",
-        "request throws Forbidden",
-      );
-    });
+        service.create({ test: true }, { provider: 'rest' }),
+        (err: Error) => err.name === 'Forbidden',
+        'request throws Forbidden',
+      )
+    })
 
-    it("throws for internal call without params.ability and not allowed options.params with checkAbilityForInternal: true", async function () {
-      const app: TestApplication = feathers();
+    it('throws for internal call without params.ability and not allowed options.params with checkAbilityForInternal: true', async function () {
+      const app: TestApplication = feathers()
       app.use(
-        "tests",
+        'tests',
         new MemoryService({
           multi: true,
           paginate: {
@@ -685,8 +685,8 @@ describe("authorize.options.test.ts", function () {
             max: 50,
           },
         }),
-      );
-      service = app.service("tests");
+      )
+      service = app.service('tests')
 
       service.hooks({
         before: {
@@ -697,13 +697,13 @@ describe("authorize.options.test.ts", function () {
             }),
           ],
         },
-      });
+      })
 
       await assert.rejects(
         service.create({ test: true }),
-        (err: Error) => err.name === "Forbidden",
-        "request throws Forbidden",
-      );
-    });
-  });
-});
+        (err: Error) => err.name === 'Forbidden',
+        'request throws Forbidden',
+      )
+    })
+  })
+})

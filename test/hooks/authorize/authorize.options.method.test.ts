@@ -1,49 +1,49 @@
-import { MemoryService } from "@feathersjs/memory";
-import { filterArray } from "feathers-utils";
-import { authorize, type ServiceCaslOptions } from "../../../src";
-import { feathers } from "@feathersjs/feathers";
-import { defineAbility } from "@casl/ability";
-import { resolveAction } from "../../test-utils";
+import { MemoryService } from '@feathersjs/memory'
+import { filterArray } from 'feathers-utils'
+import { authorize, type ServiceCaslOptions } from '../../../src/index.js'
+import { feathers } from '@feathersjs/feathers'
+import { defineAbility } from '@casl/ability'
+import { resolveAction } from '../../test-utils.js'
 
-declare module "@feathersjs/memory" {
+declare module '@feathersjs/memory' {
   interface MemoryServiceOptions {
-    casl?: ServiceCaslOptions;
+    casl?: ServiceCaslOptions
   }
 }
 
 class CustomService extends MemoryService {
   sum(data: any, params: any) {
-    return this.find(params);
+    return this.find(params)
   }
 }
 
-describe("authorize.options.method", () => {
-  it("should work", async () => {
+describe('authorize.options.method', () => {
+  it('should work', async () => {
     const app = feathers<{
-      tests: CustomService;
-    }>();
+      tests: CustomService
+    }>()
 
-    const id = "id";
+    const id = 'id'
 
     app.use(
-      "tests",
+      'tests',
       new CustomService({
         id,
         multi: true,
         startId: 1,
         filters: {
-          ...filterArray("$nor"),
+          ...filterArray('$nor'),
         },
-        operators: ["$nor"],
+        operators: ['$nor'],
         casl: {
           availableFields: [
-            "id",
-            "userId",
-            "hi",
-            "test",
-            "published",
-            "supersecret",
-            "hidden",
+            'id',
+            'userId',
+            'hi',
+            'test',
+            'published',
+            'supersecret',
+            'hidden',
           ],
         },
         paginate: {
@@ -52,16 +52,16 @@ describe("authorize.options.method", () => {
         },
       }),
       {
-        methods: ["find", "get", "create", "update", "patch", "remove", "sum"],
+        methods: ['find', 'get', 'create', 'update', 'patch', 'remove', 'sum'],
       },
-    );
+    )
 
     const hook = authorize({
-      method: "find",
-      adapter: "@feathersjs/memory",
-    });
+      method: 'find',
+      adapter: '@feathersjs/memory',
+    })
 
-    const service = app.service("tests");
+    const service = app.service('tests')
 
     service.hooks({
       before: {
@@ -70,28 +70,28 @@ describe("authorize.options.method", () => {
       after: {
         sum: [hook],
       },
-    });
+    })
 
-    const item1 = await service.create({ test: true, userId: 1 });
-    await service.create({ test: true, userId: 2 });
-    await service.create({ test: true, userId: 3 });
-    const items = await service.find({ paginate: false });
-    assert.strictEqual(items.length, 3, "has three items");
+    const item1 = await service.create({ test: true, userId: 1 })
+    await service.create({ test: true, userId: 2 })
+    await service.create({ test: true, userId: 3 })
+    const items = await service.find({ paginate: false })
+    assert.strictEqual(items.length, 3, 'has three items')
 
     const returnedItems = (await service.sum(null, {
       ability: defineAbility(
         (can) => {
-          can("read", "tests", { userId: 1 });
+          can('read', 'tests', { userId: 1 })
         },
         { resolveAction },
       ),
       paginate: false,
-    })) as any as any[];
+    })) as any as any[]
 
     assert.deepStrictEqual(
       returnedItems,
       [{ [id]: item1[id], test: true, userId: 1 }],
-      "just returned one item",
-    );
-  });
-});
+      'just returned one item',
+    )
+  })
+})

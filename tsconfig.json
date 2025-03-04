@@ -1,12 +1,9 @@
 {
+  "extends": "@tsconfig/node22/tsconfig.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "esModuleInterop": true,
-    "strict": true,
+    "resolveJsonModule": true,
     "types": ["vitest/globals"]
   },
-  "include": ["src/**/*", "test/**/*"],
+  "include": ["src/**/*", "test/**/*", "vite.config.ts", "build.config.ts", "docs/.vitepress/**/*"],
   "exclude": ["node_modules"]
 }

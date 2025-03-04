@@ -1,18 +1,18 @@
-import { MongoMemoryServer } from "mongodb-memory-server";
-import mongoose from "mongoose";
-import { Service } from "feathers-mongoose";
-mongoose.Promise = global.Promise;
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import mongoose from 'mongoose'
+import { Service } from 'feathers-mongoose'
+mongoose.Promise = global.Promise
 
-import makeTests from "./makeTests";
-import { getItemsIsArray } from "feathers-utils";
-import type { ServiceCaslOptions } from "../../../../src";
-import type { HookContext } from "@feathersjs/feathers";
+import makeTests from './makeTests/index.js'
+import { getItemsIsArray } from 'feathers-utils'
+import type { ServiceCaslOptions } from '../../../../src/index.js'
+import type { HookContext } from '@feathersjs/feathers'
 
-let Model;
+let Model
 
-declare module "feathers-mongoose" {
+declare module 'feathers-mongoose' {
   interface MongooseServiceOptions {
-    casl: ServiceCaslOptions;
+    casl: ServiceCaslOptions
   }
 }
 
@@ -21,50 +21,50 @@ const makeService = () => {
     Model,
     multi: true,
     lean: true,
-    whitelist: ["$nor"],
+    whitelist: ['$nor'],
     casl: {
       availableFields: [
-        "id",
-        "userId",
-        "hi",
-        "test",
-        "published",
-        "supersecret",
-        "hidden",
+        'id',
+        'userId',
+        'hi',
+        'test',
+        'published',
+        'supersecret',
+        'hidden',
       ],
     },
     paginate: {
       default: 10,
       max: 50,
     },
-  });
-};
+  })
+}
 
 const afterHooks = [
   (context: HookContext) => {
-    const { items } = getItemsIsArray(context);
+    const { items } = getItemsIsArray(context)
 
     items.forEach((item) => {
-      delete item.__v;
-    });
+      delete item.__v
+    })
   },
-];
+]
 
 makeTests(
-  "feathers-mongoose",
+  'feathers-mongoose',
   makeService,
   async (app, service) => {
-    await service.remove(null);
+    await service.remove(null)
   },
-  { adapter: "feathers-mongoose" },
+  { adapter: 'feathers-mongoose' },
   afterHooks,
   async () => {
-    const server = await MongoMemoryServer.create();
-    const uri = server.getUri();
+    const server = await MongoMemoryServer.create()
+    const uri = server.getUri()
 
-    const client = await mongoose.connect(uri);
+    const client = await mongoose.connect(uri)
 
-    const { Schema } = client;
+    const { Schema } = client
     const schema = new Schema(
       {
         userId: { type: Number },
@@ -77,11 +77,11 @@ makeTests(
       {
         timestamps: false,
       },
-    );
+    )
 
-    if (client.modelNames().includes("tests")) {
-      client.deleteModel("tests");
+    if (client.modelNames().includes('tests')) {
+      client.deleteModel('tests')
     }
-    Model = client.model("tests", schema);
+    Model = client.model('tests', schema)
   },
-);
+)

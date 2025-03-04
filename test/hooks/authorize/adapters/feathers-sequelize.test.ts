@@ -1,16 +1,16 @@
-import { Sequelize, DataTypes, Op } from "sequelize";
-import makeTests from "./makeTests";
-import { SequelizeService } from "feathers-sequelize";
-import { getItemsIsArray, filterArray } from "feathers-utils";
-import type { ServiceCaslOptions } from "../../../../src";
-import type { HookContext } from "@feathersjs/feathers";
+import { Sequelize, DataTypes, Op } from 'sequelize'
+import makeTests from './makeTests/index.js'
+import { SequelizeService } from 'feathers-sequelize'
+import { getItemsIsArray, filterArray } from 'feathers-utils'
+import type { ServiceCaslOptions } from '../../../../src/index.js'
+import type { HookContext } from '@feathersjs/feathers'
 
-const sequelize = new Sequelize("sqlite::memory:", {
+const sequelize = new Sequelize('sqlite::memory:', {
   logging: false,
-});
+})
 
 const Model = sequelize.define(
-  "tests",
+  'tests',
   {
     userId: {
       type: DataTypes.INTEGER,
@@ -34,11 +34,11 @@ const Model = sequelize.define(
   {
     timestamps: false,
   },
-);
+)
 
-declare module "feathers-sequelize" {
+declare module 'feathers-sequelize' {
   interface SequelizeAdapterOptions {
-    casl?: ServiceCaslOptions;
+    casl?: ServiceCaslOptions
   }
 }
 
@@ -50,56 +50,56 @@ const makeService = () => {
       $not: Op.not,
     },
     filters: {
-      ...filterArray("$not"),
+      ...filterArray('$not'),
     },
-    operators: ["$not"],
+    operators: ['$not'],
     casl: {
       availableFields: [
-        "id",
-        "userId",
-        "hi",
-        "test",
-        "published",
-        "supersecret",
-        "hidden",
+        'id',
+        'userId',
+        'hi',
+        'test',
+        'published',
+        'supersecret',
+        'hidden',
       ],
     },
     paginate: {
       default: 10,
       max: 50,
     },
-  });
-};
+  })
+}
 
 const afterHooks = [
   (context: HookContext) => {
-    const { Model } = context.service;
-    const fields = Model.fieldRawAttributesMap;
-    const { items } = getItemsIsArray(context);
+    const { Model } = context.service
+    const fields = Model.fieldRawAttributesMap
+    const { items } = getItemsIsArray(context)
 
     items.forEach((item) => {
-      const keys = Object.keys(item);
+      const keys = Object.keys(item)
       keys.forEach((key) => {
-        const field = fields[key];
+        const field = fields[key]
         if (item[key] === null) {
-          delete item[key];
-          return;
+          delete item[key]
+          return
         }
 
         if (field.type instanceof DataTypes.BOOLEAN) {
-          item[key] = !!item[key];
+          item[key] = !!item[key]
         }
-      });
-    });
+      })
+    })
   },
-];
+]
 
 makeTests(
-  "feathers-sequelize",
+  'feathers-sequelize',
   makeService,
   async () => {
-    await Model.sync({ force: true });
+    await Model.sync({ force: true })
   },
-  { adapter: "feathers-sequelize" },
+  { adapter: 'feathers-sequelize' },
   { afterHooks },
-);
+)

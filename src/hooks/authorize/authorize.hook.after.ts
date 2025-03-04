@@ -1,9 +1,9 @@
-import { replaceItems } from "feathers-hooks-common";
-import { subject } from "@casl/ability";
-import _pick from "lodash/pick.js";
-import _isEmpty from "lodash/isEmpty.js";
+import { replaceItems } from 'feathers-hooks-common'
+import { subject } from '@casl/ability'
+import _pick from 'lodash/pick.js'
+import _isEmpty from 'lodash/isEmpty.js'
 
-import { shouldSkip, mergeArrays, getItemsIsArray } from "feathers-utils";
+import { shouldSkip, mergeArrays, getItemsIsArray } from 'feathers-utils'
 
 import {
   getPersistedConfig,
@@ -12,90 +12,90 @@ import {
   getConditionalSelect,
   refetchItems,
   HOOKNAME,
-} from "./authorize.hook.utils";
+} from './authorize.hook.utils.js'
 
 import {
   getAvailableFields,
   hasRestrictingFields,
   getModelName,
-} from "../../utils";
+} from '../../utils/index.js'
 
-import { Forbidden } from "@feathersjs/errors";
+import { Forbidden } from '@feathersjs/errors'
 
-import type { HookContext } from "@feathersjs/feathers";
+import type { HookContext } from '@feathersjs/feathers'
 import type {
   AuthorizeHookOptions,
   HasRestrictingFieldsOptions,
-} from "../../types";
-import { getMethodName } from "../../utils/getMethodName";
+} from '../../types.js'
+import { getMethodName } from '../../utils/getMethodName.js'
 
 export const authorizeAfter = async <H extends HookContext = HookContext>(
   context: H,
   options: AuthorizeHookOptions,
 ) => {
   if (shouldSkip(HOOKNAME, context, options) || !context.params) {
-    return context;
+    return context
   }
 
   // eslint-disable-next-line prefer-const
-  let { isArray, items } = getItemsIsArray(context, { from: "result" });
+  let { isArray, items } = getItemsIsArray(context, { from: 'result' })
   if (!items.length) {
-    return context;
+    return context
   }
 
-  options = makeOptions(context.app, options);
+  options = makeOptions(context.app, options)
 
-  const modelName = getModelName(options.modelName, context);
+  const modelName = getModelName(options.modelName, context)
   if (!modelName) {
-    return context;
+    return context
   }
 
   const skipCheckConditions = getPersistedConfig(
     context,
-    "skipRestrictingRead.conditions",
-  );
+    'skipRestrictingRead.conditions',
+  )
   const skipCheckFields = getPersistedConfig(
     context,
-    "skipRestrictingRead.fields",
-  );
+    'skipRestrictingRead.fields',
+  )
 
   if (skipCheckConditions && skipCheckFields) {
-    return context;
+    return context
   }
 
-  const { params } = context;
+  const { params } = context
 
-  params.ability = await getAbility(context, options);
+  params.ability = await getAbility(context, options)
   if (!params.ability) {
     // Ignore internal or not authenticated requests
-    return context;
+    return context
   }
 
-  const { ability } = params;
+  const { ability } = params
 
-  const availableFields = getAvailableFields(context, options);
+  const availableFields = getAvailableFields(context, options)
 
   const hasRestrictingFieldsOptions: HasRestrictingFieldsOptions = {
     availableFields: availableFields,
-  };
+  }
 
-  const getOrFind = isArray ? "find" : "get";
+  const getOrFind = isArray ? 'find' : 'get'
 
-  const $select: string[] | undefined = params.query?.$select;
+  const $select: string[] | undefined = params.query?.$select
 
-  const method = getMethodName(context, options);
+  const method = getMethodName(context, options)
 
-  if (method !== "remove") {
+  if (method !== 'remove') {
     const $newSelect = getConditionalSelect(
       $select,
       ability,
       getOrFind,
       modelName,
-    );
+    )
     if ($newSelect) {
-      const _items = await refetchItems(context);
+      const _items = await refetchItems(context)
       if (_items) {
-        items = _items;
+        items = _items
       }
     }
   }
@@ -105,7 +105,7 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
       !skipCheckConditions &&
       !ability.can(getOrFind, subject(modelName, item))
     ) {
-      return undefined;
+      return undefined
     }
 
     let fields = hasRestrictingFields(
@@ -113,42 +113,42 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
       getOrFind,
       subject(modelName, item),
       hasRestrictingFieldsOptions,
-    );
+    )
 
     if (fields === true) {
       // full restriction
-      return {};
+      return {}
     } else if (skipCheckFields || (!fields && !$select)) {
       // no restrictions
-      return item;
+      return item
     } else if (fields && $select) {
-      fields = mergeArrays(fields, $select, "intersect") as string[];
+      fields = mergeArrays(fields, $select, 'intersect') as string[]
     } else {
-      fields = fields ? fields : $select;
+      fields = fields ? fields : $select
     }
 
-    return _pick(item, fields);
-  };
+    return _pick(item, fields)
+  }
 
-  let result;
+  let result
   if (isArray) {
-    result = [];
+    result = []
     for (let i = 0, n = items.length; i < n; i++) {
-      const item = pickFieldsForItem(items[i]);
+      const item = pickFieldsForItem(items[i])
 
       if (item) {
-        result.push(item);
+        result.push(item)
       }
     }
   } else {
-    result = pickFieldsForItem(items[0]);
-    if (method === "get" && _isEmpty(result)) {
-      if (options.actionOnForbidden) options.actionOnForbidden();
-      throw new Forbidden(`You're not allowed to ${method} ${modelName}`);
+    result = pickFieldsForItem(items[0])
+    if (method === 'get' && _isEmpty(result)) {
+      if (options.actionOnForbidden) options.actionOnForbidden()
+      throw new Forbidden(`You're not allowed to ${method} ${modelName}`)
     }
   }
 
-  replaceItems(context, result);
+  replaceItems(context, result)
 
-  return context;
-};
+  return context
+}

@@ -1,18 +1,18 @@
-import { permittedFieldsOf } from "@casl/ability/extra";
-import { getMinimalFields } from "./getMinimalFields";
+import { permittedFieldsOf } from '@casl/ability/extra'
+import { getMinimalFields } from './getMinimalFields.js'
 
-import type { AnyAbility, Subject } from "@casl/ability";
-import type { PermittedFieldsOptions } from "@casl/ability/extra";
-import type { HasRestrictingFieldsOptions } from "../types";
+import type { AnyAbility, Subject } from '@casl/ability'
+import type { PermittedFieldsOptions } from '@casl/ability/extra'
+import type { HasRestrictingFieldsOptions } from '../types.js'
 
 function areSameArray<T>(arr1: T[], arr2: T[]): boolean {
   if (arr1.length != arr2.length) {
-    return false;
+    return false
   }
-  const arr1test = arr1.slice().sort();
-  const arr2test = arr2.slice().sort();
-  const result = !arr1test.some((val, idx) => val !== arr2test[idx]);
-  return result;
+  const arr1test = arr1.slice().sort()
+  const arr2test = arr2.slice().sort()
+  const result = !arr1test.some((val, idx) => val !== arr2test[idx])
+  return result
 }
 
 export const hasRestrictingFields = (
@@ -21,8 +21,8 @@ export const hasRestrictingFields = (
   subject: Subject,
   options?: HasRestrictingFieldsOptions,
 ): boolean | string[] => {
-  let fields: string[];
-  if (typeof subject !== "string") {
+  let fields: string[]
+  if (typeof subject !== 'string') {
     fields = getMinimalFields(
       ability,
       action,
@@ -31,24 +31,24 @@ export const hasRestrictingFields = (
         availableFields: options?.availableFields,
         checkCan: false,
       },
-    );
+    )
   } else {
     const permittedFieldsOfOptions: PermittedFieldsOptions<AnyAbility> = {
       fieldsFrom: (rule) => {
-        return rule.fields || options?.availableFields || [];
+        return rule.fields || options?.availableFields || []
       },
-    };
+    }
 
     fields = permittedFieldsOf(
       ability,
       action,
       subject,
       permittedFieldsOfOptions,
-    );
+    )
   }
 
   if (fields.length === 0 && !options?.availableFields) {
-    return false;
+    return false
   }
 
   if (fields.length > 0) {
@@ -59,11 +59,11 @@ export const hasRestrictingFields = (
         areSameArray(fields, options?.availableFields))
     ) {
       // arrays are the same -> no restrictions
-      return false;
+      return false
     } else {
-      return fields;
+      return fields
     }
   }
 
-  return true;
-};
+  return true
+}
