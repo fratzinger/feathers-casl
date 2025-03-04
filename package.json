@@ -46,7 +46,7 @@
     "vitest": "vitest",
     "test": "vitest run",
     "coverage": "vitest run --coverage",
-    "lint": "eslint .",
+    "lint": "eslint",
     "docs": "vitepress dev docs",
     "docs:build": "vitepress build docs"
   },
@@ -93,7 +93,7 @@
     "knex": "^3.1.0",
     "mongodb": "^6.14.1",
     "mongodb-memory-server": "^10.1.4",
-    "mongoose": "^8.12.0",
+    "mongoose": "^8.12.1",
     "np": "^10.2.0",
     "objection": "^3.1.5",
     "prettier": "^3.5.3",

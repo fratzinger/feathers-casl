@@ -3,9 +3,9 @@ import { defineAbility } from '@casl/ability'
 import { Sequelize, Op, DataTypes } from 'sequelize'
 import { feathers } from '@feathersjs/feathers'
 import { SequelizeService } from 'feathers-sequelize'
-import { authorize } from '../../src/index.js'
+import { authorize } from '../../src'
 import path from 'node:path'
-import { resolveAction } from '../test-utils.js'
+import { resolveAction } from '../test-utils'
 
 describe('authorize.users.test.ts', function () {
   function mockAbility(user) {

@@ -35,6 +35,8 @@ describe('channels.default.test.ts', function () {
 
     app = mock.app
 
+    app = mock.app
+
     const port = await getPort()
     app.set('port', port)
 
@@ -77,6 +79,13 @@ describe('channels.default.test.ts', function () {
         promises.push(promise)
       }
     })
+
+    const promise = client3.service('authentication').create({
+      strategy: 'local',
+      email: '3',
+      password: '3',
+    })
+    promises.push(promise)
 
     const socket = io(`http://localhost:${port}`)
     client4 = feathers()

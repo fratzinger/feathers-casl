@@ -1,11 +1,11 @@
 import assert from 'node:assert'
 import { defineAbility } from '@casl/ability'
 import { feathers } from '@feathersjs/feathers'
-import { authorize } from '../../../src/index.js'
+import { authorize } from '../../../src'
 import { MemoryService } from '@feathersjs/memory'
 import { joinQuery } from 'feathers-fletching'
 import { filterArray } from 'feathers-utils'
-import { resolveAction } from '../../test-utils.js'
+import { resolveAction } from '../../test-utils'
 
 describe('authorize.relations', function () {
   const mock = () => {

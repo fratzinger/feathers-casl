@@ -1,10 +1,10 @@
 import { Model } from 'objection'
-import makeTests from './makeTests/index.js'
+import makeTests from './makeTests'
 import { Service } from 'feathers-objection'
 import { getItemsIsArray } from 'feathers-utils'
 import knex from 'knex'
 import path from 'node:path'
-import type { ServiceCaslOptions } from '../../../../src/index.js'
+import type { ServiceCaslOptions } from '../../../../src'
 import type { HookContext } from '@feathersjs/feathers'
 
 const __dirname = import.meta.dirname

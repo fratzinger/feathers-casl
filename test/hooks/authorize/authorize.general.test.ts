@@ -1,11 +1,11 @@
 import assert from 'node:assert'
-import { authorize } from '../../../src/index.js'
+import { authorize } from '../../../src'
 import { defineAbility } from '@casl/ability'
 import _cloneDeep from 'lodash/cloneDeep.js'
 import { filterArray, filterObject, markHookForSkip } from 'feathers-utils'
 import type { HookContext } from '@feathersjs/feathers'
 import { MemoryService } from '@feathersjs/memory'
-import { resolveAction } from '../../test-utils.js'
+import { resolveAction } from '../../test-utils'
 
 describe('authorize.general.test.ts', function () {
   describe('before', function () {

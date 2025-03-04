@@ -32,6 +32,8 @@ describe('channels.receive.test.ts', function () {
 
     app = mock.app
 
+    app = mock.app
+
     const port = await getPort()
     app.set('port', port)
 
