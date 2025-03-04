@@ -10,11 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version: [20.x, 22.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
       - uses: actions/checkout@v4
 
+      - run: npm install -g corepack@latest
       - run: corepack enable
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -22,6 +23,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "pnpm"
       - run: pnpm i
+      - run: pnpm run lint
       - run: pnpm run test
 
   coverage:
@@ -30,6 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - run: npm install -g corepack@latest
       - run: corepack enable
       - uses: actions/setup-node@v4
         with:
@@ -47,7 +50,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
+      - run: npm install -g corepack@latest
       - run: corepack enable
       - uses: actions/setup-node@v4
         with:

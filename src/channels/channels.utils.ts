@@ -1,49 +1,49 @@
-import { getAvailableFields } from "../utils";
+import { getAvailableFields } from '../utils/index.js'
 
-import type { Ability, AnyAbility } from "@casl/ability";
+import type { Ability, AnyAbility } from '@casl/ability'
 
-import type { Application, HookContext } from "@feathersjs/feathers";
-import type { RealTimeConnection } from "@feathersjs/transport-commons";
+import type { Application, HookContext } from '@feathersjs/feathers'
+import type { RealTimeConnection } from '@feathersjs/transport-commons'
 
-import type { ChannelOptions, EventName, InitOptions } from "../types";
+import type { ChannelOptions, EventName, InitOptions } from '../types.js'
 
 export const makeChannelOptions = (
   app: Application,
   options?: Partial<ChannelOptions>,
 ): ChannelOptions => {
-  options = options || {};
-  return Object.assign({}, defaultOptions, getAppOptions(app), options);
-};
+  options = options || {}
+  return Object.assign({}, defaultOptions, getAppOptions(app), options)
+}
 
-const defaultOptions: Omit<ChannelOptions, "channels"> = {
+const defaultOptions: Omit<ChannelOptions, 'channels'> = {
   activated: true,
-  channelOnError: ["authenticated"],
+  channelOnError: ['authenticated'],
 
   ability: (app: Application, connection: RealTimeConnection): Ability => {
-    return connection.ability;
+    return connection.ability
   },
   modelName: (context) => context.path,
   restrictFields: true,
   availableFields: (context: HookContext): string[] | undefined => {
     const availableFields: string[] | ((context: HookContext) => string[]) =
-      context.service.options?.casl?.availableFields;
-    return getAvailableFields(context, { availableFields });
+      context.service.options?.casl?.availableFields
+    return getAvailableFields(context, { availableFields })
   },
-  useActionName: "get",
-};
+  useActionName: 'get',
+}
 
 export const makeDefaultOptions = (
   options?: Partial<ChannelOptions>,
 ): ChannelOptions => {
-  return Object.assign({}, defaultOptions, options);
-};
+  return Object.assign({}, defaultOptions, options)
+}
 
 const getAppOptions = (
   app: Application,
 ): ChannelOptions | Record<string, never> => {
-  const caslOptions: InitOptions = app?.get("casl");
-  return caslOptions && caslOptions.channels ? caslOptions.channels : {};
-};
+  const caslOptions: InitOptions = app?.get('casl')
+  return caslOptions && caslOptions.channels ? caslOptions.channels : {}
+}
 
 export const getAbility = (
   app: Application,
@@ -53,20 +53,20 @@ export const getAbility = (
   options: Partial<ChannelOptions>,
 ): undefined | AnyAbility => {
   if (options.ability) {
-    return typeof options.ability === "function"
+    return typeof options.ability === 'function'
       ? options.ability(app, connection, data, context)
-      : options.ability;
+      : options.ability
   } else {
-    return connection.ability;
+    return connection.ability
   }
-};
+}
 
 const eventNameMap = {
-  create: "created",
-  update: "updated",
-  patch: "patched",
-  remove: "removed",
-} satisfies Record<string, EventName>;
+  create: 'created',
+  update: 'updated',
+  patch: 'patched',
+  remove: 'removed',
+} satisfies Record<string, EventName>
 
 export const getEventName = (method: string): EventName | undefined =>
-  (eventNameMap as any)[method];
+  (eventNameMap as any)[method]

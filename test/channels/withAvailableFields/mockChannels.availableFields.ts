@@ -1,46 +1,49 @@
-import assert from "node:assert";
-import "@feathersjs/transport-commons";
+import assert from 'node:assert'
+import '@feathersjs/transport-commons'
 import type {
   HookContext,
   Params,
   RealTimeConnection,
-} from "@feathersjs/feathers";
+} from '@feathersjs/feathers'
 
-import { getChannelsWithReadAbility, makeChannelOptions } from "../../../src";
-import type { Application } from "@feathersjs/express";
+import {
+  getChannelsWithReadAbility,
+  makeChannelOptions,
+} from '../../../src/index.js'
+import type { Application } from '@feathersjs/express'
 
 export default function (app: Application): void {
-  if (typeof app.channel !== "function") {
-    return;
+  if (typeof app.channel !== 'function') {
+    return
   }
 
-  app.on("connection", (connection: RealTimeConnection): void => {
-    app.channel("anonymous").join(connection);
-  });
+  app.on('connection', (connection: RealTimeConnection): void => {
+    app.channel('anonymous').join(connection)
+  })
 
-  app.on("login", (authResult: any, { connection }: Params): void => {
+  app.on('login', (authResult: any, { connection }: Params): void => {
     if (connection) {
       if (authResult.ability) {
-        connection.ability = authResult.ability;
-        connection.rules = authResult.rules;
+        connection.ability = authResult.ability
+        connection.rules = authResult.rules
       }
 
-      app.channel("anonymous").leave(connection);
-      app.channel("authenticated").join(connection);
+      app.channel('anonymous').leave(connection)
+      app.channel('authenticated').join(connection)
     }
-  });
+  })
 
-  const caslOptions = makeChannelOptions(app);
+  const caslOptions = makeChannelOptions(app)
 
   const fields = caslOptions.availableFields({
-    service: app.service("users"),
-  });
+    service: app.service('users'),
+  })
 
   assert.deepStrictEqual(
     fields,
-    ["id", "email", "password"],
-    "gets availableFields from service correctly",
-  );
+    ['id', 'email', 'password'],
+    'gets availableFields from service correctly',
+  )
 
   app.publish((data: unknown, context: HookContext) => {
     const result = getChannelsWithReadAbility(
@@ -48,9 +51,9 @@ export default function (app: Application): void {
       data as Record<string, unknown>,
       context,
       caslOptions,
-    );
+    )
 
     // e.g. to publish all service events to all authenticated users use
-    return result;
-  });
+    return result
+  })
 }

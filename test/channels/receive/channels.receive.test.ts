@@ -1,68 +1,70 @@
-import assert from "node:assert";
-import type { Application } from "@feathersjs/feathers";
-import { feathers } from "@feathersjs/feathers";
-import socketio from "@feathersjs/socketio-client";
-import type { Server } from "node:http";
-import { io } from "socket.io-client";
+import assert from 'node:assert'
+import type { Application } from '@feathersjs/feathers'
+import { feathers } from '@feathersjs/feathers'
+import socketio from '@feathersjs/socketio-client'
+import type { Server } from 'node:http'
+import { io } from 'socket.io-client'
 
-import { mockServer } from "../.mockServer";
-import channels1 from "./mockChannels.receive";
-import services1 from "./mockServices.receive";
-import getPort from "get-port";
-import { promiseTimeout } from "../../test-utils";
+import { mockServer } from '../.mockServer/index.js'
+import channels1 from './mockChannels.receive.js'
+import services1 from './mockServices.receive.js'
+import getPort from 'get-port'
+import { promiseTimeout } from '../../test-utils.js'
 
-describe("channels.receive.test.ts", function () {
-  let server: Server;
-  let app: Application;
+describe('channels.receive.test.ts', function () {
+  let server: Server
+  let app: Application
 
-  const clients: Application[] = [];
+  const clients: Application[] = []
   let users: Record<string, unknown>[] = [
-    { id: 0, email: "1", password: "1" },
-    { id: 1, email: "2", password: "2" },
-    { id: 2, email: "3", password: "3" },
-    { id: 3, email: "4", password: "4" },
-    { id: 4, email: "5", password: "5" },
-  ];
+    { id: 0, email: '1', password: '1' },
+    { id: 1, email: '2', password: '2' },
+    { id: 2, email: '3', password: '3' },
+    { id: 3, email: '4', password: '4' },
+    { id: 4, email: '5', password: '5' },
+  ]
 
   beforeAll(async function () {
     const mock = mockServer({
       channels: channels1,
       services: services1,
-    });
+    })
 
-    app = mock.app;
+    app = mock.app
 
-    const port = await getPort();
-    app.set("port", port);
+    app = mock.app
 
-    server = await app.listen(port);
+    const port = await getPort()
+    app.set('port', port)
 
-    users = await app.service("users").create(users);
+    server = await app.listen(port)
+
+    users = await app.service('users').create(users)
 
     const promises = users.map(async (user) => {
-      const socket = io(`http://localhost:${port}`);
-      const client = feathers();
-      client.configure(socketio(socket));
-      clients.push(client);
+      const socket = io(`http://localhost:${port}`)
+      const client = feathers()
+      client.configure(socketio(socket))
+      clients.push(client)
 
-      await client.service("authentication").create({
-        strategy: "local",
+      await client.service('authentication').create({
+        strategy: 'local',
         email: user.email,
         password: user.email,
-      });
-    });
+      })
+    })
 
-    const socket = io(`http://localhost:${port}`);
-    const client = feathers();
-    client.configure(socketio(socket));
-    clients.push(client);
+    const socket = io(`http://localhost:${port}`)
+    const client = feathers()
+    client.configure(socketio(socket))
+    clients.push(client)
 
-    await Promise.all(promises);
-  });
+    await Promise.all(promises)
+  })
 
   afterAll(async function () {
-    server.close();
-  });
+    server.close()
+  })
 
   const checkClient = async (
     servicePath: string,
@@ -74,8 +76,8 @@ describe("channels.receive.test.ts", function () {
     assert.ok(
       Object.prototype.hasOwnProperty.call(expectedPerClient, i),
       `client${i} has expected value`,
-    );
-    const expected = expectedPerClient[i];
+    )
+    const expected = expectedPerClient[i]
     const fulFill = new Promise((resolve) => {
       clients[i].service(servicePath).on(event, (result) => {
         if (expected) {
@@ -83,11 +85,11 @@ describe("channels.receive.test.ts", function () {
             result,
             expected,
             `'client${i}:${servicePath}:${methodName}': result is expected`,
-          );
+          )
         }
-        resolve(result);
-      });
-    });
+        resolve(result)
+      })
+    })
 
     if (expected) {
       await assert.doesNotReject(
@@ -96,10 +98,10 @@ describe("channels.receive.test.ts", function () {
           fulFill,
           `'client${i}:${servicePath}:${methodName}': does not receive message`,
         ).finally(() => {
-          clients[i].service(servicePath).removeAllListeners(event);
+          clients[i].service(servicePath).removeAllListeners(event)
         }),
         `'client${i}:${servicePath}:${methodName}': receives message`,
-      );
+      )
     } else {
       await assert.rejects(
         promiseTimeout(
@@ -107,86 +109,86 @@ describe("channels.receive.test.ts", function () {
           fulFill,
           `'client${i}:${servicePath}:${methodName}': does not receive message`,
         ).finally(() => {
-          clients[i].service(servicePath).removeAllListeners(event);
+          clients[i].service(servicePath).removeAllListeners(event)
         }),
         () => true,
         `'client${i}:${servicePath}:${methodName}': does not receive message`,
-      );
+      )
     }
-  };
+  }
 
-  it("users receive events", async function () {
-    const services = ["articles", "comments"];
+  it('users receive events', async function () {
+    const services = ['articles', 'comments']
 
     for (let i = 0, n = services.length; i < n; i++) {
-      const servicePath = services[i];
+      const servicePath = services[i]
 
       const methods = {
         create: {
           params: [{ id: 0, test: true, userId: 4 }],
-          event: "created",
+          event: 'created',
           expectedPerClient: {
             0: { id: 0, test: true, userId: 4 },
             1: false,
             2: false,
             3: { id: 0, test: true, userId: 4 },
-            4: servicePath === "articles" ? false : { id: 0 },
+            4: servicePath === 'articles' ? false : { id: 0 },
             5: false,
           },
         },
         update: {
           params: [0, { test: false, userId: 4 }],
-          event: "updated",
+          event: 'updated',
           expectedPerClient: {
             0: { id: 0, test: false, userId: 4 },
             1: false,
             2: false,
             3: { id: 0, test: false, userId: 4 },
-            4: servicePath === "articles" ? false : { id: 0 },
+            4: servicePath === 'articles' ? false : { id: 0 },
             5: false,
           },
         },
         patch: {
-          params: [0, { test: true, userId: 1, title: "test" }],
-          event: "patched",
+          params: [0, { test: true, userId: 1, title: 'test' }],
+          event: 'patched',
           expectedPerClient: {
-            0: { id: 0, test: true, userId: 1, title: "test" },
+            0: { id: 0, test: true, userId: 1, title: 'test' },
             1: false,
             2: false,
-            3: { id: 0, test: true, userId: 1, title: "test" },
+            3: { id: 0, test: true, userId: 1, title: 'test' },
             4: false,
             5: false,
           },
         },
         remove: {
           params: [0],
-          event: "removed",
+          event: 'removed',
           expectedPerClient: {
-            0: { id: 0, test: true, userId: 1, title: "test" },
+            0: { id: 0, test: true, userId: 1, title: 'test' },
             1: false,
             2: false,
-            3: { id: 0, test: true, userId: 1, title: "test" },
+            3: { id: 0, test: true, userId: 1, title: 'test' },
             4: false,
             5: false,
           },
         },
-      };
+      }
 
-      const methodNames = Object.keys(methods);
+      const methodNames = Object.keys(methods)
       for (let j = 0, o = methodNames.length; j < o; j++) {
-        const methodName = methodNames[j];
-        const method = methods[methodName];
-        const service = app.service(servicePath);
-        const { event, params, expectedPerClient } = method;
+        const methodName = methodNames[j]
+        const method = methods[methodName]
+        const service = app.service(servicePath)
+        const { event, params, expectedPerClient } = method
 
         const promises = clients.map((client, i) =>
           checkClient(servicePath, methodName, event, expectedPerClient, i),
-        );
+        )
 
-        service[methodName](...params);
+        service[methodName](...params)
 
-        await Promise.all(promises);
+        await Promise.all(promises)
       }
     }
-  });
-});
+  })
+})

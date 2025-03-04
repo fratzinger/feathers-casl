@@ -1,19 +1,19 @@
-import assert from "node:assert";
-import { authorize } from "../../../src";
-import { defineAbility } from "@casl/ability";
-import _cloneDeep from "lodash/cloneDeep.js";
-import { filterArray, filterObject, markHookForSkip } from "feathers-utils";
-import type { HookContext } from "@feathersjs/feathers";
-import { MemoryService } from "@feathersjs/memory";
-import { resolveAction } from "../../test-utils";
+import assert from 'node:assert'
+import { authorize } from '../../../src'
+import { defineAbility } from '@casl/ability'
+import _cloneDeep from 'lodash/cloneDeep.js'
+import { filterArray, filterObject, markHookForSkip } from 'feathers-utils'
+import type { HookContext } from '@feathersjs/feathers'
+import { MemoryService } from '@feathersjs/memory'
+import { resolveAction } from '../../test-utils'
 
-describe("authorize.general.test.ts", function () {
-  describe("before", function () {
-    it("passes if no ability", async function () {
+describe('authorize.general.test.ts', function () {
+  describe('before', function () {
+    it('passes if no ability', async function () {
       const makeContext = (method: string, type: string) => {
         return {
           service: {},
-          path: "tests",
+          path: 'tests',
           method,
           type,
           data: {
@@ -24,41 +24,41 @@ describe("authorize.general.test.ts", function () {
           params: {
             query: {},
           },
-        } as unknown as HookContext;
-      };
+        } as unknown as HookContext
+      }
 
-      const types = ["before"];
-      const methods = ["find", "get", "create", "update", "patch", "remove"];
-      const promises: Promise<any>[] = [];
+      const types = ['before']
+      const methods = ['find', 'get', 'create', 'update', 'patch', 'remove']
+      const promises: Promise<any>[] = []
       types.forEach((type) => {
         methods.forEach((method) => {
-          const context = makeContext(method, type);
+          const context = makeContext(method, type)
 
-          markHookForSkip("checkBasicPermission", "all", context);
-          const query = Object.assign({}, context.params.query);
+          markHookForSkip('checkBasicPermission', 'all', context)
+          const query = Object.assign({}, context.params.query)
 
           const promise = authorize()(context).then((result) => {
             assert.deepStrictEqual(
               result.params.query,
               query,
               `'${type}:${method}': does not change query object`,
-            );
-          });
-          promises.push(promise);
-        });
-      });
-      await Promise.all(promises);
-    });
+            )
+          })
+          promises.push(promise)
+        })
+      })
+      await Promise.all(promises)
+    })
 
-    it("throws forbidden for no permissions", async function () {
-      const makeContext = (method = "find", type = "before") => {
+    it('throws forbidden for no permissions', async function () {
+      const makeContext = (method = 'find', type = 'before') => {
         return {
           service: {
             get(id) {
-              return { id, userId: 1 };
+              return { id, userId: 1 }
             },
           },
-          path: "tests",
+          path: 'tests',
           method,
           type,
           id: 1,
@@ -71,32 +71,32 @@ describe("authorize.general.test.ts", function () {
             ability: defineAbility(() => {}, { resolveAction }),
             query: {},
           },
-        } as unknown as HookContext;
-      };
+        } as unknown as HookContext
+      }
 
-      const types = ["before"];
-      const methods = ["find", "get", "create", "update", "patch", "remove"];
-      const promises: Promise<any>[] = [];
+      const types = ['before']
+      const methods = ['find', 'get', 'create', 'update', 'patch', 'remove']
+      const promises: Promise<any>[] = []
       types.forEach((type) => {
         methods.forEach((method) => {
-          const context = makeContext(method, type);
-          markHookForSkip("checkBasicPermission", "all", context);
+          const context = makeContext(method, type)
+          markHookForSkip('checkBasicPermission', 'all', context)
           const promise = assert.rejects(
             authorize()(context),
-            (err: Error) => err.name === "Forbidden",
+            (err: Error) => err.name === 'Forbidden',
             `'${type}:${method}': with no permissions returns 'Forbidden' error`,
-          );
-          promises.push(promise);
-        });
-      });
-      await Promise.all(promises);
-    });
+          )
+          promises.push(promise)
+        })
+      })
+      await Promise.all(promises)
+    })
 
     it("passes for 'manage' 'all' permission", async function () {
       const makeContext = (method, type) => {
         return {
           service: {},
-          path: "tests",
+          path: 'tests',
           method,
           type,
           data: {
@@ -107,43 +107,43 @@ describe("authorize.general.test.ts", function () {
           params: {
             ability: defineAbility(
               (can) => {
-                can("manage", "all");
+                can('manage', 'all')
               },
               { resolveAction },
             ),
             query: {},
           },
-        } as unknown as HookContext;
-      };
+        } as unknown as HookContext
+      }
 
-      const types = ["before"];
-      const methods = ["find", "get", "create", "update", "patch", "remove"];
-      const promises: Promise<any>[] = [];
+      const types = ['before']
+      const methods = ['find', 'get', 'create', 'update', 'patch', 'remove']
+      const promises: Promise<any>[] = []
       types.forEach((type) => {
         methods.forEach((method) => {
-          const context = makeContext(method, type);
+          const context = makeContext(method, type)
 
-          markHookForSkip("checkBasicPermission", "all", context);
-          const query = Object.assign({}, context.params.query);
+          markHookForSkip('checkBasicPermission', 'all', context)
+          const query = Object.assign({}, context.params.query)
 
           const promise = authorize({
-            availableFields: ["id", "userId", "test"],
+            availableFields: ['id', 'userId', 'test'],
           })(context).then((result) => {
             assert.deepStrictEqual(
               result.params.query,
               query,
-              "does not change query object",
-            );
-          });
-          promises.push(promise);
-        });
-      });
-      await Promise.all(promises);
-    });
+              'does not change query object',
+            )
+          })
+          promises.push(promise)
+        })
+      })
+      await Promise.all(promises)
+    })
 
-    it("passes for general individual permission", async function () {
+    it('passes for general individual permission', async function () {
       const makeContext = (method, type) => {
-        const path = "tests";
+        const path = 'tests'
         return {
           service: {},
           path,
@@ -157,40 +157,40 @@ describe("authorize.general.test.ts", function () {
           params: {
             ability: defineAbility(
               (can) => {
-                can(method, path);
+                can(method, path)
               },
               { resolveAction },
             ),
             query: {},
           },
-        } as unknown as HookContext;
-      };
+        } as unknown as HookContext
+      }
 
-      const types = ["before"];
-      const methods = ["find", "get", "create", "update", "patch", "remove"];
-      const promises: Promise<any>[] = [];
+      const types = ['before']
+      const methods = ['find', 'get', 'create', 'update', 'patch', 'remove']
+      const promises: Promise<any>[] = []
       types.forEach((type) => {
         methods.forEach((method) => {
-          const context = makeContext(method, type);
-          const query = Object.assign({}, context.params.query);
+          const context = makeContext(method, type)
+          const query = Object.assign({}, context.params.query)
           const promise = authorize()(context).then((result) => {
             assert.deepStrictEqual(
               result.params.query,
               query,
-              "does not change query object",
-            );
-          });
-          promises.push(promise);
-        });
-      });
-      await Promise.all(promises);
-    });
+              'does not change query object',
+            )
+          })
+          promises.push(promise)
+        })
+      })
+      await Promise.all(promises)
+    })
 
     it("passes for 'manage' 'all' permission with availableFields: undefined", async function () {
       const makeContext = (method, type) => {
         return {
           service: {},
-          path: "tests",
+          path: 'tests',
           method,
           type,
           data: {
@@ -201,24 +201,24 @@ describe("authorize.general.test.ts", function () {
           params: {
             ability: defineAbility(
               (can) => {
-                can("manage", "all");
+                can('manage', 'all')
               },
               { resolveAction },
             ),
             query: {},
           },
-        } as unknown as HookContext;
-      };
+        } as unknown as HookContext
+      }
 
-      const types = ["before"];
-      const methods = ["find", "get", "create", "update", "patch", "remove"];
-      const promises: Promise<any>[] = [];
+      const types = ['before']
+      const methods = ['find', 'get', 'create', 'update', 'patch', 'remove']
+      const promises: Promise<any>[] = []
       types.forEach((type) => {
         methods.forEach((method) => {
-          const context = makeContext(method, type);
+          const context = makeContext(method, type)
 
-          markHookForSkip("checkBasicPermission", "all", context);
-          const query = Object.assign({}, context.params.query);
+          markHookForSkip('checkBasicPermission', 'all', context)
+          const query = Object.assign({}, context.params.query)
 
           const promise = authorize({ availableFields: undefined })(
             context,
@@ -226,20 +226,20 @@ describe("authorize.general.test.ts", function () {
             assert.deepStrictEqual(
               result.params.query,
               query,
-              "does not change query object",
-            );
-          });
-          promises.push(promise);
-        });
-      });
-      await Promise.all(promises);
-    });
+              'does not change query object',
+            )
+          })
+          promises.push(promise)
+        })
+      })
+      await Promise.all(promises)
+    })
 
-    it("passes if skip", async function () {
+    it('passes if skip', async function () {
       const makeContext = (method: string, type: string) => {
         return {
           service: {},
-          path: "tests",
+          path: 'tests',
           method,
           type,
           data: {
@@ -249,40 +249,40 @@ describe("authorize.general.test.ts", function () {
           },
           params: {
             ability: defineAbility(() => {}, { resolveAction }),
-            skipHooks: ["authorize"],
+            skipHooks: ['authorize'],
             query: {},
           },
-        } as unknown as HookContext;
-      };
+        } as unknown as HookContext
+      }
 
-      const types = ["before"];
-      const methods = ["find", "get", "create", "update", "patch", "remove"];
-      const promises: Promise<any>[] = [];
+      const types = ['before']
+      const methods = ['find', 'get', 'create', 'update', 'patch', 'remove']
+      const promises: Promise<any>[] = []
       types.forEach((type) => {
         methods.forEach((method) => {
-          const context = makeContext(method, type);
+          const context = makeContext(method, type)
 
-          markHookForSkip("checkBasicPermission", "all", context);
-          const query = Object.assign({}, context.params.query);
+          markHookForSkip('checkBasicPermission', 'all', context)
+          const query = Object.assign({}, context.params.query)
 
           const promise = authorize()(context).then((result) => {
             assert.deepStrictEqual(
               result.params.query,
               query,
               `'${type}:${method}': does not change query object`,
-            );
-          });
-          promises.push(promise);
-        });
-      });
-      await Promise.all(promises);
-    });
+            )
+          })
+          promises.push(promise)
+        })
+      })
+      await Promise.all(promises)
+    })
 
-    it("passes for undefined modelName", async function () {
+    it('passes for undefined modelName', async function () {
       const makeContext = (method: string, type: string) => {
         return {
           service: {},
-          path: "tests",
+          path: 'tests',
           method,
           type,
           data: {
@@ -294,18 +294,18 @@ describe("authorize.general.test.ts", function () {
             ability: defineAbility(() => {}, { resolveAction }),
             query: {},
           },
-        } as unknown as HookContext;
-      };
+        } as unknown as HookContext
+      }
 
-      const types = ["before"];
-      const methods = ["find", "get", "create", "update", "patch", "remove"];
-      const promises: Promise<any>[] = [];
+      const types = ['before']
+      const methods = ['find', 'get', 'create', 'update', 'patch', 'remove']
+      const promises: Promise<any>[] = []
       types.forEach((type) => {
         methods.forEach((method) => {
-          const context = makeContext(method, type);
+          const context = makeContext(method, type)
 
-          markHookForSkip("checkBasicPermission", "all", context);
-          const query = Object.assign({}, context.params.query);
+          markHookForSkip('checkBasicPermission', 'all', context)
+          const query = Object.assign({}, context.params.query)
 
           const promise = authorize({ modelName: undefined })(context).then(
             (result) => {
@@ -313,21 +313,21 @@ describe("authorize.general.test.ts", function () {
                 result.params.query,
                 query,
                 `'${type}:${method}': does not change query object`,
-              );
+              )
             },
-          );
-          promises.push(promise);
-        });
-      });
-      await Promise.all(promises);
-    });
+          )
+          promises.push(promise)
+        })
+      })
+      await Promise.all(promises)
+    })
 
-    it("makes clean query with multiple rules", async function () {
-      const expectedResult = { id: 1, userId: 1, test: true };
+    it('makes clean query with multiple rules', async function () {
+      const expectedResult = { id: 1, userId: 1, test: true }
       const makeContext = (method, type) => {
         return {
           service: {},
-          path: "tests",
+          path: 'tests',
           method,
           type,
           result: Object.assign({}, expectedResult),
@@ -335,10 +335,10 @@ describe("authorize.general.test.ts", function () {
           params: {
             ability: defineAbility(
               (can) => {
-                can(["find"], "tests", { userId: 1 });
-                can(["find"], "tests", { userId: 1 });
-                can(["find"], "tests", { userId: 1 });
-                can(["find"], "tests", { userId: 1 });
+                can(['find'], 'tests', { userId: 1 })
+                can(['find'], 'tests', { userId: 1 })
+                can(['find'], 'tests', { userId: 1 })
+                can(['find'], 'tests', { userId: 1 })
               },
               { resolveAction },
             ),
@@ -346,24 +346,24 @@ describe("authorize.general.test.ts", function () {
               test: true,
             },
           },
-        } as unknown as HookContext;
-      };
+        } as unknown as HookContext
+      }
 
-      const context = makeContext("find", "before");
-      await authorize({ availableFields: undefined })(context);
+      const context = makeContext('find', 'before')
+      await authorize({ availableFields: undefined })(context)
       assert.deepStrictEqual(context.params.query, {
         userId: 1,
         test: true,
-      });
-    });
+      })
+    })
 
-    describe("create", function () {
+    describe('create', function () {
       it("'create:single' passes", async function () {
         const context = {
           service: {},
-          path: "tests",
-          method: "create",
-          type: "before",
+          path: 'tests',
+          method: 'create',
+          type: 'before',
           data: {
             id: 1,
             userId: 1,
@@ -372,28 +372,28 @@ describe("authorize.general.test.ts", function () {
           params: {
             ability: defineAbility(
               (can) => {
-                can("create", "tests", { userId: 1 });
+                can('create', 'tests', { userId: 1 })
               },
               { resolveAction },
             ),
             query: {},
           },
-        } as unknown as HookContext;
+        } as unknown as HookContext
 
-        markHookForSkip("checkBasicPermission", "all", context);
+        markHookForSkip('checkBasicPermission', 'all', context)
 
         await assert.doesNotReject(
           authorize()(context),
-          "passes authorize hook",
-        );
-      });
+          'passes authorize hook',
+        )
+      })
 
       it("'create:multi' passes", async function () {
         const context = {
           service: {},
-          path: "tests",
-          method: "create",
-          type: "before",
+          path: 'tests',
+          method: 'create',
+          type: 'before',
           data: [
             {
               id: 1,
@@ -414,29 +414,29 @@ describe("authorize.general.test.ts", function () {
           params: {
             ability: defineAbility(
               (can) => {
-                can("create", "tests", { userId: 1 });
-                can("read", "tests");
+                can('create', 'tests', { userId: 1 })
+                can('read', 'tests')
               },
               { resolveAction },
             ),
             query: {},
           },
-        } as unknown as HookContext;
+        } as unknown as HookContext
 
-        markHookForSkip("checkBasicPermission", "all", context);
+        markHookForSkip('checkBasicPermission', 'all', context)
 
         await assert.doesNotReject(
-          authorize({ availableFields: ["id", "userId", "test"] })(context),
-          "passes authorize hook",
-        );
-      });
+          authorize({ availableFields: ['id', 'userId', 'test'] })(context),
+          'passes authorize hook',
+        )
+      })
 
       it("'create:multi' fails with 'checkMultiActions: true'", async function () {
         const context = {
           service: {},
-          path: "tests",
-          method: "create",
-          type: "before",
+          path: 'tests',
+          method: 'create',
+          type: 'before',
           data: [
             {
               id: 1,
@@ -457,29 +457,29 @@ describe("authorize.general.test.ts", function () {
           params: {
             ability: defineAbility(
               (can) => {
-                can("create", "tests", { userId: 1 });
-                can("read", "tests");
+                can('create', 'tests', { userId: 1 })
+                can('read', 'tests')
               },
               { resolveAction },
             ),
             query: {},
           },
-        } as unknown as HookContext;
+        } as unknown as HookContext
 
-        markHookForSkip("checkBasicPermission", "all", context);
+        markHookForSkip('checkBasicPermission', 'all', context)
 
         await assert.rejects(
           authorize({ checkMultiActions: true })(context),
-          "passes authorize hook",
-        );
-      });
+          'passes authorize hook',
+        )
+      })
 
       it("'create:single' fails", async function () {
         const context = {
           service: {},
-          path: "tests",
-          method: "create",
-          type: "before",
+          path: 'tests',
+          method: 'create',
+          type: 'before',
           data: {
             id: 1,
             userId: 2,
@@ -488,29 +488,29 @@ describe("authorize.general.test.ts", function () {
           params: {
             ability: defineAbility(
               (can) => {
-                can("create", "tests", { userId: 1 });
+                can('create', 'tests', { userId: 1 })
               },
               { resolveAction },
             ),
             query: {},
           },
-        } as unknown as HookContext;
+        } as unknown as HookContext
 
-        markHookForSkip("checkBasicPermission", "all", context);
+        markHookForSkip('checkBasicPermission', 'all', context)
 
         await assert.rejects(
           authorize()(context),
-          (err: Error) => err.name === "Forbidden",
+          (err: Error) => err.name === 'Forbidden',
           "rejects with 'Forbidden' error",
-        );
-      });
+        )
+      })
 
       it("'create:multi' fails", async function () {
         const context = {
           service: {},
-          path: "tests",
-          method: "create",
-          type: "before",
+          path: 'tests',
+          method: 'create',
+          type: 'before',
           data: [
             {
               id: 1,
@@ -531,24 +531,24 @@ describe("authorize.general.test.ts", function () {
           params: {
             ability: defineAbility(
               (can) => {
-                can("create", "tests", { userId: 1 });
+                can('create', 'tests', { userId: 1 })
               },
               { resolveAction },
             ),
             query: {},
           },
-        } as unknown as HookContext;
+        } as unknown as HookContext
 
-        markHookForSkip("checkBasicPermission", "all", context);
+        markHookForSkip('checkBasicPermission', 'all', context)
 
         await assert.rejects(
           authorize()(context),
-          (err: Error) => err.name === "Forbidden",
+          (err: Error) => err.name === 'Forbidden',
           "rejects with 'Forbidden' error",
-        );
-      });
+        )
+      })
 
-      it("makes right query for inverted rules", async function () {
+      it('makes right query for inverted rules', async function () {
         const pairs = [
           {
             condition: { userId: 1 },
@@ -582,17 +582,17 @@ describe("authorize.general.test.ts", function () {
             condition: { userId: { $nin: [1] } },
             inverted: { $nor: [{ userId: { $nin: [1] } }] },
           },
-        ];
-        const promises: Promise<any>[] = [];
+        ]
+        const promises: Promise<any>[] = []
 
         pairs.forEach(({ condition, inverted }) => {
           const makeContext = (method: string, type: string): HookContext => {
             const service = new MemoryService({
               filters: {
-                ...filterArray("$and"),
-                ...filterObject("$not", "$nor"),
+                ...filterArray('$and'),
+                ...filterObject('$not', '$nor'),
               },
-              operators: ["$and", "$not", "$nor"],
+              operators: ['$and', '$not', '$nor'],
               store: {
                 1: {
                   id: 1,
@@ -600,40 +600,40 @@ describe("authorize.general.test.ts", function () {
                   test: true,
                 },
               },
-            });
+            })
 
             return {
               service,
-              path: "tests",
+              path: 'tests',
               method,
               type,
               params: {
                 ability: defineAbility(
                   (can, cannot) => {
-                    can("manage", "all");
-                    cannot(["read", "update", "remove"], "tests", condition);
-                    cannot("update", "tests", condition);
-                    cannot("remove", "tests", condition);
+                    can('manage', 'all')
+                    cannot(['read', 'update', 'remove'], 'tests', condition)
+                    cannot('update', 'tests', condition)
+                    cannot('remove', 'tests', condition)
                   },
                   { resolveAction },
                 ),
                 query: {},
               },
-            } as unknown as HookContext;
-          };
+            } as unknown as HookContext
+          }
 
-          const types = ["before"];
-          const methods = ["find"];
+          const types = ['before']
+          const methods = ['find']
 
           types.forEach((type) => {
             methods.forEach((method) => {
-              const context = makeContext(method, type);
-              const query = Object.assign({}, context.params.query);
+              const context = makeContext(method, type)
+              const query = Object.assign({}, context.params.query)
               assert.deepStrictEqual(
                 query,
                 {},
                 `'${type}:${method}': query is empty`,
-              );
+              )
 
               const promise = authorize()(context).then((result) => {
                 assert.deepStrictEqual(
@@ -642,126 +642,126 @@ describe("authorize.general.test.ts", function () {
                   `'${type}:${method}': for condition: '${JSON.stringify(
                     condition,
                   )}' the inverted is: ${JSON.stringify(result.params.query)}`,
-                );
-              });
-              promises.push(promise);
-            });
-          });
-        });
-        await Promise.all(promises);
-      });
-    });
+                )
+              })
+              promises.push(promise)
+            })
+          })
+        })
+        await Promise.all(promises)
+      })
+    })
 
-    describe("patch", function () {
+    describe('patch', function () {
       it("'patch:multi' passes with 'patch-multi' and 'checkMultiActions: true'", async function () {
         const context = {
           service: {},
-          path: "tests",
-          method: "patch",
-          type: "before",
+          path: 'tests',
+          method: 'patch',
+          type: 'before',
           id: null,
           data: { id: 1 },
           params: {
             ability: defineAbility(
               (can) => {
-                can("patch-multi", "tests");
+                can('patch-multi', 'tests')
               },
               { resolveAction },
             ),
             query: {},
           },
-        } as unknown as HookContext;
+        } as unknown as HookContext
 
         await assert.rejects(
           authorize({ checkMultiActions: true })(context),
-          "authorize rejects",
-        );
-      });
+          'authorize rejects',
+        )
+      })
 
       it("'patch:multi' fails with 'checkMultiActions: true'", async function () {
         const context = {
           service: {},
-          path: "tests",
-          method: "patch",
-          type: "before",
+          path: 'tests',
+          method: 'patch',
+          type: 'before',
           id: null,
           data: { id: 1 },
           params: {
             ability: defineAbility(
               (can) => {
-                can("patch", "tests");
+                can('patch', 'tests')
               },
               { resolveAction },
             ),
             query: {},
           },
-        } as unknown as HookContext;
+        } as unknown as HookContext
 
         await assert.rejects(
           authorize({ checkMultiActions: true })(context),
-          "authorize rejects",
-        );
-      });
-    });
+          'authorize rejects',
+        )
+      })
+    })
 
-    describe("remove", function () {
+    describe('remove', function () {
       it("'remove:multi' passes with 'remove-multi' and 'checkMultiActions: true'", async function () {
         const context = {
           service: {},
-          path: "tests",
-          method: "remove",
-          type: "before",
+          path: 'tests',
+          method: 'remove',
+          type: 'before',
           id: null,
           params: {
             ability: defineAbility(
               (can) => {
-                can("remove-multi", "tests");
+                can('remove-multi', 'tests')
               },
               { resolveAction },
             ),
             query: {},
           },
-        } as unknown as HookContext;
+        } as unknown as HookContext
 
         await assert.rejects(
           authorize({ checkMultiActions: true })(context),
-          "authorize rejects",
-        );
-      });
+          'authorize rejects',
+        )
+      })
 
       it("'remove:multi' fails with 'checkMultiActions: true'", async function () {
         const context = {
           service: {},
-          path: "tests",
-          method: "remove",
-          type: "before",
+          path: 'tests',
+          method: 'remove',
+          type: 'before',
           id: null,
           params: {
             ability: defineAbility(
               (can) => {
-                can("remove", "tests");
+                can('remove', 'tests')
               },
               { resolveAction },
             ),
             query: {},
           },
-        } as unknown as HookContext;
+        } as unknown as HookContext
 
         await assert.rejects(
           authorize({ checkMultiActions: true })(context),
-          "authorize rejects",
-        );
-      });
-    });
-  });
+          'authorize rejects',
+        )
+      })
+    })
+  })
 
-  describe("after", function () {
+  describe('after', function () {
     it("after - passes single with 'get' rule", async function () {
-      const expectedResult = { id: 1, userId: 1, test: true };
+      const expectedResult = { id: 1, userId: 1, test: true }
       const makeContext = (method, type) => {
         return {
           service: {},
-          path: "tests",
+          path: 'tests',
           method,
           type,
           result: Object.assign({}, expectedResult),
@@ -769,21 +769,21 @@ describe("authorize.general.test.ts", function () {
           params: {
             ability: defineAbility(
               (can) => {
-                can(["get", "create", "update", "patch", "remove"], "all");
+                can(['get', 'create', 'update', 'patch', 'remove'], 'all')
               },
               { resolveAction },
             ),
             query: {},
           },
-        } as unknown as HookContext;
-      };
+        } as unknown as HookContext
+      }
 
-      const types = ["after"];
-      const methods = ["get", "create", "update", "patch", "remove"];
-      const promises: Promise<any>[] = [];
+      const types = ['after']
+      const methods = ['get', 'create', 'update', 'patch', 'remove']
+      const promises: Promise<any>[] = []
       types.forEach((type) => {
         methods.forEach((method) => {
-          const context = makeContext(method, type);
+          const context = makeContext(method, type)
           const promise = authorize({ availableFields: undefined })(
             context,
           ).then(({ result }) => {
@@ -791,49 +791,49 @@ describe("authorize.general.test.ts", function () {
               result,
               expectedResult,
               `returns complete object for '${type}:${method}'`,
-            );
-          });
-          promises.push(promise);
-        });
-      });
-      await Promise.all(promises);
-    });
+            )
+          })
+          promises.push(promise)
+        })
+      })
+      await Promise.all(promises)
+    })
 
     it.skip("after - passes single primitive value with 'find' rule", async function () {
-      const promises: Promise<any>[] = [];
-      ["test", true, 123].forEach((val) => {
-        const methods = ["find"];
+      const promises: Promise<any>[] = []
+      ;['test', true, 123].forEach((val) => {
+        const methods = ['find']
         const service = {
-          path: "tests",
-        };
+          path: 'tests',
+        }
         methods.forEach((method) => {
           service[method] = () => {
-            return val;
-          };
-        });
+            return val
+          }
+        })
         const makeContext = (method, type) => {
           return {
             service,
-            path: "tests",
+            path: 'tests',
             method,
             type,
             result: val,
             params: {
               ability: defineAbility(
                 (can) => {
-                  can(["get", "create", "update", "patch", "remove"], "all");
+                  can(['get', 'create', 'update', 'patch', 'remove'], 'all')
                 },
                 { resolveAction },
               ),
               query: {},
             },
-          } as unknown as HookContext;
-        };
+          } as unknown as HookContext
+        }
 
-        const types = ["after"];
+        const types = ['after']
         types.forEach((type) => {
           methods.forEach((method) => {
-            const context = makeContext(method, type);
+            const context = makeContext(method, type)
             const promise = authorize({ availableFields: undefined })(
               context,
             ).then(({ result }) => {
@@ -841,22 +841,22 @@ describe("authorize.general.test.ts", function () {
                 result,
                 val,
                 `returns complete object for '${type}:${method}'`,
-              );
-            });
-            promises.push(promise);
-          });
-        });
-      });
+              )
+            })
+            promises.push(promise)
+          })
+        })
+      })
 
-      await Promise.all(promises);
-    });
+      await Promise.all(promises)
+    })
 
     it("after - passes multi with 'find' rule", async function () {
-      const expectedResult = [{ id: 1, userId: 1, test: true }];
+      const expectedResult = [{ id: 1, userId: 1, test: true }]
       const makeContext = (method, type) => {
         return {
           service: {},
-          path: "tests",
+          path: 'tests',
           method,
           type,
           result: _cloneDeep(expectedResult),
@@ -864,21 +864,21 @@ describe("authorize.general.test.ts", function () {
           params: {
             ability: defineAbility(
               (can) => {
-                can(["find", "create", "patch", "remove"], "all");
+                can(['find', 'create', 'patch', 'remove'], 'all')
               },
               { resolveAction },
             ),
             query: {},
           },
-        } as unknown as HookContext;
-      };
+        } as unknown as HookContext
+      }
 
-      const types = ["after"];
-      const methods = ["find", "create", "patch", "remove"];
-      const promises: Promise<any>[] = [];
+      const types = ['after']
+      const methods = ['find', 'create', 'patch', 'remove']
+      const promises: Promise<any>[] = []
       types.forEach((type) => {
         methods.forEach((method) => {
-          const context = makeContext(method, type);
+          const context = makeContext(method, type)
           const promise = authorize({ availableFields: undefined })(
             context,
           ).then(({ result }) => {
@@ -886,13 +886,13 @@ describe("authorize.general.test.ts", function () {
               result,
               expectedResult,
               `returns complete object for '${type}:${method}'`,
-            );
-          });
-          promises.push(promise);
-        });
-      });
-      await Promise.all(promises);
-    });
+            )
+          })
+          promises.push(promise)
+        })
+      })
+      await Promise.all(promises)
+    })
 
     it("after - passes multi with 'pagination' with 'find' rule", async function () {
       const expectedResult = {
@@ -900,11 +900,11 @@ describe("authorize.general.test.ts", function () {
         limit: 10,
         skip: 0,
         data: [{ id: 1, userId: 1, test: true }],
-      };
+      }
       const makeContext = (method, type) => {
         return {
           service: {},
-          path: "tests",
+          path: 'tests',
           method,
           type,
           result: _cloneDeep(expectedResult),
@@ -912,21 +912,21 @@ describe("authorize.general.test.ts", function () {
           params: {
             ability: defineAbility(
               (can) => {
-                can(["find", "create", "patch", "remove"], "all");
+                can(['find', 'create', 'patch', 'remove'], 'all')
               },
               { resolveAction },
             ),
             query: {},
           },
-        } as unknown as HookContext;
-      };
+        } as unknown as HookContext
+      }
 
-      const types = ["after"];
-      const methods = ["find"];
-      const promises: Promise<any>[] = [];
+      const types = ['after']
+      const methods = ['find']
+      const promises: Promise<any>[] = []
       types.forEach((type) => {
         methods.forEach((method) => {
-          const context = makeContext(method, type);
+          const context = makeContext(method, type)
           const promise = authorize({ availableFields: undefined })(
             context,
           ).then(({ result }) => {
@@ -934,12 +934,12 @@ describe("authorize.general.test.ts", function () {
               result,
               expectedResult,
               `returns complete object for '${type}:${method}'`,
-            );
-          });
-          promises.push(promise);
-        });
-      });
-      await Promise.all(promises);
-    });
-  });
-});
+            )
+          })
+          promises.push(promise)
+        })
+      })
+      await Promise.all(promises)
+    })
+  })
+})

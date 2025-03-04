@@ -1,10 +1,10 @@
-import { shouldSkip } from "feathers-utils";
+import { shouldSkip } from 'feathers-utils'
 
-import type { HookContext } from "@feathersjs/feathers";
-import type { CheckBasicPermissionHookOptions } from "../types";
-import { checkBasicPermissionUtil } from "../utils";
+import type { HookContext } from '@feathersjs/feathers'
+import type { CheckBasicPermissionHookOptions } from '../types.js'
+import { checkBasicPermissionUtil } from '../utils/index.js'
 
-const HOOKNAME = "checkBasicPermission";
+const HOOKNAME = 'checkBasicPermission'
 
 export const checkBasicPermission = <H extends HookContext>(
   _options?: Partial<CheckBasicPermissionHookOptions>,
@@ -13,12 +13,12 @@ export const checkBasicPermission = <H extends HookContext>(
     if (
       !_options?.notSkippable &&
       (shouldSkip(HOOKNAME, context) ||
-        context.type !== "before" ||
+        context.type !== 'before' ||
         !context.params)
     ) {
-      return context;
+      return context
     }
 
-    return await checkBasicPermissionUtil(context, _options);
-  };
-};
+    return await checkBasicPermissionUtil(context, _options)
+  }
+}

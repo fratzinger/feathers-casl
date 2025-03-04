@@ -1,9 +1,9 @@
-import { defineBuildConfig } from "unbuild";
-import pkg from "./package.json";
+import { defineBuildConfig } from 'unbuild'
+import pkg from './package.json'
 
 export default defineBuildConfig({
-  entries: ["./src/index"],
-  outDir: "./dist",
+  entries: ['./src/index'],
+  outDir: './dist',
   declaration: true,
   externals: [
     ...Object.keys(pkg.dependencies),
@@ -12,4 +12,4 @@ export default defineBuildConfig({
   rollup: {
     emitCJS: true,
   },
-});
+})

@@ -1,12 +1,12 @@
-import { shouldSkip } from "feathers-utils";
+import { shouldSkip } from 'feathers-utils'
 
-import { HOOKNAME, makeOptions } from "./authorize.hook.utils";
-import { authorizeAfter } from "./authorize.hook.after";
-import { authorizeBefore } from "./authorize.hook.before";
+import { HOOKNAME, makeOptions } from './authorize.hook.utils.js'
+import { authorizeAfter } from './authorize.hook.after.js'
+import { authorizeBefore } from './authorize.hook.before.js'
 
-import type { HookContext, NextFunction } from "@feathersjs/feathers";
+import type { HookContext, NextFunction } from '@feathersjs/feathers'
 
-import type { AuthorizeHookOptions } from "../../types";
+import type { AuthorizeHookOptions } from '../../types.js'
 
 export const authorize =
   <H extends HookContext = HookContext>(
@@ -16,22 +16,22 @@ export const authorize =
     if (
       shouldSkip(HOOKNAME, context, _options) ||
       !context.params ||
-      context.type === "error"
+      context.type === 'error'
     ) {
-      return next ? await next() : context;
+      return next ? await next() : context
     }
 
-    const options = makeOptions(context.app, _options);
+    const options = makeOptions(context.app, _options)
 
     // around hook
     if (next) {
-      await authorizeBefore(context, options);
-      await next();
-      await authorizeAfter(context, options);
-      return context;
+      await authorizeBefore(context, options)
+      await next()
+      await authorizeAfter(context, options)
+      return context
     }
 
-    return context.type === "before"
+    return context.type === 'before'
       ? await authorizeBefore(context, options)
-      : await authorizeAfter(context, options);
-  };
+      : await authorizeAfter(context, options)
+  }
