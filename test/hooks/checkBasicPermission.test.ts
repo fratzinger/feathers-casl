@@ -2,7 +2,7 @@ import assert from 'node:assert'
 import { defineAbility } from '@casl/ability'
 import { checkBasicPermission } from '../../src'
 import type { HookContext } from '@feathersjs/feathers'
-import { markHookForSkip } from 'feathers-utils'
+import { markHookForSkip } from '@fratzinger/feathers-utils'
 import { resolveAction } from '../test-utils'
 
 describe('checkBasicPermission.test.ts', function () {

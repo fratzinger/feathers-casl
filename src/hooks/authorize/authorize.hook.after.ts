@@ -3,7 +3,11 @@ import { subject } from '@casl/ability'
 import _pick from 'lodash/pick.js'
 import _isEmpty from 'lodash/isEmpty.js'
 
-import { shouldSkip, mergeArrays, getItemsIsArray } from 'feathers-utils'
+import {
+  shouldSkip,
+  mergeArrays,
+  getItemsIsArray,
+} from '@fratzinger/feathers-utils'
 
 import {
   getPersistedConfig,

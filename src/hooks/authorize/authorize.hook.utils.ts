@@ -9,7 +9,11 @@ import {
 } from '../../utils/index.js'
 import { makeDefaultBaseOptions } from '../common.js'
 
-import { getItemsIsArray, isMulti, markHookForSkip } from 'feathers-utils'
+import {
+  getItemsIsArray,
+  isMulti,
+  markHookForSkip,
+} from '@fratzinger/feathers-utils'
 
 import type { AnyAbility, ForcedSubject } from '@casl/ability'
 import type { Application, HookContext, Params } from '@feathersjs/feathers'

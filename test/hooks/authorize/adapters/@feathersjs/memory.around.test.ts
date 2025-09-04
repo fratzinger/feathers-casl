@@ -1,5 +1,5 @@
 import { MemoryService } from '@feathersjs/memory'
-import { filterArray } from 'feathers-utils'
+import { filterArray } from '@fratzinger/feathers-utils'
 import type { Adapter, ServiceCaslOptions } from '../../../../../src/index.js'
 import makeTests from '../makeTests/index.js'
 

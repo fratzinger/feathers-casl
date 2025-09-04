@@ -1,4 +1,4 @@
-import { shouldSkip } from 'feathers-utils'
+import { shouldSkip } from '@fratzinger/feathers-utils'
 
 import { HOOKNAME, makeOptions } from './authorize.hook.utils.js'
 import { authorizeAfter } from './authorize.hook.after.js'
