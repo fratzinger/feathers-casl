@@ -1,5 +1,5 @@
 import { rulesToQuery } from '@casl/ability/extra'
-import { mergeQuery } from 'feathers-utils'
+import { mergeQuery } from '@fratzinger/feathers-utils'
 import _isEmpty from 'lodash/isEmpty.js'
 import { getAdapter } from '../hooks/authorize/authorize.hook.utils.js'
 import { convertRuleToQuery } from './convertRuleToQuery.js'

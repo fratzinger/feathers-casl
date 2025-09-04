@@ -1,4 +1,4 @@
-import { shouldSkip } from 'feathers-utils'
+import { shouldSkip } from '@fratzinger/feathers-utils'
 
 import type { HookContext } from '@feathersjs/feathers'
 import type { CheckBasicPermissionHookOptions } from '../types.js'

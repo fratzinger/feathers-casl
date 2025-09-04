@@ -1,7 +1,7 @@
 import { Sequelize, DataTypes, Op } from 'sequelize'
 import makeTests from './makeTests/index.js'
 import { SequelizeService } from 'feathers-sequelize'
-import { getItemsIsArray, filterArray } from 'feathers-utils'
+import { getItemsIsArray, filterArray } from '@fratzinger/feathers-utils'
 import type { ServiceCaslOptions } from '../../../../src/index.js'
 import type { HookContext } from '@feathersjs/feathers'
 

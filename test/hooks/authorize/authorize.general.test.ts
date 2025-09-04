@@ -2,7 +2,11 @@ import assert from 'node:assert'
 import { authorize } from '../../../src'
 import { defineAbility } from '@casl/ability'
 import _cloneDeep from 'lodash/cloneDeep.js'
-import { filterArray, filterObject, markHookForSkip } from 'feathers-utils'
+import {
+  filterArray,
+  filterObject,
+  markHookForSkip,
+} from '@fratzinger/feathers-utils'
 import type { HookContext } from '@feathersjs/feathers'
 import { MemoryService } from '@feathersjs/memory'
 import { resolveAction } from '../../test-utils'

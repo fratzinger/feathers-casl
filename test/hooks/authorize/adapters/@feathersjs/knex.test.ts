@@ -1,7 +1,7 @@
 import { knex } from 'knex'
 import makeTests from '../makeTests/index.js'
 import { KnexService } from '@feathersjs/knex'
-import { getItemsIsArray } from 'feathers-utils'
+import { getItemsIsArray } from '@fratzinger/feathers-utils'
 import type { HookContext } from '@feathersjs/feathers'
 import type { Adapter, ServiceCaslOptions } from '../../../../../src/index.js'
 

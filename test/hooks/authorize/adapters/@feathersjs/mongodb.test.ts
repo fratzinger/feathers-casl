@@ -4,7 +4,7 @@ import { MongoDBService } from '@feathersjs/mongodb'
 
 import makeTests from '../makeTests/index.js'
 import type { Adapter, ServiceCaslOptions } from '../../../../../src/index.js'
-import { filterArray } from 'feathers-utils'
+import { filterArray } from '@fratzinger/feathers-utils'
 
 let Model
 

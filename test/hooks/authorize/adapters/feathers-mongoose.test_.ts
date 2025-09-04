@@ -4,7 +4,7 @@ import { Service } from 'feathers-mongoose'
 mongoose.Promise = global.Promise
 
 import makeTests from './makeTests/index.js'
-import { getItemsIsArray } from 'feathers-utils'
+import { getItemsIsArray } from '@fratzinger/feathers-utils'
 import type { ServiceCaslOptions } from '../../../../src/index.js'
 import type { HookContext } from '@feathersjs/feathers'
 

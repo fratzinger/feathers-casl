@@ -5,7 +5,7 @@ import _set from 'lodash/set.js'
 import type { AnyAbility } from '@casl/ability'
 import { subject } from '@casl/ability'
 
-import { shouldSkip, isMulti } from 'feathers-utils'
+import { shouldSkip, isMulti } from '@fratzinger/feathers-utils'
 
 import {
   hasRestrictingFields,

@@ -1,5 +1,5 @@
 import { detectSubjectType } from '@casl/ability'
-import { mergeArrays } from 'feathers-utils'
+import { mergeArrays } from '@fratzinger/feathers-utils'
 
 import type { AnyAbility } from '@casl/ability'
 import type { GetMinimalFieldsOptions } from '../types.js'

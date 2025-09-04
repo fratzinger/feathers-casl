@@ -1,5 +1,5 @@
 import { subject } from '@casl/ability'
-import { getItemsIsArray } from 'feathers-utils'
+import { getItemsIsArray } from '@fratzinger/feathers-utils'
 
 import { throwUnlessCan } from './authorize/authorize.hook.utils.js'
 

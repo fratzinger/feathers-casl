@@ -4,7 +4,7 @@ import { feathers } from '@feathersjs/feathers'
 import { authorize } from '../../../src'
 import { MemoryService } from '@feathersjs/memory'
 import { joinQuery } from 'feathers-fletching'
-import { filterArray } from 'feathers-utils'
+import { filterArray } from '@fratzinger/feathers-utils'
 import { resolveAction } from '../../test-utils'
 
 describe('authorize.relations', function () {
