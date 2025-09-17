@@ -14,7 +14,11 @@ export default (
   makeService: () => any,
   clean: (app, service) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
-  { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] },
+  { around, beforeHooks, afterHooks }: MakeTestsOptions = {
+    around: false,
+    beforeHooks: [],
+    afterHooks: [],
+  },
 ): void => {
   let app: Application
   let service
@@ -62,6 +66,9 @@ export default (
           around: {
             all: [authorize(options)],
           },
+          before: {
+            all: [...(beforeHooks ?? [])],
+          },
           after: {
             all: afterHooks,
           },
@@ -69,7 +76,7 @@ export default (
       } else {
         service.hooks({
           before: {
-            all: [authorize(options)],
+            all: [authorize(options), ...(beforeHooks ?? [])],
           },
           after: {
             all: [...afterHooks, authorize(options)],
