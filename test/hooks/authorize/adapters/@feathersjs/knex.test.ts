@@ -20,12 +20,6 @@ const db = knex({
   useNullAsDefault: true,
 })
 
-// Create the schema
-db.schema.createTable('messages', (table) => {
-  table.increments('id')
-  table.string('text')
-})
-
 const makeService = () => {
   return new KnexService({
     Model: db,

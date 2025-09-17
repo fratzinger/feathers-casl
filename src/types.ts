@@ -13,6 +13,7 @@ export type Adapter =
   // | "feathers-nedb"
   // | "feathers-objection"
   | 'feathers-sequelize'
+  | 'feathers-kysely'
 
 export interface ServiceCaslOptions {
   availableFields: string[]

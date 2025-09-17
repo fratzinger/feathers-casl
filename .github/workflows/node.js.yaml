@@ -5,6 +5,11 @@ name: Node.js CI
 
 on: [push, pull_request]
 
+env:
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: password
+  POSTGRES_DB: test
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -12,6 +17,16 @@ jobs:
       matrix:
         node-version: [20.x, 22.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@v4
 

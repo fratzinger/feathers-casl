@@ -19,6 +19,7 @@ export default async function (
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
   makeTestsOptions: MakeTestsOptions = {
     around: false,
+    beforeHooks: [],
     afterHooks: [],
     actionBefore: () => {},
   },
