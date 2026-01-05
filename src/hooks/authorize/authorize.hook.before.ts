@@ -172,7 +172,18 @@ const handleSingle = async <H extends HookContext = HookContext>(
           getMethod,
           method,
           id,
+          ability.relevantRuleFor(method, modelName),
           paramsGet.query,
+          'query from casl',
+          mergeQueryFromAbility(
+            context.app,
+            ability,
+            method,
+            modelName,
+            {},
+            context.service,
+            options,
+          ),
         )
       }
 
