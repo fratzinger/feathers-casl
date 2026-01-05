@@ -21,6 +21,7 @@ const defaultOptions: HookBaseOptions = {
     return context.path
   },
   notSkippable: false,
+  debug: false,
 }
 
 export const makeDefaultBaseOptions = (): HookBaseOptions => {

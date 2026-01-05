@@ -34,6 +34,7 @@ export interface HookBaseOptions<H extends HookContext = HookContext> {
   modelName: GetModelName
   notSkippable: boolean
   method?: string | ((context: H) => string)
+  debug?: boolean
 }
 
 export interface CheckBasicPermissionHookOptions<
@@ -128,7 +129,7 @@ export interface GetMinimalFieldsOptions {
 export type Path = string | Array<string | number>
 
 export interface ThrowUnlessCanOptions
-  extends Pick<HookBaseOptions, 'actionOnForbidden'> {
+  extends Pick<HookBaseOptions, 'actionOnForbidden' | 'debug'> {
   skipThrow: boolean
 }
 

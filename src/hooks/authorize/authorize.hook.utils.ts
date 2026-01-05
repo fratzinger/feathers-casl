@@ -28,7 +28,7 @@ import type {
   ThrowUnlessCanOptions,
 } from '../../types.js'
 import type { Promisable } from 'type-fest'
-import { getMethodName } from '../../utils/getMethodName'
+import { getMethodName } from '../../utils/getMethodName.js'
 
 declare module '@feathersjs/feathers' {
   interface Params {
@@ -146,6 +146,15 @@ export const throwUnlessCan = <T extends ForcedSubject<string>>(
 ): boolean => {
   if (ability.cannot(method, resource)) {
     if (options.actionOnForbidden) options.actionOnForbidden()
+    if (options.debug) {
+      console.error(
+        'Feathers-CASL: throwUnlessCan - permission denied',
+        method,
+        modelName,
+        resource,
+        ability.relevantRuleFor(method, resource),
+      )
+    }
     if (!options.skipThrow) {
       throw new Forbidden(`You are not allowed to ${method} ${modelName}`)
     }

@@ -148,6 +148,14 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
     result = pickFieldsForItem(items[0])
     if (method === 'get' && _isEmpty(result)) {
       if (options.actionOnForbidden) options.actionOnForbidden()
+      if (options.debug) {
+        console.error(
+          'Feathers-CASL: authorizeAfter hook - all fields are restricted for this action',
+          method,
+          modelName,
+          items[0],
+        )
+      }
       throw new Forbidden(`You're not allowed to ${method} ${modelName}`)
     }
   }
