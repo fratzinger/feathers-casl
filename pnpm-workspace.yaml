@@ -1,0 +1,5 @@
+allowBuilds:
+  esbuild: true
+  mongodb-memory-server: true
+  sqlite3: true
+  unrs-resolver: true

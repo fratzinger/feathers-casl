@@ -11,19 +11,11 @@ import type { Application, Query } from '@feathersjs/feathers'
 import type { AdapterBase } from '@feathersjs/adapter-commons'
 import type { Adapter, AuthorizeHookOptions } from '../types.js'
 
-// const adaptersFor$not: Adapter[] = ["feathers-nedb"];
 const adaptersFor$not: Adapter[] = []
 
-const adaptersFor$notAsArray: Adapter[] = [
-  'feathers-sequelize',
-  // "feathers-objection",
-]
+const adaptersFor$notAsArray: Adapter[] = ['feathers-sequelize']
 
-const adaptersFor$nor: Adapter[] = [
-  '@feathersjs/memory',
-  // "feathers-mongoose",
-  '@feathersjs/mongodb',
-]
+const adaptersFor$nor: Adapter[] = ['@feathersjs/memory', '@feathersjs/mongodb']
 
 export const mergeQueryFromAbility = <T>(
   app: Application,

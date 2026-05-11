@@ -9,9 +9,6 @@ export type Adapter =
   | '@feathersjs/memory'
   | '@feathersjs/knex'
   | '@feathersjs/mongodb'
-  // | "feathers-mongoose"
-  // | "feathers-nedb"
-  // | "feathers-objection"
   | 'feathers-sequelize'
   | 'feathers-kysely'
 
