@@ -1,6 +1,6 @@
 export type MakeTestsOptions = {
   around?: boolean
-  beforeHooks?: unknown[]
-  afterHooks?: unknown[]
+  beforeHooks?: any[]
+  afterHooks?: any[]
   actionBefore?: () => Promise<void> | void
 }

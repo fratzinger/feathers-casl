@@ -21,7 +21,7 @@ declare module '@feathersjs/adapter-commons' {
 describe('authorize.options.test.ts', function () {
   type TestApplication = Application<{ tests: MemoryService }>
   let app: TestApplication
-  let service: MemoryService
+  let service: any
 
   describe('checkMultiActions', function () {
     beforeEach(function () {
@@ -370,7 +370,7 @@ describe('authorize.options.test.ts', function () {
                   },
                   { resolveAction },
                 ),
-              ),
+              ) as any,
             }),
           ],
         },
@@ -526,7 +526,7 @@ describe('authorize.options.test.ts', function () {
     })
 
     it('fails for empty ability in options', async function () {
-      const makeContext = (method, type) => {
+      const makeContext = (method: string, type: string) => {
         return {
           path: 'tests',
           method,
@@ -539,7 +539,7 @@ describe('authorize.options.test.ts', function () {
           params: {
             query: {},
           },
-        }
+        } as unknown as HookContext
       }
 
       const types = ['before']

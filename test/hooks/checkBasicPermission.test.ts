@@ -1,9 +1,9 @@
 import assert from 'node:assert'
 import { defineAbility } from '@casl/ability'
-import { checkBasicPermission } from '../../src'
+import { checkBasicPermission } from '../../src/index.js'
 import type { HookContext } from '@feathersjs/feathers'
 import { markHookForSkip } from '@fratzinger/feathers-utils'
-import { resolveAction } from '../test-utils'
+import { resolveAction } from '../test-utils.js'
 
 describe('checkBasicPermission.test.ts', function () {
   describe('general', function () {
@@ -52,7 +52,7 @@ describe('checkBasicPermission.test.ts', function () {
         return {
           service: {
             modelName: 'Test',
-            get(id) {
+            get(id: any) {
               return { id, userId: 1 }
             },
           },
@@ -90,7 +90,7 @@ describe('checkBasicPermission.test.ts', function () {
     })
 
     it("passes for 'manage' 'all' permission", async function () {
-      const makeContext = (method, type) => {
+      const makeContext = (method: string, type: string) => {
         return {
           service: {
             modelName: 'Test',
@@ -136,7 +136,7 @@ describe('checkBasicPermission.test.ts', function () {
     })
 
     it('passes for general individual permission', async function () {
-      const makeContext = (method, type) => {
+      const makeContext = (method: string, type: string) => {
         const path = 'tests'
         return {
           service: {

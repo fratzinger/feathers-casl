@@ -1,7 +1,7 @@
 import type { HookContext } from '@feathersjs/feathers'
 
 export const getModelName = (
-  modelName: string | ((context: HookContext) => string),
+  modelName: string | ((context: HookContext) => string) | undefined,
   context: HookContext,
 ): string => {
   if (modelName === undefined) {

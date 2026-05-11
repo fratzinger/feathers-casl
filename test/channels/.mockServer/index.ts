@@ -28,7 +28,7 @@ type Application = ExpressFeathers<{
 
 export const mockServer = (options: MockServerOptions) => {
   const { channels, services } = options
-  const app: Application = express(feathers())
+  const app: Application = (express as any)(feathers())
 
   // Load app configuration
   app.configure(configuration())

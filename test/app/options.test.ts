@@ -1,8 +1,8 @@
 import assert from 'node:assert'
 import { feathers } from '@feathersjs/feathers'
 import { MemoryService } from '@feathersjs/memory'
-import { feathersCasl, authorize } from '../../src'
-import type { InitOptions } from '../../src'
+import { feathersCasl, authorize } from '../../src/index.js'
+import type { InitOptions } from '../../src/index.js'
 import { defineAbility } from '@casl/ability'
 
 const mockApp = () => {
@@ -53,6 +53,8 @@ describe('app-options / service-options', function () {
       let calledActionOnForbidden = false
       let calledAbility = false
       let calledModelName = false
+      let calledChannelAbility = false
+      let calledChannelModelName = false
 
       app.configure(
         feathersCasl({

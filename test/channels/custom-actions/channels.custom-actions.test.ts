@@ -47,7 +47,7 @@ describe('channels.custom-actions.test.ts', function () {
     const promises = users.map(async (user) => {
       const socket = io(`http://localhost:${port}`)
       const client = feathers()
-      client.configure(socketio(socket))
+      client.configure((socketio as any)(socket))
       clients.push(client)
       await client.service('authentication').create({
         strategy: 'local',
@@ -58,7 +58,7 @@ describe('channels.custom-actions.test.ts', function () {
 
     const socket = io(`http://localhost:${port}`)
     const client = feathers()
-    client.configure(socketio(socket))
+    client.configure((socketio as any)(socket))
     clients.push(client)
 
     await Promise.all(promises)
@@ -72,7 +72,7 @@ describe('channels.custom-actions.test.ts', function () {
     servicePath: string,
     methodName: string,
     event: string,
-    expectedPerClient: unknown,
+    expectedPerClient: any,
     i: number,
   ) => {
     assert.ok(
@@ -188,7 +188,7 @@ describe('channels.custom-actions.test.ts', function () {
       const methodNames = Object.keys(methods)
       for (let j = 0, o = methodNames.length; j < o; j++) {
         const methodName = methodNames[j]
-        const method = methods[methodName]
+        const method = (methods as any)[methodName]
         const service = app.service(servicePath)
         const { event, params, expectedPerClient } = method
 
@@ -196,7 +196,7 @@ describe('channels.custom-actions.test.ts', function () {
           checkClient(servicePath, methodName, event, expectedPerClient, i),
         )
 
-        service[methodName](...params)
+        ;(service as any)[methodName](...params)
 
         await Promise.all(promises)
       }

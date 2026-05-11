@@ -7,7 +7,7 @@ import { defineAbility } from '@casl/ability'
 import { checkCan } from '../../src/index.js'
 
 describe('utils - checkCan', function () {
-  let app: Application, service, service2
+  let app: Application, service: any, service2: any
   beforeAll(async function () {
     app = feathers()
     app.use('tests', new MemoryService({ multi: true }))

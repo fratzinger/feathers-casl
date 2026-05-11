@@ -112,26 +112,27 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
       return undefined
     }
 
-    let fields = hasRestrictingFields(
+    const restrictingFields = hasRestrictingFields(
       ability,
       getOrFind,
       subject(modelName, item),
       hasRestrictingFieldsOptions,
     )
 
-    if (fields === true) {
+    if (restrictingFields === true) {
       // full restriction
       return {}
-    } else if (skipCheckFields || (!fields && !$select)) {
+    } else if (skipCheckFields || (!restrictingFields && !$select)) {
       // no restrictions
       return item
-    } else if (fields && $select) {
-      fields = mergeArrays(fields, $select, 'intersect') as string[]
-    } else {
-      fields = fields ? fields : $select
     }
 
-    return _pick(item, fields)
+    const pickFields: string[] =
+      restrictingFields && $select
+        ? (mergeArrays(restrictingFields, $select, 'intersect') as string[])
+        : ((restrictingFields || $select) as string[])
+
+    return _pick(item, pickFields)
   }
 
   let result

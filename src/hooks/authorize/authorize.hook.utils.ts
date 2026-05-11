@@ -22,6 +22,7 @@ import type {
   Adapter,
   AuthorizeHookOptions,
   AuthorizeHookOptionsExclusive,
+  AvailableFieldsOption,
   HookBaseOptions,
   InitOptions,
   Path,
@@ -48,24 +49,28 @@ export const makeOptions = <A extends Application = Application>(
     defaultOptions,
     getAppOptions(app),
     options,
-  )
+  ) as unknown as AuthorizeHookOptions
 }
 
-const defaultOptions: AuthorizeHookOptionsExclusive<HookContext> = {
+const defaultOptions = {
   adapter: undefined,
-  availableFields: (context): string[] => {
-    const availableFields: string[] | ((context: HookContext) => string[]) =
+  availableFields: (context: HookContext): string[] | undefined => {
+    const availableFields: AvailableFieldsOption =
       context.service.options?.casl?.availableFields
     return getAvailableFields(context, { availableFields })
   },
   usePatchData: false,
   useUpdateData: false,
-}
+} satisfies Partial<AuthorizeHookOptionsExclusive<HookContext>>
 
 export const makeDefaultOptions = (
   options?: Partial<AuthorizeHookOptions>,
 ): AuthorizeHookOptions => {
-  return Object.assign(makeDefaultBaseOptions(), defaultOptions, options)
+  return Object.assign(
+    makeDefaultBaseOptions(),
+    defaultOptions,
+    options,
+  ) as unknown as AuthorizeHookOptions
 }
 
 const getAppOptions = (
@@ -191,7 +196,7 @@ export const refetchItems = async (
 }
 
 export const getConditionalSelect = (
-  $select: string[],
+  $select: string[] | undefined,
   ability: AnyAbility,
   method: string,
   modelName: string,

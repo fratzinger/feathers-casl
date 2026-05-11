@@ -12,7 +12,7 @@ import type {
 } from '../types.js'
 import { getMethodName } from '../utils/getMethodName.js'
 
-const defaultOptions: HookBaseOptions = {
+const defaultOptions = {
   ability: undefined,
   actionOnForbidden: undefined,
   checkMultiActions: false,
@@ -22,10 +22,10 @@ const defaultOptions: HookBaseOptions = {
   },
   notSkippable: false,
   debug: false,
-}
+} satisfies Partial<HookBaseOptions>
 
 export const makeDefaultBaseOptions = (): HookBaseOptions => {
-  return Object.assign({}, defaultOptions)
+  return Object.assign({}, defaultOptions) as unknown as HookBaseOptions
 }
 
 export const checkCreatePerItem = (

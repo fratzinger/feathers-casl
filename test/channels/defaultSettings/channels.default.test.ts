@@ -49,7 +49,7 @@ describe('channels.default.test.ts', function () {
     users.forEach((user, i) => {
       const socket = io(`http://localhost:${port}`)
       const client = feathers()
-      client.configure(socketio(socket))
+      client.configure((socketio as any)(socket))
       if (i === 0) {
         client1 = client
         user1 = user
@@ -89,7 +89,7 @@ describe('channels.default.test.ts', function () {
 
     const socket = io(`http://localhost:${port}`)
     client4 = feathers()
-    client4.configure(socketio(socket))
+    client4.configure((socketio as any)(socket))
     await Promise.all(promises)
   })
 
@@ -126,7 +126,7 @@ describe('channels.default.test.ts', function () {
       const servicePath = services[i]
       for (let j = 0, o = methodNames.length; j < o; j++) {
         const methodName = methodNames[j]
-        const method = methods[methodName]
+        const method = (methods as any)[methodName]
         const service = app.service(servicePath)
         const { event, params, expected } = method
         const fulFill = new Promise((resolve) => {
@@ -134,8 +134,7 @@ describe('channels.default.test.ts', function () {
             assert.deepStrictEqual(result, expected, 'result is full')
             resolve(result)
           })
-
-          service[methodName](...params)
+          ;(service as any)[methodName](...params)
         })
 
         await assert.doesNotReject(
@@ -181,7 +180,7 @@ describe('channels.default.test.ts', function () {
       const servicePath = services[i]
       for (let j = 0, o = methodNames.length; j < o; j++) {
         const methodName = methodNames[j]
-        const method = methods[methodName]
+        const method = (methods as any)[methodName]
         const service = app.service(servicePath)
         const { event, params, expected } = method
         const fulFill1 = new Promise((resolve) => {
@@ -195,7 +194,7 @@ describe('channels.default.test.ts', function () {
           client2.service(servicePath).on(event, resolve)
         })
 
-        service[methodName](...params)
+        ;(service as any)[methodName](...params)
 
         await Promise.all([
           assert.doesNotReject(
@@ -253,7 +252,7 @@ describe('channels.default.test.ts', function () {
       const servicePath = services[i]
       for (let j = 0, o = methodNames.length; j < o; j++) {
         const methodName = methodNames[j]
-        const method = methods[methodName]
+        const method = (methods as any)[methodName]
         const service = app.service(servicePath)
         const { event, params, expected } = method
 
@@ -264,7 +263,7 @@ describe('channels.default.test.ts', function () {
           })
         })
 
-        service[methodName](...params)
+        ;(service as any)[methodName](...params)
 
         await assert.doesNotReject(
           promiseTimeout(
@@ -314,7 +313,7 @@ describe('channels.default.test.ts', function () {
       const servicePath = services[i]
       for (let j = 0, o = methodNames.length; j < o; j++) {
         const methodName = methodNames[j]
-        const method = methods[methodName]
+        const method = (methods as any)[methodName]
         const service = app.service(servicePath)
         const { event, params, user1Expected, user2Expected } = method
 
@@ -340,7 +339,7 @@ describe('channels.default.test.ts', function () {
           })
         })
 
-        service[methodName](...params)
+        ;(service as any)[methodName](...params)
 
         await Promise.all([
           assert.doesNotReject(
