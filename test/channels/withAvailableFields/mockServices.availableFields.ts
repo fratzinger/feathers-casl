@@ -14,7 +14,7 @@ const resolveAction = createAliasResolver({
   delete: 'remove',
 })
 
-declare module '@feathersjs/Memory' {
+declare module '@feathersjs/memory' {
   interface MemoryServiceOptions {
     casl?: ServiceCaslOptions
   }
