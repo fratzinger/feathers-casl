@@ -8,7 +8,7 @@
     "src/**/*",
     "test/**/*",
     "vite.config.ts",
-    "build.config.ts",
+    "tsdown.config.ts",
     "docs/.vitepress/**/*"
   ],
   "exclude": ["node_modules"]

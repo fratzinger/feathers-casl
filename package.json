@@ -20,14 +20,12 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
     }
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "files": [
     "CHANGELOG.md",
     "LICENSE",
@@ -36,11 +34,11 @@
     "dist/**"
   ],
   "engines": {
-    "node": ">= 20.0.0"
+    "node": ">= 22.0.0"
   },
   "packageManager": "pnpm@11.0.9",
   "scripts": {
-    "build": "unbuild",
+    "build": "tsdown",
     "version": "npm run build",
     "release": "np",
     "vitest": "vitest",
@@ -48,6 +46,7 @@
     "coverage": "vitest run --coverage",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "attw": "attw --pack . --profile esm-only",
     "docs": "vitepress dev docs",
     "docs:build": "vitepress build docs"
   },
@@ -60,10 +59,11 @@
     "@feathersjs/feathers": "^5.0.44",
     "@feathersjs/transport-commons": "^5.0.44",
     "@fratzinger/feathers-utils": "^7.0.1",
-    "feathers-hooks-common": "^8.2.1",
+    "feathers-utils": "^10.0.0",
     "lodash": "^4.18.1"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.2",
     "@casl/ability": "^6.8.1",
     "@feathers-community/eslint-config": "^0.1.0",
     "@feathersjs/adapter-commons": "^5.0.44",
@@ -78,6 +78,7 @@
     "@feathersjs/socketio-client": "^5.0.44",
     "@fratzinger/feathers-kysely": "^0.5.1",
     "@tsconfig/node22": "^22.0.5",
+    "@types/cors": "^2.8.19",
     "@types/lodash": "^4.17.24",
     "@types/node": "^25.6.2",
     "@types/pg": "^8.20.0",
@@ -101,9 +102,10 @@
     "sequelize": "^6.37.8",
     "socket.io-client": "^4.8.3",
     "sqlite3": "^6.0.1",
+    "tsdown": "^0.22.0",
     "type-fest": "^5.6.0",
     "typescript": "^6.0.3",
-    "unbuild": "^3.6.1",
+    "unrun": "^0.3.0",
     "vite": "^8.0.12",
     "vitepress": "^1.6.4",
     "vitest": "^4.1.5"

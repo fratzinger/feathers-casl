@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(pnpm run *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(npx tsdown *)",
+      "WebFetch(domain:utils.feathersjs.com)",
+      "Bash(pnpm lint *)",
+      "Bash(pnpm typecheck *)",
+      "Bash(pnpm test *)"
     ]
   }
 }

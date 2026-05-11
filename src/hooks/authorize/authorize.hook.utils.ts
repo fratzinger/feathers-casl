@@ -9,11 +9,8 @@ import {
 } from '../../utils/index.js'
 import { makeDefaultBaseOptions } from '../common.js'
 
-import {
-  getItemsIsArray,
-  isMulti,
-  markHookForSkip,
-} from '@fratzinger/feathers-utils'
+import { getResultIsArray } from 'feathers-utils'
+import { isMulti, markHookForSkip } from '@fratzinger/feathers-utils'
 
 import type { AnyAbility, ForcedSubject } from '@casl/ability'
 import type { Application, HookContext, Params } from '@feathersjs/feathers'
@@ -175,7 +172,7 @@ export const refetchItems = async (
   if (!context.result) {
     return
   }
-  const { items } = getItemsIsArray(context, { from: 'result' })
+  const { result: items } = getResultIsArray(context)
 
   if (!items) {
     return

@@ -1,13 +1,9 @@
-import { replaceItems } from 'feathers-hooks-common'
 import { subject } from '@casl/ability'
 import _pick from 'lodash/pick.js'
 import _isEmpty from 'lodash/isEmpty.js'
 
-import {
-  shouldSkip,
-  mergeArrays,
-  getItemsIsArray,
-} from '@fratzinger/feathers-utils'
+import { getResultIsArray, mutateResult } from 'feathers-utils'
+import { shouldSkip, mergeArrays } from '@fratzinger/feathers-utils'
 
 import {
   getPersistedConfig,
@@ -42,7 +38,7 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
   }
 
   // eslint-disable-next-line prefer-const
-  let { isArray, items } = getItemsIsArray(context, { from: 'result' })
+  let { isArray, result: items } = getResultIsArray(context)
   if (!items.length) {
     return context
   }
@@ -99,7 +95,7 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
     if ($newSelect) {
       const _items = await refetchItems(context)
       if (_items) {
-        items = _items
+        items = _items as typeof items
       }
     }
   }
@@ -135,33 +131,28 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
     return _pick(item, pickFields)
   }
 
-  let result
-  if (isArray) {
-    result = []
-    for (let i = 0, n = items.length; i < n; i++) {
-      const item = pickFieldsForItem(items[i])
+  const newResult = isArray
+    ? items
+        .map(pickFieldsForItem)
+        .filter((x): x is Record<string, unknown> => !!x)
+    : [pickFieldsForItem(items[0])]
 
-      if (item) {
-        result.push(item)
-      }
+  if (!isArray && method === 'get' && _isEmpty(newResult[0])) {
+    if (options.actionOnForbidden) options.actionOnForbidden()
+    if (options.debug) {
+      console.error(
+        'Feathers-CASL: authorizeAfter hook - all fields are restricted for this action',
+        method,
+        modelName,
+        items[0],
+      )
     }
-  } else {
-    result = pickFieldsForItem(items[0])
-    if (method === 'get' && _isEmpty(result)) {
-      if (options.actionOnForbidden) options.actionOnForbidden()
-      if (options.debug) {
-        console.error(
-          'Feathers-CASL: authorizeAfter hook - all fields are restricted for this action',
-          method,
-          modelName,
-          items[0],
-        )
-      }
-      throw new Forbidden(`You're not allowed to ${method} ${modelName}`)
-    }
+    throw new Forbidden(`You're not allowed to ${method} ${modelName}`)
   }
 
-  replaceItems(context, result)
+  await mutateResult(context, (item) => item, {
+    transform: () => newResult as any[],
+  })
 
   return context
 }

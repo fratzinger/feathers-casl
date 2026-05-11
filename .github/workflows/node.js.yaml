@@ -85,3 +85,4 @@ jobs:
           cache: "pnpm"
       - run: pnpm i
       - run: pnpm run build
+      - run: pnpm run attw
