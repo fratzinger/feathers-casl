@@ -30,7 +30,9 @@ import { getMethodName } from '../../utils/getMethodName.js'
 
 declare module '@feathersjs/feathers' {
   interface Params {
-    ability?: AnyAbility
+    ability?:
+      | AnyAbility
+      | ((context: HookContext) => AnyAbility | Promise<AnyAbility>)
   }
 }
 

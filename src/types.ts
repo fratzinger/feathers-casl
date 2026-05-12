@@ -17,7 +17,7 @@ export interface ServiceCaslOptions {
 }
 
 export interface CaslParams<A extends AnyMongoAbility = AnyMongoAbility> {
-  ability?: A
+  ability?: A | ((context: HookContext) => A | Promise<A>)
   casl?: {
     ability: A | (() => A)
   }
