@@ -12,13 +12,13 @@ import type { MakeTestsOptions } from './_makeTests.types.js'
 export default (
   adapterName: Adapter | string,
   makeService: () => any,
-  clean: (app, service) => Promise<void>,
+  clean: (app: Application, service: any) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
   { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] },
 ): void => {
   let app: Application
-  let service
-  let id
+  let service: any
+  let id: any
 
   // const itSkip = (adapterToTest: string | string[]) => {
   //   const condition =
@@ -238,7 +238,7 @@ export default (
     })
 
     it("patches item and returns empty object for not overlapping '$select' and 'restricting fields'", async function () {
-      let item = { test: true, userId: 1, supersecret: true, hidden: true }
+      let item: any = { test: true, userId: 1, supersecret: true, hidden: true }
 
       item = await service.create(item)
 

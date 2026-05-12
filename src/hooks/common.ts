@@ -1,5 +1,5 @@
 import { subject } from '@casl/ability'
-import { getItemsIsArray } from '@fratzinger/feathers-utils'
+import { getDataIsArray } from 'feathers-utils'
 
 import { throwUnlessCan } from './authorize/authorize.hook.utils.js'
 
@@ -12,7 +12,7 @@ import type {
 } from '../types.js'
 import { getMethodName } from '../utils/getMethodName.js'
 
-const defaultOptions: HookBaseOptions = {
+const defaultOptions = {
   ability: undefined,
   actionOnForbidden: undefined,
   checkMultiActions: false,
@@ -21,10 +21,11 @@ const defaultOptions: HookBaseOptions = {
     return context.path
   },
   notSkippable: false,
-}
+  debug: false,
+} satisfies Partial<HookBaseOptions>
 
 export const makeDefaultBaseOptions = (): HookBaseOptions => {
-  return Object.assign({}, defaultOptions)
+  return Object.assign({}, defaultOptions) as unknown as HookBaseOptions
 }
 
 export const checkCreatePerItem = (
@@ -53,7 +54,7 @@ export const checkCreatePerItem = (
   }
 
   // we have all information we need (maybe we need populated data?)
-  const { items } = getItemsIsArray(context, { from: 'data' })
+  const { data: items } = getDataIsArray(context)
 
   for (let i = 0, n = items.length; i < n; i++) {
     throwUnlessCan(

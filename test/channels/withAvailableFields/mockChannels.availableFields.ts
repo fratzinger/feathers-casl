@@ -35,7 +35,7 @@ export default function (app: Application): void {
 
   const caslOptions = makeChannelOptions(app)
 
-  const fields = caslOptions.availableFields({
+  const fields = (caslOptions.availableFields as any)({
     service: app.service('users'),
   })
 

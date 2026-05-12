@@ -1,5 +1,5 @@
 import assert from 'node:assert'
-import { authorize } from '../../../src'
+import { authorize } from '../../../src/index.js'
 import { defineAbility } from '@casl/ability'
 import _cloneDeep from 'lodash/cloneDeep.js'
 import {
@@ -9,7 +9,7 @@ import {
 } from '@fratzinger/feathers-utils'
 import type { HookContext } from '@feathersjs/feathers'
 import { MemoryService } from '@feathersjs/memory'
-import { resolveAction } from '../../test-utils'
+import { resolveAction } from '../../test-utils.js'
 
 describe('authorize.general.test.ts', function () {
   describe('before', function () {
@@ -58,7 +58,7 @@ describe('authorize.general.test.ts', function () {
       const makeContext = (method = 'find', type = 'before') => {
         return {
           service: {
-            get(id) {
+            get(id: any) {
               return { id, userId: 1 }
             },
           },
@@ -97,7 +97,7 @@ describe('authorize.general.test.ts', function () {
     })
 
     it("passes for 'manage' 'all' permission", async function () {
-      const makeContext = (method, type) => {
+      const makeContext = (method: string, type: string) => {
         return {
           service: {},
           path: 'tests',
@@ -146,7 +146,7 @@ describe('authorize.general.test.ts', function () {
     })
 
     it('passes for general individual permission', async function () {
-      const makeContext = (method, type) => {
+      const makeContext = (method: string, type: string) => {
         const path = 'tests'
         return {
           service: {},
@@ -191,7 +191,7 @@ describe('authorize.general.test.ts', function () {
     })
 
     it("passes for 'manage' 'all' permission with availableFields: undefined", async function () {
-      const makeContext = (method, type) => {
+      const makeContext = (method: string, type: string) => {
         return {
           service: {},
           path: 'tests',
@@ -328,7 +328,7 @@ describe('authorize.general.test.ts', function () {
 
     it('makes clean query with multiple rules', async function () {
       const expectedResult = { id: 1, userId: 1, test: true }
-      const makeContext = (method, type) => {
+      const makeContext = (method: string, type: string) => {
         return {
           service: {},
           path: 'tests',
@@ -762,7 +762,7 @@ describe('authorize.general.test.ts', function () {
   describe('after', function () {
     it("after - passes single with 'get' rule", async function () {
       const expectedResult = { id: 1, userId: 1, test: true }
-      const makeContext = (method, type) => {
+      const makeContext = (method: string, type: string) => {
         return {
           service: {},
           path: 'tests',
@@ -807,7 +807,7 @@ describe('authorize.general.test.ts', function () {
       const promises: Promise<any>[] = []
       ;['test', true, 123].forEach((val) => {
         const methods = ['find']
-        const service = {
+        const service: Record<string, any> = {
           path: 'tests',
         }
         methods.forEach((method) => {
@@ -815,7 +815,7 @@ describe('authorize.general.test.ts', function () {
             return val
           }
         })
-        const makeContext = (method, type) => {
+        const makeContext = (method: string, type: string) => {
           return {
             service,
             path: 'tests',
@@ -857,7 +857,7 @@ describe('authorize.general.test.ts', function () {
 
     it("after - passes multi with 'find' rule", async function () {
       const expectedResult = [{ id: 1, userId: 1, test: true }]
-      const makeContext = (method, type) => {
+      const makeContext = (method: string, type: string) => {
         return {
           service: {},
           path: 'tests',
@@ -905,7 +905,7 @@ describe('authorize.general.test.ts', function () {
         skip: 0,
         data: [{ id: 1, userId: 1, test: true }],
       }
-      const makeContext = (method, type) => {
+      const makeContext = (method: string, type: string) => {
         return {
           service: {},
           path: 'tests',

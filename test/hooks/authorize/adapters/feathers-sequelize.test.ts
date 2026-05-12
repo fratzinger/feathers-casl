@@ -1,7 +1,8 @@
 import { Sequelize, DataTypes, Op } from 'sequelize'
 import makeTests from './makeTests/index.js'
 import { SequelizeService } from 'feathers-sequelize'
-import { getItemsIsArray, filterArray } from '@fratzinger/feathers-utils'
+import { getResultIsArray } from 'feathers-utils'
+import { filterArray } from '@fratzinger/feathers-utils'
 import type { ServiceCaslOptions } from '../../../../src/index.js'
 import type { HookContext } from '@feathersjs/feathers'
 
@@ -75,7 +76,7 @@ const afterHooks = [
   (context: HookContext) => {
     const { Model } = context.service
     const fields = Model.fieldRawAttributesMap
-    const { items } = getItemsIsArray(context)
+    const { result: items } = getResultIsArray(context)
 
     items.forEach((item) => {
       const keys = Object.keys(item)

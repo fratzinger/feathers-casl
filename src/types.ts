@@ -9,9 +9,6 @@ export type Adapter =
   | '@feathersjs/memory'
   | '@feathersjs/knex'
   | '@feathersjs/mongodb'
-  // | "feathers-mongoose"
-  // | "feathers-nedb"
-  // | "feathers-objection"
   | 'feathers-sequelize'
   | 'feathers-kysely'
 
@@ -20,7 +17,7 @@ export interface ServiceCaslOptions {
 }
 
 export interface CaslParams<A extends AnyMongoAbility = AnyMongoAbility> {
-  ability?: A
+  ability?: A | ((context: HookContext) => A | Promise<A>)
   casl?: {
     ability: A | (() => A)
   }
@@ -34,6 +31,7 @@ export interface HookBaseOptions<H extends HookContext = HookContext> {
   modelName: GetModelName
   notSkippable: boolean
   method?: string | ((context: H) => string)
+  debug?: boolean
 }
 
 export interface CheckBasicPermissionHookOptions<
@@ -128,7 +126,7 @@ export interface GetMinimalFieldsOptions {
 export type Path = string | Array<string | number>
 
 export interface ThrowUnlessCanOptions
-  extends Pick<HookBaseOptions, 'actionOnForbidden'> {
+  extends Pick<HookBaseOptions, 'actionOnForbidden' | 'debug'> {
   skipThrow: boolean
 }
 

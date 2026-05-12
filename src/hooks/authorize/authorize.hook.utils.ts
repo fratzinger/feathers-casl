@@ -9,11 +9,8 @@ import {
 } from '../../utils/index.js'
 import { makeDefaultBaseOptions } from '../common.js'
 
-import {
-  getItemsIsArray,
-  isMulti,
-  markHookForSkip,
-} from '@fratzinger/feathers-utils'
+import { getResultIsArray } from 'feathers-utils'
+import { isMulti, markHookForSkip } from '@fratzinger/feathers-utils'
 
 import type { AnyAbility, ForcedSubject } from '@casl/ability'
 import type { Application, HookContext, Params } from '@feathersjs/feathers'
@@ -22,17 +19,20 @@ import type {
   Adapter,
   AuthorizeHookOptions,
   AuthorizeHookOptionsExclusive,
+  AvailableFieldsOption,
   HookBaseOptions,
   InitOptions,
   Path,
   ThrowUnlessCanOptions,
 } from '../../types.js'
 import type { Promisable } from 'type-fest'
-import { getMethodName } from '../../utils/getMethodName'
+import { getMethodName } from '../../utils/getMethodName.js'
 
 declare module '@feathersjs/feathers' {
   interface Params {
-    ability?: AnyAbility
+    ability?:
+      | AnyAbility
+      | ((context: HookContext) => AnyAbility | Promise<AnyAbility>)
   }
 }
 
@@ -48,24 +48,28 @@ export const makeOptions = <A extends Application = Application>(
     defaultOptions,
     getAppOptions(app),
     options,
-  )
+  ) as unknown as AuthorizeHookOptions
 }
 
-const defaultOptions: AuthorizeHookOptionsExclusive<HookContext> = {
+const defaultOptions = {
   adapter: undefined,
-  availableFields: (context): string[] => {
-    const availableFields: string[] | ((context: HookContext) => string[]) =
+  availableFields: (context: HookContext): string[] | undefined => {
+    const availableFields: AvailableFieldsOption =
       context.service.options?.casl?.availableFields
     return getAvailableFields(context, { availableFields })
   },
   usePatchData: false,
   useUpdateData: false,
-}
+} satisfies Partial<AuthorizeHookOptionsExclusive<HookContext>>
 
 export const makeDefaultOptions = (
   options?: Partial<AuthorizeHookOptions>,
 ): AuthorizeHookOptions => {
-  return Object.assign(makeDefaultBaseOptions(), defaultOptions, options)
+  return Object.assign(
+    makeDefaultBaseOptions(),
+    defaultOptions,
+    options,
+  ) as unknown as AuthorizeHookOptions
 }
 
 const getAppOptions = (
@@ -146,6 +150,17 @@ export const throwUnlessCan = <T extends ForcedSubject<string>>(
 ): boolean => {
   if (ability.cannot(method, resource)) {
     if (options.actionOnForbidden) options.actionOnForbidden()
+    /* v8 ignore start */
+    if (options.debug) {
+      console.error(
+        'Feathers-CASL: throwUnlessCan - permission denied',
+        method,
+        modelName,
+        resource,
+        ability.relevantRuleFor(method, resource),
+      )
+    }
+    /* v8 ignore stop */
     if (!options.skipThrow) {
       throw new Forbidden(`You are not allowed to ${method} ${modelName}`)
     }
@@ -161,7 +176,7 @@ export const refetchItems = async (
   if (!context.result) {
     return
   }
-  const { items } = getItemsIsArray(context, { from: 'result' })
+  const { result: items } = getResultIsArray(context)
 
   if (!items) {
     return
@@ -182,7 +197,7 @@ export const refetchItems = async (
 }
 
 export const getConditionalSelect = (
-  $select: string[],
+  $select: string[] | undefined,
   ability: AnyAbility,
   method: string,
   modelName: string,

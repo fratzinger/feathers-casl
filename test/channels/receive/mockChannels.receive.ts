@@ -37,7 +37,7 @@ export default function (app: Application): void {
     useActionName: 'receive',
   })
 
-  const fields = caslOptions.availableFields({
+  const fields = (caslOptions.availableFields as any)({
     service: app.service('users'),
   })
 

@@ -1,7 +1,7 @@
 import { knex } from 'knex'
 import makeTests from '../makeTests/index.js'
 import { KnexService } from '@feathersjs/knex'
-import { getItemsIsArray } from '@fratzinger/feathers-utils'
+import { getResultIsArray } from 'feathers-utils'
 import type { HookContext } from '@feathersjs/feathers'
 import type { Adapter, ServiceCaslOptions } from '../../../../../src/index.js'
 
@@ -47,7 +47,7 @@ const boolFields = ['test', 'published', 'supersecret', 'hidden']
 
 const afterHooks = [
   (context: HookContext) => {
-    const { items, isArray } = getItemsIsArray(context)
+    const { result: items, isArray } = getResultIsArray(context)
 
     const result = items
 

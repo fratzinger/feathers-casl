@@ -1,11 +1,11 @@
 import assert from 'node:assert'
 import { defineAbility } from '@casl/ability'
 import { feathers } from '@feathersjs/feathers'
-import { authorize } from '../../../src'
+import { authorize } from '../../../src/index.js'
 import { MemoryService } from '@feathersjs/memory'
 import { joinQuery } from 'feathers-fletching'
 import { filterArray } from '@fratzinger/feathers-utils'
-import { resolveAction } from '../../test-utils'
+import { resolveAction } from '../../test-utils.js'
 
 describe('authorize.relations', function () {
   const mock = () => {
@@ -479,7 +479,7 @@ describe('authorize.relations', function () {
       )
 
       assert.ok(
-        otherAlbums.every((x) => !x.stars),
+        otherAlbums.every((x: any) => !x.stars),
         'none of other albums has stars',
       )
     })
@@ -576,7 +576,7 @@ describe('authorize.relations', function () {
       )
 
       assert.ok(
-        otherAlbums.every((x) => !x.stars),
+        otherAlbums.every((x: any) => !x.stars),
         'none of other albums has stars',
       )
     })

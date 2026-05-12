@@ -14,13 +14,13 @@ const resolveAction = createAliasResolver({
   delete: 'remove',
 })
 
-declare module '@feathersjs/Memory' {
+declare module '@feathersjs/memory' {
   interface MemoryServiceOptions {
     casl?: ServiceCaslOptions
   }
 }
 
-const defineAbilitiesFor = (user) => {
+const defineAbilitiesFor = (user: any) => {
   return defineAbility(
     (can) => {
       if (user.id === 0) {
@@ -115,16 +115,16 @@ export default function (app: Application): void {
       all: [],
       find: [],
       get: [],
-      create: [hashPassword('password')],
-      update: [hashPassword('password')],
-      patch: [hashPassword('password')],
+      create: [(hashPassword as any)('password')],
+      update: [(hashPassword as any)('password')],
+      patch: [(hashPassword as any)('password')],
       remove: [],
     },
     after: {
       all: [
         // Make sure the password field is never sent to the client
         // Always must be the last hook
-        protect('password'),
+        (protect as any)('password'),
       ],
     },
   })

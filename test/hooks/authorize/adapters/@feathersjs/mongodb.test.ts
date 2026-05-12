@@ -6,7 +6,7 @@ import makeTests from '../makeTests/index.js'
 import type { Adapter, ServiceCaslOptions } from '../../../../../src/index.js'
 import { filterArray } from '@fratzinger/feathers-utils'
 
-let Model
+let Model: any
 
 declare module '@feathersjs/mongodb' {
   interface MongoDBAdapterOptions {

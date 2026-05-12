@@ -3,12 +3,12 @@ import { defineAbility } from '@casl/ability'
 import { Sequelize, Op, DataTypes } from 'sequelize'
 import { feathers } from '@feathersjs/feathers'
 import { SequelizeService } from 'feathers-sequelize'
-import { authorize } from '../../src'
+import { authorize } from '../../src/index.js'
 import path from 'node:path'
-import { resolveAction } from '../test-utils'
+import { resolveAction } from '../test-utils.js'
 
 describe('authorize.users.test.ts', function () {
-  function mockAbility(user) {
+  function mockAbility(user: any) {
     const ability = defineAbility(
       (can, cannot) => {
         can('manage', 'all', { companyId: 1 })
@@ -25,7 +25,7 @@ describe('authorize.users.test.ts', function () {
     return ability
   }
 
-  async function mockApp(hook) {
+  async function mockApp(hook: any) {
     const __dirname = import.meta.dirname
 
     const sequelize = new Sequelize('sequelize', '', '', {
@@ -99,7 +99,7 @@ describe('authorize.users.test.ts', function () {
 
   it('user can update user', async function () {
     let hadAbility = false
-    const { service } = await mockApp((context) => {
+    const { service } = await mockApp((context: any) => {
       if (!context.params.ability) {
         return context
       }

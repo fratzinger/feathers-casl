@@ -4,7 +4,7 @@ import { Pool } from 'pg'
 import makeTests from './makeTests/index.js'
 import type { Adapter, ServiceCaslOptions } from '../../../../src/types.js'
 import { KyselyService } from '@fratzinger/feathers-kysely'
-import { getItemsIsArray } from '@fratzinger/feathers-utils'
+import { getResultIsArray } from 'feathers-utils'
 import type { HookContext } from '@feathersjs/feathers'
 
 declare module '@fratzinger/feathers-kysely' {
@@ -58,7 +58,7 @@ const boolFields = ['test', 'published', 'supersecret', 'hidden']
 
 const afterHooks = [
   (context: HookContext) => {
-    const { items, isArray } = getItemsIsArray(context)
+    const { result: items, isArray } = getResultIsArray(context)
 
     const result = items
 

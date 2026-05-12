@@ -74,7 +74,7 @@ describe('utils - getMinimalFields', function () {
     const ability = defineAbility((can) => {
       can('manage', 'all', ['id'])
     })
-    const availableFields = []
+    const availableFields: string[] = []
     for (const method of methods) {
       const record: Record<string, unknown> = { id: 1, test: true }
       const fields = getMinimalFields(

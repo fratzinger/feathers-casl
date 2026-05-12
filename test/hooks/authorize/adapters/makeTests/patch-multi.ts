@@ -14,13 +14,13 @@ import type { MakeTestsOptions } from './_makeTests.types.js'
 export default (
   adapterName: Adapter | string,
   makeService: () => any,
-  clean: (app, service) => Promise<void>,
+  clean: (app: Application, service: any) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
   { around, afterHooks }: MakeTestsOptions = { around: false, afterHooks: [] },
 ): void => {
   let app: Application
-  let service
-  let id
+  let service: any
+  let id: any
 
   // const itSkip = (adapterToTest: string | string[]) => {
   //   const condition =
@@ -199,7 +199,7 @@ export default (
 
       assert.deepStrictEqual(
         _sortBy(patchedItems, id),
-        realItems.filter((x) => _isEqual(x[id], item1[id])),
+        realItems.filter((x: any) => _isEqual(x[id], item1[id])),
         'result of patch is real item',
       )
     })
@@ -249,7 +249,7 @@ export default (
     })
 
     it('patch:multi patches allowed items and returns subset for read', async function () {
-      let items = [
+      let items: any[] = [
         { published: false, test: true, userId: 1 },
         { published: true, test: true, userId: 1 },
         { published: true, test: true, userId: 2 },
@@ -299,7 +299,7 @@ export default (
     })
 
     it('patch:multi patches allowed items and returns subset for read', async function () {
-      let items = [
+      let items: any[] = [
         { published: false, test: true, userId: 1 },
         { published: true, test: true, userId: 1 },
         { published: true, test: true, userId: 2 },

@@ -15,7 +15,7 @@ import type { MakeTestsOptions } from './_makeTests.types.js'
 export default async function (
   name: Adapter | string,
   makeService: () => unknown,
-  clean: (app, service) => Promise<void>,
+  clean: (app: any, service: any) => Promise<void>,
   authorizeHookOptions: Partial<AuthorizeHookOptions>,
   makeTestsOptions: MakeTestsOptions = {
     around: false,

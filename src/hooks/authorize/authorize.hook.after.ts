@@ -1,13 +1,9 @@
-import { replaceItems } from 'feathers-hooks-common'
 import { subject } from '@casl/ability'
 import _pick from 'lodash/pick.js'
 import _isEmpty from 'lodash/isEmpty.js'
 
-import {
-  shouldSkip,
-  mergeArrays,
-  getItemsIsArray,
-} from '@fratzinger/feathers-utils'
+import { getResultIsArray, mutateResult } from 'feathers-utils'
+import { shouldSkip, mergeArrays } from '@fratzinger/feathers-utils'
 
 import {
   getPersistedConfig,
@@ -42,7 +38,7 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
   }
 
   // eslint-disable-next-line prefer-const
-  let { isArray, items } = getItemsIsArray(context, { from: 'result' })
+  let { isArray, result: items } = getResultIsArray(context)
   if (!items.length) {
     return context
   }
@@ -99,7 +95,7 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
     if ($newSelect) {
       const _items = await refetchItems(context)
       if (_items) {
-        items = _items
+        items = _items as typeof items
       }
     }
   }
@@ -112,47 +108,56 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
       return undefined
     }
 
-    let fields = hasRestrictingFields(
+    const restrictingFields = hasRestrictingFields(
       ability,
       getOrFind,
       subject(modelName, item),
       hasRestrictingFieldsOptions,
     )
 
-    if (fields === true) {
+    if (restrictingFields === true) {
       // full restriction
       return {}
-    } else if (skipCheckFields || (!fields && !$select)) {
+    } else if (skipCheckFields || (!restrictingFields && !$select)) {
       // no restrictions
       return item
-    } else if (fields && $select) {
-      fields = mergeArrays(fields, $select, 'intersect') as string[]
-    } else {
-      fields = fields ? fields : $select
     }
 
-    return _pick(item, fields)
+    const pickFields: string[] =
+      restrictingFields && $select
+        ? (mergeArrays(restrictingFields, $select, 'intersect') as string[])
+        : ((restrictingFields || $select) as string[])
+
+    return _pick(item, pickFields)
   }
 
-  let result
+  let newResult: (Record<string, unknown> | undefined)[]
   if (isArray) {
-    result = []
-    for (let i = 0, n = items.length; i < n; i++) {
-      const item = pickFieldsForItem(items[i])
-
-      if (item) {
-        result.push(item)
-      }
-    }
+    newResult = items
+      .map(pickFieldsForItem)
+      .filter((x): x is Record<string, unknown> => !!x)
   } else {
-    result = pickFieldsForItem(items[0])
-    if (method === 'get' && _isEmpty(result)) {
+    const single = pickFieldsForItem(items[0])
+    if (method === 'get' && _isEmpty(single)) {
       if (options.actionOnForbidden) options.actionOnForbidden()
+      /* v8 ignore start */
+      if (options.debug) {
+        console.error(
+          'Feathers-CASL: authorizeAfter hook - all fields are restricted for this action',
+          method,
+          modelName,
+          items[0],
+        )
+      }
+      /* v8 ignore stop */
       throw new Forbidden(`You're not allowed to ${method} ${modelName}`)
     }
+    newResult = [single]
   }
 
-  replaceItems(context, result)
+  await mutateResult(context, (item) => item, {
+    transform: () => newResult as any[],
+  })
 
   return context
 }

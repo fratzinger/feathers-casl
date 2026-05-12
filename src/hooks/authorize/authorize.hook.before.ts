@@ -165,7 +165,32 @@ const handleSingle = async <H extends HookContext = HookContext>(
 
     const getMethod = service._get ? '_get' : 'get'
 
-    const item = await service[getMethod](id, paramsGet)
+    const item = await service[getMethod](id, paramsGet).catch((err: any) => {
+      /* v8 ignore start */
+      if (options.debug) {
+        console.error(
+          'Feathers-CASL: authorizeBefore hook - error fetching item for single-item authorization check',
+          getMethod,
+          method,
+          id,
+          ability.relevantRuleFor(method, modelName),
+          paramsGet.query,
+          'query from casl',
+          mergeQueryFromAbility(
+            context.app,
+            ability,
+            method,
+            modelName,
+            {},
+            context.service,
+            options,
+          ),
+        )
+      }
+      /* v8 ignore stop */
+
+      throw err
+    })
 
     const restrictingFields = hasRestrictingFields(
       ability,
@@ -180,6 +205,16 @@ const handleSingle = async <H extends HookContext = HookContext>(
       if (options.actionOnForbidden) {
         options.actionOnForbidden()
       }
+      /* v8 ignore start */
+      if (options.debug) {
+        console.error(
+          'Feathers-CASL: authorizeBefore hook - all fields are restricted for this action',
+          method,
+          modelName,
+          id,
+        )
+      }
+      /* v8 ignore stop */
       throw new Forbidden("You're not allowed to make this request")
     }
 
@@ -198,6 +233,16 @@ const handleSingle = async <H extends HookContext = HookContext>(
       if (options.actionOnForbidden) {
         options.actionOnForbidden()
       }
+      /* v8 ignore start */
+      if (options.debug) {
+        console.error(
+          'Feathers-CASL: authorizeBefore hook - no fields are allowed to be changed for this action',
+          method,
+          modelName,
+          id,
+        )
+      }
+      /* v8 ignore stop */
       throw new Forbidden("You're not allowed to make this request")
     }
 
@@ -222,7 +267,7 @@ const checkData = <H extends HookContext = HookContext>(
   data: Record<string, unknown>,
   options: Pick<
     AuthorizeHookOptions,
-    'actionOnForbidden' | 'usePatchData' | 'useUpdateData' | 'method'
+    'actionOnForbidden' | 'usePatchData' | 'useUpdateData' | 'method' | 'debug'
   >,
 ): void => {
   const method = getMethodName(context, options)
@@ -261,6 +306,15 @@ const handleMulti = async <H extends HookContext = HookContext>(
       if (options.actionOnForbidden) {
         options.actionOnForbidden()
       }
+      /* v8 ignore start */
+      if (options.debug) {
+        console.error(
+          'Feathers-CASL: authorizeBefore hook - all fields are restricted for multi-patch action',
+          method,
+          modelName,
+        )
+      }
+      /* v8 ignore stop */
       throw new Forbidden("You're not allowed to make this request")
     }
     if (fields && fields.length > 0) {
