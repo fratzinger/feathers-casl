@@ -7,7 +7,9 @@
       "WebFetch(domain:utils.feathersjs.com)",
       "Bash(pnpm lint *)",
       "Bash(pnpm typecheck *)",
-      "Bash(pnpm test *)"
+      "Bash(pnpm test *)",
+      "Bash(pnpm coverage *)",
+      "Bash(pnpm vitest *)"
     ]
   }
 }

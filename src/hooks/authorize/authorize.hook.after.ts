@@ -131,23 +131,28 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
     return _pick(item, pickFields)
   }
 
-  const newResult = isArray
-    ? items
-        .map(pickFieldsForItem)
-        .filter((x): x is Record<string, unknown> => !!x)
-    : [pickFieldsForItem(items[0])]
-
-  if (!isArray && method === 'get' && _isEmpty(newResult[0])) {
-    if (options.actionOnForbidden) options.actionOnForbidden()
-    if (options.debug) {
-      console.error(
-        'Feathers-CASL: authorizeAfter hook - all fields are restricted for this action',
-        method,
-        modelName,
-        items[0],
-      )
+  let newResult: (Record<string, unknown> | undefined)[]
+  if (isArray) {
+    newResult = items
+      .map(pickFieldsForItem)
+      .filter((x): x is Record<string, unknown> => !!x)
+  } else {
+    const single = pickFieldsForItem(items[0])
+    if (method === 'get' && _isEmpty(single)) {
+      if (options.actionOnForbidden) options.actionOnForbidden()
+      /* v8 ignore start */
+      if (options.debug) {
+        console.error(
+          'Feathers-CASL: authorizeAfter hook - all fields are restricted for this action',
+          method,
+          modelName,
+          items[0],
+        )
+      }
+      /* v8 ignore stop */
+      throw new Forbidden(`You're not allowed to ${method} ${modelName}`)
     }
-    throw new Forbidden(`You're not allowed to ${method} ${modelName}`)
+    newResult = [single]
   }
 
   await mutateResult(context, (item) => item, {

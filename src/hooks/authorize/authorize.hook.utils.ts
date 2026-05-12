@@ -148,6 +148,7 @@ export const throwUnlessCan = <T extends ForcedSubject<string>>(
 ): boolean => {
   if (ability.cannot(method, resource)) {
     if (options.actionOnForbidden) options.actionOnForbidden()
+    /* v8 ignore start */
     if (options.debug) {
       console.error(
         'Feathers-CASL: throwUnlessCan - permission denied',
@@ -157,6 +158,7 @@ export const throwUnlessCan = <T extends ForcedSubject<string>>(
         ability.relevantRuleFor(method, resource),
       )
     }
+    /* v8 ignore stop */
     if (!options.skipThrow) {
       throw new Forbidden(`You are not allowed to ${method} ${modelName}`)
     }

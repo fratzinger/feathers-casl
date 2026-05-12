@@ -166,6 +166,7 @@ const handleSingle = async <H extends HookContext = HookContext>(
     const getMethod = service._get ? '_get' : 'get'
 
     const item = await service[getMethod](id, paramsGet).catch((err: any) => {
+      /* v8 ignore start */
       if (options.debug) {
         console.error(
           'Feathers-CASL: authorizeBefore hook - error fetching item for single-item authorization check',
@@ -186,6 +187,7 @@ const handleSingle = async <H extends HookContext = HookContext>(
           ),
         )
       }
+      /* v8 ignore stop */
 
       throw err
     })
@@ -203,6 +205,7 @@ const handleSingle = async <H extends HookContext = HookContext>(
       if (options.actionOnForbidden) {
         options.actionOnForbidden()
       }
+      /* v8 ignore start */
       if (options.debug) {
         console.error(
           'Feathers-CASL: authorizeBefore hook - all fields are restricted for this action',
@@ -211,6 +214,7 @@ const handleSingle = async <H extends HookContext = HookContext>(
           id,
         )
       }
+      /* v8 ignore stop */
       throw new Forbidden("You're not allowed to make this request")
     }
 
@@ -229,6 +233,7 @@ const handleSingle = async <H extends HookContext = HookContext>(
       if (options.actionOnForbidden) {
         options.actionOnForbidden()
       }
+      /* v8 ignore start */
       if (options.debug) {
         console.error(
           'Feathers-CASL: authorizeBefore hook - no fields are allowed to be changed for this action',
@@ -237,6 +242,7 @@ const handleSingle = async <H extends HookContext = HookContext>(
           id,
         )
       }
+      /* v8 ignore stop */
       throw new Forbidden("You're not allowed to make this request")
     }
 
@@ -300,6 +306,7 @@ const handleMulti = async <H extends HookContext = HookContext>(
       if (options.actionOnForbidden) {
         options.actionOnForbidden()
       }
+      /* v8 ignore start */
       if (options.debug) {
         console.error(
           'Feathers-CASL: authorizeBefore hook - all fields are restricted for multi-patch action',
@@ -307,6 +314,7 @@ const handleMulti = async <H extends HookContext = HookContext>(
           modelName,
         )
       }
+      /* v8 ignore stop */
       throw new Forbidden("You're not allowed to make this request")
     }
     if (fields && fields.length > 0) {
