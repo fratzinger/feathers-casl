@@ -64,6 +64,40 @@ describe('utils - checkCan', function () {
     )
   })
 
+  it('skips the general check when checkGeneral is false', async function () {
+    // no rule allows 'get' at the class level, so the general check would reject;
+    // checkGeneral: false skips it and only the item-level conditions are checked.
+    const ability = defineAbility((can) => {
+      can('get', 'tests', { published: true })
+    })
+    const can = await checkCan(ability, 0, 'get', 'tests', service, {
+      checkGeneral: false,
+      skipThrow: true,
+    })
+    assert.strictEqual(can, true, "'get:0' returns true")
+  })
+
+  it("uses 'get' (no $select) when useConditionalSelect is false and the service lacks _get", async function () {
+    const ability = defineAbility((can) => {
+      can('get', 'tests', { published: true })
+    })
+    let receivedParams: unknown = 'untouched'
+    const getOnlyService = {
+      get: async (id: number, params: unknown) => {
+        receivedParams = params
+        return { id, published: true }
+      },
+    } as any
+
+    const can = await checkCan(ability, 0, 'get', 'tests', getOnlyService, {
+      checkGeneral: false,
+      useConditionalSelect: false,
+      skipThrow: true,
+    })
+    assert.strictEqual(can, true)
+    assert.strictEqual(receivedParams, undefined, 'no params are built')
+  })
+
   it("'checkCan' with skipThrow", async function () {
     const ability = defineAbility((can, cannot) => {
       can('get', 'tests')
