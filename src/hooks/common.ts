@@ -12,20 +12,18 @@ import type {
 } from '../types.js'
 import { getMethodName } from '../utils/getMethodName.js'
 
-const defaultOptions = {
-  ability: undefined,
-  actionOnForbidden: undefined,
-  checkMultiActions: false,
-  checkAbilityForInternal: false,
-  modelName: (context: Pick<HookContext, 'path'>): string => {
-    return context.path
-  },
-  notSkippable: false,
-  debug: false,
-} satisfies Partial<HookBaseOptions>
-
 export const makeDefaultBaseOptions = (): HookBaseOptions => {
-  return Object.assign({}, defaultOptions) as unknown as HookBaseOptions
+  return {
+    ability: undefined,
+    actionOnForbidden: undefined,
+    checkMultiActions: false,
+    checkAbilityForInternal: false,
+    modelName: (context: Pick<HookContext, 'path'>): string => {
+      return context.path
+    },
+    notSkippable: false,
+    debug: false,
+  } as unknown as HookBaseOptions
 }
 
 export const checkCreatePerItem = (

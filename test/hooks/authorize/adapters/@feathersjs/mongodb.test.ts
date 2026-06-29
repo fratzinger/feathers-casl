@@ -4,7 +4,7 @@ import { MongoDBService } from '@feathersjs/mongodb'
 
 import makeTests from '../makeTests/index.js'
 import type { Adapter, ServiceCaslOptions } from '../../../../../src/index.js'
-import { filterArray } from '@fratzinger/feathers-utils'
+import { filterArray } from '../../../../test-utils.js'
 
 let Model: any
 
@@ -18,7 +18,7 @@ const makeService = () => {
   return new MongoDBService({
     Model,
     multi: true,
-    operators: ['$nor'],
+    operators: ['$nor', '$and'],
     filters: {
       ...filterArray('$nor'),
     },

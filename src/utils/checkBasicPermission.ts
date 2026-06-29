@@ -24,7 +24,7 @@ const makeOptions = (
   options?: Partial<CheckBasicPermissionUtilsOptions>,
 ): CheckBasicPermissionUtilsOptions => {
   options = options || {}
-  return Object.assign(makeDefaultBaseOptions(), defaultOptions, options)
+  return { ...makeDefaultBaseOptions(), ...defaultOptions, ...options }
 }
 
 export const checkBasicPermissionUtil = async <H extends HookContext>(

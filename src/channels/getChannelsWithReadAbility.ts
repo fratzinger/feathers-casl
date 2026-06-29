@@ -10,7 +10,12 @@ import {
   getEventName,
 } from './channels.utils.js'
 
-import { getModelName, getAvailableFields } from '../utils/index.js'
+import {
+  getModelName,
+  getAvailableFields,
+  getIdFields,
+  mergeArrays,
+} from '../utils/index.js'
 import { hasRestrictingFields } from '../utils/hasRestrictingFields.js'
 
 import type { RealTimeConnection } from '@feathersjs/transport-commons'
@@ -114,9 +119,14 @@ export const getChannelsWithReadAbility = (
       }
     }
 
+    const idFields = getIdFields(context)
+
     for (let i = 0, n = connectionsPerFields.length; i < n; i++) {
       const { fields, connections } = connectionsPerFields[i]
-      const restrictedData = fields ? _pick(data, fields) : data
+      // always keep the service id field(s) so records stay identifiable
+      const restrictedData = fields
+        ? _pick(data, mergeArrays(fields, idFields, 'combine') as string[])
+        : data
       if (!_isEmpty(restrictedData)) {
         result.push(new Channel(connections, restrictedData))
       }

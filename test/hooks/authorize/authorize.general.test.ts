@@ -2,14 +2,10 @@ import assert from 'node:assert'
 import { authorize } from '../../../src/index.js'
 import { defineAbility } from '@casl/ability'
 import _cloneDeep from 'lodash/cloneDeep.js'
-import {
-  filterArray,
-  filterObject,
-  markHookForSkip,
-} from '@fratzinger/feathers-utils'
+import { addSkip } from 'feathers-utils'
 import type { HookContext } from '@feathersjs/feathers'
 import { MemoryService } from '@feathersjs/memory'
-import { resolveAction } from '../../test-utils.js'
+import { filterArray, filterObject, resolveAction } from '../../test-utils.js'
 
 describe('authorize.general.test.ts', function () {
   describe('before', function () {
@@ -38,8 +34,8 @@ describe('authorize.general.test.ts', function () {
         methods.forEach((method) => {
           const context = makeContext(method, type)
 
-          markHookForSkip('checkBasicPermission', 'all', context)
-          const query = Object.assign({}, context.params.query)
+          addSkip(context, 'checkBasicPermission')
+          const query = { ...context.params.query }
 
           const promise = authorize()(context).then((result) => {
             assert.deepStrictEqual(
@@ -84,7 +80,7 @@ describe('authorize.general.test.ts', function () {
       types.forEach((type) => {
         methods.forEach((method) => {
           const context = makeContext(method, type)
-          markHookForSkip('checkBasicPermission', 'all', context)
+          addSkip(context, 'checkBasicPermission')
           const promise = assert.rejects(
             authorize()(context),
             (err: Error) => err.name === 'Forbidden',
@@ -127,8 +123,8 @@ describe('authorize.general.test.ts', function () {
         methods.forEach((method) => {
           const context = makeContext(method, type)
 
-          markHookForSkip('checkBasicPermission', 'all', context)
-          const query = Object.assign({}, context.params.query)
+          addSkip(context, 'checkBasicPermission')
+          const query = { ...context.params.query }
 
           const promise = authorize({
             availableFields: ['id', 'userId', 'test'],
@@ -176,7 +172,7 @@ describe('authorize.general.test.ts', function () {
       types.forEach((type) => {
         methods.forEach((method) => {
           const context = makeContext(method, type)
-          const query = Object.assign({}, context.params.query)
+          const query = { ...context.params.query }
           const promise = authorize()(context).then((result) => {
             assert.deepStrictEqual(
               result.params.query,
@@ -221,8 +217,8 @@ describe('authorize.general.test.ts', function () {
         methods.forEach((method) => {
           const context = makeContext(method, type)
 
-          markHookForSkip('checkBasicPermission', 'all', context)
-          const query = Object.assign({}, context.params.query)
+          addSkip(context, 'checkBasicPermission')
+          const query = { ...context.params.query }
 
           const promise = authorize({ availableFields: undefined })(
             context,
@@ -266,8 +262,8 @@ describe('authorize.general.test.ts', function () {
         methods.forEach((method) => {
           const context = makeContext(method, type)
 
-          markHookForSkip('checkBasicPermission', 'all', context)
-          const query = Object.assign({}, context.params.query)
+          addSkip(context, 'checkBasicPermission')
+          const query = { ...context.params.query }
 
           const promise = authorize()(context).then((result) => {
             assert.deepStrictEqual(
@@ -308,8 +304,8 @@ describe('authorize.general.test.ts', function () {
         methods.forEach((method) => {
           const context = makeContext(method, type)
 
-          markHookForSkip('checkBasicPermission', 'all', context)
-          const query = Object.assign({}, context.params.query)
+          addSkip(context, 'checkBasicPermission')
+          const query = { ...context.params.query }
 
           const promise = authorize({ modelName: undefined })(context).then(
             (result) => {
@@ -334,7 +330,7 @@ describe('authorize.general.test.ts', function () {
           path: 'tests',
           method,
           type,
-          result: Object.assign({}, expectedResult),
+          result: { ...expectedResult },
           id: 1,
           params: {
             ability: defineAbility(
@@ -384,7 +380,7 @@ describe('authorize.general.test.ts', function () {
           },
         } as unknown as HookContext
 
-        markHookForSkip('checkBasicPermission', 'all', context)
+        addSkip(context, 'checkBasicPermission')
 
         await assert.doesNotReject(
           authorize()(context),
@@ -427,7 +423,7 @@ describe('authorize.general.test.ts', function () {
           },
         } as unknown as HookContext
 
-        markHookForSkip('checkBasicPermission', 'all', context)
+        addSkip(context, 'checkBasicPermission')
 
         await assert.doesNotReject(
           authorize({ availableFields: ['id', 'userId', 'test'] })(context),
@@ -470,7 +466,7 @@ describe('authorize.general.test.ts', function () {
           },
         } as unknown as HookContext
 
-        markHookForSkip('checkBasicPermission', 'all', context)
+        addSkip(context, 'checkBasicPermission')
 
         await assert.rejects(
           authorize({ checkMultiActions: true })(context),
@@ -500,7 +496,7 @@ describe('authorize.general.test.ts', function () {
           },
         } as unknown as HookContext
 
-        markHookForSkip('checkBasicPermission', 'all', context)
+        addSkip(context, 'checkBasicPermission')
 
         await assert.rejects(
           authorize()(context),
@@ -543,7 +539,7 @@ describe('authorize.general.test.ts', function () {
           },
         } as unknown as HookContext
 
-        markHookForSkip('checkBasicPermission', 'all', context)
+        addSkip(context, 'checkBasicPermission')
 
         await assert.rejects(
           authorize()(context),
@@ -632,7 +628,7 @@ describe('authorize.general.test.ts', function () {
           types.forEach((type) => {
             methods.forEach((method) => {
               const context = makeContext(method, type)
-              const query = Object.assign({}, context.params.query)
+              const query = { ...context.params.query }
               assert.deepStrictEqual(
                 query,
                 {},
@@ -768,7 +764,7 @@ describe('authorize.general.test.ts', function () {
           path: 'tests',
           method,
           type,
-          result: Object.assign({}, expectedResult),
+          result: { ...expectedResult },
           id: 1,
           params: {
             ability: defineAbility(

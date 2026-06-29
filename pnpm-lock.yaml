@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@fratzinger/feathers-kysely': link:../@fratzinger/feathers-kysely
+
 importers:
 
   .:
@@ -17,12 +20,9 @@ importers:
       '@feathersjs/transport-commons':
         specifier: ^5.0.44
         version: 5.0.44
-      '@fratzinger/feathers-utils':
-        specifier: ^7.0.1
-        version: 7.0.1(@feathersjs/feathers@5.0.44)
       feathers-utils:
-        specifier: ^10.0.0
-        version: 10.0.0(@feathersjs/feathers@5.0.44)
+        specifier: ^10.4.0
+        version: 10.4.0(@feathersjs/feathers@5.0.44)
       lodash:
         specifier: ^4.18.1
         version: 4.18.1
@@ -67,8 +67,8 @@ importers:
         specifier: ^5.0.44
         version: 5.0.44
       '@fratzinger/feathers-kysely':
-        specifier: ^0.5.1
-        version: 0.5.1(@feathersjs/feathers@5.0.44)(kysely@0.29.0)
+        specifier: link:../@fratzinger/feathers-kysely
+        version: link:../@fratzinger/feathers-kysely
       '@tsconfig/node22':
         specifier: ^22.0.5
         version: 22.0.5
@@ -551,6 +551,10 @@ packages:
     resolution: {integrity: sha512-m9rho8bJnNw8wJEuwQkUMiWf9N8qeWxUB/4yDD2lEwKIlP7/DKxwrWveN11T5veO4T452Z+5/uv5chBWijYG5w==}
     engines: {node: '>= 12'}
 
+  '@feathersjs/adapter-commons@5.0.45':
+    resolution: {integrity: sha512-5GZluJHbBDrbScbEPUvZbayND4ONlRyy9OQGVTACzpdETrp4iTf0zxntpkHlrHXpqd0MUvEAd81BgkZx5OaHVg==}
+    engines: {node: '>= 12'}
+
   '@feathersjs/authentication-local@5.0.44':
     resolution: {integrity: sha512-UcDJLxcNj2UOUvnXbEA63/FHBmDlAy+XvrnGfeofN7DCvl547s/a22QLJJ7GCSgAM6gST8At0hfXTCy2x4pGyg==}
     engines: {node: '>= 12'}
@@ -575,6 +579,10 @@ packages:
     resolution: {integrity: sha512-PnxCyKqzWLAqv1LSazDsOXNf520KQOlqUasZ/9YRz4lYRPJ0pzzfZXvzmjBFOsNPaohzKmyySS8578E9vlTQrA==}
     engines: {node: '>= 12'}
 
+  '@feathersjs/commons@5.0.45':
+    resolution: {integrity: sha512-dCe9Kfi+T6wRvhXLii1PJWaRAvqiJRMmBFsNzrrOi/wacph14NijUK63H8u/iy8Ni3gYIRaEYyBnKTfTbxbiRQ==}
+    engines: {node: '>= 12'}
+
   '@feathersjs/configuration@5.0.44':
     resolution: {integrity: sha512-JIag7lt/odJw1a5PqqdxhjmbDHzkOMwpTfbXUktbRU6XKVmWxqr72HKmSU0Iw8XB/n1bOC/VcVWlOlnHKqnDiA==}
     engines: {node: '>= 12'}
@@ -591,6 +599,10 @@ packages:
     resolution: {integrity: sha512-QcxrUvEFHGBT47VyH02rlhw51M+G0yam3fpDnko1HlkM6C62notLwE2lirEDz34JWITwkn/lwV527h1HwHpOuQ==}
     engines: {node: '>= 12'}
 
+  '@feathersjs/errors@5.0.45':
+    resolution: {integrity: sha512-BwMYJ62FMcB9yNyPW5ghr49k44Xv8tM+4lz2Sv9q2Gcf9Br2ZYBNOTH+2OAWVcdaCm/xAYdd/RWgUzzCIVRspg==}
+    engines: {node: '>= 12'}
+
   '@feathersjs/express@5.0.44':
     resolution: {integrity: sha512-mnSUxOjQnuDzQJD6jlmTtsZimxB7IoJMHyXe0T+nnYOhBIWnuX//6oznncgUUXIGxjhcpswA/2BPoeLFDnZFzQ==}
     engines: {node: '>= 12'}
@@ -605,6 +617,10 @@ packages:
 
   '@feathersjs/feathers@5.0.44':
     resolution: {integrity: sha512-qxZ9ZQQBIfyIdQKUIFUXZ2EegcUWpIwG4BOBpO7RZXu7nlv9SNMttrTbVWEfUzc72jhKtJuRW8/FHdrsb1446g==}
+    engines: {node: '>= 12'}
+
+  '@feathersjs/feathers@5.0.45':
+    resolution: {integrity: sha512-0NLBzf67grpx1uX8+t09ctklhgmh4T9D1q/kkdPdR21qYhPcvI+6wrJHJo/CfnQNEJ6mlVVV2NqdDDC/omC+Bg==}
     engines: {node: '>= 12'}
 
   '@feathersjs/hooks@0.9.0':
@@ -644,19 +660,6 @@ packages:
   '@feathersjs/transport-commons@5.0.44':
     resolution: {integrity: sha512-BxUyGFcbt+o5TWcXKXNVrbh3zrq2iGAzE9uvaVJ7tVQX820LVHOWAp6NL5GxG+InhLUq0cc3CTpQENE0+oXRMw==}
     engines: {node: '>= 12'}
-
-  '@fratzinger/feathers-kysely@0.5.1':
-    resolution: {integrity: sha512-3ruLQgoN7TnKDSDckUsOHbfoL0SobPnOgJ0tNfD6ML7UdPNlp4MHML2yOLrLMCnAFPhxo+HZEjn2D/6Ff3iWbg==}
-    engines: {node: '>= 14'}
-    peerDependencies:
-      '@feathersjs/feathers': ^5.0.0
-      kysely: ^0.28.0
-
-  '@fratzinger/feathers-utils@7.0.1':
-    resolution: {integrity: sha512-gRXeQ5p34+ge4PkVbgn8zaE7LXcacfdFIGi4i084t3PXsFAwOorWCMcix8x3hpT4tGOPUA01U8xLvvjcRkZvIQ==}
-    engines: {node: '>= 18'}
-    peerDependencies:
-      '@feathersjs/feathers': ^5.0.0
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -1622,9 +1625,6 @@ packages:
       ajv:
         optional: true
 
-  ajv@6.12.6:
-    resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
-
   ajv@6.15.0:
     resolution: {integrity: sha512-fgFx7Hfoq60ytK2c7DhnF8jIvzYgOMxfugjLOSMHjLIPgenqa7S7oaagATUq99mV6IYvN2tRmC0wnTYX6iPbMw==}
 
@@ -2137,15 +2137,6 @@ packages:
       supports-color:
         optional: true
 
-  debug@4.4.0:
-    resolution: {integrity: sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA==}
-    engines: {node: '>=6.0'}
-    peerDependencies:
-      supports-color: '*'
-    peerDependenciesMeta:
-      supports-color:
-        optional: true
-
   debug@4.4.1:
     resolution: {integrity: sha512-KcKCqiftBJcZr++7ykoDIEwSa3XWowTfNPo92BYxjXiyYEVrUQh2aLyhxBCwww+heortUFxEJYcRzosstTEBYQ==}
     engines: {node: '>=6.0'}
@@ -2549,10 +2540,6 @@ packages:
   fast-diff@1.3.0:
     resolution: {integrity: sha512-VxPP4NqbUjj6MaAOafWeUn2cXWLcCtljklUtZf0Ind4XQ+QPtmA0b18zZy0jIQx+ExRVCR/ZQpBmik5lXshNsw==}
 
-  fast-equals@5.2.2:
-    resolution: {integrity: sha512-V7/RktU11J3I36Nwq2JnZEM7tNm17eBJz+u25qdxBZeCKiX6BkVSZQjwWIr+IobgnZy+ag73tTZgZi7tr0LrBw==}
-    engines: {node: '>=6.0.0'}
-
   fast-fifo@1.3.2:
     resolution: {integrity: sha512-/d9sfos4yxzpwkDkuN7k2SqFKtYNmCTzgfEpz82x34IM9/zc8KGxQoXg1liNC/izpRM/MBdt44Nmx41ZWqk+FQ==}
 
@@ -2595,12 +2582,6 @@ packages:
     peerDependencies:
       '@feathersjs/feathers': ^5.0.0
 
-  feathers-hooks-common@8.2.1:
-    resolution: {integrity: sha512-t3gLAaTY5ufnAoKczLCNXJddq/L9ORrvxAlfuU2Azgoi0b6X3t0Y91l1JCJAvixzxxwLJmgdnKpFX32+CvEn0A==}
-    engines: {node: '>= 18'}
-    peerDependencies:
-      '@feathersjs/feathers': ^5.0.0
-
   feathers-knex@8.0.1:
     resolution: {integrity: sha512-zeMIeQcxarN0F08U6sxkHagLfCyAslWr7Lx58LHY5n/jwgB4nvgxsyk5huwcaDXBZmGSoVlyGDo4rRYN1MQDkg==}
     engines: {node: '>= 6'}
@@ -2609,18 +2590,9 @@ packages:
     resolution: {integrity: sha512-ePI6XxqSu5yldKKHDPb1cc+JG5a1eZg40seDiZsRFjDfIxcR9mzwEgIqDnqHhO844tJdxfyHjNN1NtiPaUYAgw==}
     engines: {node: '>= 14'}
 
-  feathers-utils@10.0.0:
-    resolution: {integrity: sha512-CrZl1NPbRebjHS1jK2xS60iAL/mX9ubMJ8LZrpEFTeD7p9NlWBNT4+MRI0nyT1NFsSQu103TQ3FX3L94AMz8Ag==}
+  feathers-utils@10.4.0:
+    resolution: {integrity: sha512-YhbKC0/cYJcAyX9Fw91YByATOPVuXjwKCsml67w50PfsPZzBzn6U7xqvY3y68d/vQn5zLVi17woNisIH8Nlpdw==}
     engines: {node: '>=22.0.0'}
-    peerDependencies:
-      '@feathersjs/feathers': ^5.0.0
-      rate-limiter-flexible: '>=10.0.0'
-    peerDependenciesMeta:
-      rate-limiter-flexible:
-        optional: true
-
-  feathers-utils@10.0.0-rc.13:
-    resolution: {integrity: sha512-0/Utj3rTG09i18KzarZ1TOnQvDph4rk9tQgaQL5nmefJgxamAsQwnc5Iy9AxBYnogesOAF8kIfQ43kYQwf8wYg==}
     peerDependencies:
       '@feathersjs/feathers': ^5.0.0
       rate-limiter-flexible: '>=10.0.0'
@@ -2795,10 +2767,6 @@ packages:
 
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
-
-  graphql@16.9.0:
-    resolution: {integrity: sha512-GGTKBX4SD7Wdb8mqeDLni2oaRGYQWjWHGKPQ24ZMnUtKfcsVoiv4uX8+LJr1K6U5VW2Lu1BwJnj7uiori0YtRw==}
-    engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
 
   has-ansi@2.0.0:
     resolution: {integrity: sha512-C8vBJ8DwUCx19vhm7urhTuUsr4/IyP6l4VzNQDv+ryHQObW3TTTp9yB68WpYgRe2bbaGuZ/se74IqFeVnMnLZg==}
@@ -5464,6 +5432,12 @@ snapshots:
       '@feathersjs/errors': 5.0.44
       '@feathersjs/feathers': 5.0.44
 
+  '@feathersjs/adapter-commons@5.0.45':
+    dependencies:
+      '@feathersjs/commons': 5.0.45
+      '@feathersjs/errors': 5.0.45
+      '@feathersjs/feathers': 5.0.45
+
   '@feathersjs/authentication-local@5.0.44(typescript@6.0.3)':
     dependencies:
       '@feathersjs/authentication': 5.0.44(typescript@6.0.3)
@@ -5499,6 +5473,8 @@ snapshots:
 
   '@feathersjs/commons@5.0.44': {}
 
+  '@feathersjs/commons@5.0.45': {}
+
   '@feathersjs/configuration@5.0.44(typescript@6.0.3)':
     dependencies:
       '@feathersjs/commons': 5.0.44
@@ -5518,6 +5494,8 @@ snapshots:
   '@feathersjs/errors@5.0.35': {}
 
   '@feathersjs/errors@5.0.44': {}
+
+  '@feathersjs/errors@5.0.45': {}
 
   '@feathersjs/express@5.0.44(typescript@6.0.3)':
     dependencies:
@@ -5555,6 +5533,12 @@ snapshots:
   '@feathersjs/feathers@5.0.44':
     dependencies:
       '@feathersjs/commons': 5.0.44
+      '@feathersjs/hooks': 0.9.0
+      events: 3.3.0
+
+  '@feathersjs/feathers@5.0.45':
+    dependencies:
+      '@feathersjs/commons': 5.0.45
       '@feathersjs/hooks': 0.9.0
       events: 3.3.0
 
@@ -5618,28 +5602,6 @@ snapshots:
       '@feathersjs/feathers': 5.0.44
       encodeurl: 2.0.0
       lodash: 4.18.1
-
-  '@fratzinger/feathers-kysely@0.5.1(@feathersjs/feathers@5.0.44)(kysely@0.29.0)':
-    dependencies:
-      '@feathersjs/adapter-commons': 5.0.44
-      '@feathersjs/commons': 5.0.44
-      '@feathersjs/errors': 5.0.44
-      '@feathersjs/feathers': 5.0.44
-      feathers-utils: 10.0.0-rc.13(@feathersjs/feathers@5.0.44)
-      kysely: 0.29.0
-    transitivePeerDependencies:
-      - rate-limiter-flexible
-
-  '@fratzinger/feathers-utils@7.0.1(@feathersjs/feathers@5.0.44)':
-    dependencies:
-      '@feathersjs/adapter-commons': 5.0.35
-      '@feathersjs/errors': 5.0.35
-      '@feathersjs/feathers': 5.0.44
-      fast-equals: 5.2.2
-      feathers-hooks-common: 8.2.1(@feathersjs/feathers@5.0.44)
-      lodash: 4.17.21
-    transitivePeerDependencies:
-      - supports-color
 
   '@humanfs/core@0.19.1': {}
 
@@ -6511,13 +6473,6 @@ snapshots:
     optionalDependencies:
       ajv: 8.20.0
 
-  ajv@6.12.6:
-    dependencies:
-      fast-deep-equal: 3.1.3
-      fast-json-stable-stringify: 2.1.0
-      json-schema-traverse: 0.4.1
-      uri-js: 4.4.1
-
   ajv@6.15.0:
     dependencies:
       fast-deep-equal: 3.1.3
@@ -7006,10 +6961,6 @@ snapshots:
     dependencies:
       ms: 2.1.2
 
-  debug@4.4.0:
-    dependencies:
-      ms: 2.1.3
-
   debug@4.4.1:
     dependencies:
       ms: 2.1.3
@@ -7470,8 +7421,6 @@ snapshots:
 
   fast-diff@1.3.0: {}
 
-  fast-equals@5.2.2: {}
-
   fast-fifo@1.3.2: {}
 
   fast-glob@3.3.2:
@@ -7515,18 +7464,6 @@ snapshots:
       rate-limiter-flexible: 2.4.2
       unset-value: 2.0.1
 
-  feathers-hooks-common@8.2.1(@feathersjs/feathers@5.0.44):
-    dependencies:
-      '@feathersjs/errors': 5.0.44
-      '@feathersjs/feathers': 5.0.44
-      ajv: 6.12.6
-      debug: 4.4.0
-      graphql: 16.9.0
-      lodash: 4.18.1
-      neotraverse: 0.6.18
-    transitivePeerDependencies:
-      - supports-color
-
   feathers-knex@8.0.1:
     dependencies:
       '@feathersjs/adapter-commons': 4.5.17
@@ -7543,20 +7480,10 @@ snapshots:
       '@feathersjs/commons': 5.0.24
       '@feathersjs/errors': 5.0.35
 
-  feathers-utils@10.0.0(@feathersjs/feathers@5.0.44):
+  feathers-utils@10.4.0(@feathersjs/feathers@5.0.44):
     dependencies:
-      '@feathersjs/adapter-commons': 5.0.44
-      '@feathersjs/errors': 5.0.44
-      '@feathersjs/feathers': 5.0.44
-      dequal: 2.0.3
-      fast-copy: 4.0.3
-      lodash: 4.18.1
-      neotraverse: 0.6.18
-
-  feathers-utils@10.0.0-rc.13(@feathersjs/feathers@5.0.44):
-    dependencies:
-      '@feathersjs/adapter-commons': 5.0.44
-      '@feathersjs/errors': 5.0.44
+      '@feathersjs/adapter-commons': 5.0.45
+      '@feathersjs/errors': 5.0.45
       '@feathersjs/feathers': 5.0.44
       dequal: 2.0.3
       fast-copy: 4.0.3
@@ -7721,8 +7648,6 @@ snapshots:
   graceful-fs@4.2.10: {}
 
   graceful-fs@4.2.11: {}
-
-  graphql@16.9.0: {}
 
   has-ansi@2.0.0:
     dependencies:

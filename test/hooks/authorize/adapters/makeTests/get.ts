@@ -36,20 +36,18 @@ export default (
 
       id = service.options.id
 
-      const options = Object.assign(
-        {
-          availableFields: [
-            id,
-            'userId',
-            'hi',
-            'test',
-            'published',
-            'supersecret',
-            'hidden',
-          ],
-        },
-        authorizeHookOptions,
-      )
+      const options = {
+        availableFields: [
+          id,
+          'userId',
+          'hi',
+          'test',
+          'published',
+          'supersecret',
+          'hidden',
+        ],
+        ...authorizeHookOptions,
+      }
 
       afterHooks = Array.isArray(afterHooks)
         ? afterHooks
@@ -144,6 +142,45 @@ export default (
       )
     })
 
+    it("keeps id when '$select' does not include it", async function () {
+      const item = await service.create({ test: true, userId: 1 })
+      assert.ok(item[id] !== undefined, 'item has id')
+      const returnedItem = await service.get(item[id], {
+        ability: defineAbility(
+          (can) => {
+            can('read', 'tests')
+          },
+          { resolveAction },
+        ),
+        query: {
+          $select: ['userId'],
+        },
+      })
+      assert.deepStrictEqual(
+        returnedItem,
+        { [id]: item[id], userId: 1 },
+        "'get' keeps id even though '$select' omitted it",
+      )
+    })
+
+    it('keeps id when restricting fields exclude it', async function () {
+      const item = await service.create({ test: true, userId: 1 })
+      assert.ok(item[id] !== undefined, 'item has id')
+      const returnedItem = await service.get(item[id], {
+        ability: defineAbility(
+          (can) => {
+            can('read', 'tests', ['userId'], { userId: 1 })
+          },
+          { resolveAction },
+        ),
+      })
+      assert.deepStrictEqual(
+        returnedItem,
+        { [id]: item[id], userId: 1 },
+        "'get' keeps id even though restricting fields omitted it",
+      )
+    })
+
     it.skip('returns subset of fields with inverted fields', async function () {})
 
     it("throws 'NotFound' for not 'can'", async function () {
@@ -189,7 +226,7 @@ export default (
       )
     })
 
-    it("throws if $select and restricted fields don't overlap", async function () {
+    it("returns only id if $select and restricted fields don't overlap", async function () {
       const item = await service.create({
         test: true,
         userId: 1,
@@ -198,7 +235,7 @@ export default (
       })
       assert.ok(item[id] !== undefined, 'item has id')
 
-      const promise = service.get(item[id], {
+      const returnedItem = await service.get(item[id], {
         query: { $select: [id, 'supersecret', 'hidden'] },
         ability: defineAbility(
           (can) => {
@@ -207,14 +244,13 @@ export default (
           { resolveAction },
         ),
       })
-      // rejects with 'Forbidden' which is handled by the after-hook
-      // the requesting user potentially can get the item, but he cannot get these fields
-      // maybe it should not throw, because that is an indication for hackers, that the data exists
-      // default behavior with `$select: ['nonExistent']` is: `{[id]: ${id} }`
-      await assert.rejects(
-        promise,
-        (err: Error) => err.name === 'Forbidden',
-        'rejects for id not allowed',
+      // the requesting user can get the item, but none of the `$select`ed fields are
+      // allowed -> only the id remains, matching Feathers' default `$select` behavior
+      // (e.g. `$select: ['nonExistent']` returns `{[id]: ${id} }`)
+      assert.deepStrictEqual(
+        returnedItem,
+        { [id]: item[id] },
+        "'get' returns only [id]",
       )
     })
   })

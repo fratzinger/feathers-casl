@@ -2,7 +2,7 @@ import assert from 'node:assert'
 import { defineAbility } from '@casl/ability'
 import { checkBasicPermission } from '../../src/index.js'
 import type { HookContext } from '@feathersjs/feathers'
-import { markHookForSkip } from '@fratzinger/feathers-utils'
+import { addSkip } from 'feathers-utils'
 import { resolveAction } from '../test-utils.js'
 
 describe('checkBasicPermission.test.ts', function () {
@@ -33,7 +33,7 @@ describe('checkBasicPermission.test.ts', function () {
       types.forEach((type) => {
         methods.forEach((method) => {
           const context = makeContext(method, type)
-          const query = Object.assign({}, context.params.query)
+          const query = { ...context.params.query }
           const promise = checkBasicPermission()(context).then((result) => {
             assert.deepStrictEqual(
               result.params.query,
@@ -121,7 +121,7 @@ describe('checkBasicPermission.test.ts', function () {
       types.forEach((type) => {
         methods.forEach((method) => {
           const context = makeContext(method, type)
-          const query = Object.assign({}, context.params.query)
+          const query = { ...context.params.query }
           const promise = checkBasicPermission()(context).then((result) => {
             assert.deepStrictEqual(
               result.params.query,
@@ -168,7 +168,7 @@ describe('checkBasicPermission.test.ts', function () {
       types.forEach((type) => {
         methods.forEach((method) => {
           const context = makeContext(method, type)
-          const query = Object.assign({}, context.params.query)
+          const query = { ...context.params.query }
           const promise = checkBasicPermission()(context).then((result) => {
             assert.deepStrictEqual(
               result.params.query,
@@ -202,7 +202,7 @@ describe('checkBasicPermission.test.ts', function () {
             query: {},
           },
         } as unknown as HookContext
-        markHookForSkip('checkBasicPermission', 'all', context)
+        addSkip(context, 'checkBasicPermission')
         return context
       }
 
@@ -212,7 +212,7 @@ describe('checkBasicPermission.test.ts', function () {
       types.forEach((type) => {
         methods.forEach((method) => {
           const context = makeContext(method, type)
-          const query = Object.assign({}, context.params.query)
+          const query = { ...context.params.query }
           const promise = checkBasicPermission()(context).then((result) => {
             assert.deepStrictEqual(
               result.params.query,

@@ -9,7 +9,7 @@ import { mockServer } from '../.mockServer/index.js'
 import channels1 from './mockChannels.receive.js'
 import services1 from './mockServices.receive.js'
 import getPort from 'get-port'
-import { promiseTimeout } from '../../test-utils.js'
+import { waitForServiceEvent } from 'feathers-utils'
 
 describe('channels.receive.test.ts', function () {
   let server: Server
@@ -78,39 +78,20 @@ describe('channels.receive.test.ts', function () {
       `client${i} has expected value`,
     )
     const expected = expectedPerClient[i]
-    const fulFill = new Promise((resolve) => {
-      clients[i].service(servicePath).on(event, (result) => {
-        if (expected) {
-          assert.deepStrictEqual(
-            result,
-            expected,
-            `'client${i}:${servicePath}:${methodName}': result is expected`,
-          )
-        }
-        resolve(result)
-      })
+    const promise = waitForServiceEvent(clients[i])(servicePath, event, {
+      timeout: 100,
     })
 
     if (expected) {
-      await assert.doesNotReject(
-        promiseTimeout(
-          100,
-          fulFill,
-          `'client${i}:${servicePath}:${methodName}': does not receive message`,
-        ).finally(() => {
-          clients[i].service(servicePath).removeAllListeners(event)
-        }),
-        `'client${i}:${servicePath}:${methodName}': receives message`,
+      const [result] = await promise
+      assert.deepStrictEqual(
+        result,
+        expected,
+        `'client${i}:${servicePath}:${methodName}': result is expected`,
       )
     } else {
       await assert.rejects(
-        promiseTimeout(
-          100,
-          fulFill,
-          `'client${i}:${servicePath}:${methodName}': does not receive message`,
-        ).finally(() => {
-          clients[i].service(servicePath).removeAllListeners(event)
-        }),
+        promise,
         () => true,
         `'client${i}:${servicePath}:${methodName}': does not receive message`,
       )

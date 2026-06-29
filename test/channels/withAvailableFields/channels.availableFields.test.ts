@@ -9,7 +9,7 @@ import { mockServer } from '../.mockServer/index.js'
 import channels1 from './mockChannels.availableFields.js'
 import services1 from './mockServices.availableFields.js'
 import getPort from 'get-port'
-import { promiseTimeout } from '../../test-utils.js'
+import { waitForServiceEvent } from 'feathers-utils'
 
 describe('channels.availableFields.test.ts', function () {
   let server: Server
@@ -102,6 +102,7 @@ describe('channels.availableFields.test.ts', function () {
   })
 
   it('user1 receives events', async function () {
+    const waitFor1 = waitForServiceEvent(client1)
     const services = ['articles', 'comments']
     const methods = {
       create: {
@@ -133,29 +134,18 @@ describe('channels.availableFields.test.ts', function () {
         const method = (methods as any)[methodName]
         const service = app.service(servicePath)
         const { event, params, expected } = method
-        const fulFill = new Promise((resolve) => {
-          client1.service(servicePath).on(event, (result) => {
-            assert.deepStrictEqual(result, expected, 'result is full')
-            resolve(result)
-          })
-          ;(service as any)[methodName](...params)
-        })
 
-        await assert.doesNotReject(
-          promiseTimeout(
-            100,
-            fulFill,
-            `timeout - '${servicePath}:${methodName}'`,
-          ).finally(() => {
-            client1.service(servicePath).removeAllListeners(event)
-          }),
-          'client1 receives message',
-        )
+        const promise = waitFor1(servicePath, event, { timeout: 100 })
+        ;(service as any)[methodName](...params)
+        const [result] = await promise
+        assert.deepStrictEqual(result, expected, 'result is full')
       }
     }
   })
 
   it("user2 doesn't receive unpublished articles", async function () {
+    const waitFor1 = waitForServiceEvent(client1)
+    const waitFor2 = waitForServiceEvent(client2)
     const services = ['articles']
     const methods = {
       create: {
@@ -187,47 +177,20 @@ describe('channels.availableFields.test.ts', function () {
         const method = (methods as any)[methodName]
         const service = app.service(servicePath)
         const { event, params, expected } = method
-        const fulFill1 = new Promise((resolve) => {
-          client1.service(servicePath).on(event, (result) => {
-            assert.deepStrictEqual(result, expected, 'result is full article')
-            resolve(result)
-          })
-        })
 
-        const fulFill2 = new Promise((resolve) => {
-          client2.service(servicePath).on(event, resolve)
-        })
-
+        const p1 = waitFor1(servicePath, event, { timeout: 60 })
+        const p2 = waitFor2(servicePath, event, { timeout: 60 })
         ;(service as any)[methodName](...params)
 
-        await Promise.all([
-          assert.doesNotReject(
-            promiseTimeout(
-              60,
-              fulFill1,
-              `timeout '${servicePath}:${methodName}'`,
-            ).finally(() => {
-              client1.service(servicePath).removeAllListeners(event)
-            }),
-            'client1 receives message',
-          ),
-          assert.rejects(
-            promiseTimeout(
-              60,
-              fulFill2,
-              `timeout '${servicePath}:${methodName}'`,
-            ).finally(() => {
-              client2.service(servicePath).removeAllListeners(event)
-            }),
-            () => true,
-            'client2 does not receive message',
-          ),
-        ])
+        const [result] = await p1
+        assert.deepStrictEqual(result, expected, 'result is full article')
+        await assert.rejects(p2, () => true, 'client2 does not receive message')
       }
     }
   })
 
   it('user2 receives published articles', async function () {
+    const waitFor2 = waitForServiceEvent(client2)
     const services = ['articles']
     const methods = {
       create: {
@@ -260,31 +223,17 @@ describe('channels.availableFields.test.ts', function () {
         const service = app.service(servicePath)
         const { event, params, expected } = method
 
-        const fulFill2 = new Promise((resolve) => {
-          client2.service(servicePath).on(event, (result) => {
-            assert.deepStrictEqual(result, expected, 'result is full article')
-            resolve(result)
-          })
-        })
-
+        const promise = waitFor2(servicePath, event, { timeout: 100 })
         ;(service as any)[methodName](...params)
-
-        await assert.doesNotReject(
-          promiseTimeout(
-            100,
-            fulFill2,
-            `timeout '${servicePath}:${methodName}'`,
-          ).finally(() => {
-            client1.service(servicePath).removeAllListeners(event)
-          }),
-          () => true,
-          'client2 receives message',
-        )
+        const [result] = await promise
+        assert.deepStrictEqual(result, expected, 'result is full article')
       }
     }
   })
 
   it('user2 receives subset of comments', async function () {
+    const waitFor1 = waitForServiceEvent(client1)
+    const waitFor2 = waitForServiceEvent(client2)
     const services = ['comments']
     const methods = {
       create: {
@@ -321,52 +270,21 @@ describe('channels.availableFields.test.ts', function () {
         const service = app.service(servicePath)
         const { event, params, user1Expected, user2Expected } = method
 
-        const fulFill1 = new Promise((resolve) => {
-          client1.service(servicePath).on(event, (result) => {
-            assert.deepStrictEqual(
-              result,
-              user1Expected,
-              `user1 with id '${user1.id}' with receives full comment for '${servicePath}:${methodName}'`,
-            )
-            resolve(result)
-          })
-        })
-
-        const fulFill2 = new Promise((resolve) => {
-          client2.service(servicePath).on(event, (result) => {
-            assert.deepStrictEqual(
-              result,
-              user2Expected,
-              `user2 with id '${user2.id}' receives subset for '${servicePath}:${methodName}'`,
-            )
-            resolve(result)
-          })
-        })
-
+        const p1 = waitFor1(servicePath, event, { timeout: 100 })
+        const p2 = waitFor2(servicePath, event, { timeout: 100 })
         ;(service as any)[methodName](...params)
 
-        await Promise.all([
-          assert.doesNotReject(
-            promiseTimeout(
-              100,
-              fulFill1,
-              `timeout '${servicePath}:${methodName}'`,
-            ).finally(() => {
-              client1.service(servicePath).removeAllListeners(event)
-            }),
-            'client1 receives event',
-          ),
-          assert.doesNotReject(
-            promiseTimeout(
-              100,
-              fulFill2,
-              `timeout '${servicePath}:${methodName}'`,
-            ).finally(() => {
-              client2.service(servicePath).removeAllListeners(event)
-            }),
-            'client2 receives event',
-          ),
-        ])
+        const [[result1], [result2]] = await Promise.all([p1, p2])
+        assert.deepStrictEqual(
+          result1,
+          user1Expected,
+          `user1 with id '${user1.id}' with receives full comment for '${servicePath}:${methodName}'`,
+        )
+        assert.deepStrictEqual(
+          result2,
+          user2Expected,
+          `user2 with id '${user2.id}' receives subset for '${servicePath}:${methodName}'`,
+        )
       }
     }
   })

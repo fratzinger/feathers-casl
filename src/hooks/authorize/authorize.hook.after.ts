@@ -3,7 +3,7 @@ import _pick from 'lodash/pick.js'
 import _isEmpty from 'lodash/isEmpty.js'
 
 import { getResultIsArray, mutateResult } from 'feathers-utils'
-import { shouldSkip, mergeArrays } from '@fratzinger/feathers-utils'
+import { shouldSkip } from 'feathers-utils/predicates'
 
 import {
   getPersistedConfig,
@@ -18,6 +18,8 @@ import {
   getAvailableFields,
   hasRestrictingFields,
   getModelName,
+  getIdFields,
+  mergeArrays,
 } from '../../utils/index.js'
 
 import { Forbidden } from '@feathersjs/errors'
@@ -33,7 +35,7 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
   context: H,
   options: AuthorizeHookOptions,
 ) => {
-  if (shouldSkip(HOOKNAME, context, options) || !context.params) {
+  if (shouldSkip(HOOKNAME)(context) || !context.params) {
     return context
   }
 
@@ -83,6 +85,8 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
 
   const $select: string[] | undefined = params.query?.$select
 
+  const idFields = getIdFields(context)
+
   const method = getMethodName(context, options)
 
   if (method !== 'remove') {
@@ -128,7 +132,13 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
         ? (mergeArrays(restrictingFields, $select, 'intersect') as string[])
         : ((restrictingFields || $select) as string[])
 
-    return _pick(item, pickFields)
+    // always keep the service id field(s) so records stay identifiable,
+    // matching Feathers' `$select` behavior (adapters always return the id)
+    const pickFieldsWithId = idFields.length
+      ? (mergeArrays(pickFields, idFields, 'combine') as string[])
+      : pickFields
+
+    return _pick(item, pickFieldsWithId)
   }
 
   let newResult: (Record<string, unknown> | undefined)[]

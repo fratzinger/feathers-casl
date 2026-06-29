@@ -36,20 +36,18 @@ export default (
 
       id = service.options.id
 
-      const options = Object.assign(
-        {
-          availableFields: [
-            id,
-            'userId',
-            'hi',
-            'test',
-            'published',
-            'supersecret',
-            'hidden',
-          ],
-        },
-        authorizeHookOptions,
-      )
+      const options = {
+        availableFields: [
+          id,
+          'userId',
+          'hi',
+          'test',
+          'published',
+          'supersecret',
+          'hidden',
+        ],
+        ...authorizeHookOptions,
+      }
 
       afterHooks = Array.isArray(afterHooks)
         ? afterHooks
@@ -407,6 +405,51 @@ export default (
           _sortBy(returnedItems, id),
           _sortBy([{ [id]: item1[id], test: true }, { [id]: item2[id] }], id),
           'just returned one item',
+        )
+      })
+
+      it("keeps id when '$select' does not include it", async function () {
+        const item1 = await service.create({ test: true, userId: 1 })
+        await service.create({ test: true, userId: 2 })
+
+        const returnedItems = await service.find({
+          ability: defineAbility(
+            (can) => {
+              can('read', 'tests', { userId: 1 })
+            },
+            { resolveAction },
+          ),
+          query: {
+            $select: ['userId'],
+          },
+          paginate: false,
+        })
+
+        assert.deepStrictEqual(
+          returnedItems,
+          [{ [id]: item1[id], userId: 1 }],
+          "keeps id even though '$select' omitted it",
+        )
+      })
+
+      it('keeps id when restricting fields exclude it', async function () {
+        const item1 = await service.create({ test: true, userId: 1 })
+        await service.create({ test: true, userId: 2 })
+
+        const returnedItems = await service.find({
+          ability: defineAbility(
+            (can) => {
+              can('read', 'tests', ['userId'], { userId: 1 })
+            },
+            { resolveAction },
+          ),
+          paginate: false,
+        })
+
+        assert.deepStrictEqual(
+          returnedItems,
+          [{ [id]: item1[id], userId: 1 }],
+          'keeps id even though restricting fields omitted it',
         )
       })
 

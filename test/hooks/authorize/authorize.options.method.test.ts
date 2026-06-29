@@ -1,9 +1,8 @@
 import { MemoryService } from '@feathersjs/memory'
-import { filterArray } from '@fratzinger/feathers-utils'
 import { authorize, type ServiceCaslOptions } from '../../../src/index.js'
 import { feathers } from '@feathersjs/feathers'
 import { defineAbility } from '@casl/ability'
-import { resolveAction } from '../../test-utils.js'
+import { filterArray, resolveAction } from '../../test-utils.js'
 
 declare module '@feathersjs/memory' {
   interface MemoryServiceOptions {

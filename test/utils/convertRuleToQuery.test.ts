@@ -84,4 +84,46 @@ describe('utils - convertRuleToQuery', function () {
 
     assert.ok(actionOnForbiddenCalled)
   })
+
+  describe('negation of inverted rules (De Morgan)', function () {
+    it('inverts a single field to a bare $ne (no wrapping $or)', function () {
+      const [rule] = defineAbility((can, cannot) => {
+        cannot('read', 'tests', { userId: 4 })
+      }).rules
+      assert.deepStrictEqual(convertRuleToQuery(rule), { userId: { $ne: 4 } })
+    })
+
+    it('negates a multi-field rule with $or', function () {
+      // `cannot({ userId: 4, status: 'archived' })` forbids records where BOTH
+      // conditions hold, so the negation must allow records where EITHER differs:
+      // `NOT (a AND b)` === `(NOT a) OR (NOT b)`.
+      const [rule] = defineAbility((can, cannot) => {
+        cannot('read', 'tests', { userId: 4, status: 'archived' })
+      }).rules
+      assert.deepStrictEqual(convertRuleToQuery(rule), {
+        $or: [{ userId: { $ne: 4 } }, { status: { $ne: 'archived' } }],
+      })
+    })
+
+    it('negates multiple operators on one field with $or', function () {
+      // `cannot({ age: { $gt: 18, $lt: 65 } })` forbids 18 < age < 65, so the
+      // negation is age <= 18 OR age >= 65 - the old code kept only the last
+      // operator and dropped the rest.
+      const [rule] = defineAbility((can, cannot) => {
+        cannot('read', 'tests', { age: { $gt: 18, $lt: 65 } })
+      }).rules
+      assert.deepStrictEqual(convertRuleToQuery(rule), {
+        $or: [{ age: { $lte: 18 } }, { age: { $gte: 65 } }],
+      })
+    })
+
+    it('negates a field value combined with a field operator', function () {
+      const [rule] = defineAbility((can, cannot) => {
+        cannot('read', 'tests', { userId: 4, age: { $gt: 30 } })
+      }).rules
+      assert.deepStrictEqual(convertRuleToQuery(rule), {
+        $or: [{ userId: { $ne: 4 } }, { age: { $lte: 30 } }],
+      })
+    })
+  })
 })

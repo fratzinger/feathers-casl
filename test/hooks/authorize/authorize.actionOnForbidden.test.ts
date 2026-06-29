@@ -37,7 +37,7 @@ const mockApp = (actionOnForbidden?: () => void) => {
 }
 
 describe('authorize hook - actionOnForbidden', function () {
-  it('calls actionOnForbidden when $select and restricted fields do not overlap (after-hook, get)', async function () {
+  it('calls actionOnForbidden when all read fields are restricted (after-hook, get)', async function () {
     let called = false
     const service = mockApp(() => {
       called = true
@@ -50,12 +50,14 @@ describe('authorize hook - actionOnForbidden', function () {
       hidden: true,
     })
 
+    // conflicting field rules -> hasRestrictingFields returns `true` (full restriction)
+    // -> after-hook get returns `{}` and throws Forbidden
     await assert.rejects(
       service.get(item.id, {
-        query: { $select: ['id', 'supersecret', 'hidden'] },
         ability: defineAbility(
           (can) => {
-            can('read', 'tests', ['test', 'userId'])
+            can('read', 'tests', ['id'])
+            can('read', 'tests', ['test'])
           },
           { resolveAction },
         ),
@@ -64,6 +66,35 @@ describe('authorize hook - actionOnForbidden', function () {
     )
 
     assert.ok(called, 'actionOnForbidden was called')
+  })
+
+  it('returns only id without actionOnForbidden when $select and restricted fields do not overlap (after-hook, get)', async function () {
+    let called = false
+    const service = mockApp(() => {
+      called = true
+    })
+
+    const item = await service.create({
+      test: true,
+      userId: 1,
+      supersecret: true,
+      hidden: true,
+    })
+
+    // `$select` and the readable fields don't overlap, but the id is always kept
+    // (matches Feathers' `$select` behavior) -> no Forbidden, no actionOnForbidden
+    const returnedItem = await service.get(item.id, {
+      query: { $select: ['id', 'supersecret', 'hidden'] },
+      ability: defineAbility(
+        (can) => {
+          can('read', 'tests', ['test', 'userId'])
+        },
+        { resolveAction },
+      ),
+    })
+
+    assert.deepStrictEqual(returnedItem, { id: item.id }, 'returns only id')
+    assert.ok(!called, 'actionOnForbidden was not called')
   })
 
   it('calls actionOnForbidden when single patch has all fields restricted (before-hook)', async function () {
