@@ -4,9 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  '@fratzinger/feathers-kysely': link:../@fratzinger/feathers-kysely
-
 importers:
 
   .:
@@ -67,8 +64,8 @@ importers:
         specifier: ^5.0.44
         version: 5.0.44
       '@fratzinger/feathers-kysely':
-        specifier: link:../@fratzinger/feathers-kysely
-        version: link:../@fratzinger/feathers-kysely
+        specifier: ^0.12.0
+        version: 0.12.0(@feathersjs/feathers@5.0.44)(kysely@0.29.0)
       '@tsconfig/node22':
         specifier: ^22.0.5
         version: 22.0.5
@@ -571,10 +568,6 @@ packages:
     resolution: {integrity: sha512-zjm3QRa1B0kZ3W4OTjFa4D73ABJrzUtN0xYPeCI4Fm19pi1/ANQULkqD3+f6Xi74nDr+uj5MadDYcsyGgHEsgA==}
     engines: {node: '>= 12'}
 
-  '@feathersjs/commons@5.0.35':
-    resolution: {integrity: sha512-YYk3SRLGcM9TPHsd2mGmTdFeZORmv5wa1MRCvmEUwzcsFIPWbq4F6ddFgqKUely216RvPumwyjV9U+MasROesQ==}
-    engines: {node: '>= 12'}
-
   '@feathersjs/commons@5.0.44':
     resolution: {integrity: sha512-PnxCyKqzWLAqv1LSazDsOXNf520KQOlqUasZ/9YRz4lYRPJ0pzzfZXvzmjBFOsNPaohzKmyySS8578E9vlTQrA==}
     engines: {node: '>= 12'}
@@ -660,6 +653,13 @@ packages:
   '@feathersjs/transport-commons@5.0.44':
     resolution: {integrity: sha512-BxUyGFcbt+o5TWcXKXNVrbh3zrq2iGAzE9uvaVJ7tVQX820LVHOWAp6NL5GxG+InhLUq0cc3CTpQENE0+oXRMw==}
     engines: {node: '>= 12'}
+
+  '@fratzinger/feathers-kysely@0.12.0':
+    resolution: {integrity: sha512-+/V81HHPQaEgwWF0gs57s56G21JBFAKD7BKfN4n8UxX5jXj5sWFAHpt8ZfvsaA3+Az/TnW1NGthb5pu6Soa7Ag==}
+    engines: {node: '>= 22'}
+    peerDependencies:
+      '@feathersjs/feathers': ^5.0.0
+      kysely: '>=0.28.0 <0.30.0'
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -2589,6 +2589,16 @@ packages:
   feathers-sequelize@7.0.3:
     resolution: {integrity: sha512-ePI6XxqSu5yldKKHDPb1cc+JG5a1eZg40seDiZsRFjDfIxcR9mzwEgIqDnqHhO844tJdxfyHjNN1NtiPaUYAgw==}
     engines: {node: '>= 14'}
+
+  feathers-utils@10.3.0:
+    resolution: {integrity: sha512-SQFxOyjm5GqfZNfF+Oqh796gkGZiWDl9CR77k4ZzglDqMiK9xrapZWURaXXG6wKIhdj37MJgnOwWQIpK1jMyIg==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@feathersjs/feathers': ^5.0.0
+      rate-limiter-flexible: '>=10.0.0'
+    peerDependenciesMeta:
+      rate-limiter-flexible:
+        optional: true
 
   feathers-utils@10.4.0:
     resolution: {integrity: sha512-YhbKC0/cYJcAyX9Fw91YByATOPVuXjwKCsml67w50PfsPZzBzn6U7xqvY3y68d/vQn5zLVi17woNisIH8Nlpdw==}
@@ -5422,8 +5432,8 @@ snapshots:
 
   '@feathersjs/adapter-commons@5.0.35':
     dependencies:
-      '@feathersjs/commons': 5.0.35
-      '@feathersjs/errors': 5.0.35
+      '@feathersjs/commons': 5.0.45
+      '@feathersjs/errors': 5.0.45
       '@feathersjs/feathers': 5.0.35
 
   '@feathersjs/adapter-commons@5.0.44':
@@ -5468,8 +5478,6 @@ snapshots:
   '@feathersjs/commons@4.5.16': {}
 
   '@feathersjs/commons@5.0.24': {}
-
-  '@feathersjs/commons@5.0.35': {}
 
   '@feathersjs/commons@5.0.44': {}
 
@@ -5526,7 +5534,7 @@ snapshots:
 
   '@feathersjs/feathers@5.0.35':
     dependencies:
-      '@feathersjs/commons': 5.0.35
+      '@feathersjs/commons': 5.0.45
       '@feathersjs/hooks': 0.9.0
       events: 3.3.0
 
@@ -5602,6 +5610,17 @@ snapshots:
       '@feathersjs/feathers': 5.0.44
       encodeurl: 2.0.0
       lodash: 4.18.1
+
+  '@fratzinger/feathers-kysely@0.12.0(@feathersjs/feathers@5.0.44)(kysely@0.29.0)':
+    dependencies:
+      '@feathersjs/adapter-commons': 5.0.45
+      '@feathersjs/commons': 5.0.45
+      '@feathersjs/errors': 5.0.45
+      '@feathersjs/feathers': 5.0.44
+      feathers-utils: 10.3.0(@feathersjs/feathers@5.0.44)
+      kysely: 0.29.0
+    transitivePeerDependencies:
+      - rate-limiter-flexible
 
   '@humanfs/core@0.19.1': {}
 
@@ -7479,6 +7498,16 @@ snapshots:
       '@feathersjs/adapter-commons': 5.0.35
       '@feathersjs/commons': 5.0.24
       '@feathersjs/errors': 5.0.35
+
+  feathers-utils@10.3.0(@feathersjs/feathers@5.0.44):
+    dependencies:
+      '@feathersjs/adapter-commons': 5.0.45
+      '@feathersjs/errors': 5.0.45
+      '@feathersjs/feathers': 5.0.44
+      dequal: 2.0.3
+      fast-copy: 4.0.3
+      lodash: 4.18.1
+      neotraverse: 0.6.18
 
   feathers-utils@10.4.0(@feathersjs/feathers@5.0.44):
     dependencies:

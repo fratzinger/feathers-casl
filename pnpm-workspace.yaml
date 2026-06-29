@@ -3,5 +3,3 @@ allowBuilds:
   mongodb-memory-server: true
   sqlite3: true
   unrs-resolver: true
-overrides:
-  '@fratzinger/feathers-kysely': link:../@fratzinger/feathers-kysely
