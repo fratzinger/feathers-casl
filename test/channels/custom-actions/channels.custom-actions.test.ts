@@ -9,7 +9,7 @@ import { mockServer } from '../.mockServer/index.js'
 import channels1 from './mockChannels.custom-actions.js'
 import services1 from './mockServices.custom-actions.js'
 import getPort from 'get-port'
-import { promiseTimeout } from '../../test-utils.js'
+import { waitForServiceEvent } from 'feathers-utils'
 
 describe('channels.custom-actions.test.ts', function () {
   let server: Server
@@ -80,39 +80,20 @@ describe('channels.custom-actions.test.ts', function () {
       `client${i} has expected value`,
     )
     const expected = expectedPerClient[i]
-    const fulFill = new Promise((resolve) => {
-      clients[i].service(servicePath).on(event, (result) => {
-        if (expected) {
-          assert.deepStrictEqual(
-            result,
-            expected,
-            `'client${i}:${servicePath}:${methodName}': result is expected`,
-          )
-        }
-        resolve(result)
-      })
+    const promise = waitForServiceEvent(clients[i])(servicePath, event, {
+      timeout: expected ? 100 : 80,
     })
 
     if (expected) {
-      await assert.doesNotReject(
-        promiseTimeout(
-          100,
-          fulFill,
-          `'client${i}:${servicePath}:${methodName}': timeout`,
-        ).finally(() => {
-          clients[i].service(servicePath).removeAllListeners(event)
-        }),
-        `'client${i}:${servicePath}:${methodName}': receives message`,
+      const [result] = await promise
+      assert.deepStrictEqual(
+        result,
+        expected,
+        `'client${i}:${servicePath}:${methodName}': result is expected`,
       )
     } else {
       await assert.rejects(
-        promiseTimeout(
-          80,
-          fulFill,
-          `'client${i}:${servicePath}:${methodName}': timeout`,
-        ).finally(() => {
-          clients[i].service(servicePath).removeAllListeners(event)
-        }),
+        promise,
         () => true,
         `'client${i}:${servicePath}:${methodName}': does not receive message`,
       )
@@ -146,7 +127,7 @@ describe('channels.custom-actions.test.ts', function () {
           event: 'updated',
           expectedPerClient: {
             0: { id: 0, test: false, userId: 4 },
-            1: servicePath === 'comments' ? { test: false } : false,
+            1: servicePath === 'comments' ? { id: 0, test: false } : false,
             2: false,
             3: { id: 0, test: false, userId: 4 },
             4: false,

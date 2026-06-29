@@ -61,10 +61,13 @@ export default defineConfig({
       copyright:
         'Copyright © 2020-present Frederik Schmatz<br />This site is powered by <a href="https://www.netlify.com" target="blank">Netlify</a>',
     },
-    algolia: {
-      appId: 'XJKV0V1N7U',
-      apiKey: 'a4c3e7c6c2fcd7b1baa2ac04e17b9f72',
-      indexName: 'feathers-casl',
+    search: {
+      provider: 'algolia',
+      options: {
+        appId: 'XJKV0V1N7U',
+        apiKey: 'a4c3e7c6c2fcd7b1baa2ac04e17b9f72',
+        indexName: 'feathers-casl',
+      },
     },
   },
 })

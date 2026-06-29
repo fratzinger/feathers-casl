@@ -5,7 +5,7 @@ import { feathers } from '@feathersjs/feathers'
 import { SequelizeService } from 'feathers-sequelize'
 import { authorize } from '../../src/index.js'
 import path from 'node:path'
-import { resolveAction } from '../test-utils.js'
+import { filterArray, resolveAction } from '../test-utils.js'
 
 describe('authorize.users.test.ts', function () {
   function mockAbility(user: any) {
@@ -57,6 +57,9 @@ describe('authorize.users.test.ts', function () {
         multi: true,
         operatorMap: {
           $not: Op.not,
+        },
+        filters: {
+          ...filterArray('$not'),
         },
         operators: ['$not'],
       }),

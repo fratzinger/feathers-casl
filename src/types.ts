@@ -64,8 +64,7 @@ export interface AuthorizeChannelCommonsOptions<
 }
 
 export interface AuthorizeHookOptions<H extends HookContext = HookContext>
-  extends HookBaseOptions<H>,
-    AuthorizeChannelCommonsOptions<H> {
+  extends HookBaseOptions<H>, AuthorizeChannelCommonsOptions<H> {
   adapter: Adapter
   useUpdateData: boolean
   usePatchData: boolean
@@ -125,8 +124,10 @@ export interface GetMinimalFieldsOptions {
 
 export type Path = string | Array<string | number>
 
-export interface ThrowUnlessCanOptions
-  extends Pick<HookBaseOptions, 'actionOnForbidden' | 'debug'> {
+export interface ThrowUnlessCanOptions extends Pick<
+  HookBaseOptions,
+  'actionOnForbidden' | 'debug'
+> {
   skipThrow: boolean
 }
 

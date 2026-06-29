@@ -1,4 +1,4 @@
-import { shouldSkip } from '@fratzinger/feathers-utils'
+import { shouldSkip } from 'feathers-utils/predicates'
 
 import type { HookContext } from '@feathersjs/feathers'
 import type { CheckBasicPermissionHookOptions } from '../types.js'
@@ -12,7 +12,7 @@ export const checkBasicPermission = <H extends HookContext>(
   return async (context: H): Promise<H> => {
     if (
       !_options?.notSkippable &&
-      (shouldSkip(HOOKNAME, context) ||
+      (shouldSkip(HOOKNAME)(context) ||
         context.type !== 'before' ||
         !context.params)
     ) {

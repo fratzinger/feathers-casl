@@ -37,20 +37,18 @@ export default (
 
       id = service.options.id
 
-      const options = Object.assign(
-        {
-          availableFields: [
-            id,
-            'userId',
-            'hi',
-            'test',
-            'published',
-            'supersecret',
-            'hidden',
-          ],
-        },
-        authorizeHookOptions,
-      )
+      const options = {
+        availableFields: [
+          id,
+          'userId',
+          'hi',
+          'test',
+          'published',
+          'supersecret',
+          'hidden',
+        ],
+        ...authorizeHookOptions,
+      }
 
       afterHooks = Array.isArray(afterHooks)
         ? afterHooks

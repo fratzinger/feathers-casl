@@ -79,3 +79,19 @@ export default {
   // ...
 };
 ```
+
+## Query / Operators
+
+### `BadRequest: Invalid query parameter $and` (or `$nor` / `$not`)
+
+`feathers-casl` merges your rule conditions into the incoming query. Inverted rules (`cannot(...)`) are expressed with `$nor`/`$not`, and whenever a rule condition and the query restrict the same property, both are combined with `$and`. If your adapter validates queries (e.g. `@feathersjs/memory`, `@feathersjs/mongodb`) and the operator isn't whitelisted, you'll get an error like:
+
+```
+BadRequest: Invalid query parameter $and
+```
+
+Whitelist the required operators in your service options — see [Getting Started — Filters / Operators](/getting-started#filters-operators):
+
+```ts
+app.use('...', new Service({ filters: { $nor: true }, operators: ['$nor', '$and'] }))
+```

@@ -11,31 +11,33 @@ export const makeChannelOptions = (
   app: Application,
   options?: Partial<ChannelOptions>,
 ): ChannelOptions => {
-  options = options || {}
-  return Object.assign({}, defaultOptions, getAppOptions(app), options)
-}
-
-const defaultOptions: Omit<ChannelOptions, 'channels'> = {
-  activated: true,
-  channelOnError: ['authenticated'],
-
-  ability: (app: Application, connection: RealTimeConnection): Ability => {
-    return connection.ability
-  },
-  modelName: (context) => context.path,
-  restrictFields: true,
-  availableFields: (context: HookContext): string[] | undefined => {
-    const availableFields: string[] | ((context: HookContext) => string[]) =
-      context.service.options?.casl?.availableFields
-    return getAvailableFields(context, { availableFields })
-  },
-  useActionName: 'get',
+  return {
+    ...makeDefaultOptions(),
+    ...getAppOptions(app),
+    ...options,
+  }
 }
 
 export const makeDefaultOptions = (
   options?: Partial<ChannelOptions>,
 ): ChannelOptions => {
-  return Object.assign({}, defaultOptions, options)
+  return {
+    activated: true,
+    channelOnError: ['authenticated'],
+
+    ability: (app: Application, connection: RealTimeConnection): Ability => {
+      return connection.ability
+    },
+    modelName: (context) => context.path,
+    restrictFields: true,
+    availableFields: (context: HookContext): string[] | undefined => {
+      const availableFields: string[] | ((context: HookContext) => string[]) =
+        context.service.options?.casl?.availableFields
+      return getAvailableFields(context, { availableFields })
+    },
+    useActionName: 'get',
+    ...options,
+  }
 }
 
 const getAppOptions = (

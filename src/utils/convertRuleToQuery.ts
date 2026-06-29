@@ -43,23 +43,36 @@ export const convertRuleToQuery = (
     return undefined
   }
   if (inverted) {
-    const newConditions = {} as Query
+    // A rule's `conditions` is a conjunction: every field (and every operator
+    // within a field) must match for the rule to apply. Negating it therefore
+    // follows De Morgan's law - `NOT (a AND b)` becomes `(NOT a) OR (NOT b)` -
+    // so each atomic condition is inverted into its own clause and the clauses
+    // are combined with `$or`. Naively merging the negations into a single
+    // object would `AND` them instead and exclude far too many records.
+    const clauses: Query[] = []
     for (const prop in conditions as Record<string, unknown>) {
-      if (_isPlainObject(conditions[prop])) {
-        const obj: any = conditions[prop]
+      const value = (conditions as Record<string, unknown>)[prop]
+      if (_isPlainObject(value)) {
+        const obj = value as Record<string, unknown>
         for (const name in obj) {
           if (!supportedOperators.includes(name)) {
             console.error(`CASL: not supported property: ${name}`)
             continue
           }
-          newConditions[prop] = invertedProp(obj, name)
+          clauses.push({ [prop]: invertedProp(obj, name) } as Query)
         }
       } else {
-        newConditions[prop] = { $ne: conditions[prop] }
+        clauses.push({ [prop]: { $ne: value } } as Query)
       }
     }
 
-    return newConditions
+    if (clauses.length === 0) {
+      return {}
+    }
+    if (clauses.length === 1) {
+      return clauses[0]
+    }
+    return { $or: clauses }
   } else {
     return conditions as Query
   }

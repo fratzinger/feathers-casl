@@ -4,8 +4,7 @@ import { feathers } from '@feathersjs/feathers'
 import { authorize } from '../../../src/index.js'
 import { MemoryService } from '@feathersjs/memory'
 import { joinQuery } from 'feathers-fletching'
-import { filterArray } from '@fratzinger/feathers-utils'
-import { resolveAction } from '../../test-utils.js'
+import { filterArray, resolveAction } from '../../test-utils.js'
 
 describe('authorize.relations', function () {
   const mock = () => {

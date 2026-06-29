@@ -40,20 +40,18 @@ export default (
 
       id = service.options.id
 
-      const options = Object.assign(
-        {
-          availableFields: [
-            id,
-            'userId',
-            'hi',
-            'test',
-            'published',
-            'supersecret',
-            'hidden',
-          ],
-        },
-        authorizeHookOptions,
-      )
+      const options = {
+        availableFields: [
+          id,
+          'userId',
+          'hi',
+          'test',
+          'published',
+          'supersecret',
+          'hidden',
+        ],
+        ...authorizeHookOptions,
+      }
 
       afterHooks = Array.isArray(afterHooks)
         ? afterHooks
@@ -293,7 +291,7 @@ export default (
 
     //TODO: skip weird feathers-knex bug
     itSkip('@feathersjs/knex')(
-      "updates item and returns empty object for not overlapping '$select' and 'restricting fields'",
+      "updates item and returns only id for not overlapping '$select' and 'restricting fields'",
       async function () {
         let item: any = {
           test: true,
@@ -324,8 +322,8 @@ export default (
         })
         assert.deepStrictEqual(
           result,
-          {},
-          'returned item is empty because of $select and restricting fields',
+          { [id]: item[id] },
+          'returned item has only id because $select and restricting fields do not overlap',
         )
 
         const itemInDb = await service.get(item[id])

@@ -5,7 +5,7 @@ import _set from 'lodash/set.js'
 import type { AnyAbility } from '@casl/ability'
 import { subject } from '@casl/ability'
 
-import { shouldSkip, isMulti } from '@fratzinger/feathers-utils'
+import { isMulti, shouldSkip } from 'feathers-utils/predicates'
 
 import {
   hasRestrictingFields,
@@ -24,7 +24,7 @@ import {
 
 import { checkBasicPermission } from '../checkBasicPermission.hook.js'
 import { checkCreatePerItem } from '../common.js'
-import { mergeQueryFromAbility } from '../../utils/mergeQueryFromAbility.js'
+import { mergeQueryFromAbility } from '../../utils/merge-query-from-ability.js'
 
 import type { HookContext } from '@feathersjs/feathers'
 
@@ -35,7 +35,7 @@ export const authorizeBefore = async <H extends HookContext = HookContext>(
   context: H,
   options: AuthorizeHookOptions,
 ) => {
-  if (shouldSkip(HOOKNAME, context, options) || !context.params) {
+  if (shouldSkip(HOOKNAME)(context) || !context.params) {
     return context
   }
 
@@ -155,11 +155,11 @@ const handleSingle = async <H extends HookContext = HookContext>(
 
   // ensure that only allowed data gets changed
   if (['update', 'patch'].includes(method)) {
-    const queryGet = Object.assign({}, params.query || {})
+    const queryGet = { ...(params.query ?? {}) }
     if (queryGet.$select) {
       delete queryGet.$select
     }
-    const paramsGet = Object.assign({}, params, { query: queryGet })
+    const paramsGet = { ...params, query: queryGet }
 
     // TODO: If not allowed to .get() and to .[method](), then throw "NotFound" (maybe optional)
 
@@ -253,7 +253,7 @@ const handleSingle = async <H extends HookContext = HookContext>(
     } else {
       // merge with initial data
       const itemPlain = await service._get(id, {})
-      context.data = Object.assign({}, itemPlain, data)
+      context.data = { ...itemPlain, ...data }
     }
   }
 

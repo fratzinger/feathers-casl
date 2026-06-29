@@ -29,7 +29,7 @@ It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CA
 - Restrict by individual fields: `cannot('update', 'User', ['roleId'])`
 - Native support for restrictive `$select`: `can('read', 'User', ['id', 'username'])` -> `$select: ['id', 'username']`
 - Support to define abilities for anything (providers, users, roles, 3rd party apps, ...)
-- Fully supported adapters: `@feathersjs/knex`, `@feathersjs/memory`, `@feathersjs/mongodb`, `feathers-sequelize`, not supported: `feathers-mongoose`, `feathers-nedb`, `feathers-objection`
+- Fully supported adapters: `@feathersjs/knex`, `@feathersjs/memory`, `@feathersjs/mongodb`, `@fratzinger/feathers-kysely`, `feathers-sequelize`, not supported: `feathers-mongoose`, `feathers-nedb`, `feathers-objection`
 - Support for dynamic rules stored in your database (Bring your own implementation ;) )
 - hooks:
   - `checkBasicPermission` hook for client side usage as a before-hook
@@ -173,7 +173,7 @@ The `authorize`-hook can be used for all methods and has support for `multi: tru
 import { authenticate } from "@feathersjs/authentication";
 import { authorize } from "feathers-casl";
 
-// CAUTION! Make sure the adapter name fits your adapter (e.g. @feathersjs/mongodb, @feathersjs/knex, feathers-sequelize, ...)!
+// CAUTION! Make sure the adapter name fits your adapter (e.g. @feathersjs/mongodb, @feathersjs/knex, @fratzinger/feathers-kysely, feathers-sequelize, ...)!
 // You'll want to have the `authorize` as an early before-hook (right after the `authenticate` hook) and as a late after hook, since it could modify the result based on the ability of the requesting user
 
 const authorizeHook = authorize({ adapter: "@feathersjs/mongodb" });
@@ -216,9 +216,12 @@ export default {
 For `feathers-casl` to work properly, you have to whitelist some operators in your service options.
 Also make sure to set the adapter option in your `authorize` hook like: `authorize({ adapter: '@feathersjs/mongodb' })`
 
-- **@feathersjs/memory**: `app.use('...', new Service({ filters: { $nor: true }, operators: ["$nor"] }))`
-- **@feathersjs/mongodb**: `app.use("...', new Service({ filters: { $nor: true }, operators: ["$nor"] ))`
+`feathers-casl` merges the conditions of your rules into the incoming query. Inverted rules (`cannot(...)`) are expressed with `$nor`/`$not`, and whenever a rule condition and the query restrict the same property, both are combined with `$and`. Your service has to allow these operators:
+
+- **@feathersjs/memory**: `app.use('...', new Service({ filters: { $nor: true }, operators: ["$nor", "$and"] }))`
+- **@feathersjs/mongodb**: `app.use('...', new Service({ filters: { $nor: true }, operators: ["$nor", "$and"] }))`
 - **@feathersjs/knex**: nothing special to configure :)
+- **@fratzinger/feathers-kysely**: expresses inverted (`cannot`) rules with `$not`, so this operator has to be allowed: `app.use('...', new KyselyService({ filters: { $not: true }, operators: ["$not", "$and"] }))`
 - **feathers-sequelize**: This one is a little bit different than the others. See the following:
 
 ```ts

@@ -9,8 +9,8 @@ import {
 } from '../../utils/index.js'
 import { makeDefaultBaseOptions } from '../common.js'
 
-import { getResultIsArray } from 'feathers-utils'
-import { isMulti, markHookForSkip } from '@fratzinger/feathers-utils'
+import { addSkip, getResultIsArray } from 'feathers-utils'
+import { isMulti } from 'feathers-utils/predicates'
 
 import type { AnyAbility, ForcedSubject } from '@casl/ability'
 import type { Application, HookContext, Params } from '@feathersjs/feathers'
@@ -18,7 +18,6 @@ import type { Application, HookContext, Params } from '@feathersjs/feathers'
 import type {
   Adapter,
   AuthorizeHookOptions,
-  AuthorizeHookOptionsExclusive,
   AvailableFieldsOption,
   HookBaseOptions,
   InitOptions,
@@ -42,34 +41,28 @@ export const makeOptions = <A extends Application = Application>(
   app: A,
   options?: Partial<AuthorizeHookOptions>,
 ): AuthorizeHookOptions => {
-  options = options || {}
-  return Object.assign(
-    makeDefaultBaseOptions(),
-    defaultOptions,
-    getAppOptions(app),
-    options,
-  ) as unknown as AuthorizeHookOptions
+  return {
+    ...makeDefaultOptions(),
+    ...getAppOptions(app),
+    ...options,
+  } as unknown as AuthorizeHookOptions
 }
-
-const defaultOptions = {
-  adapter: undefined,
-  availableFields: (context: HookContext): string[] | undefined => {
-    const availableFields: AvailableFieldsOption =
-      context.service.options?.casl?.availableFields
-    return getAvailableFields(context, { availableFields })
-  },
-  usePatchData: false,
-  useUpdateData: false,
-} satisfies Partial<AuthorizeHookOptionsExclusive<HookContext>>
 
 export const makeDefaultOptions = (
   options?: Partial<AuthorizeHookOptions>,
 ): AuthorizeHookOptions => {
-  return Object.assign(
-    makeDefaultBaseOptions(),
-    defaultOptions,
-    options,
-  ) as unknown as AuthorizeHookOptions
+  return {
+    ...makeDefaultBaseOptions(),
+    adapter: undefined as any,
+    availableFields: (context: HookContext): string[] | undefined => {
+      const availableFields: AvailableFieldsOption =
+        context.service.options?.casl?.availableFields
+      return getAvailableFields(context, { availableFields })
+    },
+    usePatchData: false,
+    useUpdateData: false,
+    ...options,
+  }
 }
 
 const getAppOptions = (
@@ -185,15 +178,23 @@ export const refetchItems = async (
   const idField = context.service.options?.id
   const ids = items.map((item) => item[idField])
 
-  params = Object.assign({}, params, { paginate: false })
+  // mark the refetch `find` to skip feathers-casl's own authorize hook.
+  // `addSkip` reassigns `context.params`, so read the updated params back.
+  const skipContext = { params: { ...params } } as unknown as HookContext
+  addSkip(skipContext, HOOKNAME)
 
-  markHookForSkip(HOOKNAME, 'all', { params } as any)
-  delete params.ability
+  const findParams = {
+    ...skipContext.params,
+    paginate: false,
+    query: {
+      ...skipContext.params.query,
+      [idField]: { $in: ids },
+    },
+  } as Params
 
-  const query = Object.assign({}, params.query, { [idField]: { $in: ids } })
-  params = Object.assign({}, params, { query })
+  delete findParams.ability
 
-  return await context.service.find(params)
+  return await context.service.find(findParams)
 }
 
 export const getConditionalSelect = (

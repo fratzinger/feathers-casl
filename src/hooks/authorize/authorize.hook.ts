@@ -1,4 +1,4 @@
-import { shouldSkip } from '@fratzinger/feathers-utils'
+import { shouldSkip } from 'feathers-utils/predicates'
 
 import { HOOKNAME, makeOptions } from './authorize.hook.utils.js'
 import { authorizeAfter } from './authorize.hook.after.js'
@@ -14,7 +14,7 @@ export const authorize =
   ) =>
   async (context: H, next?: NextFunction) => {
     if (
-      shouldSkip(HOOKNAME, context, _options) ||
+      shouldSkip(HOOKNAME)(context) ||
       !context.params ||
       context.type === 'error'
     ) {

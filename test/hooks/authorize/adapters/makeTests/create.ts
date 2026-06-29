@@ -36,20 +36,18 @@ export default (
 
       id = service.options.id
 
-      const options = Object.assign(
-        {
-          availableFields: [
-            id,
-            'userId',
-            'hi',
-            'test',
-            'published',
-            'supersecret',
-            'hidden',
-          ],
-        },
-        authorizeHookOptions,
-      )
+      const options = {
+        availableFields: [
+          id,
+          'userId',
+          'hi',
+          'test',
+          'published',
+          'supersecret',
+          'hidden',
+        ],
+        ...authorizeHookOptions,
+      }
 
       afterHooks = Array.isArray(afterHooks)
         ? afterHooks
@@ -200,7 +198,7 @@ export default (
       )
     })
 
-    it("creates item and returns empty object for not overlapping '$select' and 'restricting fields'", async function () {
+    it("creates item and returns only id for not overlapping '$select' and 'restricting fields'", async function () {
       let item: any = { test: true, userId: 1, supersecret: true, hidden: true }
       const result = await service.create(item, {
         query: { $select: [id, 'supersecret', 'hidden'] },
@@ -215,8 +213,8 @@ export default (
       ;[item] = await service.find({ paginate: false })
       assert.deepStrictEqual(
         result,
-        {},
-        'returned item is empty because of $select and restricting fields',
+        { [id]: item[id] },
+        'returned item has only id because $select and restricting fields do not overlap',
       )
 
       const itemInDb = await service.get(item[id])
