@@ -30,8 +30,12 @@ describe('channels.utils.test.ts', function () {
 
   it('default ability resolves to the connection ability', function () {
     const { ability } = makeDefaultOptions()
+    assert.strictEqual(typeof ability, 'function')
     const connection = { ability: 'connection-ability' } as any
-    assert.strictEqual(ability({} as any, connection), 'connection-ability')
+    assert.strictEqual(
+      (ability as (...args: any[]) => any)({} as any, connection),
+      'connection-ability',
+    )
   })
 
   it('getEventName', function () {
