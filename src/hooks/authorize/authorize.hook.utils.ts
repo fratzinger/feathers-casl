@@ -59,6 +59,7 @@ export const makeDefaultOptions = (
         context.service.options?.casl?.availableFields
       return getAvailableFields(context, { availableFields })
     },
+    preserveIdFields: true,
     usePatchData: false,
     useUpdateData: false,
     ...options,

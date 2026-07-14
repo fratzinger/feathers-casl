@@ -132,13 +132,14 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
         ? (mergeArrays(restrictingFields, $select, 'intersect') as string[])
         : ((restrictingFields || $select) as string[])
 
-    // always keep the service id field(s) so records stay identifiable,
-    // matching Feathers' `$select` behavior (adapters always return the id)
-    const pickFieldsWithId = idFields.length
-      ? (mergeArrays(pickFields, idFields, 'combine') as string[])
-      : pickFields
+    // Keep service id fields by default so records stay identifiable, matching
+    // Feathers' `$select` behavior. Applications can opt into an exact projection.
+    const projectedFields =
+      options.preserveIdFields && idFields.length
+        ? (mergeArrays(pickFields, idFields, 'combine') as string[])
+        : pickFields
 
-    return _pick(item, pickFieldsWithId)
+    return _pick(item, projectedFields)
   }
 
   let newResult: (Record<string, unknown> | undefined)[]
