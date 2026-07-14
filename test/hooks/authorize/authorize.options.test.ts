@@ -612,6 +612,55 @@ describe('authorize.options.test.ts', function () {
     })
   })
 
+  describe('preserveIdFields', function () {
+    beforeEach(function () {
+      app = feathers()
+      app.use('tests', new MemoryService({ paginate: false }))
+      service = app.service('tests')
+
+      service.hooks({
+        around: {
+          all: [
+            authorize({
+              availableFields: ['id', 'name'],
+              preserveIdFields: false,
+            }),
+          ],
+        },
+      })
+    })
+
+    it("omits id when '$select' does not include it", async function () {
+      const item = await service.create({ name: 'Example' })
+      const result = await service.get(item.id, {
+        ability: defineAbility(
+          (can) => {
+            can('read', 'tests')
+          },
+          { resolveAction },
+        ),
+        query: { $select: ['name'] },
+      })
+
+      assert.deepStrictEqual(result, { name: 'Example' })
+    })
+
+    it('omits id when restricting fields exclude it', async function () {
+      await service.create({ name: 'Example' })
+      const result = await service.find({
+        ability: defineAbility(
+          (can) => {
+            can('read', 'tests', ['name'])
+          },
+          { resolveAction },
+        ),
+        paginate: false,
+      })
+
+      assert.deepStrictEqual(result, [{ name: 'Example' }])
+    })
+  })
+
   describe('checkAbilityForInternal', function () {
     it('passes for internal call without params.ability and not allowed options.params by default', async function () {
       const app: TestApplication = feathers()
