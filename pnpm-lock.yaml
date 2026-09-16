@@ -257,9 +257,6 @@ importers:
       feathers-fletching:
         specifier: ^2.0.7
         version: 2.0.7(@feathersjs/feathers@5.0.50)
-      feathers-knex:
-        specifier: ^8.0.1
-        version: 8.0.1(supports-color@10.2.2)
       feathers-sequelize:
         specifier: ^7.0.3
         version: 7.0.3
@@ -284,9 +281,6 @@ importers:
       np:
         specifier: ^12.1.1
         version: 12.1.1(@types/node@25.9.7)(@typescript/typescript6@6.0.2)
-      objection:
-        specifier: ^3.1.5
-        version: 3.1.5(knex@3.3.0(pg@8.23.0)(sqlite3@6.0.1)(supports-color@10.2.2))
       pg:
         specifier: ^8.23.0
         version: 8.23.0
@@ -448,10 +442,6 @@ packages:
     peerDependencies:
       eslint: ^10.0.0
 
-  '@feathersjs/adapter-commons@4.5.21':
-    resolution: {integrity: sha512-b9FwaFRVMR5CiMY0l/ypJaJk/zE0MBOBvVWvfng3vBFSUA0RekojdsJQgvIJ+Ezkxt/sVnaRuDzvurr2J1juJQ==}
-    engines: {node: '>= 10'}
-
   '@feathersjs/adapter-commons@5.0.50':
     resolution: {integrity: sha512-m3+TzrPtBdJiPI34e+bEOdBMmU/ApoF5Si5irRTlu3UsrFTfAHYg0bBUh80dpuhZZi8W+XHaJ7OQqtaXV4wNMg==}
     engines: {node: '>= 12'}
@@ -464,10 +454,6 @@ packages:
     resolution: {integrity: sha512-finvUR5Sz0CCa5iy8PDCbg8rcYEPqmiehb3bzDNmYqKUZn9t14npRgKv8ZbVUb/7lz2tGNd7jHCrUvmfbTubeg==}
     engines: {node: '>= 12'}
 
-  '@feathersjs/commons@4.5.21':
-    resolution: {integrity: sha512-X2EjuY8ezv1WU9pFBPcxIlihpbV5FYQG4HhGcoprf6J9QDzC7CYUTa9khc5DmaZzEVjScQe7A+NJGcAHJ18Qjg==}
-    engines: {node: '>= 10'}
-
   '@feathersjs/commons@5.0.50':
     resolution: {integrity: sha512-vzdX1G3d2X1WK/cnH3a1PA2ry3z8y8XBvLjl+RHg9wvOAy1g6dOXwD+ULjOK7Z4LrPmbyUG4b4lvsQChdPcbPw==}
     engines: {node: '>= 12'}
@@ -476,10 +462,6 @@ packages:
     resolution: {integrity: sha512-lZ1XUkGdVeQWbWJB+BtYcWGrTR15Rs59rHwLJ3f2SNt5NB43LLiv6+h+VxnLbGjcznqMD4moorX8SeIcejOqqg==}
     engines: {node: '>= 12'}
 
-  '@feathersjs/errors@4.5.21':
-    resolution: {integrity: sha512-5r3P9HBIoXy8VOxPDsF9TMHSKsZxQOcEtceA7TK5of4u7e2xxYzFodFzOCYmMzCO5q7Ki65954JRh77erfZzEg==}
-    engines: {node: '>= 10'}
-
   '@feathersjs/errors@5.0.50':
     resolution: {integrity: sha512-sMzZbaRfFio3CgbUDmmxjZqlv+6CgrWpR9eS/t1NYUkx2T29qhnMwvIuBefy9Eu4a/B/UrarIAYJaV09GcvDSg==}
     engines: {node: '>= 12'}
@@ -487,10 +469,6 @@ packages:
   '@feathersjs/express@5.0.50':
     resolution: {integrity: sha512-nhFctY1qHxspufPzVpx/VcOX7vYRD+fVm4NqL5WlML/pjxQSr2dpy45MLJ9RkcCF2wWnwsq+wEtrtA4yYD4Y7w==}
     engines: {node: '>= 12'}
-
-  '@feathersjs/feathers@4.5.21':
-    resolution: {integrity: sha512-6Axa0u+UPTUO6foJcdgfzj6QnoZUMuwXasd9I8PYkwITIA26GLw4u7lyAUmErz+IBBl5ZUL2g4/Qtm85R2D3eg==}
-    engines: {node: '>= 10'}
 
   '@feathersjs/feathers@5.0.50':
     resolution: {integrity: sha512-rd3swoLKXZ70bcRQovmu1CdIe6NRLnvYmokM/nIyWUo0pHs5sJKZX/slhcNg/Mopcna1tRNZ8+1zzQ7bSKbs3Q==}
@@ -1659,14 +1637,6 @@ packages:
     resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
     engines: {node: '>= 14'}
 
-  ajv-formats@2.1.1:
-    resolution: {integrity: sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==}
-    peerDependencies:
-      ajv: ^8.0.0
-    peerDependenciesMeta:
-      ajv:
-        optional: true
-
   ajv-formats@3.0.1:
     resolution: {integrity: sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==}
     peerDependencies:
@@ -2120,9 +2090,6 @@ packages:
   date-fns@1.30.1:
     resolution: {integrity: sha512-hBSVCvSmWC+QypYObzwGOd9wqdDpOt+0wl0KbU+R+uuZBS1jN8VsD1ss3irQDknRj5NvxiTF6oj/nDRnN/UQNw==}
 
-  db-errors@0.2.3:
-    resolution: {integrity: sha512-OOgqgDuCavHXjYSJoV2yGhv6SeG8nk42aoCSoyXLZUH7VwFG27rxbavU1z+VrZbZjphw5UkDQwUlD21MwZpUng==}
-
   debug@2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
     peerDependencies:
@@ -2574,10 +2541,6 @@ packages:
     peerDependencies:
       '@feathersjs/feathers': ^5.0.0
 
-  feathers-knex@8.0.1:
-    resolution: {integrity: sha512-zeMIeQcxarN0F08U6sxkHagLfCyAslWr7Lx58LHY5n/jwgB4nvgxsyk5huwcaDXBZmGSoVlyGDo4rRYN1MQDkg==}
-    engines: {node: '>= 6'}
-
   feathers-sequelize@7.0.3:
     resolution: {integrity: sha512-ePI6XxqSu5yldKKHDPb1cc+JG5a1eZg40seDiZsRFjDfIxcR9mzwEgIqDnqHhO844tJdxfyHjNN1NtiPaUYAgw==}
     engines: {node: '>= 14'}
@@ -3025,10 +2988,6 @@ packages:
   is-plain-obj@4.1.0:
     resolution: {integrity: sha512-+Pgi+vMuUNkJyExiMBt5IlFoMyKnr5zhJ4Uspz58WOhBF5QoIZkFyNHIbBAtHwzVAgk5RtndVNsDRN61/mmDqg==}
     engines: {node: '>=12'}
-
-  is-plain-object@5.1.0:
-    resolution: {integrity: sha512-bUi/yjmtKYcRVUtWRGr0UA6xEFh2I6zWUwMrUXB3s7bmYCaZ8a+0ZsTRkrawh/mzlSD1Y0Ph8bp/U+TvBpWDNw==}
-    engines: {node: '>=0.10.0'}
 
   is-promise@2.2.2:
     resolution: {integrity: sha512-+lP4/6lKUBfQjZ2pdxThZvLUAafmZb8OAxFb8XXtiQmS35INgr85hdOGoEs124ez1FCnZJt6jau/T+alh58QFQ==}
@@ -3652,12 +3611,6 @@ packages:
   object-inspect@1.13.4:
     resolution: {integrity: sha512-W67iLl4J2EXEGTbfeHCffrjDfitvLANg0UlX3wFUUSTx92KXRFegMHUVgSqE+wvhAbi4WqjGg9czysTV2Epbew==}
     engines: {node: '>= 0.4'}
-
-  objection@3.1.5:
-    resolution: {integrity: sha512-Hx/ipAwXSuRBbOMWFKtRsAN0yITafqXtWB4OT4Z9wED7ty1h7bOnBdhLtcNus23GwLJqcMsRWdodL2p5GwlnfQ==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      knex: '>=1.0.1'
 
   obug@2.2.1:
     resolution: {integrity: sha512-XrsrhT5sybtKI6wakr2SPOlGZWWYbUXZ7a0jT8/QOeAPau+1X/bSegNe5YR75oJmEZQbKningirmGOEJCIk61Q==}
@@ -4621,9 +4574,6 @@ packages:
     engines: {node: '>=16.20.0'}
     hasBin: true
 
-  uberproto@2.0.6:
-    resolution: {integrity: sha512-68H97HffZoFaa3HFtpstahWorN9dSp5uTU6jo3GjIQ6JkJBR3hC2Nx/e/HFOoYHdUyT/Z1MRWfxN1EiQJZUyCQ==}
-
   unconfig-core@7.5.0:
     resolution: {integrity: sha512-Su3FauozOGP44ZmKdHy2oE6LPjk51M/TRRjHv2HNCWiDvfvCoxC2lno6jevMA91MYAdCdwP05QnWdWpSbncX/w==}
 
@@ -5128,14 +5078,6 @@ snapshots:
       - supports-color
       - typescript
 
-  '@feathersjs/adapter-commons@4.5.21(supports-color@10.2.2)':
-    dependencies:
-      '@feathersjs/commons': 4.5.21
-      '@feathersjs/errors': 4.5.21(supports-color@10.2.2)
-      '@feathersjs/feathers': 4.5.21(supports-color@10.2.2)
-    transitivePeerDependencies:
-      - supports-color
-
   '@feathersjs/adapter-commons@5.0.50':
     dependencies:
       '@feathersjs/commons': 5.0.50
@@ -5169,8 +5111,6 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@feathersjs/commons@4.5.21': {}
-
   '@feathersjs/commons@5.0.50': {}
 
   '@feathersjs/configuration@5.0.50(@typescript/typescript6@6.0.2)':
@@ -5182,12 +5122,6 @@ snapshots:
       config: 5.0.1
     transitivePeerDependencies:
       - typescript
-
-  '@feathersjs/errors@4.5.21(supports-color@10.2.2)':
-    dependencies:
-      debug: 4.4.3(supports-color@10.2.2)
-    transitivePeerDependencies:
-      - supports-color
 
   '@feathersjs/errors@5.0.50': {}
 
@@ -5208,15 +5142,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
       - typescript
-
-  '@feathersjs/feathers@4.5.21(supports-color@10.2.2)':
-    dependencies:
-      '@feathersjs/commons': 4.5.21
-      debug: 4.4.3(supports-color@10.2.2)
-      events: 3.3.0
-      uberproto: 2.0.6
-    transitivePeerDependencies:
-      - supports-color
 
   '@feathersjs/feathers@5.0.50':
     dependencies:
@@ -6211,10 +6136,6 @@ snapshots:
 
   agent-base@7.1.4: {}
 
-  ajv-formats@2.1.1(ajv@8.20.0):
-    optionalDependencies:
-      ajv: 8.20.0
-
   ajv-formats@3.0.1(ajv@8.20.0):
     optionalDependencies:
       ajv: 8.20.0
@@ -6640,8 +6561,6 @@ snapshots:
   csstype@3.2.3: {}
 
   date-fns@1.30.1: {}
-
-  db-errors@0.2.3: {}
 
   debug@2.6.9(supports-color@10.2.2):
     dependencies:
@@ -7123,16 +7042,6 @@ snapshots:
       rate-limiter-flexible: 2.4.2
       unset-value: 2.0.1
 
-  feathers-knex@8.0.1(supports-color@10.2.2):
-    dependencies:
-      '@feathersjs/adapter-commons': 4.5.21(supports-color@10.2.2)
-      '@feathersjs/commons': 4.5.21
-      '@feathersjs/errors': 4.5.21(supports-color@10.2.2)
-      debug: 4.4.3(supports-color@10.2.2)
-      is-plain-object: 5.1.0
-    transitivePeerDependencies:
-      - supports-color
-
   feathers-sequelize@7.0.3:
     dependencies:
       '@feathersjs/adapter-commons': 5.0.50
@@ -7559,8 +7468,6 @@ snapshots:
   is-path-inside@4.0.0: {}
 
   is-plain-obj@4.1.0: {}
-
-  is-plain-object@5.1.0: {}
 
   is-promise@2.2.2: {}
 
@@ -8177,13 +8084,6 @@ snapshots:
   object-assign@4.1.1: {}
 
   object-inspect@1.13.4: {}
-
-  objection@3.1.5(knex@3.3.0(pg@8.23.0)(sqlite3@6.0.1)(supports-color@10.2.2)):
-    dependencies:
-      ajv: 8.20.0
-      ajv-formats: 2.1.1(ajv@8.20.0)
-      db-errors: 0.2.3
-      knex: 3.3.0(pg@8.23.0)(sqlite3@6.0.1)(supports-color@10.2.2)
 
   obug@2.2.1: {}
 
@@ -9172,8 +9072,6 @@ snapshots:
       '@typescript/typescript-sunos-x64': 7.0.2
       '@typescript/typescript-win32-arm64': 7.0.2
       '@typescript/typescript-win32-x64': 7.0.2
-
-  uberproto@2.0.6: {}
 
   unconfig-core@7.5.0:
     dependencies:
