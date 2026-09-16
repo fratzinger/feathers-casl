@@ -24,7 +24,7 @@ It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CA
 
 ## Features
 
-- Fully powered by Feathers 5 & CASL 6
+- Fully powered by Feathers 5 & CASL 7
 - Allows permissions for all methods `create`, `find`, `get`, `update`, `patch`, `remove`, or `create`, `read`, `update`, `delete`
 - Define permissions not based on methods: `can('view', 'Settings')` (Bring your custom logic)
 - Restrict by conditions: `can('create', 'Task', { userId: user.id })`
@@ -62,7 +62,7 @@ Simply run `npm test` and all your tests in the `test/` directory will be run. I
 
 ## Help
 
-For more information on all the things you can do, visit [FeathersJS](http://docs.feathersjs.com) and [CASL](https://casl.js.org/v6/en/).
+For more information on all the things you can do, visit [FeathersJS](http://docs.feathersjs.com) and [CASL](https://casl.js.org/v7/en/).
 
 ## License
 

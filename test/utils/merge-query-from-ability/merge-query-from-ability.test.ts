@@ -230,4 +230,34 @@ describe('utils - mergeQueryFromAbility', function () {
       })
     })
   })
+  // casl evaluates rules top down and lets the last matching one win, so a
+  // `cannot` only bounds the `can` rules declared before it.
+  describe('rule precedence', function () {
+    it('drops a cannot that is overridden by a later can', function () {
+      const ability = defineAbility((can, cannot) => {
+        cannot('read', 'tests', { secret: true })
+        can('read', 'tests', { userId: 1 })
+      })
+      assert.deepStrictEqual(build(ability, '@feathersjs/memory'), {
+        userId: 1,
+      })
+    })
+
+    it('bounds each allowing rule by the cannots that outrank it', function () {
+      const ability = defineAbility((can, cannot) => {
+        cannot('read', 'tests', { status: 'archived' })
+        can('read', 'tests', { userId: 1 })
+        cannot('read', 'tests', { userId: 9 })
+        can('read', 'tests', { userId: 2 })
+      })
+      assert.deepStrictEqual(build(ability, '@feathersjs/memory'), {
+        $or: [
+          // `userId: 2` outranks both cannots
+          { userId: 2 },
+          // `userId: 1` only outranks the `status` one
+          { userId: 1, $nor: [{ userId: 9 }] },
+        ],
+      })
+    })
+  })
 })

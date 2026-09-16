@@ -18,11 +18,11 @@
 Add access control with CASL to your feathers application.
 
 This project is built for [FeathersJS](http://feathersjs.com). An open source web framework for building modern real-time applications.
-It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CASL** in your feathers.js-project. Supported versions: `@casl/ability^6` and `@feathersjs/feathers^5`.
+It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CASL** in your feathers.js-project. Supported versions: `@casl/ability^7` and `@feathersjs/feathers^5`.
 
 ## Features
 
-- Fully powered by Feathers 5 & CASL 6
+- Fully powered by Feathers 5 & CASL 7
 - Allows permissions for all methods `create`, `find`, `get`, `update`, `patch`, `remove`, or `create`, `read`, `update`, `delete`
 - Define permissions not based on methods: `can('view', 'Settings')` (Bring your custom logic)
 - Restrict by conditions: `can('create', 'Task', { userId: user.id })`
@@ -73,7 +73,11 @@ For most cases we want to define rules per user (or per user-role). So we first 
 
 ```ts
 // src/services/authentication/authentication.abilities.ts
-import { Ability, AbilityBuilder, createAliasResolver } from "@casl/ability";
+import {
+  AbilityBuilder,
+  createAliasResolver,
+  createMongoAbility
+} from "@casl/ability";
 
 // don't forget this, as `read` is used internally
 const resolveAction = createAliasResolver({
@@ -83,8 +87,8 @@ const resolveAction = createAliasResolver({
 });
 
 export const defineRulesFor = (user) => {
-  // also see https://casl.js.org/v6/en/guide/define-rules
-  const { can, cannot, rules } = new AbilityBuilder(Ability);
+  // also see https://casl.js.org/v7/en/guide/define-rules
+  const { can, cannot, rules } = new AbilityBuilder(createMongoAbility);
 
   if (user.role && user.role.name === "SuperAdmin") {
     // SuperAdmin can do evil
@@ -110,7 +114,7 @@ export const defineRulesFor = (user) => {
 export const defineAbilitiesFor = (user) => {
   const rules = defineRulesFor(user);
 
-  return new Ability(rules, { resolveAction });
+  return createMongoAbility(rules, { resolveAction });
 };
 ```
 
@@ -315,4 +319,4 @@ Simply run `npm test` and all your tests in the `test/` directory will be run. T
 
 ## Help
 
-For more information on all the things you can do, visit [FeathersJS](http://docs.feathersjs.com) and [CASL](https://casl.js.org/v6/en/).
+For more information on all the things you can do, visit [FeathersJS](http://docs.feathersjs.com) and [CASL](https://casl.js.org/v7/en/).
