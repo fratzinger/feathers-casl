@@ -36,6 +36,7 @@ export default defineConfig({
           { text: 'Client Side', link: '/client-side' },
           { text: 'Gotchas', link: '/gotchas' },
           { text: 'Cookbook', link: '/cookbook' },
+          { text: 'Migrating to v4', link: '/migrating' },
         ],
       },
     ],

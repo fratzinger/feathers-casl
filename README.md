@@ -15,6 +15,8 @@
 
 > NOTE: This is the version for Feathers v5. For Feathers v4 use [feathers-casl v0](https://github.com/fratzinger/feathers-casl/tree/crow)
 
+> Coming from v3? See [Migrating to v4](https://feathers-casl.netlify.app/migrating).
+
 ## About
 
 Add access control with CASL to your feathers application.
