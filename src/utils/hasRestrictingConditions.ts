@@ -1,13 +1,17 @@
 import type { AnyAbility } from '@casl/ability'
 
-type Rule = ReturnType<AnyAbility['possibleRulesFor']>[0]
-
+/**
+ * Whether the rules for `action` on `modelName` need the query to be narrowed.
+ *
+ * `true` when at least one rule carries conditions, and also when there are no
+ * rules at all - the caller then has nothing to go on and must not assume the
+ * whole collection is readable.
+ */
 export const hasRestrictingConditions = (
   ability: AnyAbility,
   action: string,
   modelName: string,
-): readonly Rule[] | false => {
+): boolean => {
   const rules = ability.possibleRulesFor(action, modelName)
-  const hasConditions = rules.length === 0 || rules.some((x) => !!x.conditions)
-  return hasConditions ? rules : false
+  return rules.length === 0 || rules.some((rule) => !!rule.conditions)
 }
