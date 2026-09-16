@@ -4,10 +4,15 @@ allowBuilds:
   sqlite3: true
   unrs-resolver: true
 
-# published less than pnpm's `minimumReleaseAge` ago at the time of the bump.
+# @types/pg and sequelize's wkx both accept any @types/node, which drags a
+# second, newer copy into the tree. Keep one, matching `engines.node`.
+overrides:
+  '@types/node': '^22.20.3'
+
+# Published less than pnpm's `minimumReleaseAge` ago at the time of the bump.
 # Safe to drop once they've aged out.
 minimumReleaseAgeExclude:
-  - '@types/node@25.9.7'
+  - '@types/node@22.20.3'
   - feathers-utils@10.8.1
   - kysely@0.29.6
   - prettier@3.9.7
