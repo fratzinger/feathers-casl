@@ -91,5 +91,20 @@ const query = mergeQueryFromAbility(
 | `method `   | The method to merge rules for. Mostly one of: `'find'`, `'get'`, `'create'`, `'update'`, `'patch'`, `'remove'` <br><br>**Type:** `string` |
 | `modelName` | The modelName to merge rules for. Mostly the service path. <br><br>**Type:** `string` |
 | `query`     | Your query you want to merge rules with. <br><br>**Type:** `object` |
-| `service`   | |
-| `options`   | |
+| `service`   | The service the query is built for. <br><br>**Type:** `AdapterBase` |
+| `options`   | `{ adapter }`, to pick how inverted (`cannot`) rules are expressed. Falls back to `casl.defaultAdapter` from your app config, then to `'@feathersjs/memory'`. <br><br>**Type:** `{ adapter?: Adapter }` |
+
+### Notable Principles
+
+- Rule precedence is casl's: every `can` becomes an `$or` branch bounded by
+  the `cannot` rules declared before it. `cannot` rules declared after a `can`
+  are overridden and left out.
+- On adapters that can't express an inverted rule natively the conditions get
+  negated operator by operator, and only `$gt`, `$gte`, `$lt`, `$lte`, `$in`,
+  `$nin` and `$ne` can be negated. Anything else throws - see
+  [Migrating to v4](/migrating#an-inverted-rule-the-adapter-can-t-express-now-throws).
+- When the ability allows nothing at all there is no query that expresses it,
+  so the query comes back unchanged. The `authorize` hook rejects the request
+  before it gets here; if you call this util yourself, check the permission
+  separately with [`checkBasicPermission`](#checkbasicpermission) or
+  `ability.can(...)`.
