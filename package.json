@@ -81,7 +81,7 @@
     "@types/lodash": "^4.17.25",
     "@types/node": "^25.9.6",
     "@types/pg": "^8.23.1",
-    "@vitest/coverage-v8": "^4.1.11",
+    "@vitest/coverage-v8": "^5.0.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "eslint": "^10.10.0",
@@ -107,6 +107,6 @@
     "unrun": "^0.3.0",
     "vite": "^8.3.0",
     "vitepress": "2.0.0-alpha.20",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.1"
   }
 }
