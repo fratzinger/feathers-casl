@@ -53,8 +53,8 @@ describe('app-options / service-options', function () {
       let calledActionOnForbidden = false
       let calledAbility = false
       let calledModelName = false
-      let calledChannelAbility = false
-      let calledChannelModelName = false
+      let _calledChannelAbility = false
+      let _calledChannelModelName = false
 
       app.configure(
         feathersCasl({
@@ -77,11 +77,11 @@ describe('app-options / service-options', function () {
             activated: false,
             channelOnError: ['Test'],
             ability: () => {
-              calledChannelAbility = true
+              _calledChannelAbility = true
               return defineAbility(() => {})
             },
             modelName: (): string => {
-              calledChannelModelName = true
+              _calledChannelModelName = true
               return 'Test'
             },
             restrictFields: false,
@@ -106,8 +106,8 @@ describe('app-options / service-options', function () {
       assert.ok(calledActionOnForbidden, 'called actionOnForbidden function')
       assert.ok(calledModelName, 'called modelName function')
 
-      //assert.ok(calledChannelAbility, "called ability function on channels");
-      //assert.ok(calledChannelModelName, "called modelName function on channels");
+      //assert.ok(_calledChannelAbility, "called ability function on channels");
+      //assert.ok(_calledChannelModelName, "called modelName function on channels");
     })
 
     it('calls service options over app options', async function () {
@@ -201,8 +201,8 @@ describe('app-options / service-options', function () {
         'not called modelName function from app options',
       )
 
-      //assert.ok(calledChannelAbility, "called ability function on channels");
-      //assert.ok(calledChannelModelName, "called modelName function on channels");
+      //assert.ok(_calledChannelAbility, "called ability function on channels");
+      //assert.ok(_calledChannelModelName, "called modelName function on channels");
     })
   })
 

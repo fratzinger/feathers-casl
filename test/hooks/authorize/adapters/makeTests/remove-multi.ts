@@ -81,9 +81,9 @@ export default (
     })
 
     it('can remove multiple items and returns [] for not allowed read', async function () {
-      const item1 = await service.create({ test: true, userId: 1 })
+      await service.create({ test: true, userId: 1 })
 
-      const item2 = await service.create({ test: true, userId: 1 })
+      await service.create({ test: true, userId: 1 })
       const item3 = await service.create({ test: true, userId: 2 })
 
       const removedItems = await service.remove(null, {

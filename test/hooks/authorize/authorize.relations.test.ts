@@ -124,25 +124,25 @@ describe('authorize.relations', function () {
         date: 2016,
       })
 
-      const killer = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'All Killer No Filler',
         artistId: sum41.id,
         date: 2001,
       })
 
-      const hero = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'Underclass Hero',
         artistId: sum41.id,
         date: 2007,
       })
 
-      const believe = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'Believe',
         artistId: justinBieber.id,
         date: 2012,
       })
 
-      const purpose = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'Purpose',
         artistId: justinBieber.id,
         date: 2020,
@@ -182,25 +182,25 @@ describe('authorize.relations', function () {
         date: 2016,
       })
 
-      const killer = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'All Killer No Filler',
         artistId: sum41.id,
         date: 2001,
       })
 
-      const hero = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'Underclass Hero',
         artistId: sum41.id,
         date: 2007,
       })
 
-      const believe = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'Believe',
         artistId: justinBieber.id,
         date: 2012,
       })
 
-      const purpose = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'Purpose',
         artistId: justinBieber.id,
         date: 2020,
@@ -261,25 +261,25 @@ describe('authorize.relations', function () {
         date: 2016,
       })
 
-      const killer = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'All Killer No Filler',
         artistId: sum41.id,
         date: 2001,
       })
 
-      const hero = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'Underclass Hero',
         artistId: sum41.id,
         date: 2007,
       })
 
-      const believe = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'Believe',
         artistId: justinBieber.id,
         date: 2012,
       })
 
-      const purpose = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'Purpose',
         artistId: justinBieber.id,
         date: 2020,
@@ -344,25 +344,25 @@ describe('authorize.relations', function () {
         date: 2016,
       })
 
-      const killer = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'All Killer No Filler',
         artistId: sum41.id,
         date: 2001,
       })
 
-      const hero = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'Underclass Hero',
         artistId: sum41.id,
         date: 2007,
       })
 
-      const believe = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'Believe',
         artistId: justinBieber.id,
         date: 2012,
       })
 
-      const purpose = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'Purpose',
         artistId: justinBieber.id,
         date: 2020,
@@ -412,25 +412,25 @@ describe('authorize.relations', function () {
         date: 2016,
       })
 
-      const killer = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'All Killer No Filler',
         artistId: sum41.id,
         date: 2001,
       })
 
-      const hero = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'Underclass Hero',
         artistId: sum41.id,
         date: 2007,
       })
 
-      const believe = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'Believe',
         artistId: justinBieber.id,
         date: 2012,
       })
 
-      const purpose = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'Purpose',
         artistId: justinBieber.id,
         date: 2020,
@@ -509,25 +509,25 @@ describe('authorize.relations', function () {
         date: 2016,
       })
 
-      const killer = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'All Killer No Filler',
         artistId: sum41.id,
         date: 2001,
       })
 
-      const hero = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'Underclass Hero',
         artistId: sum41.id,
         date: 2007,
       })
 
-      const believe = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'Believe',
         artistId: justinBieber.id,
         date: 2012,
       })
 
-      const purpose = await serviceAlbums.create({
+      await serviceAlbums.create({
         name: 'Purpose',
         artistId: justinBieber.id,
         date: 2020,

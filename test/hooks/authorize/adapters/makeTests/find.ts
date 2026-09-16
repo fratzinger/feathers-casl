@@ -530,9 +530,9 @@ export default (
       it("returns only allowed items with '$in' query", async function () {
         const item1 = await service.create({ test: true, userId: 1 })
 
-        const item2 = await service.create({ test: true, userId: 2 })
+        await service.create({ test: true, userId: 2 })
 
-        const item3 = await service.create({ test: true, userId: 3 })
+        await service.create({ test: true, userId: 3 })
         const items = (await service.find({ paginate: false })) as unknown[]
         assert.strictEqual(items.length, 3, 'has three items')
 
