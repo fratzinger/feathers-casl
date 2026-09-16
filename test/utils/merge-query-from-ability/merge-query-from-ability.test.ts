@@ -284,4 +284,28 @@ describe('utils - mergeQueryFromAbility', function () {
       })
     })
   })
+  describe('rules an adapter cannot express', function () {
+    // before this threw, the `cannot` silently vanished from the query and
+    // `find` happily returned the records it was supposed to hide
+    it('throws instead of dropping a cannot it cannot negate', function () {
+      const ability = defineAbility((can, cannot) => {
+        can('read', 'tests')
+        cannot('read', 'tests', { name: { $regex: 'x' } as any })
+      })
+      assert.throws(
+        () => build(ability, '@feathersjs/knex'),
+        /cannot negate name\.\$regex/,
+      )
+    })
+
+    it('uses $nor for the same rule where the adapter supports it', function () {
+      const ability = defineAbility((can, cannot) => {
+        can('read', 'tests')
+        cannot('read', 'tests', { name: { $regex: 'x' } as any })
+      })
+      assert.deepStrictEqual(build(ability, '@feathersjs/memory'), {
+        $nor: [{ name: { $regex: 'x' } }],
+      })
+    })
+  })
 })

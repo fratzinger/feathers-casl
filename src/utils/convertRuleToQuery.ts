@@ -1,3 +1,4 @@
+import { GeneralError } from '@feathersjs/errors'
 import _isPlainObject from 'lodash/isPlainObject.js'
 
 import type { SubjectRawRule, MongoQuery, ClaimRawRule } from '@casl/ability'
@@ -31,6 +32,14 @@ const invertedProp = (
   }
 }
 
+/**
+ * Turns a rule's conditions into a feathers query, negating them for inverted
+ * (`cannot`) rules.
+ *
+ * Throws a `GeneralError` when an inverted rule uses only operators that can't
+ * be negated - the alternative would be to hand back a query that doesn't
+ * restrict anything, which reads as "allowed" and silently leaks records.
+ */
 export const convertRuleToQuery = (
   rule: SubjectRawRule<any, any, MongoQuery> | ClaimRawRule<any>,
   options?: GetConditionalQueryOptions,
@@ -50,13 +59,14 @@ export const convertRuleToQuery = (
     // are combined with `$or`. Naively merging the negations into a single
     // object would `AND` them instead and exclude far too many records.
     const clauses: Query[] = []
+    const unsupported: string[] = []
     for (const prop in conditions as Record<string, unknown>) {
       const value = (conditions as Record<string, unknown>)[prop]
       if (_isPlainObject(value)) {
         const obj = value as Record<string, unknown>
         for (const name in obj) {
-          if (!supportedOperators.includes(name)) {
-            console.error(`CASL: not supported property: ${name}`)
+          if (!Object.hasOwn(invertedMap, name)) {
+            unsupported.push(`${prop}.${name}`)
             continue
           }
           clauses.push({ [prop]: invertedProp(obj, name) } as Query)
@@ -64,6 +74,27 @@ export const convertRuleToQuery = (
       } else {
         clauses.push({ [prop]: { $ne: value } } as Query)
       }
+    }
+
+    if (unsupported.length) {
+      const detail =
+        `cannot negate ${unsupported.join(', ')} for this adapter. ` +
+        `Invertible operators are ${supportedOperators.join(', ')}. ` +
+        `Adapters with native support for inverted rules (@feathersjs/memory, ` +
+        `@feathersjs/mongodb, feathers-kysely, feathers-sequelize) don't have ` +
+        `this restriction.`
+
+      if (clauses.length === 0) {
+        // nothing left to restrict by - the `cannot` would just disappear
+        throw new GeneralError(`feathers-casl: ${detail}`)
+      }
+
+      // dropping one branch of an `$or` narrows the result, so this errs on the
+      // safe side - but the query is stricter than the rule asked for
+      console.warn(
+        `feathers-casl: ${detail} The condition is left out, so the query is ` +
+          `more restrictive than the rule.`,
+      )
     }
 
     if (clauses.length === 0) {

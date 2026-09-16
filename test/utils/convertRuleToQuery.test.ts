@@ -29,8 +29,6 @@ describe('utils - convertRuleToQuery', function () {
       can('create', 'tests')
 
       can('create', 'tests', { $sort: { id: 1 } })
-      cannot('create', 'tests', { $sort: { id: 1 } })
-      cannot('create', 'tests', { id: { $sort: 1 } })
     })
     const expected = [
       { id: 1, test: true },
@@ -57,8 +55,6 @@ describe('utils - convertRuleToQuery', function () {
       undefined,
 
       { $sort: { id: 1 } },
-      {},
-      {},
     ]
     const { rules } = ability
 
@@ -69,6 +65,37 @@ describe('utils - convertRuleToQuery', function () {
         `${i}: expected result for rule is: '${JSON.stringify(expected[i])}'`,
       )
     })
+  })
+
+  // leaving these out would hand back a query that restricts nothing, which
+  // the caller reads as "everything is allowed"
+  it('throws when an inverted rule has nothing invertible in it', function () {
+    const rules = defineAbility((can, cannot) => {
+      cannot('create', 'tests', { $sort: { id: 1 } })
+      cannot('create', 'tests', { id: { $sort: 1 } })
+    }).rules
+
+    for (const rule of rules) {
+      assert.throws(() => convertRuleToQuery(rule), /cannot negate/)
+    }
+  })
+
+  it('warns and narrows when only part of an inverted rule is invertible', function () {
+    const [rule] = defineAbility((can, cannot) => {
+      cannot('create', 'tests', { id: { $ne: 1, $sort: 1 } })
+    }).rules
+
+    const warnings: string[] = []
+    const warn = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      assert.deepStrictEqual(convertRuleToQuery(rule), { id: 1 })
+    } finally {
+      console.warn = warn
+    }
+
+    assert.strictEqual(warnings.length, 1)
+    assert.match(warnings[0], /more restrictive than the rule/)
   })
 
   it('calls actionOnForbidden', function () {
