@@ -17,6 +17,7 @@ import {
 import {
   getAvailableFields,
   hasRestrictingFields,
+  couldHaveRestrictingFields,
   getModelName,
   getIdFields,
   mergeArrays,
@@ -85,6 +86,12 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
 
   const $select: string[] | undefined = params.query?.$select
 
+  // without a single rule carrying `fields`, `hasRestrictingFields` can only
+  // ever answer `false` - so ask once instead of once per item
+  const couldRestrictFields =
+    !skipCheckFields &&
+    couldHaveRestrictingFields(ability, getOrFind, modelName)
+
   const idFields = getIdFields(context)
 
   const method = getMethodName(context, options)
@@ -105,19 +112,20 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
   }
 
   const pickFieldsForItem = (item: Record<string, unknown>) => {
-    if (
-      !skipCheckConditions &&
-      !ability.can(getOrFind, subject(modelName, item))
-    ) {
+    const itemAsSubject = subject(modelName, item)
+
+    if (!skipCheckConditions && !ability.can(getOrFind, itemAsSubject)) {
       return undefined
     }
 
-    const restrictingFields = hasRestrictingFields(
-      ability,
-      getOrFind,
-      subject(modelName, item),
-      hasRestrictingFieldsOptions,
-    )
+    const restrictingFields = couldRestrictFields
+      ? hasRestrictingFields(
+          ability,
+          getOrFind,
+          itemAsSubject,
+          hasRestrictingFieldsOptions,
+        )
+      : false
 
     if (restrictingFields === true) {
       // full restriction
