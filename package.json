@@ -36,7 +36,7 @@
   "engines": {
     "node": ">= 22.0.0"
   },
-  "packageManager": "pnpm@11.27.0",
+  "packageManager": "pnpm@12.4.2",
   "scripts": {
     "build": "tsdown",
     "version": "npm run build",
@@ -94,7 +94,7 @@
     "kysely": "^0.29.5",
     "mongodb": "^7.6.0",
     "mongodb-memory-server": "^11.2.0",
-    "np": "^11.2.2",
+    "np": "^12.1.1",
     "objection": "^3.1.5",
     "pg": "^8.23.0",
     "prettier": "^3.9.6",
