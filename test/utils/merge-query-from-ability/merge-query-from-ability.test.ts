@@ -243,6 +243,30 @@ describe('utils - mergeQueryFromAbility', function () {
       })
     })
 
+    it('keeps the bounds of an unconditional can', function () {
+      const ability = defineAbility((can, cannot) => {
+        can('read', 'tests')
+        cannot('read', 'tests', { secret: true })
+      })
+      assert.deepStrictEqual(build(ability, '@feathersjs/memory'), {
+        $nor: [{ secret: true }],
+      })
+    })
+
+    it('falls back to the original query for an unconditional cannot', function () {
+      const ability = defineAbility((can, cannot) => {
+        can('read', 'tests', { userId: 1 })
+        cannot('read', 'tests')
+      })
+      // nothing is readable at all - that's for `checkBasicPermission` to
+      // reject, there is no query that could express it
+      const originalQuery = { test: true }
+      assert.deepStrictEqual(
+        build(ability, '@feathersjs/memory', originalQuery),
+        originalQuery,
+      )
+    })
+
     it('bounds each allowing rule by the cannots that outrank it', function () {
       const ability = defineAbility((can, cannot) => {
         cannot('read', 'tests', { status: 'archived' })

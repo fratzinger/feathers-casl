@@ -41,7 +41,7 @@ const and = (queries: Query[]): Query => {
 }
 
 const or = (queries: Query[]): Query => {
-  if (queries.length === 0 || queries.some((query) => _isEmpty(query))) {
+  if (queries.some((query) => _isEmpty(query))) {
     return {}
   }
   return queries.length === 1 ? queries[0] : { $or: queries }
