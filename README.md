@@ -5,7 +5,7 @@
 </p>
 
 [![npm](https://img.shields.io/npm/v/feathers-casl)](https://www.npmjs.com/package/feathers-casl)
-[![Github CI](https://github.com/fratzinger/feathers-casl/actions/workflows/node.js.yml/badge.svg)](https://github.com/fratzinger/feathers-casl/actions)
+[![Github CI](https://github.com/fratzinger/feathers-casl/actions/workflows/node.js.yaml/badge.svg)](https://github.com/fratzinger/feathers-casl/actions)
 [![Maintainability](https://qlty.sh/gh/fratzinger/projects/feathers-casl/maintainability.svg)](https://qlty.sh/gh/fratzinger/projects/feathers-casl)
 [![Code Coverage](https://qlty.sh/gh/fratzinger/projects/feathers-casl/coverage.svg)](https://qlty.sh/gh/fratzinger/projects/feathers-casl)
 [![libraries.io](https://img.shields.io/librariesio/release/npm/feathers-casl)](https://libraries.io/npm/feathers-casl)
