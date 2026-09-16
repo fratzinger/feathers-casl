@@ -1,4 +1,3 @@
-import _isEqual from 'lodash/isEqual.js'
 import _pick from 'lodash/pick.js'
 import _isEmpty from 'lodash/isEmpty.js'
 import { Channel } from '@feathersjs/transport-commons'
@@ -22,7 +21,7 @@ import type { RealTimeConnection } from '@feathersjs/transport-commons'
 
 interface ConnectionsPerField {
   fields: false | string[]
-  connections: RealTimeConnection[]
+  connections: Set<RealTimeConnection>
 }
 
 import type { HookContext, Application } from '@feathersjs/feathers'
@@ -79,11 +78,16 @@ export const getChannelsWithReadAbility = (
     })
   } else {
     // filter by restricted Fields
-    const connectionsPerFields: ConnectionsPerField[] = []
+    const availableFields = getAvailableFields(context, options)
+
+    // connections that see the same fields share a channel. The serialized
+    // field list is the group key, so grouping stays O(1) per connection, and
+    // the connections themselves are a `Set` because a connection can show up
+    // in more than one of the channels we're filtering.
+    const connectionsPerFields = new Map<string, ConnectionsPerField>()
 
     for (let i = 0, n = channels.length; i < n; i++) {
-      const channel = channels[i]
-      const { connections } = channel
+      const { connections } = channels[i]
 
       for (let j = 0, o = connections.length; j < o; j++) {
         const connection = connections[j]
@@ -92,7 +96,6 @@ export const getChannelsWithReadAbility = (
           // connection cannot read item -> don't send data
           continue
         }
-        const availableFields = getAvailableFields(context, options)
 
         const fields = hasRestrictingFields(ability, method, dataToTest, {
           availableFields,
@@ -101,18 +104,14 @@ export const getChannelsWithReadAbility = (
         if (fields && (fields === true || fields.length === 0)) {
           continue
         }
-        const connField = connectionsPerFields.find((x) =>
-          _isEqual(x.fields, fields),
-        )
+
+        const key = JSON.stringify(fields)
+        const connField = connectionsPerFields.get(key)
         if (connField) {
-          if (connField.connections.indexOf(connection) !== -1) {
-            // connection is already in array -> skip
-            continue
-          }
-          connField.connections.push(connection)
+          connField.connections.add(connection)
         } else {
-          connectionsPerFields.push({
-            connections: [connection],
+          connectionsPerFields.set(key, {
+            connections: new Set([connection]),
             fields: fields as string[] | false,
           })
         }
@@ -121,14 +120,13 @@ export const getChannelsWithReadAbility = (
 
     const idFields = getIdFields(context)
 
-    for (let i = 0, n = connectionsPerFields.length; i < n; i++) {
-      const { fields, connections } = connectionsPerFields[i]
+    for (const { fields, connections } of connectionsPerFields.values()) {
       // always keep the service id field(s) so records stay identifiable
       const restrictedData = fields
         ? _pick(data, mergeArrays(fields, idFields, 'combine') as string[])
         : data
       if (!_isEmpty(restrictedData)) {
-        result.push(new Channel(connections, restrictedData))
+        result.push(new Channel([...connections], restrictedData))
       }
     }
   }
