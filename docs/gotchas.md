@@ -15,6 +15,24 @@ const ability = defineAbility((can, cannot) => {
 });
 ```
 
+### A `cannot` only restricts the rules before it
+
+The same order applies to the query `feathers-casl` builds for `find`,
+`patch`-multi and `remove`-multi. A `cannot` bounds the `can` rules declared
+before it and is ignored by the ones declared after it - exactly how
+`ability.can(...)` decides for a single item:
+
+```ts
+const ability = defineAbility((can, cannot) => {
+  cannot("read", "users", { blocked: true });
+  can("read", "users", { id: user.id });
+});
+```
+
+Here the `cannot` never makes it into the query, because the `can` below it
+wins for every item it matches. Swap the two and you get
+`{ id: user.id, $nor: [{ blocked: true }] }`.
+
 ## Fields
 
 ### Conditional subset
