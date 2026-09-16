@@ -3,3 +3,11 @@ allowBuilds:
   mongodb-memory-server: true
   sqlite3: true
   unrs-resolver: true
+
+# published less than pnpm's `minimumReleaseAge` ago at the time of the bump.
+# Safe to drop once they've aged out.
+minimumReleaseAgeExclude:
+  - '@types/node@25.9.7'
+  - feathers-utils@10.8.1
+  - kysely@0.29.6
+  - prettier@3.9.7
