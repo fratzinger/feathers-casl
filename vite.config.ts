@@ -1,7 +1,10 @@
 import { defineConfig } from 'vitest/config'
-import dotenv from 'dotenv'
+import { existsSync } from 'node:fs'
 
-dotenv.config()
+// optional - CI passes POSTGRES_* through the environment instead
+if (existsSync('.env')) {
+  process.loadEnvFile()
+}
 
 export default defineConfig({
   test: {

@@ -84,7 +84,6 @@
     "@typescript/native": "npm:typescript@^7.0.2",
     "@vitest/coverage-v8": "^5.0.1",
     "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
     "eslint": "^10.10.0",
     "feathers-fletching": "^2.0.7",
     "feathers-sequelize": "^7.0.3",
