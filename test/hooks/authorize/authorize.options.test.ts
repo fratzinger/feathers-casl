@@ -588,12 +588,7 @@ describe('authorize.options.test.ts', function () {
 
       const types: ('before' | 'after')[] = ['before']
       const methods: (
-        | 'find'
-        | 'get'
-        | 'create'
-        | 'update'
-        | 'patch'
-        | 'remove'
+        'find' | 'get' | 'create' | 'update' | 'patch' | 'remove'
       )[] = ['find', 'get', 'create', 'update', 'patch', 'remove']
       const promises: Promise<any>[] = []
       types.forEach((type) => {

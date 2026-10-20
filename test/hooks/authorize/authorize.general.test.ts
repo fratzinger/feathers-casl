@@ -1,7 +1,6 @@
 import assert from 'node:assert'
 import { authorize } from '../../../src/index.js'
-import { defineAbility } from '@casl/ability'
-import _cloneDeep from 'lodash/cloneDeep.js'
+import { defineAbility, subject } from '@casl/ability'
 import { addSkip } from 'feathers-utils'
 import type { HookContext } from '@feathersjs/feathers'
 import { MemoryService } from '@feathersjs/memory'
@@ -357,6 +356,123 @@ describe('authorize.general.test.ts', function () {
       })
     })
 
+    it('does not restrict a can that overrules an earlier cannot', async function () {
+      const store = {
+        1: { id: 1, userId: 1, published: true },
+        // only readable because the `can` below overrules the `cannot`
+        2: { id: 2, userId: 2, published: false },
+        3: { id: 3, userId: 1, published: false },
+        4: { id: 4, userId: 3, published: true },
+      }
+
+      const service = new MemoryService({
+        filters: { ...filterArray('$and', '$nor') },
+        operators: ['$and', '$nor'],
+        store: structuredClone(store),
+        paginate: undefined,
+      })
+
+      // `can('read', { userId: 2 })` is declared last and therefore has the
+      // highest priority - the `cannot` above must not bound it
+      const ability = defineAbility(
+        (can, cannot) => {
+          can('read', 'tests', { userId: 1 })
+          cannot('read', 'tests', { published: false })
+          can('read', 'tests', { userId: 2 })
+        },
+        { resolveAction },
+      )
+
+      const context = {
+        service,
+        path: 'tests',
+        method: 'find',
+        type: 'before',
+        params: { ability, query: {} },
+      } as unknown as HookContext
+
+      const result = await authorize()(context)
+      const found = (await service.find({
+        query: result.params.query,
+      })) as unknown as { id: number }[]
+
+      assert.deepStrictEqual(
+        found.map((item) => item.id),
+        [1, 2],
+        'query returns exactly the readable items',
+      )
+
+      // the query and `ability.can()` have to agree on every single item
+      Object.values(store).forEach((item) => {
+        assert.strictEqual(
+          ability.can('read', subject('tests', item)),
+          found.some((f) => f.id === item.id),
+          `query and ability.can() agree on ${JSON.stringify(item)}`,
+        )
+      })
+    })
+
+    it('bounds every can when the cannot is declared last', function () {
+      // same rules as above, but the `cannot` now has the highest priority -
+      // so it restricts both `can` rules and item 2 drops out as well
+      const store = {
+        1: { id: 1, userId: 1, published: true },
+        2: { id: 2, userId: 2, published: false },
+        3: { id: 3, userId: 1, published: false },
+        4: { id: 4, userId: 3, published: true },
+      }
+
+      const service = new MemoryService({
+        filters: { ...filterArray('$and', '$nor') },
+        operators: ['$and', '$nor'],
+        store: structuredClone(store),
+        paginate: undefined,
+      })
+
+      const ability = defineAbility(
+        (can, cannot) => {
+          can('read', 'tests', { userId: 1 })
+          can('read', 'tests', { userId: 2 })
+          cannot('read', 'tests', { published: false })
+        },
+        { resolveAction },
+      )
+
+      const context = {
+        service,
+        path: 'tests',
+        method: 'find',
+        type: 'before',
+        params: { ability, query: {} },
+      } as unknown as HookContext
+
+      return authorize()(context).then(async (result) => {
+        // shared bounds stay hoisted to the top level - no nesting
+        assert.deepStrictEqual(result.params.query, {
+          userId: { $in: [2, 1] },
+          $nor: [{ published: false }],
+        })
+
+        const found = (await service.find({
+          query: result.params.query,
+        })) as unknown as { id: number }[]
+
+        assert.deepStrictEqual(
+          found.map((item) => item.id),
+          [1],
+          'query returns exactly the readable items',
+        )
+
+        Object.values(store).forEach((item) => {
+          assert.strictEqual(
+            ability.can('read', subject('tests', item)),
+            found.some((f) => f.id === item.id),
+            `query and ability.can() agree on ${JSON.stringify(item)}`,
+          )
+        })
+      })
+    })
+
     describe('create', function () {
       it("'create:single' passes", async function () {
         const context = {
@@ -576,11 +692,11 @@ describe('authorize.general.test.ts', function () {
           },
           {
             condition: { userId: { $in: [1] } },
-            inverted: { $nor: [{ userId: { $in: [1] } }] },
+            inverted: { $nor: [{ userId: 1 }] },
           },
           {
             condition: { userId: { $nin: [1] } },
-            inverted: { $nor: [{ userId: { $nin: [1] } }] },
+            inverted: { $nor: [{ userId: { $ne: 1 } }] },
           },
         ]
         const promises: Promise<any>[] = []
@@ -653,6 +769,35 @@ describe('authorize.general.test.ts', function () {
     })
 
     describe('patch', function () {
+      it("'patch:single' fetches the item with the ability's query", async function () {
+        const getQueries: unknown[] = []
+        const context = {
+          service: {
+            async _get(id: number, params: any) {
+              getQueries.push(params.query)
+              return { id, userId: 1 }
+            },
+          },
+          path: 'tests',
+          method: 'patch',
+          type: 'before',
+          id: 1,
+          data: { test: true },
+          params: {
+            provider: 'rest',
+            ability: defineAbility((can) => {
+              can('patch', 'tests', { userId: 1 })
+            }),
+            query: {},
+          },
+        } as unknown as HookContext
+
+        const result = await authorize()(context)
+
+        assert.deepStrictEqual(result.params.query, { userId: 1 })
+        assert.deepStrictEqual(getQueries, [{ userId: 1 }])
+      })
+
       it("'patch:multi' passes with 'patch-multi' and 'checkMultiActions: true'", async function () {
         const context = {
           service: {},
@@ -756,6 +901,39 @@ describe('authorize.general.test.ts', function () {
   })
 
   describe('after', function () {
+    describe('without rules carrying fields', function () {
+      const makeContext = (availableFields: string[] | undefined) =>
+        ({
+          service: { options: { casl: { availableFields } } },
+          path: 'tests',
+          method: 'find',
+          type: 'after',
+          result: [
+            { id: 1, userId: 1, test: true },
+            { id: 2, userId: 2, test: true },
+          ],
+          params: {
+            provider: 'rest',
+            ability: defineAbility((can) => {
+              can('find', 'tests', { userId: 1 })
+            }),
+            query: {},
+          },
+        }) as unknown as HookContext
+
+      it('returns the complete items', async function () {
+        for (const availableFields of [undefined, ['id', 'userId', 'test']]) {
+          const { result } = await authorize()(makeContext(availableFields))
+          assert.deepStrictEqual(result, [{ id: 1, userId: 1, test: true }])
+        }
+      })
+
+      it("restricts every field for 'availableFields: []'", async function () {
+        const { result } = await authorize()(makeContext([]))
+        assert.deepStrictEqual(result, [{}])
+      })
+    })
+
     it("after - passes single with 'get' rule", async function () {
       const expectedResult = { id: 1, userId: 1, test: true }
       const makeContext = (method: string, type: string) => {
@@ -859,7 +1037,7 @@ describe('authorize.general.test.ts', function () {
           path: 'tests',
           method,
           type,
-          result: _cloneDeep(expectedResult),
+          result: structuredClone(expectedResult),
           id: null,
           params: {
             ability: defineAbility(
@@ -907,7 +1085,7 @@ describe('authorize.general.test.ts', function () {
           path: 'tests',
           method,
           type,
-          result: _cloneDeep(expectedResult),
+          result: structuredClone(expectedResult),
           id: null,
           params: {
             ability: defineAbility(

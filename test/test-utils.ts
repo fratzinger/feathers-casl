@@ -77,3 +77,20 @@ export const filterObject = <T extends string[]>(
   }
   return result
 }
+
+/**
+ * Returns a copy of `items` sorted by `key`. Ids are numbers, strings or mongo
+ * `ObjectId`s - anything but numbers is compared by its string form.
+ */
+export const sortBy = <T extends Record<string, any>>(
+  items: readonly T[],
+  key: string,
+): T[] =>
+  items.toSorted((a, b) => {
+    const x = a[key]
+    const y = b[key]
+    if (typeof x === 'number' && typeof y === 'number') {
+      return x - y
+    }
+    return String(x) < String(y) ? -1 : String(x) > String(y) ? 1 : 0
+  })

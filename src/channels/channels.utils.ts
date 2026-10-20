@@ -1,6 +1,6 @@
 import { getAvailableFields } from '../utils/index.js'
 
-import type { Ability, AnyAbility } from '@casl/ability'
+import type { AnyAbility } from '@casl/ability'
 
 import type { Application, HookContext } from '@feathersjs/feathers'
 import type { RealTimeConnection } from '@feathersjs/transport-commons'
@@ -25,7 +25,7 @@ export const makeDefaultOptions = (
     activated: true,
     channelOnError: ['authenticated'],
 
-    ability: (app: Application, connection: RealTimeConnection): Ability => {
+    ability: (app: Application, connection: RealTimeConnection): AnyAbility => {
       return connection.ability
     },
     modelName: (context) => context.path,

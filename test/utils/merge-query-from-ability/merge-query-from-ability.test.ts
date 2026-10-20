@@ -5,6 +5,8 @@ import type { Adapter } from '../../../src/index.js'
 
 // `app` is only used by `getAdapter` when `options.adapter` is not set, and
 // `service` is unused by `mergeQueryFromAbility` - so plain stubs are enough.
+const cannotNegate = /cannot negate/
+
 const app = {} as any
 const service = {} as any
 
@@ -44,6 +46,82 @@ describe('utils - mergeQueryFromAbility', function () {
     )
   })
 
+  // Rules come in highest priority first, so a `cannot` only bounds the `can`
+  // rules declared before it - exactly how `ability.can()` evaluates them.
+  describe('rule priority', function () {
+    it('ignores a cannot that a later can overrules', function () {
+      const ability = defineAbility((can, cannot) => {
+        cannot('read', 'tests', { userId: 4 })
+        can('read', 'tests', { userId: 1 })
+      })
+      assert.deepStrictEqual(build(ability, '@feathersjs/knex'), { userId: 1 })
+    })
+
+    it('bounds only the can rules below the cannot', function () {
+      const ability = defineAbility((can, cannot) => {
+        can('read', 'tests', { userId: 1 })
+        cannot('read', 'tests', { userId: 4 })
+        can('read', 'tests', { userId: 2 })
+      })
+      // same field on both sides - needs a nested $and
+      assert.deepStrictEqual(build(ability, '@feathersjs/knex'), {
+        $or: [{ userId: 2 }, { $and: [{ userId: 1 }, { userId: { $ne: 4 } }] }],
+      })
+      // $nor merges into the branch, so this stays flat
+      assert.deepStrictEqual(build(ability, '@feathersjs/memory'), {
+        $or: [{ userId: 2 }, { userId: 1, $nor: [{ userId: 4 }] }],
+      })
+    })
+
+    it('merges the bound into the branch when the fields differ', function () {
+      const ability = defineAbility((can, cannot) => {
+        can('read', 'tests', { userId: 1 })
+        cannot('read', 'tests', { hi: 'test' })
+        can('read', 'tests', { userId: 2 })
+      })
+      assert.deepStrictEqual(build(ability, '@feathersjs/knex'), {
+        $or: [{ userId: 2 }, { userId: 1, hi: { $ne: 'test' } }],
+      })
+    })
+  })
+
+  // Rules without conditions stop the iteration - everything with a lower
+  // priority (= defined earlier) can no longer widen or narrow the query.
+  describe('rules without conditions', function () {
+    // falling back to the original query would allow everything
+    it('throws Forbidden for a blanket cannot', function () {
+      const ability = defineAbility((can, cannot) => {
+        can('read', 'tests', { userId: 1 })
+        cannot('read', 'tests')
+      })
+      assert.throws(
+        () => build(ability, '@feathersjs/knex', { test: true }),
+        (err: Error) => err.name === 'Forbidden',
+      )
+    })
+
+    it('throws Forbidden for a cannot with empty conditions', function () {
+      const ability = defineAbility((can, cannot) => {
+        can('read', 'tests', { userId: 1 })
+        cannot('read', 'tests', {})
+      })
+      assert.throws(
+        () => build(ability, '@feathersjs/memory', { test: true }),
+        (err: Error) => err.name === 'Forbidden',
+      )
+    })
+
+    it('keeps the inverted conditions of a blanket can', function () {
+      const ability = defineAbility((can, cannot) => {
+        can('read', 'tests')
+        cannot('read', 'tests', { userId: 4 })
+      })
+      assert.deepStrictEqual(build(ability, '@feathersjs/knex'), {
+        userId: { $ne: 4 },
+      })
+    })
+  })
+
   // Allowing (`can`) rules are adapter-independent - the per-adapter callback
   // only kicks in for inverted (`cannot`) rules.
   describe('allowing rules', function () {
@@ -60,12 +138,22 @@ describe('utils - mergeQueryFromAbility', function () {
         can('read', 'tests', { userId: 2 })
       })
       assert.deepStrictEqual(build(ability, '@feathersjs/knex'), {
-        $or: [{ userId: 2 }, { userId: 1 }],
+        userId: { $in: [2, 1] },
       })
     })
   })
 
   describe('@feathersjs/knex (default: inverts operators)', function () {
+    // the `cannot` must not disappear from the query: `ability.can()` denies
+    // a matching record, so `find` must not return it either
+    it('throws for a cannot with an operator it cannot invert', function () {
+      const ability = defineAbility((can, cannot) => {
+        can('read', 'tests')
+        cannot('read', 'tests', { name: { $regex: 'x' } })
+      })
+      assert.throws(() => build(ability, '@feathersjs/knex'), cannotNegate)
+    })
+
     it('inverts an equality condition to $ne', function () {
       const ability = defineAbility((can, cannot) => {
         can('read', 'tests')
@@ -93,7 +181,7 @@ describe('utils - mergeQueryFromAbility', function () {
         cannot('read', 'tests', { userId: 4 })
       })
       assert.deepStrictEqual(build(ability, '@feathersjs/knex'), {
-        $or: [{ userId: 2 }, { userId: 1 }],
+        $or: [{ userId: { $in: [2, 1] } }],
         userId: { $ne: 4 },
       })
     })
@@ -139,7 +227,7 @@ describe('utils - mergeQueryFromAbility', function () {
         cannot('read', 'tests', { userId: 4, status: 'archived' })
       })
       assert.deepStrictEqual(build(ability, '@feathersjs/knex'), {
-        $or: [{ userId: 2 }, { userId: 1 }],
+        userId: { $in: [2, 1] },
         $and: [
           { $or: [{ userId: { $ne: 4 } }, { status: { $ne: 'archived' } }] },
         ],
@@ -175,7 +263,7 @@ describe('utils - mergeQueryFromAbility', function () {
         cannot('read', 'tests', { userId: 4 })
       })
       assert.deepStrictEqual(build(ability, 'feathers-kysely'), {
-        $or: [{ userId: 2 }, { userId: 1 }],
+        userId: { $in: [2, 1] },
         $not: { userId: 4 },
       })
     })
@@ -199,7 +287,7 @@ describe('utils - mergeQueryFromAbility', function () {
         cannot('read', 'tests', { userId: 4 })
       })
       assert.deepStrictEqual(build(ability, 'feathers-sequelize'), {
-        $or: [{ userId: 2 }, { userId: 1 }],
+        userId: { $in: [2, 1] },
         $not: [{ userId: 4 }],
       })
     })
@@ -223,7 +311,7 @@ describe('utils - mergeQueryFromAbility', function () {
         cannot('read', 'tests', { userId: 4 })
       })
       assert.deepStrictEqual(build(ability, '@feathersjs/mongodb'), {
-        $or: [{ userId: 2 }, { userId: 1 }],
+        userId: { $in: [2, 1] },
         $nor: [{ userId: 4 }],
       })
     })

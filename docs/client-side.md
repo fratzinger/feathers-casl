@@ -52,7 +52,7 @@ The best way to keep the rules, is in our `vuex`-store. So first, we add a custo
 ```ts
 // src/store/vuex.plugin.casl.ts
 import {
-  Ability,
+  createMongoAbility,
   createAliasResolver,
   detectSubjectType as defaultDetector
 } from "@casl/ability";
@@ -70,7 +70,7 @@ const resolveAction = createAliasResolver({
   delete: "remove" // use 'delete' or 'remove'
 });
 
-const ability = new Ability([], { detectSubjectType, resolveAction });
+const ability = createMongoAbility([], { detectSubjectType, resolveAction });
 
 const caslPlugin = (store) => {
   store.registerModule("casl", {

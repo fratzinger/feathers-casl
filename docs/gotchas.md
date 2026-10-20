@@ -15,6 +15,17 @@ const ability = defineAbility((can, cannot) => {
 });
 ```
 
+The same order applies the other way around: a `can` declared **after** a `cannot` overrules it and stays unrestricted. `feathers-casl` builds its queries accordingly, so `find` returns exactly the records that `ability.can()` allows:
+
+```ts
+const ability = defineAbility((can, cannot) => {
+  can("read", "posts", { authorId: 1 });
+  cannot("read", "posts", { published: false });
+  // declared last -> wins, unpublished posts of author 2 stay readable
+  can("read", "posts", { authorId: 2 });
+});
+```
+
 ## Fields
 
 ### Conditional subset
@@ -95,3 +106,18 @@ Whitelist the required operators in your service options — see [Getting Starte
 ```ts
 app.use('...', new Service({ filters: { $nor: true }, operators: ['$nor', '$and'] }))
 ```
+
+`$and` can also show up **inside** an `$or` branch when a `can` overrules an earlier `cannot` (see [Mind the order of your rules](#mind-the-order-of-your-rules)) and both rules restrict the same property. Whitelisting `$and` in `operators` covers that case as well.
+
+### `GeneralError: feathers-casl: cannot negate ...`
+
+Adapters without native support for inverted rules (e.g. `@feathersjs/knex`) get each operator of a `cannot` condition negated one by one. Only `$gt`, `$gte`, `$lt`, `$lte`, `$in`, `$nin` and `$ne` (and plain equality) can be negated:
+
+```ts
+can('read', 'tasks')
+cannot('read', 'tasks', { title: { $like: '%secret%' } }) // throws on @feathersjs/knex
+```
+
+If nothing of a `cannot` condition can be negated, `feathers-casl` throws instead of dropping the rule - dropping it would let `find` return records that `ability.can()` denies. If only part of it can be negated, the rest is left out with a warning, which makes the query stricter than the rule.
+
+Either use invertible operators in `cannot` rules, or an adapter with native support for inverted rules: `@feathersjs/memory`, `@feathersjs/mongodb`, `feathers-kysely` or `feathers-sequelize`.

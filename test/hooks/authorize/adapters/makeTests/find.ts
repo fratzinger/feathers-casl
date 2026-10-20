@@ -1,12 +1,11 @@
 import assert from 'node:assert'
-import type { Paginated, Application } from '@feathersjs/feathers'
+import type { Application } from '@feathersjs/feathers'
 import { feathers } from '@feathersjs/feathers'
 import { defineAbility } from '@casl/ability'
-import _sortBy from 'lodash/sortBy.js'
 
 import { authorize } from '../../../../../src/index.js'
 import type { Adapter, AuthorizeHookOptions } from '../../../../../src/index.js'
-import { resolveAction } from '../../../../test-utils.js'
+import { resolveAction, sortBy } from '../../../../test-utils.js'
 import type { MakeTestsOptions } from './_makeTests.types.js'
 
 export default (
@@ -128,7 +127,7 @@ export default (
             { resolveAction },
           ),
           paginate: false,
-        })) as Paginated<unknown>
+        })) as any[]
 
         assert.deepStrictEqual(
           returnedItems,
@@ -156,8 +155,8 @@ export default (
         })
 
         assert.deepStrictEqual(
-          _sortBy(returnedItems, id),
-          _sortBy(
+          sortBy(returnedItems, id),
+          sortBy(
             [{ [id]: item1[id], test: true, userId: 1 }, { [id]: item2[id] }],
             id,
           ),
@@ -181,11 +180,11 @@ export default (
             { resolveAction },
           ),
           paginate: false,
-        })) as Paginated<unknown>
+        })) as any[]
 
         assert.deepStrictEqual(
-          _sortBy(returnedItems, id),
-          _sortBy(
+          sortBy(returnedItems, id),
+          sortBy(
             [
               { [id]: item1[id], test: true, userId: 1 },
               { [id]: item2[id], test: true, userId: 2 },
@@ -255,11 +254,11 @@ export default (
             { resolveAction },
           ),
           paginate: false,
-        })) as Paginated<unknown>
+        })) as any[]
 
         assert.deepStrictEqual(
-          _sortBy(returnedItems, id),
-          _sortBy(items, id),
+          sortBy(returnedItems, id),
+          sortBy(items, id),
           'returns all items',
         )
       })
@@ -280,11 +279,11 @@ export default (
             { resolveAction },
           ),
           paginate: false,
-        })) as Paginated<unknown>
+        })) as any[]
 
         assert.deepStrictEqual(
-          _sortBy(returnedItems, id),
-          _sortBy(items, id),
+          sortBy(returnedItems, id),
+          sortBy(items, id),
           'returns all items',
         )
       })
@@ -306,11 +305,11 @@ export default (
             { resolveAction },
           ),
           paginate: false,
-        })) as Paginated<unknown>
+        })) as any[]
 
         assert.deepStrictEqual(
-          _sortBy(returnedItems, id),
-          _sortBy([{ [id]: item2[id] }, item3], id),
+          sortBy(returnedItems, id),
+          sortBy([{ [id]: item2[id] }, item3], id),
           'returns subset of items',
         )
       })
@@ -343,8 +342,8 @@ export default (
         })
 
         assert.deepStrictEqual(
-          _sortBy(returnedItems, id),
-          _sortBy([item1, item2], id),
+          sortBy(returnedItems, id),
+          sortBy([item1, item2], id),
           'returns all items',
         )
       })
@@ -374,8 +373,8 @@ export default (
         })
 
         assert.deepStrictEqual(
-          _sortBy(returnedItems, id),
-          _sortBy([item4], id),
+          sortBy(returnedItems, id),
+          sortBy([item4], id),
           'just returned one item',
         )
       })
@@ -402,8 +401,8 @@ export default (
         })
 
         assert.deepStrictEqual(
-          _sortBy(returnedItems, id),
-          _sortBy([{ [id]: item1[id], test: true }, { [id]: item2[id] }], id),
+          sortBy(returnedItems, id),
+          sortBy([{ [id]: item1[id], test: true }, { [id]: item2[id] }], id),
           'just returned one item',
         )
       })
@@ -484,7 +483,7 @@ export default (
             ],
           },
           paginate: false,
-        })) as Paginated<unknown>
+        })) as any[]
 
         assert.deepStrictEqual(
           returnedItems,
@@ -518,11 +517,11 @@ export default (
             ],
           },
           paginate: false,
-        })) as Paginated<unknown>
+        })) as any[]
 
         assert.deepStrictEqual(
-          _sortBy(returnedItems, id),
-          _sortBy([item1, item2], id),
+          sortBy(returnedItems, id),
+          sortBy([item1, item2], id),
           'just returned two items',
         )
       })
@@ -549,7 +548,7 @@ export default (
             },
           },
           paginate: false,
-        })) as Paginated<unknown>
+        })) as any[]
 
         assert.deepStrictEqual(
           returnedItems,
@@ -578,7 +577,7 @@ export default (
             },
           },
           paginate: false,
-        })) as Paginated<unknown>
+        })) as any[]
 
         assert.deepStrictEqual(
           returnedItems,

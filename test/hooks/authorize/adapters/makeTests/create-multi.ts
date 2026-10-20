@@ -1,13 +1,12 @@
 import assert from 'node:assert'
 import { feathers } from '@feathersjs/feathers'
 import { defineAbility } from '@casl/ability'
-import _sortBy from 'lodash/sortBy.js'
 
 import type { Application } from '@feathersjs/feathers'
 
 import { authorize } from '../../../../../src/index.js'
 import type { Adapter, AuthorizeHookOptions } from '../../../../../src/index.js'
-import { resolveAction } from '../../../../test-utils.js'
+import { resolveAction, sortBy } from '../../../../test-utils.js'
 import type { MakeTestsOptions } from './_makeTests.types.js'
 
 export default (
@@ -131,8 +130,8 @@ export default (
         })) as Record<string, unknown>[]
 
         assert.deepStrictEqual(
-          _sortBy(items, id),
-          _sortBy(expectedItems, id),
+          sortBy(items, id),
+          sortBy(expectedItems, id),
           `created items for read: '${read}'`,
         )
       }

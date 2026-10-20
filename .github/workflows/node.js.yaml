@@ -15,8 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [22.x, 24.x]
+        node-version: [22.x, 24.x, 26.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        casl-version: ["6", "7"]
     services:
       postgres:
         image: postgres:18
@@ -39,8 +40,10 @@ jobs:
           cache: "pnpm"
       - run: pnpm i
       - run: pnpm run lint
-      - run: pnpm run typecheck
-      - run: pnpm run test
+      - name: typecheck (@casl/ability@${{ matrix.casl-version }})
+        run: pnpm run typecheck${{ matrix.casl-version == '6' && ':casl6' || '' }}
+      - name: test (@casl/ability@${{ matrix.casl-version }})
+        run: pnpm run test${{ matrix.casl-version == '6' && ':casl6' || '' }}
 
   coverage:
     name: coverage

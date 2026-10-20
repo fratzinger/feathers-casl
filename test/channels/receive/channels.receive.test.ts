@@ -74,7 +74,7 @@ describe('channels.receive.test.ts', function () {
     i: number,
   ) => {
     assert.ok(
-      Object.prototype.hasOwnProperty.call(expectedPerClient, i),
+      Object.hasOwn(expectedPerClient, i),
       `client${i} has expected value`,
     )
     const expected = expectedPerClient[i]

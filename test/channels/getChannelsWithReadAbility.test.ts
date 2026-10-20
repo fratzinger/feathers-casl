@@ -111,5 +111,28 @@ describe('getChannelsWithReadAbility', function () {
       // id is always kept, plus the single restricted field
       assert.deepStrictEqual(result.data, { id: 1, title: 't' })
     })
+
+    it('uses the `ability` option instead of `connection.ability`', function () {
+      const ability = defineAbility((can) => {
+        can('get', 'tests', ['title'])
+      })
+      // the connection itself carries no ability
+      const conn = {} as any
+
+      const result = getChannelsWithReadAbility(
+        makeApp(),
+        { id: 1, title: 't', secret: 's' },
+        context({ service: { options: { id: 'id' } } }),
+        {
+          channels: new Channel([conn]),
+          availableFields,
+          ability: () => ability,
+        },
+      ) as Channel
+
+      assert.ok(result instanceof Channel)
+      assert.deepStrictEqual(result.connections, [conn])
+      assert.deepStrictEqual(result.data, { id: 1, title: 't' })
+    })
   })
 })

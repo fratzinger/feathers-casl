@@ -1,6 +1,5 @@
 import { subject } from '@casl/ability'
-import _pick from 'lodash/pick.js'
-import _isEmpty from 'lodash/isEmpty.js'
+import { isEmptyObject, pickPaths } from 'feathers-utils/helpers'
 
 import { getResultIsArray, mutateResult } from 'feathers-utils'
 import { shouldSkip } from 'feathers-utils/predicates'
@@ -17,6 +16,7 @@ import {
 import {
   getAvailableFields,
   hasRestrictingFields,
+  couldHaveRestrictingFields,
   getModelName,
   getIdFields,
   mergeArrays,
@@ -85,6 +85,13 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
 
   const $select: string[] | undefined = params.query?.$select
 
+  // without a single rule carrying `fields`, `hasRestrictingFields` can only
+  // answer `false` - unless `availableFields` is empty, which restricts every
+  // field. So ask once per request instead of once per item.
+  const couldRestrictFields =
+    availableFields?.length === 0 ||
+    couldHaveRestrictingFields(ability, getOrFind, modelName)
+
   const idFields = getIdFields(context)
 
   const method = getMethodName(context, options)
@@ -105,19 +112,19 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
   }
 
   const pickFieldsForItem = (item: Record<string, unknown>) => {
-    if (
-      !skipCheckConditions &&
-      !ability.can(getOrFind, subject(modelName, item))
-    ) {
+    const itemSubject = subject(modelName, item)
+    if (!skipCheckConditions && !ability.can(getOrFind, itemSubject)) {
       return undefined
     }
 
-    const restrictingFields = hasRestrictingFields(
-      ability,
-      getOrFind,
-      subject(modelName, item),
-      hasRestrictingFieldsOptions,
-    )
+    const restrictingFields = couldRestrictFields
+      ? hasRestrictingFields(
+          ability,
+          getOrFind,
+          itemSubject,
+          hasRestrictingFieldsOptions,
+        )
+      : false
 
     if (restrictingFields === true) {
       // full restriction
@@ -138,7 +145,7 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
       ? (mergeArrays(pickFields, idFields, 'combine') as string[])
       : pickFields
 
-    return _pick(item, pickFieldsWithId)
+    return pickPaths(item, pickFieldsWithId)
   }
 
   let newResult: (Record<string, unknown> | undefined)[]
@@ -148,7 +155,7 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
       .filter((x): x is Record<string, unknown> => !!x)
   } else {
     const single = pickFieldsForItem(items[0])
-    if (method === 'get' && _isEmpty(single)) {
+    if (method === 'get' && (!single || isEmptyObject(single))) {
       if (options.actionOnForbidden) options.actionOnForbidden()
       /* v8 ignore start */
       if (options.debug) {

@@ -1,5 +1,4 @@
-import _get from 'lodash/get.js'
-import _set from 'lodash/set.js'
+import { getPath, setPath } from 'feathers-utils/helpers'
 
 import { Forbidden } from '@feathersjs/errors'
 
@@ -30,8 +29,7 @@ import { getMethodName } from '../../utils/getMethodName.js'
 declare module '@feathersjs/feathers' {
   interface Params {
     ability?:
-      | AnyAbility
-      | ((context: HookContext) => AnyAbility | Promise<AnyAbility>)
+      AnyAbility | ((context: HookContext) => AnyAbility | Promise<AnyAbility>)
   }
 }
 
@@ -245,7 +243,7 @@ export const setPersistedConfig = (
   key: Path,
   val: unknown,
 ): HookContext => {
-  return _set(context, `params.casl.${key}`, val)
+  return setPath(context, `params.casl.${key}`, val)
 }
 
 export function getPersistedConfig(
@@ -269,5 +267,5 @@ export function getPersistedConfig(
 ): boolean
 
 export function getPersistedConfig(context: HookContext, key: Path): any {
-  return _get(context, `params.casl.${key}`)
+  return getPath(context, `params.casl.${key}`)
 }

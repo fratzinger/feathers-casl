@@ -1,10 +1,11 @@
-import { rulesToQuery } from '@casl/ability/extra'
+import { Forbidden } from '@feathersjs/errors'
 import { mergeQuery, simplifyQuery } from 'feathers-utils/utils'
-import _isEmpty from 'lodash/isEmpty.js'
+import { isEmptyObject } from 'feathers-utils/helpers'
 
 import { getAdapter } from '../hooks/authorize/authorize.hook.utils.js'
 import { convertRuleToQuery } from './convertRuleToQuery.js'
 import { hasRestrictingConditions } from './hasRestrictingConditions.js'
+import { rulesToQuery } from './rules-to-query.js'
 
 import type { AnyAbility } from '@casl/ability'
 import type { Application, Query } from '@feathersjs/feathers'
@@ -34,7 +35,8 @@ export const mergeQueryFromAbility = <T>(
   modelName: string,
   originalQuery: Query,
   service: AdapterBase<T>,
-  options: Pick<AuthorizeHookOptions, 'adapter'>,
+  options: Pick<AuthorizeHookOptions, 'adapter'> &
+    Partial<Pick<AuthorizeHookOptions, 'actionOnForbidden'>>,
 ): Query => {
   if (!hasRestrictingConditions(ability, method, modelName)) {
     return originalQuery
@@ -43,13 +45,22 @@ export const mergeQueryFromAbility = <T>(
   const adapter = getAdapter(app, options)
   const invertRule = invertedRuleToQuery[adapter] ?? convertRuleToQuery
 
-  const query = simplifyQuery(
-    rulesToQuery(ability, method, modelName, (rule) =>
-      rule.inverted ? invertRule(rule) : rule.conditions,
-    ),
+  const rulesQuery = rulesToQuery(ability, method, modelName, (rule) =>
+    rule.inverted ? invertRule(rule) : rule.conditions,
   )
 
-  if (_isEmpty(query)) {
+  // the rules allow nothing - fail closed. Falling back to `originalQuery`
+  // would let e.g. `remove(null)` remove every record before any after-hook
+  // could filter the result.
+  if (rulesQuery === null) {
+    options.actionOnForbidden?.()
+    throw new Forbidden(`You're not allowed to ${method} ${modelName}`)
+  }
+
+  const query = simplifyQuery(rulesQuery)
+
+  // the rules allow everything
+  if (isEmptyObject(query)) {
     return originalQuery
   }
 

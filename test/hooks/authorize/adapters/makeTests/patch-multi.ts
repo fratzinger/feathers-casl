@@ -1,14 +1,13 @@
 import assert from 'node:assert'
 import { feathers } from '@feathersjs/feathers'
 import { defineAbility } from '@casl/ability'
-import _sortBy from 'lodash/sortBy.js'
-import _isEqual from 'lodash/isEqual.js'
+import { isEqual } from 'feathers-utils/helpers'
 
 import type { Application } from '@feathersjs/feathers'
 
 import { authorize } from '../../../../../src/index.js'
 import type { Adapter, AuthorizeHookOptions } from '../../../../../src/index.js'
-import { resolveAction } from '../../../../test-utils.js'
+import { resolveAction, sortBy } from '../../../../test-utils.js'
 import type { MakeTestsOptions } from './_makeTests.types.js'
 
 export default (
@@ -110,8 +109,8 @@ export default (
         { [id]: item3[id], test: true, userId: 2 },
       ]
       assert.deepStrictEqual(
-        _sortBy(realItems, id),
-        _sortBy(expected, id),
+        sortBy(realItems, id),
+        sortBy(expected, id),
         'patched items correctly',
       )
     })
@@ -148,8 +147,8 @@ export default (
         ]
 
         assert.deepStrictEqual(
-          _sortBy(patchedItems, id),
-          _sortBy(expectedResult, id),
+          sortBy(patchedItems, id),
+          sortBy(expectedResult, id),
           `result is right array for read: '${read}'`,
         )
 
@@ -160,8 +159,8 @@ export default (
           { [id]: item3[id], test: true, userId: 2 },
         ]
         assert.deepStrictEqual(
-          _sortBy(realItems, id),
-          _sortBy(expected, id),
+          sortBy(realItems, id),
+          sortBy(expected, id),
           'patched items correctly',
         )
       }
@@ -190,14 +189,14 @@ export default (
       const expected = [{ [id]: item1[id], test: false, userId: 1 }, item2]
 
       assert.deepStrictEqual(
-        _sortBy(realItems, id),
-        _sortBy(expected, id),
+        sortBy(realItems, id),
+        sortBy(expected, id),
         'patched item correctly',
       )
 
       assert.deepStrictEqual(
-        _sortBy(patchedItems, id),
-        realItems.filter((x: any) => _isEqual(x[id], item1[id])),
+        sortBy(patchedItems, id),
+        realItems.filter((x: any) => isEqual(x[id], item1[id])),
         'result of patch is real item',
       )
     })
@@ -228,8 +227,8 @@ export default (
       ]
 
       assert.deepStrictEqual(
-        _sortBy(patchedItems, id),
-        _sortBy(expectedResult, id),
+        sortBy(patchedItems, id),
+        sortBy(expectedResult, id),
         'result is right array',
       )
 
@@ -240,8 +239,8 @@ export default (
         { [id]: item3[id], test: true, userId: 2 },
       ]
       assert.deepStrictEqual(
-        _sortBy(realItems, id),
-        _sortBy(expected, id),
+        sortBy(realItems, id),
+        sortBy(expected, id),
         'patched items correctly',
       )
     })
@@ -290,8 +289,8 @@ export default (
         { [id]: items[4][id], published: false, test: true, userId: 2 },
       ]
       assert.deepStrictEqual(
-        _sortBy(realItems, id),
-        _sortBy(expected, id),
+        sortBy(realItems, id),
+        sortBy(expected, id),
         'patched items correctly',
       )
     })
@@ -328,8 +327,8 @@ export default (
       ]
 
       assert.deepStrictEqual(
-        _sortBy(patchedItems, id),
-        _sortBy(expectedResult, id),
+        sortBy(patchedItems, id),
+        sortBy(expectedResult, id),
         'result is right array',
       )
 
@@ -342,8 +341,8 @@ export default (
         { [id]: items[4][id], published: false, test: true, userId: 2 },
       ]
       assert.deepStrictEqual(
-        _sortBy(realItems, id),
-        _sortBy(expected, id),
+        sortBy(realItems, id),
+        sortBy(expected, id),
         'patched items correctly',
       )
     })

@@ -14,11 +14,10 @@ export const getMinimalFields = (
     return []
   }
   const subjectType = detectSubjectType(subject)
-  const rules = ability.possibleRulesFor(action, subjectType).filter((rule) => {
-    const { fields } = rule
-    const matched = rule.matchesConditions(subject)
-    return fields && matched
-  })
+  // check `fields` first - matching the conditions is the expensive part
+  const rules = ability
+    .possibleRulesFor(action, subjectType)
+    .filter((rule) => rule.fields && rule.matchesConditions(subject))
   if (rules.length === 0) {
     return options.availableFields || []
   }

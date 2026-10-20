@@ -1,13 +1,12 @@
 import assert from 'node:assert'
 import { feathers } from '@feathersjs/feathers'
 import { defineAbility } from '@casl/ability'
-import _sortBy from 'lodash/sortBy.js'
 
 import type { Application } from '@feathersjs/feathers'
 
 import { authorize } from '../../../../../src/index.js'
 import type { Adapter, AuthorizeHookOptions } from '../../../../../src/index.js'
-import { resolveAction } from '../../../../test-utils.js'
+import { resolveAction, sortBy } from '../../../../test-utils.js'
 import type { MakeTestsOptions } from './_makeTests.types.js'
 
 export default (
@@ -133,8 +132,8 @@ export default (
         ]
 
         assert.deepStrictEqual(
-          _sortBy(removedItems, id),
-          _sortBy(expectedResult, id),
+          sortBy(removedItems, id),
+          sortBy(expectedResult, id),
           `result is right array for read: '${read}'`,
         )
 
@@ -170,16 +169,16 @@ export default (
       ]
 
       assert.deepStrictEqual(
-        _sortBy(removedItems, id),
-        _sortBy(expectedResult, id),
+        sortBy(removedItems, id),
+        sortBy(expectedResult, id),
         'result is right array',
       )
 
       const realItems = await service.find({ paginate: false })
       const expected = [{ [id]: item3[id], test: true, userId: 2 }]
       assert.deepStrictEqual(
-        _sortBy(realItems, id),
-        _sortBy(expected, id),
+        sortBy(realItems, id),
+        sortBy(expected, id),
         'removed items correctly',
       )
     })
@@ -235,8 +234,8 @@ export default (
         { [id]: item5[id], published: false, test: true, userId: 2 },
       ]
       assert.deepStrictEqual(
-        _sortBy(realItems, id),
-        _sortBy(expected, id),
+        sortBy(realItems, id),
+        sortBy(expected, id),
         'removed items correctly',
       )
     })
@@ -268,8 +267,8 @@ export default (
       ]
 
       assert.deepStrictEqual(
-        _sortBy(removedItems, id),
-        _sortBy(expectedResult, id),
+        sortBy(removedItems, id),
+        sortBy(expectedResult, id),
         'result is right array',
       )
 
@@ -280,8 +279,8 @@ export default (
         { [id]: items[4][id], published: false, test: true, userId: 2 },
       ]
       assert.deepStrictEqual(
-        _sortBy(realItems, id),
-        _sortBy(expected, id),
+        sortBy(realItems, id),
+        sortBy(expected, id),
         'removed items correctly',
       )
     })

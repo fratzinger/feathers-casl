@@ -1,7 +1,5 @@
 import { Forbidden } from '@feathersjs/errors'
-import _isEmpty from 'lodash/isEmpty.js'
-import _pick from 'lodash/pick.js'
-import _set from 'lodash/set.js'
+import { isEmptyObject, pickPaths, setPath } from 'feathers-utils/helpers'
 import type { AnyAbility } from '@casl/ability'
 import { subject } from '@casl/ability'
 
@@ -79,7 +77,7 @@ export const authorizeBefore = async <H extends HookContext = HookContext>(
   // if context is with multiple items, there's a change that we need to handle each item separately
   if (multi) {
     if (!couldHaveRestrictingFields(ability, 'find', modelName)) {
-      // if has no restricting fields at all -> can skip _pick() in after-hook
+      // if has no restricting fields at all -> can skip pickPaths() in after-hook
       setPersistedConfig(context, 'skipRestrictingRead.fields', true)
     }
   }
@@ -139,7 +137,7 @@ const handleSingle = async <H extends HookContext = HookContext>(
     method,
   }
 
-  const { params, service, id } = context
+  const { service, id } = context
 
   const query = mergeQueryFromAbility(
     context.app,
@@ -151,7 +149,9 @@ const handleSingle = async <H extends HookContext = HookContext>(
     options,
   )
 
-  _set(context, 'params.query', query)
+  // `setPath` replaces `context.params` (copy on write), so read it afterwards
+  setPath(context, 'params.query', query)
+  const { params } = context
 
   // ensure that only allowed data gets changed
   if (['update', 'patch'].includes(method)) {
@@ -220,7 +220,7 @@ const handleSingle = async <H extends HookContext = HookContext>(
 
     const data = !restrictingFields
       ? context.data
-      : _pick(context.data, restrictingFields as string[])
+      : pickPaths(context.data, restrictingFields as string[])
 
     checkData(context, ability, modelName, data, options)
 
@@ -229,7 +229,7 @@ const handleSingle = async <H extends HookContext = HookContext>(
     }
 
     // if fields are not overlapping -> throw
-    if (_isEmpty(data)) {
+    if (isEmptyObject(data)) {
       if (options.actionOnForbidden) {
         options.actionOnForbidden()
       }
@@ -251,9 +251,9 @@ const handleSingle = async <H extends HookContext = HookContext>(
     if (method === 'patch') {
       context.data = data
     } else {
-      // merge with initial data
-      const itemPlain = await service._get(id, {})
-      context.data = { ...itemPlain, ...data }
+      // merge with initial data - `item` is already the complete record
+      // (fetched without `$select`), no need to fetch it again
+      context.data = { ...item, ...data }
     }
   }
 
@@ -318,7 +318,7 @@ const handleMulti = async <H extends HookContext = HookContext>(
       throw new Forbidden("You're not allowed to make this request")
     }
     if (fields && fields.length > 0) {
-      const data = _pick(context.data, fields)
+      const data = pickPaths(context.data, fields)
       context.data = data
     }
   }
@@ -333,7 +333,7 @@ const handleMulti = async <H extends HookContext = HookContext>(
     options,
   )
 
-  _set(context, 'params.query', query)
+  setPath(context, 'params.query', query)
 
   return context
 }

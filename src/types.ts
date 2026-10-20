@@ -53,9 +53,7 @@ export type CheckBasicPermissionHookOptionsExclusive<
 >
 
 export type AvailableFieldsOption<H extends HookContext = HookContext> =
-  | string[]
-  | ((context: H) => string[] | undefined)
-  | undefined
+  string[] | ((context: H) => string[] | undefined) | undefined
 
 export interface AuthorizeChannelCommonsOptions<
   H extends HookContext = HookContext,
@@ -77,8 +75,7 @@ export type AuthorizeHookOptionsExclusive<H extends HookContext = HookContext> =
   >
 
 export type GetModelName<H extends HookContext = HookContext> =
-  | string
-  | ((context: H) => string)
+  string | ((context: H) => string)
 
 export type EventName = 'created' | 'updated' | 'patched' | 'removed'
 

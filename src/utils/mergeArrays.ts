@@ -41,7 +41,7 @@ export const mergeArrays = <T>(
     if (!Array.isArray(targetArr)) {
       return sourceArr
     }
-    return [...new Set(targetArr.concat(sourceArr))]
+    return [...new Set([...targetArr, ...sourceArr])]
   } else if (handle === 'intersect' || handle === 'intersectOrFull') {
     if (!Array.isArray(targetArr) || !Array.isArray(sourceArr)) {
       if (handle === 'intersect') {

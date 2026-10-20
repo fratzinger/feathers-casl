@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  // typecheck against `@casl/ability@6` - feathers-casl supports v6 and v7
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@casl/ability": [
+        "./node_modules/@casl/ability-v6/dist/types/index.d.ts"
+      ],
+      "@casl/ability/extra": [
+        "./node_modules/@casl/ability-v6/dist/types/extra/index.d.ts"
+      ]
+    }
+  }
+}

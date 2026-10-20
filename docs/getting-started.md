@@ -18,7 +18,7 @@
 Add access control with CASL to your feathers application.
 
 This project is built for [FeathersJS](http://feathersjs.com). An open source web framework for building modern real-time applications.
-It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CASL** in your feathers.js-project. Supported versions: `@casl/ability^6` and `@feathersjs/feathers^5`.
+It's based on [CASL](https://casl.js.org/) and is a convenient layer to use **CASL** in your feathers.js-project. Supported versions: `@casl/ability^6` or `@casl/ability^7` and `@feathersjs/feathers^5`.
 
 ## Features
 
@@ -73,7 +73,7 @@ For most cases we want to define rules per user (or per user-role). So we first 
 
 ```ts
 // src/services/authentication/authentication.abilities.ts
-import { Ability, AbilityBuilder, createAliasResolver } from "@casl/ability";
+import { AbilityBuilder, createAliasResolver, createMongoAbility } from "@casl/ability";
 
 // don't forget this, as `read` is used internally
 const resolveAction = createAliasResolver({
@@ -84,7 +84,7 @@ const resolveAction = createAliasResolver({
 
 export const defineRulesFor = (user) => {
   // also see https://casl.js.org/v6/en/guide/define-rules
-  const { can, cannot, rules } = new AbilityBuilder(Ability);
+  const { can, cannot, rules } = new AbilityBuilder(createMongoAbility);
 
   if (user.role && user.role.name === "SuperAdmin") {
     // SuperAdmin can do evil
@@ -110,9 +110,13 @@ export const defineRulesFor = (user) => {
 export const defineAbilitiesFor = (user) => {
   const rules = defineRulesFor(user);
 
-  return new Ability(rules, { resolveAction });
+  return createMongoAbility(rules, { resolveAction });
 };
 ```
+
+::: tip @casl/ability v7
+`@casl/ability@7` renamed `PureAbility` to `Ability` and dropped the mongo defaults of the old `Ability` class. Use `createMongoAbility` as shown above - it works with v6 and v7. `feathers-casl` relies on mongo conditions, so a plain `new Ability(...)` doesn't work with v7.
+:::
 
 ### Add abilities to hooks context
 

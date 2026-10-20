@@ -92,4 +92,6 @@ const query = mergeQueryFromAbility(
 | `modelName` | The modelName to merge rules for. Mostly the service path. <br><br>**Type:** `string` |
 | `query`     | Your query you want to merge rules with. <br><br>**Type:** `object` |
 | `service`   | |
-| `options`   | |
+| `options`   | `adapter` and `actionOnForbidden`, see the `authorize` hook options |
+
+If the rules of the ability allow nothing for `method` on `modelName`, `mergeQueryFromAbility` calls `actionOnForbidden` and throws a `Forbidden` error instead of returning a query.
