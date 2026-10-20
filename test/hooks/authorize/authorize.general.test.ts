@@ -450,7 +450,7 @@ describe('authorize.general.test.ts', function () {
       return authorize()(context).then(async (result) => {
         // shared bounds stay hoisted to the top level - no nesting
         assert.deepStrictEqual(result.params.query, {
-          $or: [{ userId: 2 }, { userId: 1 }],
+          userId: { $in: [2, 1] },
           $nor: [{ published: false }],
         })
 
@@ -693,11 +693,11 @@ describe('authorize.general.test.ts', function () {
           },
           {
             condition: { userId: { $in: [1] } },
-            inverted: { $nor: [{ userId: { $in: [1] } }] },
+            inverted: { $nor: [{ userId: 1 }] },
           },
           {
             condition: { userId: { $nin: [1] } },
-            inverted: { $nor: [{ userId: { $nin: [1] } }] },
+            inverted: { $nor: [{ userId: { $ne: 1 } }] },
           },
         ]
         const promises: Promise<any>[] = []

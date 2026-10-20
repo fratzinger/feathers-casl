@@ -9,8 +9,8 @@ function areSameArray<T>(arr1: T[], arr2: T[]): boolean {
   if (arr1.length != arr2.length) {
     return false
   }
-  const arr1test = arr1.slice().sort()
-  const arr2test = arr2.slice().sort()
+  const arr1test = arr1.toSorted()
+  const arr2test = arr2.toSorted()
   const result = !arr1test.some((val, idx) => val !== arr2test[idx])
   return result
 }

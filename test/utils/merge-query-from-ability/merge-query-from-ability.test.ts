@@ -125,7 +125,7 @@ describe('utils - mergeQueryFromAbility', function () {
         can('read', 'tests', { userId: 2 })
       })
       assert.deepStrictEqual(build(ability, '@feathersjs/knex'), {
-        $or: [{ userId: 2 }, { userId: 1 }],
+        userId: { $in: [2, 1] },
       })
     })
   })
@@ -158,7 +158,7 @@ describe('utils - mergeQueryFromAbility', function () {
         cannot('read', 'tests', { userId: 4 })
       })
       assert.deepStrictEqual(build(ability, '@feathersjs/knex'), {
-        $or: [{ userId: 2 }, { userId: 1 }],
+        $or: [{ userId: { $in: [2, 1] } }],
         userId: { $ne: 4 },
       })
     })
@@ -204,7 +204,7 @@ describe('utils - mergeQueryFromAbility', function () {
         cannot('read', 'tests', { userId: 4, status: 'archived' })
       })
       assert.deepStrictEqual(build(ability, '@feathersjs/knex'), {
-        $or: [{ userId: 2 }, { userId: 1 }],
+        userId: { $in: [2, 1] },
         $and: [
           { $or: [{ userId: { $ne: 4 } }, { status: { $ne: 'archived' } }] },
         ],
@@ -240,7 +240,7 @@ describe('utils - mergeQueryFromAbility', function () {
         cannot('read', 'tests', { userId: 4 })
       })
       assert.deepStrictEqual(build(ability, 'feathers-kysely'), {
-        $or: [{ userId: 2 }, { userId: 1 }],
+        userId: { $in: [2, 1] },
         $not: { userId: 4 },
       })
     })
@@ -264,7 +264,7 @@ describe('utils - mergeQueryFromAbility', function () {
         cannot('read', 'tests', { userId: 4 })
       })
       assert.deepStrictEqual(build(ability, 'feathers-sequelize'), {
-        $or: [{ userId: 2 }, { userId: 1 }],
+        userId: { $in: [2, 1] },
         $not: [{ userId: 4 }],
       })
     })
@@ -288,7 +288,7 @@ describe('utils - mergeQueryFromAbility', function () {
         cannot('read', 'tests', { userId: 4 })
       })
       assert.deepStrictEqual(build(ability, '@feathersjs/mongodb'), {
-        $or: [{ userId: 2 }, { userId: 1 }],
+        userId: { $in: [2, 1] },
         $nor: [{ userId: 4 }],
       })
     })

@@ -3,3 +3,5 @@ allowBuilds:
   mongodb-memory-server: true
   sqlite3: true
   unrs-resolver: true
+minimumReleaseAgeExclude:
+  - feathers-utils@10.9.4 || 10.10.0

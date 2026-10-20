@@ -105,7 +105,7 @@ export const getChannelsWithReadAbility = (
           _isEqual(x.fields, fields),
         )
         if (connField) {
-          if (connField.connections.indexOf(connection) !== -1) {
+          if (connField.connections.includes(connection)) {
             // connection is already in array -> skip
             continue
           }
