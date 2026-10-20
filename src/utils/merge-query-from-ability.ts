@@ -1,10 +1,10 @@
-import { rulesToQuery } from '@casl/ability/extra'
 import { mergeQuery, simplifyQuery } from 'feathers-utils/utils'
 import _isEmpty from 'lodash/isEmpty.js'
 
 import { getAdapter } from '../hooks/authorize/authorize.hook.utils.js'
 import { convertRuleToQuery } from './convertRuleToQuery.js'
 import { hasRestrictingConditions } from './hasRestrictingConditions.js'
+import { rulesToQuery } from './rules-to-query.js'
 
 import type { AnyAbility } from '@casl/ability'
 import type { Application, Query } from '@feathersjs/feathers'

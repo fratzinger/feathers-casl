@@ -15,6 +15,17 @@ const ability = defineAbility((can, cannot) => {
 });
 ```
 
+The same order applies the other way around: a `can` declared **after** a `cannot` overrules it and stays unrestricted. `feathers-casl` builds its queries accordingly, so `find` returns exactly the records that `ability.can()` allows:
+
+```ts
+const ability = defineAbility((can, cannot) => {
+  can("read", "posts", { authorId: 1 });
+  cannot("read", "posts", { published: false });
+  // declared last -> wins, unpublished posts of author 2 stay readable
+  can("read", "posts", { authorId: 2 });
+});
+```
+
 ## Fields
 
 ### Conditional subset
@@ -95,3 +106,5 @@ Whitelist the required operators in your service options — see [Getting Starte
 ```ts
 app.use('...', new Service({ filters: { $nor: true }, operators: ['$nor', '$and'] }))
 ```
+
+`$and` can also show up **inside** an `$or` branch when a `can` overrules an earlier `cannot` (see [Mind the order of your rules](#mind-the-order-of-your-rules)) and both rules restrict the same property. Whitelisting `$and` in `operators` covers that case as well.

@@ -43,6 +43,8 @@
     "release": "np",
     "vitest": "vitest",
     "test": "vitest run",
+    "test:casl6": "CASL_VERSION=6 vitest run",
+    "typecheck:casl6": "tsc --noEmit -p tsconfig.casl6.json",
     "coverage": "vitest run --coverage",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
@@ -51,7 +53,7 @@
     "docs:build": "vitepress build docs"
   },
   "peerDependencies": {
-    "@casl/ability": "6.x",
+    "@casl/ability": "6.x || 7.x",
     "@feathersjs/feathers": "^5.0.0"
   },
   "dependencies": {
@@ -63,7 +65,8 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
-    "@casl/ability": "^6.8.1",
+    "@casl/ability": "^7.0.1",
+    "@casl/ability-v6": "npm:@casl/ability@^6.8.1",
     "@feathers-community/eslint-config": "^0.1.0",
     "@feathersjs/adapter-commons": "^5.0.44",
     "@feathersjs/authentication": "^5.0.44",
@@ -83,8 +86,8 @@
     "@types/pg": "^8.20.0",
     "@vitest/coverage-v8": "^4.1.5",
     "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
     "eslint": "^10.3.0",
+    "fast-check": "^4.10.2",
     "feathers-fletching": "^2.0.7",
     "feathers-knex": "^8.0.1",
     "feathers-sequelize": "^7.0.3",
@@ -99,6 +102,7 @@
     "pg": "^8.20.0",
     "prettier": "^3.8.3",
     "sequelize": "^6.37.8",
+    "sift": "^17.1.4",
     "socket.io-client": "^4.8.3",
     "sqlite3": "^6.0.1",
     "tsdown": "^0.22.0",

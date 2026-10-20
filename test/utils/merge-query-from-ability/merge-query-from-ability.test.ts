@@ -44,6 +44,71 @@ describe('utils - mergeQueryFromAbility', function () {
     )
   })
 
+  // Rules come in highest priority first, so a `cannot` only bounds the `can`
+  // rules declared before it - exactly how `ability.can()` evaluates them.
+  describe('rule priority', function () {
+    it('ignores a cannot that a later can overrules', function () {
+      const ability = defineAbility((can, cannot) => {
+        cannot('read', 'tests', { userId: 4 })
+        can('read', 'tests', { userId: 1 })
+      })
+      assert.deepStrictEqual(build(ability, '@feathersjs/knex'), { userId: 1 })
+    })
+
+    it('bounds only the can rules below the cannot', function () {
+      const ability = defineAbility((can, cannot) => {
+        can('read', 'tests', { userId: 1 })
+        cannot('read', 'tests', { userId: 4 })
+        can('read', 'tests', { userId: 2 })
+      })
+      // same field on both sides - needs a nested $and
+      assert.deepStrictEqual(build(ability, '@feathersjs/knex'), {
+        $or: [{ userId: 2 }, { $and: [{ userId: 1 }, { userId: { $ne: 4 } }] }],
+      })
+      // $nor merges into the branch, so this stays flat
+      assert.deepStrictEqual(build(ability, '@feathersjs/memory'), {
+        $or: [{ userId: 2 }, { userId: 1, $nor: [{ userId: 4 }] }],
+      })
+    })
+
+    it('merges the bound into the branch when the fields differ', function () {
+      const ability = defineAbility((can, cannot) => {
+        can('read', 'tests', { userId: 1 })
+        cannot('read', 'tests', { hi: 'test' })
+        can('read', 'tests', { userId: 2 })
+      })
+      assert.deepStrictEqual(build(ability, '@feathersjs/knex'), {
+        $or: [{ userId: 2 }, { userId: 1, hi: { $ne: 'test' } }],
+      })
+    })
+  })
+
+  // Rules without conditions stop the iteration - everything with a lower
+  // priority (= defined earlier) can no longer widen or narrow the query.
+  describe('rules without conditions', function () {
+    it('returns the original query for a blanket cannot', function () {
+      const ability = defineAbility((can, cannot) => {
+        can('read', 'tests', { userId: 1 })
+        cannot('read', 'tests')
+      })
+      const originalQuery = { test: true }
+      assert.deepStrictEqual(
+        build(ability, '@feathersjs/knex', originalQuery),
+        originalQuery,
+      )
+    })
+
+    it('keeps the inverted conditions of a blanket can', function () {
+      const ability = defineAbility((can, cannot) => {
+        can('read', 'tests')
+        cannot('read', 'tests', { userId: 4 })
+      })
+      assert.deepStrictEqual(build(ability, '@feathersjs/knex'), {
+        userId: { $ne: 4 },
+      })
+    })
+  })
+
   // Allowing (`can`) rules are adapter-independent - the per-adapter callback
   // only kicks in for inverted (`cannot`) rules.
   describe('allowing rules', function () {

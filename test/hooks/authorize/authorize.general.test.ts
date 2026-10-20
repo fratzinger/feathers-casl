@@ -1,6 +1,6 @@
 import assert from 'node:assert'
 import { authorize } from '../../../src/index.js'
-import { defineAbility } from '@casl/ability'
+import { defineAbility, subject } from '@casl/ability'
 import _cloneDeep from 'lodash/cloneDeep.js'
 import { addSkip } from 'feathers-utils'
 import type { HookContext } from '@feathersjs/feathers'
@@ -354,6 +354,123 @@ describe('authorize.general.test.ts', function () {
       assert.deepStrictEqual(context.params.query, {
         userId: 1,
         test: true,
+      })
+    })
+
+    it('does not restrict a can that overrules an earlier cannot', async function () {
+      const store = {
+        1: { id: 1, userId: 1, published: true },
+        // only readable because the `can` below overrules the `cannot`
+        2: { id: 2, userId: 2, published: false },
+        3: { id: 3, userId: 1, published: false },
+        4: { id: 4, userId: 3, published: true },
+      }
+
+      const service = new MemoryService({
+        filters: { ...filterArray('$and', '$nor') },
+        operators: ['$and', '$nor'],
+        store: _cloneDeep(store),
+        paginate: undefined,
+      })
+
+      // `can('read', { userId: 2 })` is declared last and therefore has the
+      // highest priority - the `cannot` above must not bound it
+      const ability = defineAbility(
+        (can, cannot) => {
+          can('read', 'tests', { userId: 1 })
+          cannot('read', 'tests', { published: false })
+          can('read', 'tests', { userId: 2 })
+        },
+        { resolveAction },
+      )
+
+      const context = {
+        service,
+        path: 'tests',
+        method: 'find',
+        type: 'before',
+        params: { ability, query: {} },
+      } as unknown as HookContext
+
+      const result = await authorize()(context)
+      const found = (await service.find({
+        query: result.params.query,
+      })) as unknown as { id: number }[]
+
+      assert.deepStrictEqual(
+        found.map((item) => item.id),
+        [1, 2],
+        'query returns exactly the readable items',
+      )
+
+      // the query and `ability.can()` have to agree on every single item
+      Object.values(store).forEach((item) => {
+        assert.strictEqual(
+          ability.can('read', subject('tests', item)),
+          found.some((f) => f.id === item.id),
+          `query and ability.can() agree on ${JSON.stringify(item)}`,
+        )
+      })
+    })
+
+    it('bounds every can when the cannot is declared last', function () {
+      // same rules as above, but the `cannot` now has the highest priority -
+      // so it restricts both `can` rules and item 2 drops out as well
+      const store = {
+        1: { id: 1, userId: 1, published: true },
+        2: { id: 2, userId: 2, published: false },
+        3: { id: 3, userId: 1, published: false },
+        4: { id: 4, userId: 3, published: true },
+      }
+
+      const service = new MemoryService({
+        filters: { ...filterArray('$and', '$nor') },
+        operators: ['$and', '$nor'],
+        store: _cloneDeep(store),
+        paginate: undefined,
+      })
+
+      const ability = defineAbility(
+        (can, cannot) => {
+          can('read', 'tests', { userId: 1 })
+          can('read', 'tests', { userId: 2 })
+          cannot('read', 'tests', { published: false })
+        },
+        { resolveAction },
+      )
+
+      const context = {
+        service,
+        path: 'tests',
+        method: 'find',
+        type: 'before',
+        params: { ability, query: {} },
+      } as unknown as HookContext
+
+      return authorize()(context).then(async (result) => {
+        // shared bounds stay hoisted to the top level - no nesting
+        assert.deepStrictEqual(result.params.query, {
+          $or: [{ userId: 2 }, { userId: 1 }],
+          $nor: [{ published: false }],
+        })
+
+        const found = (await service.find({
+          query: result.params.query,
+        })) as unknown as { id: number }[]
+
+        assert.deepStrictEqual(
+          found.map((item) => item.id),
+          [1],
+          'query returns exactly the readable items',
+        )
+
+        Object.values(store).forEach((item) => {
+          assert.strictEqual(
+            ability.can('read', subject('tests', item)),
+            found.some((f) => f.id === item.id),
+            `query and ability.can() agree on ${JSON.stringify(item)}`,
+          )
+        })
       })
     })
 
