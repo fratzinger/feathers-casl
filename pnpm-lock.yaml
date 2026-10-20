@@ -176,8 +176,8 @@ importers:
         specifier: ^5.0.50
         version: 5.0.50
       feathers-utils:
-        specifier: ^10.10.0
-        version: 10.10.0(@feathersjs/feathers@5.0.50)
+        specifier: ^10.10.1
+        version: 10.10.1(@feathersjs/feathers@5.0.50)
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: ^0.18.5
@@ -2832,8 +2832,8 @@ packages:
     resolution: {integrity: sha512-ePI6XxqSu5yldKKHDPb1cc+JG5a1eZg40seDiZsRFjDfIxcR9mzwEgIqDnqHhO844tJdxfyHjNN1NtiPaUYAgw==}
     engines: {node: '>= 14'}
 
-  feathers-utils@10.10.0:
-    resolution: {integrity: sha512-C0lLaIQK2WPt8fTVHrzPTXJ8dcs9IF4XHJE8mkVpiB8LOalD8AuoYX47OeNcKl2K5z4PrZEm5cWqvOwYW1eWsQ==}
+  feathers-utils@10.10.1:
+    resolution: {integrity: sha512-E8pzzyTHm4XaqcH1cuhAq3vJLsaQfqRNy8pOu9CuHq8Q0f1En1RiLY8a6ibPKZPt20i4joaC5g8k7nJSeALSog==}
     engines: {node: '>=22.0.0'}
     peerDependencies:
       '@feathersjs/feathers': ^5.0.0
@@ -5812,7 +5812,7 @@ snapshots:
       '@feathersjs/commons': 5.0.50
       '@feathersjs/errors': 5.0.50
       '@feathersjs/feathers': 5.0.50
-      feathers-utils: 10.10.0(@feathersjs/feathers@5.0.50)
+      feathers-utils: 10.10.1(@feathersjs/feathers@5.0.50)
       kysely: 0.29.7
     transitivePeerDependencies:
       - rate-limiter-flexible
@@ -7738,7 +7738,7 @@ snapshots:
       '@feathersjs/commons': 5.0.24
       '@feathersjs/errors': 5.0.50
 
-  feathers-utils@10.10.0(@feathersjs/feathers@5.0.50):
+  feathers-utils@10.10.1(@feathersjs/feathers@5.0.50):
     dependencies:
       '@feathersjs/errors': 5.0.50
       '@feathersjs/feathers': 5.0.50

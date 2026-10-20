@@ -104,17 +104,15 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
   }
 
   const pickFieldsForItem = (item: Record<string, unknown>) => {
-    if (
-      !skipCheckConditions &&
-      !ability.can(getOrFind, subject(modelName, item))
-    ) {
+    const itemSubject = subject(modelName, item)
+    if (!skipCheckConditions && !ability.can(getOrFind, itemSubject)) {
       return undefined
     }
 
     const restrictingFields = hasRestrictingFields(
       ability,
       getOrFind,
-      subject(modelName, item),
+      itemSubject,
       hasRestrictingFieldsOptions,
     )
 

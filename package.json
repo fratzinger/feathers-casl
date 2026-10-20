@@ -46,6 +46,7 @@
     "test:casl6": "CASL_VERSION=6 vitest run",
     "typecheck:casl6": "tsc --noEmit -p tsconfig.casl6.json",
     "coverage": "vitest run --coverage",
+    "bench": "tsdown && vitest bench --run",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "attw": "attw --pack . --profile esm-only",
@@ -60,7 +61,7 @@
     "@feathersjs/errors": "^5.0.50",
     "@feathersjs/feathers": "^5.0.50",
     "@feathersjs/transport-commons": "^5.0.50",
-    "feathers-utils": "^10.10.0"
+    "feathers-utils": "^10.10.1"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",

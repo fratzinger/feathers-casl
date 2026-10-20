@@ -249,9 +249,9 @@ const handleSingle = async <H extends HookContext = HookContext>(
     if (method === 'patch') {
       context.data = data
     } else {
-      // merge with initial data
-      const itemPlain = await service._get(id, {})
-      context.data = { ...itemPlain, ...data }
+      // merge with initial data - `item` is already the complete record
+      // (fetched without `$select`), no need to fetch it again
+      context.data = { ...item, ...data }
     }
   }
 
