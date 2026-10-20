@@ -1,4 +1,4 @@
-import _isPlainObject from 'lodash/isPlainObject.js'
+import { isPlainObject } from 'feathers-utils/helpers'
 
 import type { SubjectRawRule, MongoQuery, ClaimRawRule } from '@casl/ability'
 import type { Query } from '@feathersjs/feathers'
@@ -52,7 +52,7 @@ export const convertRuleToQuery = (
     const clauses: Query[] = []
     for (const prop in conditions as Record<string, unknown>) {
       const value = (conditions as Record<string, unknown>)[prop]
-      if (_isPlainObject(value)) {
+      if (isPlainObject(value)) {
         const obj = value as Record<string, unknown>
         for (const name in obj) {
           if (!supportedOperators.includes(name)) {

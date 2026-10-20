@@ -1,4 +1,4 @@
-import _isEmpty from 'lodash/isEmpty.js'
+import { isEmptyObject } from 'feathers-utils/helpers'
 
 import type { AnyAbility } from '@casl/ability'
 import type { Query } from '@feathersjs/feathers'
@@ -30,7 +30,7 @@ export const rulesToQuery = (
   for (const rule of ability.rulesFor(action, subjectType)) {
     // empty conditions `{}` match everything - casl@7 treats them like no
     // conditions at all, and so does a mongo matcher in casl@6
-    if (!rule.conditions || _isEmpty(rule.conditions)) {
+    if (!rule.conditions || isEmptyObject(rule.conditions)) {
       // a `cannot` without conditions forbids everything below it
       if (rule.inverted) {
         break

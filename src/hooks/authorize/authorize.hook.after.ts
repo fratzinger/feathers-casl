@@ -1,6 +1,5 @@
 import { subject } from '@casl/ability'
-import _pick from 'lodash/pick.js'
-import _isEmpty from 'lodash/isEmpty.js'
+import { isEmptyObject, pickPaths } from 'feathers-utils/helpers'
 
 import { getResultIsArray, mutateResult } from 'feathers-utils'
 import { shouldSkip } from 'feathers-utils/predicates'
@@ -138,7 +137,7 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
       ? (mergeArrays(pickFields, idFields, 'combine') as string[])
       : pickFields
 
-    return _pick(item, pickFieldsWithId)
+    return pickPaths(item, pickFieldsWithId)
   }
 
   let newResult: (Record<string, unknown> | undefined)[]
@@ -148,7 +147,7 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
       .filter((x): x is Record<string, unknown> => !!x)
   } else {
     const single = pickFieldsForItem(items[0])
-    if (method === 'get' && _isEmpty(single)) {
+    if (method === 'get' && (!single || isEmptyObject(single))) {
       if (options.actionOnForbidden) options.actionOnForbidden()
       /* v8 ignore start */
       if (options.debug) {

@@ -1,5 +1,5 @@
 import { mergeQuery, simplifyQuery } from 'feathers-utils/utils'
-import _isEmpty from 'lodash/isEmpty.js'
+import { isEmptyObject } from 'feathers-utils/helpers'
 
 import { getAdapter } from '../hooks/authorize/authorize.hook.utils.js'
 import { convertRuleToQuery } from './convertRuleToQuery.js'
@@ -49,7 +49,7 @@ export const mergeQueryFromAbility = <T>(
     ),
   )
 
-  if (_isEmpty(query)) {
+  if (!query || isEmptyObject(query)) {
     return originalQuery
   }
 

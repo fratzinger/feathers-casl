@@ -1,7 +1,6 @@
 import assert from 'node:assert'
 import { authorize } from '../../../src/index.js'
 import { defineAbility, subject } from '@casl/ability'
-import _cloneDeep from 'lodash/cloneDeep.js'
 import { addSkip } from 'feathers-utils'
 import type { HookContext } from '@feathersjs/feathers'
 import { MemoryService } from '@feathersjs/memory'
@@ -369,7 +368,7 @@ describe('authorize.general.test.ts', function () {
       const service = new MemoryService({
         filters: { ...filterArray('$and', '$nor') },
         operators: ['$and', '$nor'],
-        store: _cloneDeep(store),
+        store: structuredClone(store),
         paginate: undefined,
       })
 
@@ -426,7 +425,7 @@ describe('authorize.general.test.ts', function () {
       const service = new MemoryService({
         filters: { ...filterArray('$and', '$nor') },
         operators: ['$and', '$nor'],
-        store: _cloneDeep(store),
+        store: structuredClone(store),
         paginate: undefined,
       })
 
@@ -976,7 +975,7 @@ describe('authorize.general.test.ts', function () {
           path: 'tests',
           method,
           type,
-          result: _cloneDeep(expectedResult),
+          result: structuredClone(expectedResult),
           id: null,
           params: {
             ability: defineAbility(
@@ -1024,7 +1023,7 @@ describe('authorize.general.test.ts', function () {
           path: 'tests',
           method,
           type,
-          result: _cloneDeep(expectedResult),
+          result: structuredClone(expectedResult),
           id: null,
           params: {
             ability: defineAbility(

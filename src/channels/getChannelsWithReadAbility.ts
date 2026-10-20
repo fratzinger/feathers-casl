@@ -1,6 +1,4 @@
-import _isEqual from 'lodash/isEqual.js'
-import _pick from 'lodash/pick.js'
-import _isEmpty from 'lodash/isEmpty.js'
+import { isEmptyObject, isEqual, pickPaths } from 'feathers-utils/helpers'
 import { Channel } from '@feathersjs/transport-commons'
 import { subject } from '@casl/ability'
 
@@ -102,7 +100,7 @@ export const getChannelsWithReadAbility = (
           continue
         }
         const connField = connectionsPerFields.find((x) =>
-          _isEqual(x.fields, fields),
+          isEqual(x.fields, fields),
         )
         if (connField) {
           if (connField.connections.includes(connection)) {
@@ -125,9 +123,9 @@ export const getChannelsWithReadAbility = (
       const { fields, connections } = connectionsPerFields[i]
       // always keep the service id field(s) so records stay identifiable
       const restrictedData = fields
-        ? _pick(data, mergeArrays(fields, idFields, 'combine') as string[])
+        ? pickPaths(data, mergeArrays(fields, idFields, 'combine') as string[])
         : data
-      if (!_isEmpty(restrictedData)) {
+      if (restrictedData && !isEmptyObject(restrictedData)) {
         result.push(new Channel(connections, restrictedData))
       }
     }

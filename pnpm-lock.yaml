@@ -176,11 +176,8 @@ importers:
         specifier: ^5.0.50
         version: 5.0.50
       feathers-utils:
-        specifier: ^10.9.4
+        specifier: ^10.10.0
         version: 10.10.0(@feathersjs/feathers@5.0.50)
-      lodash:
-        specifier: ^4.18.1
-        version: 4.18.1
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: ^0.18.5
@@ -233,9 +230,6 @@ importers:
       '@types/cors':
         specifier: ^2.8.19
         version: 2.8.19
-      '@types/lodash':
-        specifier: ^4.17.26
-        version: 4.17.26
       '@types/node':
         specifier: ^26.6.5
         version: 26.6.5
@@ -1428,9 +1422,6 @@ packages:
 
   '@types/linkify-it@5.0.0':
     resolution: {integrity: sha512-sVDA58zAw4eWAffKOaQH5/5j3XeayukzDk+ewSsnv3p4yJEZHCCzMDiZM8e0OUrRvmpGZ85jf4yDHkHsgBNr9Q==}
-
-  '@types/lodash@4.17.26':
-    resolution: {integrity: sha512-48NWfiY6oNcKOh47Z4h+sIvwcQR91h6KPhaYKgeMIrkT2jV82Gy90SErj60vW8jQbeMSOSbhIv3bZ7JoqPPVhA==}
 
   '@types/markdown-it@14.1.2':
     resolution: {integrity: sha512-promo4eFwuiW+TfGxhi+0x3czqTYJkG8qB17ZUJiVF10Xm7NLVRSLUsfRTU/6h1e24VvRnXCx+hG7li58lkzog==}
@@ -6350,8 +6341,6 @@ snapshots:
       '@types/node': 25.6.2
 
   '@types/linkify-it@5.0.0': {}
-
-  '@types/lodash@4.17.26': {}
 
   '@types/markdown-it@14.1.2':
     dependencies:
