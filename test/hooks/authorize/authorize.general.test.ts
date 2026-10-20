@@ -901,6 +901,39 @@ describe('authorize.general.test.ts', function () {
   })
 
   describe('after', function () {
+    describe('without rules carrying fields', function () {
+      const makeContext = (availableFields: string[] | undefined) =>
+        ({
+          service: { options: { casl: { availableFields } } },
+          path: 'tests',
+          method: 'find',
+          type: 'after',
+          result: [
+            { id: 1, userId: 1, test: true },
+            { id: 2, userId: 2, test: true },
+          ],
+          params: {
+            provider: 'rest',
+            ability: defineAbility((can) => {
+              can('find', 'tests', { userId: 1 })
+            }),
+            query: {},
+          },
+        }) as unknown as HookContext
+
+      it('returns the complete items', async function () {
+        for (const availableFields of [undefined, ['id', 'userId', 'test']]) {
+          const { result } = await authorize()(makeContext(availableFields))
+          assert.deepStrictEqual(result, [{ id: 1, userId: 1, test: true }])
+        }
+      })
+
+      it("restricts every field for 'availableFields: []'", async function () {
+        const { result } = await authorize()(makeContext([]))
+        assert.deepStrictEqual(result, [{}])
+      })
+    })
+
     it("after - passes single with 'get' rule", async function () {
       const expectedResult = { id: 1, userId: 1, test: true }
       const makeContext = (method: string, type: string) => {

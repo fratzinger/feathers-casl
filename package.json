@@ -58,7 +58,6 @@
   },
   "dependencies": {
     "@feathersjs/errors": "^5.0.50",
-    "@feathersjs/feathers": "^5.0.50",
     "@feathersjs/transport-commons": "^5.0.50",
     "feathers-utils": "^10.10.1"
   },
@@ -72,6 +71,7 @@
     "@feathersjs/authentication-local": "^5.0.50",
     "@feathersjs/configuration": "^5.0.50",
     "@feathersjs/express": "^5.0.50",
+    "@feathersjs/feathers": "^5.0.50",
     "@feathersjs/knex": "^5.0.50",
     "@feathersjs/memory": "^5.0.50",
     "@feathersjs/mongodb": "^5.0.50",

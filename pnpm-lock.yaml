@@ -169,9 +169,6 @@ importers:
       '@feathersjs/errors':
         specifier: ^5.0.50
         version: 5.0.50
-      '@feathersjs/feathers':
-        specifier: ^5.0.50
-        version: 5.0.50
       '@feathersjs/transport-commons':
         specifier: ^5.0.50
         version: 5.0.50
@@ -206,6 +203,9 @@ importers:
       '@feathersjs/express':
         specifier: ^5.0.50
         version: 5.0.50(supports-color@7.2.0)(typescript@6.0.3)
+      '@feathersjs/feathers':
+        specifier: ^5.0.50
+        version: 5.0.50
       '@feathersjs/knex':
         specifier: ^5.0.50
         version: 5.0.50(knex@3.3.0(pg@8.23.1)(sqlite3@6.0.1)(supports-color@7.2.0))

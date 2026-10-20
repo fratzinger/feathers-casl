@@ -6,7 +6,9 @@ import { filterArray } from '../../../test-utils.js'
 import type { ServiceCaslOptions } from '../../../../src/index.js'
 import type { HookContext } from '@feathersjs/feathers'
 
-const sequelize = new Sequelize('sqlite::memory:', {
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  storage: ':memory:',
   logging: false,
 })
 

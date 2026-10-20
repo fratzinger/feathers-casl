@@ -5,6 +5,8 @@ import type { Adapter } from '../../../src/index.js'
 
 // `app` is only used by `getAdapter` when `options.adapter` is not set, and
 // `service` is unused by `mergeQueryFromAbility` - so plain stubs are enough.
+const cannotNegate = /cannot negate/
+
 const app = {} as any
 const service = {} as any
 
@@ -142,6 +144,16 @@ describe('utils - mergeQueryFromAbility', function () {
   })
 
   describe('@feathersjs/knex (default: inverts operators)', function () {
+    // the `cannot` must not disappear from the query: `ability.can()` denies
+    // a matching record, so `find` must not return it either
+    it('throws for a cannot with an operator it cannot invert', function () {
+      const ability = defineAbility((can, cannot) => {
+        can('read', 'tests')
+        cannot('read', 'tests', { name: { $regex: 'x' } })
+      })
+      assert.throws(() => build(ability, '@feathersjs/knex'), cannotNegate)
+    })
+
     it('inverts an equality condition to $ne', function () {
       const ability = defineAbility((can, cannot) => {
         can('read', 'tests')

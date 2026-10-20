@@ -17,6 +17,11 @@ const ability = defineAbility((can, cannot) => {
   cannot('find', 'tests', ['secret'], { userId: 3 })
 })
 
+// no rule carries `fields`
+const abilityWithoutFields = defineAbility((can) => {
+  can('find', 'tests', { userId: { $in: [1, 2, 3] } })
+})
+
 const app = { get: () => undefined } as any
 
 const makeItems = (n: number) =>
@@ -28,7 +33,11 @@ const makeItems = (n: number) =>
     userId: (i % 4) + 1,
   }))
 
-const makeContext = (items: unknown[], $select?: string[]) =>
+const makeContext = (
+  items: unknown[],
+  $select?: string[],
+  ability_: unknown = ability,
+) =>
   ({
     app,
     path: 'tests',
@@ -37,7 +46,7 @@ const makeContext = (items: unknown[], $select?: string[]) =>
     service: { options: { id: 'id', casl: { availableFields } } },
     params: {
       provider: 'rest',
-      ability,
+      ability: ability_,
       query: $select ? { $select } : {},
     },
     result: items,
@@ -59,6 +68,16 @@ for (const n of [100, 1000]) {
           makeContext(
             items.map((x) => ({ ...x })),
             ['id', 'title', 'secret', 'userId'],
+          ),
+        )
+      }),
+
+      bench('without field rules', async () => {
+        await hook(
+          makeContext(
+            items.map((x) => ({ ...x })),
+            undefined,
+            abilityWithoutFields,
           ),
         )
       }),
