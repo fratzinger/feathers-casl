@@ -40,7 +40,6 @@
   "scripts": {
     "build": "tsdown",
     "version": "npm run build",
-    "release": "np",
     "vitest": "vitest",
     "test": "vitest run",
     "test:casl6": "CASL_VERSION=6 vitest run",
@@ -96,7 +95,6 @@
     "kysely": "^0.29.7",
     "mongodb": "^7.7.0",
     "mongodb-memory-server": "^11.3.0",
-    "np": "^12.1.1",
     "objection": "^4.2.0",
     "pg": "^8.23.1",
     "prettier": "^3.9.10",
@@ -109,7 +107,7 @@
     "typescript": "^6.0.3",
     "unrun": "^0.3.1",
     "vite": "^8.3.4",
-    "vitepress": "2.0.0-alpha.17",
+    "vitepress": "2.0.0-alpha.20",
     "vitest": "^5.0.5"
   }
 }

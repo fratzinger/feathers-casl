@@ -769,6 +769,35 @@ describe('authorize.general.test.ts', function () {
     })
 
     describe('patch', function () {
+      it("'patch:single' fetches the item with the ability's query", async function () {
+        const getQueries: unknown[] = []
+        const context = {
+          service: {
+            async _get(id: number, params: any) {
+              getQueries.push(params.query)
+              return { id, userId: 1 }
+            },
+          },
+          path: 'tests',
+          method: 'patch',
+          type: 'before',
+          id: 1,
+          data: { test: true },
+          params: {
+            provider: 'rest',
+            ability: defineAbility((can) => {
+              can('patch', 'tests', { userId: 1 })
+            }),
+            query: {},
+          },
+        } as unknown as HookContext
+
+        const result = await authorize()(context)
+
+        assert.deepStrictEqual(result.params.query, { userId: 1 })
+        assert.deepStrictEqual(getQueries, [{ userId: 1 }])
+      })
+
       it("'patch:multi' passes with 'patch-multi' and 'checkMultiActions: true'", async function () {
         const context = {
           service: {},

@@ -137,7 +137,7 @@ const handleSingle = async <H extends HookContext = HookContext>(
     method,
   }
 
-  const { params, service, id } = context
+  const { service, id } = context
 
   const query = mergeQueryFromAbility(
     context.app,
@@ -149,7 +149,9 @@ const handleSingle = async <H extends HookContext = HookContext>(
     options,
   )
 
+  // `setPath` replaces `context.params` (copy on write), so read it afterwards
   setPath(context, 'params.query', query)
+  const { params } = context
 
   // ensure that only allowed data gets changed
   if (['update', 'patch'].includes(method)) {
