@@ -9,6 +9,7 @@ import makePatchDataTests from './patch-data.js'
 import makePatchMultiTests from './patch-multi.js'
 import makeRemoveTests from './remove.js'
 import makeRemoveMultiTests from './remove-multi.js'
+import makeForbiddenTests from './forbidden.js'
 import type { Adapter, AuthorizeHookOptions } from '../../../../../src/index.js'
 import type { MakeTestsOptions } from './_makeTests.types.js'
 
@@ -99,6 +100,13 @@ export default async function (
       makeTestsOptions,
     )
     makeRemoveMultiTests(
+      name,
+      makeService,
+      clean,
+      authorizeHookOptions,
+      makeTestsOptions,
+    )
+    makeForbiddenTests(
       name,
       makeService,
       clean,

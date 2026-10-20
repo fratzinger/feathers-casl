@@ -86,15 +86,26 @@ describe('utils - mergeQueryFromAbility', function () {
   // Rules without conditions stop the iteration - everything with a lower
   // priority (= defined earlier) can no longer widen or narrow the query.
   describe('rules without conditions', function () {
-    it('returns the original query for a blanket cannot', function () {
+    // falling back to the original query would allow everything
+    it('throws Forbidden for a blanket cannot', function () {
       const ability = defineAbility((can, cannot) => {
         can('read', 'tests', { userId: 1 })
         cannot('read', 'tests')
       })
-      const originalQuery = { test: true }
-      assert.deepStrictEqual(
-        build(ability, '@feathersjs/knex', originalQuery),
-        originalQuery,
+      assert.throws(
+        () => build(ability, '@feathersjs/knex', { test: true }),
+        (err: Error) => err.name === 'Forbidden',
+      )
+    })
+
+    it('throws Forbidden for a cannot with empty conditions', function () {
+      const ability = defineAbility((can, cannot) => {
+        can('read', 'tests', { userId: 1 })
+        cannot('read', 'tests', {})
+      })
+      assert.throws(
+        () => build(ability, '@feathersjs/memory', { test: true }),
+        (err: Error) => err.name === 'Forbidden',
       )
     })
 
