@@ -98,4 +98,98 @@ describe('authorize without availableFields', function () {
       ],
     )
   })
+
+  it('drops the fields a pattern forbids', async function () {
+    const service = await setup()
+    await service.patch(1, { address: { city: 'c', street: 's' } })
+
+    const ability = defineAbility(
+      (can, cannot) => {
+        can('read', 'tests')
+        cannot('read', 'tests', ['address.*'])
+      },
+      { resolveAction },
+    )
+
+    const item = await service.get(1, { ability })
+    // CASL counts the object itself as matched by its pattern
+    assert.ok(!('address' in item))
+    assert.strictEqual(item.title, 'one')
+  })
+
+  describe('writes', function () {
+    const forbidChangingSecretOf = (userId?: number) =>
+      defineAbility(
+        (can, cannot) => {
+          can('manage', 'tests')
+          cannot('update', 'tests', ['secret'], userId ? { userId } : undefined)
+        },
+        { resolveAction },
+      )
+
+    const stored = async (service: any, id: number) => service.get(id)
+
+    it('keeps a field an inverted rule forbids from being patched', async function () {
+      const service = await setup()
+      const ability = forbidChangingSecretOf(2)
+
+      await service.patch(1, { title: 'new', secret: 'x' }, { ability })
+      await service.patch(2, { title: 'new', secret: 'x' }, { ability })
+
+      assert.deepStrictEqual(
+        [await stored(service, 1), await stored(service, 2)].map(
+          ({ title, secret }) => ({ title, secret }),
+        ),
+        [
+          { title: 'new', secret: 'x' },
+          { title: 'new', secret: 'b' },
+        ],
+      )
+    })
+
+    it('keeps the stored value of a forbidden field on update', async function () {
+      const service = await setup()
+
+      await service.update(
+        2,
+        { userId: 2, title: 'new', secret: 'x' },
+        { ability: forbidChangingSecretOf(2) },
+      )
+
+      const { title, secret } = await stored(service, 2)
+      assert.deepStrictEqual({ title, secret }, { title: 'new', secret: 'b' })
+    })
+
+    it('forbids a patch of forbidden fields only', async function () {
+      const service = await setup()
+
+      await assert.rejects(
+        service.patch(
+          2,
+          { secret: 'x' },
+          { ability: forbidChangingSecretOf(2) },
+        ),
+        { name: 'Forbidden' },
+      )
+    })
+
+    it('keeps a forbidden field from being patched on many', async function () {
+      const service = await setup()
+
+      await service.patch(
+        null,
+        { title: 'new', secret: 'x' },
+        { ability: forbidChangingSecretOf() },
+      )
+
+      const items = await service.find({ paginate: false })
+      assert.deepStrictEqual(
+        items.map(({ title, secret }: any) => ({ title, secret })),
+        [
+          { title: 'new', secret: 'a' },
+          { title: 'new', secret: 'b' },
+        ],
+      )
+    })
+  })
 })

@@ -50,4 +50,47 @@ describe('getForbiddenFields', function () {
       [],
     )
   })
+
+  describe('field patterns, matched against the paths of the data', function () {
+    const data = {
+      title: 't',
+      titleText: 'tt',
+      address: { city: 'c', geo: { lat: 1 } },
+    }
+    const cases: [string, string[]][] = [
+      ['address.*', ['address', 'address.city', 'address.geo']],
+      [
+        'address.**',
+        ['address', 'address.city', 'address.geo', 'address.geo.lat'],
+      ],
+      ['address.*.lat', ['address.geo.lat']],
+      ['*', ['title', 'titleText', 'address']],
+      [
+        '**',
+        [
+          'title',
+          'titleText',
+          'address',
+          'address.city',
+          'address.geo',
+          'address.geo.lat',
+        ],
+      ],
+      ['title*', ['title', 'titleText']],
+    ]
+
+    for (const [pattern, forbidden] of cases) {
+      it(`'${pattern}'`, function () {
+        const ability = defineAbility((can, cannot) => {
+          can('read', 'tests')
+          cannot('read', 'tests', [pattern])
+        })
+
+        assert.deepStrictEqual(
+          getForbiddenFields(ability, 'read', item(data)).toSorted(),
+          forbidden.toSorted(),
+        )
+      })
+    }
+  })
 })

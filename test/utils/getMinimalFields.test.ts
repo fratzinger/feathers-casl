@@ -145,4 +145,77 @@ describe('utils - getMinimalFields', function () {
       }
     }
   })
+
+  describe('field patterns', function () {
+    const availableFields = ['id', 'title', 'address', 'address.city']
+    const record: Record<string, unknown> = {
+      id: 1,
+      title: 't',
+      address: { city: 'c' },
+    }
+    const item = subject('tests', record)
+
+    it('removes what an inverted pattern matches', function () {
+      const ability = defineAbility((can, cannot) => {
+        can('read', 'tests')
+        cannot('read', 'tests', ['address.*'])
+      })
+
+      assert.deepStrictEqual(
+        getMinimalFields(ability, 'read', item, { availableFields }),
+        ['id', 'title'],
+      )
+    })
+
+    it('removes what a deep pattern matches', function () {
+      const deep = [
+        'id',
+        'address',
+        'address.geo',
+        'address.geo.lat',
+        'title',
+        'titleText',
+      ]
+      const record: Record<string, unknown> = { id: 1 }
+      const forbidden = (pattern: string) => {
+        const ability = defineAbility((can, cannot) => {
+          can('read', 'tests')
+          cannot('read', 'tests', [pattern])
+        })
+        return getMinimalFields(ability, 'read', subject('tests', record), {
+          availableFields: deep,
+        })
+      }
+
+      assert.deepStrictEqual(forbidden('address.**'), [
+        'id',
+        'title',
+        'titleText',
+      ])
+      assert.deepStrictEqual(forbidden('address.*.lat'), [
+        'id',
+        'address',
+        'address.geo',
+        'title',
+        'titleText',
+      ])
+      assert.deepStrictEqual(forbidden('title*'), [
+        'id',
+        'address',
+        'address.geo',
+        'address.geo.lat',
+      ])
+    })
+
+    it('keeps what a pattern permits', function () {
+      const ability = defineAbility((can) => {
+        can('read', 'tests', ['address.*'])
+      })
+
+      assert.deepStrictEqual(
+        getMinimalFields(ability, 'read', item, { availableFields }),
+        ['address', 'address.city'],
+      )
+    })
+  })
 })

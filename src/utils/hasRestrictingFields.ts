@@ -33,9 +33,14 @@ export const hasRestrictingFields = (
       },
     )
   } else {
+    const availableFields = options?.availableFields
     const permittedFieldsOfOptions: PermittedFieldsOptions<AnyAbility> = {
       fieldsFrom: (rule) => {
-        return rule.fields || options?.availableFields || []
+        if (!rule.fields) return availableFields || []
+        // a pattern like `'address.*'` stands for the available fields it matches
+        return availableFields
+          ? availableFields.filter((field) => rule.matchesField(field))
+          : rule.fields
       },
     }
 

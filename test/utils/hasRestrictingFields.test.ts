@@ -82,4 +82,18 @@ describe('utils - hasRestrictingFields', function () {
       assert.deepStrictEqual(result, ['id'], `is subset for method '${method}'`)
     })
   })
+
+  it('applies a pattern to a subject type', function () {
+    const ability = defineAbility((can, cannot) => {
+      can('read', 'tests')
+      cannot('read', 'tests', ['address.*'])
+    })
+
+    assert.deepStrictEqual(
+      hasRestrictingFields(ability, 'read', 'tests', {
+        availableFields: ['id', 'title', 'address', 'address.city'],
+      }),
+      ['id', 'title'],
+    )
+  })
 })
