@@ -135,4 +135,59 @@ describe('getChannelsWithReadAbility', function () {
       assert.deepStrictEqual(result.data, { id: 1, title: 't' })
     })
   })
+
+  describe('restrictFields: true without availableFields', function () {
+    const data = {
+      id: 1,
+      userId: 2,
+      title: 't',
+      secret: 's',
+      related: { name: 'r' },
+    }
+    const withService = context({ service: { options: { id: 'id' } } })
+
+    it('sends each connection the data without what its ability forbids', function () {
+      const restricted = {
+        ability: defineAbility((can, cannot) => {
+          can('get', 'tests')
+          cannot('get', 'tests', ['secret'], { userId: 2 })
+        }),
+      } as any
+      const unrestricted = {
+        ability: defineAbility((can) => {
+          can('get', 'tests')
+        }),
+      } as any
+
+      const result = getChannelsWithReadAbility(makeApp(), data, withService, {
+        channels: new Channel([restricted, unrestricted]),
+      }) as Channel[]
+
+      assert.deepStrictEqual(
+        result.map((channel) => [channel.connections, channel.data]),
+        [
+          [
+            [restricted],
+            { id: 1, userId: 2, title: 't', related: { name: 'r' } },
+          ],
+          [[unrestricted], data],
+        ],
+      )
+    })
+
+    it("sends the whole data where a rule's conditions don't match it", function () {
+      const conn = {
+        ability: defineAbility((can, cannot) => {
+          can('get', 'tests')
+          cannot('get', 'tests', ['secret'], { userId: 3 })
+        }),
+      } as any
+
+      const result = getChannelsWithReadAbility(makeApp(), data, withService, {
+        channels: new Channel([conn]),
+      }) as Channel
+
+      assert.deepStrictEqual(result.data, data)
+    })
+  })
 })

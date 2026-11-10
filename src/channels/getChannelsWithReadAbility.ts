@@ -1,4 +1,4 @@
-import { isEmptyObject, pickPaths } from 'feathers-utils/helpers'
+import { isEmptyObject, omitPaths, pickPaths } from 'feathers-utils/helpers'
 import { Channel } from '@feathersjs/transport-commons'
 import { subject } from '@casl/ability'
 
@@ -15,11 +15,13 @@ import {
   mergeArrays,
 } from '../utils/index.js'
 import { hasRestrictingFields } from '../utils/hasRestrictingFields.js'
+import { getForbiddenFields } from '../utils/getForbiddenFields.js'
 
 import type { RealTimeConnection } from '@feathersjs/transport-commons'
 
 interface ConnectionsPerField {
   fields: false | string[]
+  omit: string[]
   connections: RealTimeConnection[]
 }
 
@@ -107,7 +109,16 @@ export const getChannelsWithReadAbility = (
         if (fields === true || (fields && fields.length === 0)) {
           continue
         }
-        const key = fields && fields.join('\0')
+        // without `availableFields` only inverted rules can't be turned into permitted fields
+        const omit =
+          !fields && !availableFields
+            ? getForbiddenFields(ability, method, dataToTest)
+            : []
+        const key = fields
+          ? fields.join('\0')
+          : omit.length
+            ? `\u0001${omit.join('\0')}`
+            : false
         const connField = connectionsPerFields.get(key)
         if (connField) {
           connField.connections.push(connection)
@@ -115,6 +126,7 @@ export const getChannelsWithReadAbility = (
           connectionsPerFields.set(key, {
             connections: [connection],
             fields,
+            omit,
           })
         }
       }
@@ -122,11 +134,13 @@ export const getChannelsWithReadAbility = (
 
     const idFields = getIdFields(context)
 
-    for (const { fields, connections } of connectionsPerFields.values()) {
+    for (const { fields, omit, connections } of connectionsPerFields.values()) {
       // always keep the service id field(s) so records stay identifiable
       const restrictedData = fields
         ? pickPaths(data, mergeArrays(fields, idFields, 'combine') as string[])
-        : data
+        : omit.length
+          ? omitPaths(data, omit)
+          : data
       if (restrictedData && !isEmptyObject(restrictedData)) {
         result.push(new Channel(connections, restrictedData))
       }

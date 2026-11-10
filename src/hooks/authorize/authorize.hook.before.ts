@@ -1,5 +1,10 @@
 import { Forbidden } from '@feathersjs/errors'
-import { isEmptyObject, pickPaths, setPath } from 'feathers-utils/helpers'
+import {
+  isEmptyObject,
+  omitPaths,
+  pickPaths,
+  setPath,
+} from 'feathers-utils/helpers'
 import type { AnyAbility } from '@casl/ability'
 import { subject } from '@casl/ability'
 
@@ -10,6 +15,7 @@ import {
   hasRestrictingConditions,
   couldHaveRestrictingFields,
   getAvailableFields,
+  getForbiddenFields,
 } from '../../utils/index.js'
 
 import {
@@ -218,13 +224,26 @@ const handleSingle = async <H extends HookContext = HookContext>(
       throw new Forbidden("You're not allowed to make this request")
     }
 
-    const data = !restrictingFields
-      ? context.data
-      : pickPaths(context.data, restrictingFields as string[])
+    // without `availableFields` only inverted rules can't be turned into permitted fields
+    const forbiddenFields =
+      !restrictingFields && !availableFields
+        ? getForbiddenFields(
+            ability,
+            method,
+            subject(modelName, item),
+            context.data,
+          )
+        : []
+
+    const data = restrictingFields
+      ? pickPaths(context.data, restrictingFields as string[])
+      : forbiddenFields.length
+        ? omitPaths(context.data, forbiddenFields)
+        : context.data
 
     checkData(context, ability, modelName, data, options)
 
-    if (!restrictingFields) {
+    if (!restrictingFields && !forbiddenFields.length) {
       return context
     }
 
@@ -320,6 +339,17 @@ const handleMulti = async <H extends HookContext = HookContext>(
     if (fields && fields.length > 0) {
       const data = pickPaths(context.data, fields)
       context.data = data
+    } else if (!fields && !availableFields) {
+      // the items aren't known yet, so only unconditional rules can forbid a field
+      const forbiddenFields = getForbiddenFields(
+        ability,
+        method,
+        modelName,
+        context.data,
+      )
+      if (forbiddenFields.length) {
+        context.data = omitPaths(context.data, forbiddenFields)
+      }
     }
   }
 

@@ -1,5 +1,4 @@
 import { detectSubjectType } from '@casl/ability'
-import { mergeArrays } from './mergeArrays.js'
 
 import type { AnyAbility } from '@casl/ability'
 import type { GetMinimalFieldsOptions } from '../types.js'
@@ -31,11 +30,12 @@ export const getMinimalFields = (
     }
   }
 
+  // `matchesField`, as a rule's fields may be patterns like `'address.*'`
   rules.forEach((rule) => {
     if (rule.inverted) {
-      fields = fields?.filter((x) => !rule.fields?.includes(x))
+      fields = fields?.filter((x) => !rule.matchesField(x))
     } else {
-      fields = mergeArrays(fields, rule.fields, 'intersect')
+      fields = fields?.filter((x) => rule.matchesField(x))
     }
   })
   return fields
