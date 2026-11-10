@@ -1,5 +1,5 @@
 import { subject } from '@casl/ability'
-import { isEmptyObject, pickPaths } from 'feathers-utils/helpers'
+import { isEmptyObject, omitPaths, pickPaths } from 'feathers-utils/helpers'
 
 import { getResultIsArray, mutateResult } from 'feathers-utils'
 import { shouldSkip } from 'feathers-utils/predicates'
@@ -15,6 +15,7 @@ import {
 
 import {
   getAvailableFields,
+  getForbiddenFields,
   hasRestrictingFields,
   couldHaveRestrictingFields,
   getModelName,
@@ -129,9 +130,20 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
     if (restrictingFields === true) {
       // full restriction
       return {}
-    } else if (skipCheckFields || (!restrictingFields && !$select)) {
-      // no restrictions
+    } else if (skipCheckFields) {
       return item
+    }
+
+    // without `availableFields` only inverted rules can't be turned into permitted fields
+    const forbiddenFields =
+      couldRestrictFields && !restrictingFields && !availableFields
+        ? getForbiddenFields(ability, getOrFind, itemSubject)
+        : []
+    const withoutForbidden = <T extends Record<string, unknown>>(data: T) =>
+      forbiddenFields.length ? omitPaths(data, forbiddenFields) : data
+
+    if (!restrictingFields && !$select) {
+      return withoutForbidden(item)
     }
 
     const pickFields: string[] =
@@ -145,7 +157,7 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
       ? (mergeArrays(pickFields, idFields, 'combine') as string[])
       : pickFields
 
-    return pickPaths(item, pickFieldsWithId)
+    return withoutForbidden(pickPaths(item, pickFieldsWithId))
   }
 
   let newResult: (Record<string, unknown> | undefined)[]
