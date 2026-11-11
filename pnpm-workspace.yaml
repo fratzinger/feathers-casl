@@ -4,4 +4,6 @@ allowBuilds:
   sqlite3: true
   unrs-resolver: true
 minimumReleaseAgeExclude:
-  - feathers-utils@10.9.4 || 10.10.0 || 10.10.1
+  - "@casl/ability@7.1.2"
+  - "@fratzinger/feathers-kysely@0.16.2"
+  - vite@8.3.8
