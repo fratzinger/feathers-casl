@@ -1,5 +1,6 @@
 import { Forbidden } from '@feathersjs/errors'
 import {
+  hasPath,
   isEmptyObject,
   omitPaths,
   pickPaths,
@@ -224,7 +225,8 @@ const handleSingle = async <H extends HookContext = HookContext>(
       throw new Forbidden("You're not allowed to make this request")
     }
 
-    // without `availableFields` only inverted rules can't be turned into permitted fields
+    // without `availableFields` only inverted rules can't be turned into permitted fields;
+    // a patch leaves the ones it doesn't hold as they are, an update would clear them
     const forbiddenFields =
       !restrictingFields && !availableFields
         ? getForbiddenFields(
@@ -232,6 +234,8 @@ const handleSingle = async <H extends HookContext = HookContext>(
             method,
             subject(modelName, item),
             context.data,
+          ).filter(
+            (field) => method !== 'patch' || hasPath(context.data, field),
           )
         : []
 
