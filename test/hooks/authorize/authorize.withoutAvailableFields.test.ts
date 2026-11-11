@@ -160,6 +160,30 @@ describe('authorize without availableFields', function () {
       assert.deepStrictEqual({ title, secret }, { title: 'new', secret: 'b' })
     })
 
+    it('keeps the stored value of a forbidden field an update leaves out', async function () {
+      const service = await setup()
+
+      await service.update(
+        2,
+        { userId: 2, title: 'new' },
+        { ability: forbidChangingSecretOf(2) },
+      )
+
+      assert.strictEqual((await stored(service, 2)).secret, 'b')
+    })
+
+    it('lets an empty patch through, as it changes no forbidden field', async function () {
+      const service = await setup()
+
+      const patched = await service.patch(
+        2,
+        {},
+        { ability: forbidChangingSecretOf(2) },
+      )
+
+      assert.strictEqual(patched.secret, 'b')
+    })
+
     it('forbids a patch of forbidden fields only', async function () {
       const service = await setup()
 
