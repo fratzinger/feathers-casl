@@ -39,6 +39,8 @@ Does a complex permission check and transforms data if necessary.
 
 if this check passes, it will continue with the other checks
 
+- Conditions may reach through a relation (`'artist.name'`): see [Conditions through a relation](#conditions-through-a-relation).
+
 #### Before:
 
 |          | `create`                                                                            | `find`                                                        | `get`                                                              | `update`                                                                                                                                       | `patch`                                                                                                                                                                   | `remove`                                                      |
@@ -49,6 +51,36 @@ if this check passes, it will continue with the other checks
 #### After:
 
 - check restricting read fields of item/items and replace result with allowed fields
+
+### Conditions through a relation
+
+A rule's condition may reach through a relation of the service: `can('read', 'albums', { 'artist.name': 'Blink182' })`. The database answers it, wherever `feathers-casl` would otherwise check in memory.
+
+#### Requirements
+
+- The adapter declares its relations in `options.relations`, as `feathers-kysely` does: `{ artist: { service: 'artists', keyHere: 'artistId', keyThere: 'id', asArray: false } }`. A path's first segment names the relation; the related service reaches further ones itself (`'artist.label.name'`, `'artist.members': { $some: { userId } }`).
+- A single id field. With a compound id (`options.id` as an array), a rule through a relation can't be answered: it counts as the worst (see below).
+
+#### How they're answered
+
+- **Queries** (`find`, and the query of `get`, `patch`, `update`, `remove`) take the conditions as they are: the adapter joins.
+- **Stored rows** checked in memory (the fields a row may show, the rows a multi `patch`/`remove` or a `create` returns, `checkCan`): the database, by the rows' ids.
+- **Data not stored yet** (`create`, `patch-data`, `update-data`): each condition through a relation is asked of the related service, by the key the data holds (`artistId`). Data is never checked against a relation it brings along (`artist: { name }`).
+- **Events**: `authorize` answers for a write's events, see [Channels](./channels.md#rules-through-a-relation).
+
+#### Cost
+
+- Queries: nothing extra.
+- Stored rows: one query per rule through a relation for all rows, or one for all of them where only whether any matches counts (each a `can` without `fields`, no `cannot` among the action's rules).
+- After a `patch`, `update` or `remove`, nothing where the write guarantees reading its rows: each rule to write by is one to read by (the same, or with the same conditions), no `cannot` or `fields` among those to read by, and the data changes no field they depend on (its own, or a relation's key). Else a remove's rows are asked before they go.
+- Data not stored yet: one query per distinct condition through a relation, for all items.
+- Events: one query per distinct condition among the connections' rules, per write.
+
+#### Pitfalls
+
+- **A missing relation matches nothing**, not even `$nin`, as the adapter queries it: the related row has to be there. Data without the relation's key included.
+- **What can't be answered counts as the worst**: a `can` doesn't match, a `cannot` does. Nothing gets through that might not be allowed, but also nothing where only such a rule allows it.
+- **`$and`, `$or`, `$nor`, `$not`**: CASL's own matcher has none of them. Through a relation, the database answers them for stored rows, as the query does; data not stored yet can't be checked by them and counts as the worst.
 
 ## checkBasicPermission
 

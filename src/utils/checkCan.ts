@@ -2,9 +2,15 @@ import { subject } from '@casl/ability'
 import { throwUnlessCan } from '../hooks/authorize/authorize.hook.utils.js'
 
 import { getFieldsForConditions } from './getFieldsForConditions.js'
+import {
+  getRelations,
+  isRelationPath,
+  mayResolveRelations,
+  resolveRelationsOfItems,
+} from './relations.js'
 
 import type { AnyAbility } from '@casl/ability'
-import type { Id, Service } from '@feathersjs/feathers'
+import type { HookContext, Id, Service } from '@feathersjs/feathers'
 import type { UtilCheckCanOptions } from '../types.js'
 
 const makeOptions = (
@@ -35,9 +41,13 @@ export const checkCan = async <S>(
     }
   }
 
+  const relations = getRelations(service)
   let params
   if (options.useConditionalSelect) {
-    const $select = getFieldsForConditions(ability, method, modelName)
+    // a condition through a relation is the database's to answer, not a field of the row
+    const $select = getFieldsForConditions(ability, method, modelName).filter(
+      (field) => !isRelationPath(field, relations),
+    )
     params = {
       query: { $select },
     }
@@ -49,8 +59,15 @@ export const checkCan = async <S>(
   // @ts-expect-error _get is not exposed
   const item = await service[getMethod](id, params)
 
+  const context = { service, params: {} } as unknown as HookContext
+  const itemAbility = mayResolveRelations(service, ability)
+    ? await resolveRelationsOfItems(context, ability, [method], modelName, [
+        item,
+      ])
+    : ability
+
   const can = throwUnlessCan(
-    ability,
+    itemAbility,
     method,
     subject(modelName, item),
     modelName,

@@ -22,6 +22,12 @@ import {
   getIdFields,
   mergeArrays,
 } from '../../utils/index.js'
+import {
+  getRelations,
+  mayResolveRelations,
+  relationsAnsweredBeforeRemove,
+  resolveRelationsOfItems,
+} from '../../utils/relations.js'
 
 import { Forbidden } from '@feathersjs/errors'
 
@@ -103,6 +109,7 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
       ability,
       getOrFind,
       modelName,
+      getRelations(context.service),
     )
     if ($newSelect) {
       const _items = await refetchItems(context)
@@ -112,15 +119,33 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
     }
   }
 
+  // rules through relations, answered by the database; a remove's rows were asked before they went
+  const checking =
+    relationsAnsweredBeforeRemove(context) ??
+    ((!skipCheckConditions || couldRestrictFields) &&
+    mayResolveRelations(context.service, ability)
+      ? await resolveRelationsOfItems(
+          context,
+          ability,
+          [getOrFind],
+          modelName,
+          items,
+          // what a patch or update took can be readable for sure
+          ['patch', 'update'].includes(method)
+            ? { action: method, data: context.data }
+            : undefined,
+        )
+      : ability)
+
   const pickFieldsForItem = (item: Record<string, unknown>) => {
     const itemSubject = subject(modelName, item)
-    if (!skipCheckConditions && !ability.can(getOrFind, itemSubject)) {
+    if (!skipCheckConditions && !checking.can(getOrFind, itemSubject)) {
       return undefined
     }
 
     const restrictingFields = couldRestrictFields
       ? hasRestrictingFields(
-          ability,
+          checking,
           getOrFind,
           itemSubject,
           hasRestrictingFieldsOptions,
@@ -137,7 +162,7 @@ export const authorizeAfter = async <H extends HookContext = HookContext>(
     // without `availableFields` only inverted rules can't be turned into permitted fields
     const forbiddenFields =
       couldRestrictFields && !restrictingFields && !availableFields
-        ? getForbiddenFields(ability, getOrFind, itemSubject)
+        ? getForbiddenFields(checking, getOrFind, itemSubject)
         : []
     const withoutForbidden = <T extends Record<string, unknown>>(data: T) =>
       forbiddenFields.length ? omitPaths(data, forbiddenFields) : data

@@ -6,6 +6,8 @@ import {
 } from '../hooks/authorize/authorize.hook.utils.js'
 
 import { checkCreatePerItem, makeDefaultBaseOptions } from '../hooks/common.js'
+import { getDataIsArray } from 'feathers-utils'
+import { mayResolveRelations, resolveRelationsOfData } from './relations.js'
 
 import type { HookContext } from '@feathersjs/feathers'
 
@@ -65,7 +67,20 @@ export const checkBasicPermissionUtil = async <H extends HookContext>(
 
   throwUnlessCan(ability, method, modelName, modelName, options)
 
-  checkCreatePerItem(context, ability, modelName, options)
+  // a create's rules through relations, answered for its data by the related services
+  const dataAbility =
+    method === 'create' &&
+    options.checkCreateForData &&
+    mayResolveRelations(context.service, ability)
+      ? await resolveRelationsOfData(
+          context,
+          ability,
+          ['create'],
+          modelName,
+          getDataIsArray(context).data,
+        )
+      : ability
+  checkCreatePerItem(context, dataAbility, modelName, options)
 
   if (options.storeAbilityForAuthorize) {
     setPersistedConfig(context, 'ability', ability)

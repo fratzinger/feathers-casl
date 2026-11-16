@@ -4,9 +4,19 @@ import { subject } from '@casl/ability'
 
 import {
   makeChannelOptions,
-  getAbility,
-  getEventName,
+  getAbility as getConnectionAbility,
 } from './channels.utils.js'
+import {
+  channelRelationsOf,
+  channelsFor,
+  getChannelAction,
+} from './resolveChannelRelations.js'
+import {
+  answerRelations,
+  getRelations,
+  hasRelations,
+  mayReachRelations,
+} from '../utils/relations.js'
 
 import {
   getModelName,
@@ -46,24 +56,50 @@ export const getChannelsWithReadAbility = (
     return !channelOnError ? new Channel() : app.channel(channelOnError)
   }
 
-  let channels = options.channels || app.channel(app.channels)
-
-  if (!Array.isArray(channels)) {
-    channels = [channels]
-  }
+  const channels = channelsFor(app, options, data, context)
 
   const dataToTest = subject(modelName, data)
 
-  let method = 'get'
+  const method = getChannelAction(options, context)
 
-  if (typeof options.useActionName === 'string') {
-    method = options.useActionName
-  } else {
-    const eventName = getEventName(context.method)
-    if (eventName && options.useActionName[eventName]) {
-      method = options.useActionName[eventName] as string
-    }
-  }
+  // rules through a relation, answered by `authorize` for the write: else the worst
+  const answers = channelRelationsOf(context)
+  // a service without relations: as ever, nothing to answer per connection
+  const actions = [method]
+  let warned = false
+  const onUnanswered = options.debug
+    ? () => {
+        if (warned) return
+        warned = true
+        console.warn(
+          `Feathers-CASL: getChannelsWithReadAbility - rules through a relation without an answer for '${modelName}' (${context.method}): they count as the worst. Did 'authorize' run for this write, and are the publisher's channel options the app's?`,
+        )
+      }
+    : undefined
+  const getAbility: typeof getConnectionAbility = hasRelations(
+    getRelations(context.service),
+  )
+    ? (app_, data_, connection, context_, options_) => {
+        const ability = getConnectionAbility(
+          app_,
+          data_,
+          connection,
+          context_,
+          options_,
+        )
+        // most can't reach a relation: as they are
+        return ability && mayReachRelations(ability)
+          ? answerRelations(
+              context,
+              ability,
+              actions,
+              modelName,
+              answers,
+              onUnanswered,
+            )
+          : ability
+      }
+    : getConnectionAbility
 
   let result: Channel[] = []
 
