@@ -2,10 +2,13 @@ import { appendFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
-import type { TestContext } from 'vitest'
+import type { Bench, BenchOptions, TestContext } from 'vitest'
 import type * as Lib from '../../src/index.js'
 
 type Library = typeof Lib
+
+/** A function to measure, or one with what runs around each call, untimed (`beforeEach`, …). */
+export type Case = (() => unknown) | (BenchOptions & { fn: () => unknown })
 
 /**
  * The builds a benchmark measures: this checkout's (`pnpm bench` builds it), and with
@@ -20,13 +23,23 @@ const base: Library | undefined = process.env.BENCH_BASE
   ? await import(pathToFileURL(resolve(process.env.BENCH_BASE)).href)
   : undefined
 
-/** Per case: its median latency in each build, for the summary. */
+/**
+ * Per case: its median latency in this checkout's build, and in what it's compared to: the base
+ * build (`measure`) or the same call without feathers-casl (`measureNet`). For the summary.
+ */
 const rows: {
   test: string
   name: string
   current: number
-  base: number | undefined
+  base?: number
+  withoutCasl?: number
 }[] = []
+
+function register(bench: Bench, name: string, task: Case) {
+  if (typeof task === 'function') return bench(name, task)
+  const { fn, ...options } = task
+  return bench(name, options, fn)
+}
 
 /**
  * Measures `cases` of each build side by side: `cases` gets a build and returns the functions to
@@ -34,10 +47,10 @@ const rows: {
  */
 export async function measure(
   { bench, task }: TestContext,
-  cases: (lib: Library) => Record<string, () => unknown>,
+  cases: (lib: Library) => Record<string, Case>,
 ): Promise<void> {
   const now = cases(current)
-  let before: Record<string, () => unknown> = {}
+  let before: Record<string, Case> = {}
   try {
     if (base) before = cases(base)
   } catch {
@@ -46,8 +59,9 @@ export async function measure(
 
   const registrations = []
   for (const [name, fn] of Object.entries(now)) {
-    registrations.push(bench(name, fn))
-    if (before[name]) registrations.push(bench(`${name} (base)`, before[name]))
+    registrations.push(register(bench, name, fn))
+    if (before[name])
+      registrations.push(register(bench, `${name} (base)`, before[name]))
   }
   const results = await bench.compare(...registrations)
   for (const name of Object.keys(now)) {
@@ -62,10 +76,83 @@ export async function measure(
   }
 }
 
-const ms = (value: number) => `${value.toFixed(4)} ms`
+/**
+ * Measures `cases` of this checkout's build against `withoutCasl`, the same calls without
+ * feathers-casl by the same names: what it costs net. Each pair in either order, the medians
+ * averaged: on Postgres, whichever of two runs second runs slower, by up to a third.
+ */
+export async function measureNet(
+  { bench, task }: TestContext,
+  cases: (lib: Library) => Record<string, Case>,
+  withoutCasl: Record<string, Case>,
+): Promise<void> {
+  const withCasl = cases(current)
+  const medians: Record<string, { current: number; withoutCasl: number }> = {}
+  for (const round of [1, 2]) {
+    const registrations = []
+    for (const name of Object.keys(withCasl)) {
+      const pair = [
+        register(bench, `${name} #${round}`, withCasl[name]),
+        register(bench, `${name} without casl #${round}`, withoutCasl[name]),
+      ]
+      if (round === 2) pair.reverse()
+      registrations.push(...pair)
+    }
+    const results = await bench.compare(...registrations)
+    for (const name of Object.keys(withCasl)) {
+      const median = (medians[name] ??= { current: 0, withoutCasl: 0 })
+      median.current += results.get(`${name} #${round}`).latency.p50 / 2
+      median.withoutCasl +=
+        results.get(`${name} without casl #${round}`).latency.p50 / 2
+    }
+  }
+  for (const [name, median] of Object.entries(medians)) {
+    rows.push({ test: task.name, name, ...median })
+  }
+}
+
+const ms = (value: number | undefined) =>
+  value === undefined ? '–' : `${value.toFixed(4)} ms`
+const percent = (value: number) =>
+  `${value > 0 ? '+' : ''}${(value * 100).toFixed(1)} %`
 
 /** Slower than this counts as a regression worth a look: runners vary by about as much. */
 const NOTEWORTHY = 0.15
+
+function change(current: number, base: number | undefined) {
+  if (base === undefined) return 'new'
+  const delta = (current - base) / base
+  return `${percent(delta)}${delta > NOTEWORTHY ? ' ⚠️' : ''}`
+}
+
+const cost = (current: number, withoutCasl: number) =>
+  `+${ms(current - withoutCasl)} (${percent((current - withoutCasl) / withoutCasl)})`
+
+const tableRow = (cells: string[]) => `| ${cells.join(' | ')} |`
+
+function columnsOf(row: (typeof rows)[number]) {
+  if (row.withoutCasl !== undefined)
+    return ['case', 'without casl', 'with casl', 'net']
+  return base ? ['case', 'base', 'current', 'Δ'] : ['case', 'current']
+}
+
+function cellsOf(row: (typeof rows)[number]) {
+  if (row.withoutCasl !== undefined) {
+    return [
+      row.name,
+      ms(row.withoutCasl),
+      ms(row.current),
+      cost(row.current, row.withoutCasl),
+    ]
+  }
+  if (!base) return [row.name, ms(row.current)]
+  return [
+    row.name,
+    ms(row.base),
+    ms(row.current),
+    change(row.current, row.base),
+  ]
+}
 
 /** The medians of a file's benchmarks as Markdown; appended to `BENCH_SUMMARY`, as CI's. */
 afterAll(() => {
@@ -75,26 +162,11 @@ afterAll(() => {
   for (const row of rows) {
     if (row.test !== test) {
       test = row.test
-      lines.push('', `#### ${test}`, '')
-      lines.push(
-        base
-          ? '| case | base | current | Δ |\n| --- | ---: | ---: | ---: |'
-          : '| case | current |\n| --- | ---: |',
-      )
+      const columns = columnsOf(row)
+      lines.push('', `#### ${test}`, '', tableRow(columns))
+      lines.push(tableRow(columns.map((_, i) => (i ? '---:' : '---'))))
     }
-    if (!base) {
-      lines.push(`| ${row.name} | ${ms(row.current)} |`)
-      continue
-    }
-    const delta =
-      row.base === undefined ? undefined : (row.current - row.base) / row.base
-    const shown =
-      delta === undefined
-        ? 'new'
-        : `${delta > 0 ? '+' : ''}${(delta * 100).toFixed(1)} %${delta > NOTEWORTHY ? ' ⚠️' : ''}`
-    lines.push(
-      `| ${row.name} | ${row.base === undefined ? '–' : ms(row.base)} | ${ms(row.current)} | ${shown} |`,
-    )
+    lines.push(tableRow(cellsOf(row)))
   }
   const markdown = lines.join('\n') + '\n'
   console.log(markdown)

@@ -1,5 +1,6 @@
-# Benchmarks of a pull request against its base branch, both builds in the same run. Reported in
-# the job's summary, not failed: runners vary by about 15 % from run to run.
+# Benchmarks of a pull request against its base branch, both builds in the same run, and on
+# Postgres what feathers-casl costs net. Reported in the job's summary, not failed: runners vary by
+# about 15 % from run to run.
 
 name: Benchmarks
 
@@ -7,9 +8,24 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: password
+  POSTGRES_DB: test
+
 jobs:
   bench:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,6 +49,6 @@ jobs:
         run: |
           {
             echo "### Benchmarks against ${{ github.base_ref || 'main' }}"
-            echo "Median latency per case; ⚠️ beyond +15 %, about what runners vary by."
+            echo "Median latency per case; ⚠️ beyond +15 %, about what runners vary by. On Postgres: the same calls without feathers-casl, and what it costs net."
             cat "${{ runner.temp }}/bench-summary.md" 2>/dev/null || echo "No results."
           } >> "$GITHUB_STEP_SUMMARY"
