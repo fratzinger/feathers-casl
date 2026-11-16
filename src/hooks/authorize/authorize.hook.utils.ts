@@ -6,6 +6,7 @@ import {
   getFieldsForConditions,
   getAvailableFields,
 } from '../../utils/index.js'
+import { isRelationPath } from '../../utils/relations.js'
 import { makeDefaultBaseOptions } from '../common.js'
 
 import { addSkip, getResultIsArray } from 'feathers-utils'
@@ -21,6 +22,7 @@ import type {
   HookBaseOptions,
   InitOptions,
   Path,
+  ServiceRelation,
   ThrowUnlessCanOptions,
 } from '../../types.js'
 import type { Promisable } from 'type-fest'
@@ -200,11 +202,15 @@ export const getConditionalSelect = (
   ability: AnyAbility,
   method: string,
   modelName: string,
+  relations: Record<string, ServiceRelation> = {},
 ): undefined | string[] => {
   if (!$select?.length) {
     return undefined
   }
-  const fields = getFieldsForConditions(ability, method, modelName)
+  // a condition through a relation is the database's to answer, not a field of the row
+  const fields = getFieldsForConditions(ability, method, modelName).filter(
+    (field) => !isRelationPath(field, relations),
+  )
   if (!fields.length) {
     return undefined
   }

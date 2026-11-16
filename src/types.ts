@@ -13,7 +13,18 @@ export type Adapter =
   | 'feathers-kysely'
 
 export interface ServiceCaslOptions {
-  availableFields: string[]
+  availableFields?: string[]
+}
+
+/**
+ * A relation of a service, as feathers-kysely declares it in `options.relations`: a rule's
+ * condition reaches through it by its name (`'artist.name'`).
+ */
+export interface ServiceRelation {
+  service: string
+  keyHere: string
+  keyThere: string
+  asArray?: boolean
 }
 
 export interface CaslParams<A extends AnyMongoAbility = AnyMongoAbility> {
@@ -92,10 +103,18 @@ export interface ChannelOptions extends AuthorizeChannelCommonsOptions {
   activated: boolean
   /** Channel that's used when there occurs an error, default: `['authenticated']` */
   channelOnError: string[]
-  /** Prefiltered channels, default: `app.channel(app.channels)` */
-  channels?: Channel | Channel[]
+  /**
+   * Prefiltered channels, or per event's data, default: `app.channel(app.channels)`. In the app's
+   * options, it's also whose rules `authorize` answers for a write's events.
+   */
+  channels?:
+    | Channel
+    | Channel[]
+    | ((data: AnyData, context: HookContext) => Channel | Channel[])
   modelName: GetModelName
   restrictFields: boolean
+  /** Warns once per event of a rule through a relation without an answer, default: `false` */
+  debug?: boolean
   /** change action to use for events. For example: `'receive'`, default: `'get'` */
   useActionName: string | { [e in EventName]?: string }
 }

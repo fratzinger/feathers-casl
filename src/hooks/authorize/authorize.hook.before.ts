@@ -9,6 +9,7 @@ import {
 import type { AnyAbility } from '@casl/ability'
 import { subject } from '@casl/ability'
 
+import { getDataIsArray } from 'feathers-utils'
 import { isMulti, shouldSkip } from 'feathers-utils/predicates'
 
 import {
@@ -18,6 +19,12 @@ import {
   getAvailableFields,
   getForbiddenFields,
 } from '../../utils/index.js'
+import {
+  mayResolveRelations,
+  resolveRelationsBeforeRemove,
+  resolveRelationsOfData,
+  resolveRelationsOfItems,
+} from '../../utils/relations.js'
 
 import {
   setPersistedConfig,
@@ -45,8 +52,9 @@ export const authorizeBefore = async <H extends HookContext = HookContext>(
   }
 
   const method = getMethodName(context, options)
+  const runsBasicCheck = !getPersistedConfig(context, 'madeBasicCheck')
 
-  if (!getPersistedConfig(context, 'madeBasicCheck')) {
+  if (runsBasicCheck) {
     const basicCheck = checkBasicPermission({
       notSkippable: true,
       ability: options.ability,
@@ -113,12 +121,26 @@ export const authorizeBefore = async <H extends HookContext = HookContext>(
   ) {
     // multi: find | patch | remove
     await handleMulti(context, ability, modelName, availableFields, options)
-  } else if (method === 'create') {
-    // create: single | multi
-    checkCreatePerItem(context, ability, modelName, {
+  } else if (method === 'create' && !runsBasicCheck) {
+    // create: single | multi, unless the basic check above just checked its data
+    const { data: items } = getDataIsArray(context)
+    const dataAbility = mayResolveRelations(context.service, ability)
+      ? await resolveRelationsOfData(
+          context,
+          ability,
+          ['create'],
+          modelName,
+          items,
+        )
+      : ability
+    checkCreatePerItem(context, dataAbility, modelName, {
       actionOnForbidden: options.actionOnForbidden,
       checkCreateForData: true,
     })
+  }
+
+  if (method === 'remove' && mayResolveRelations(context.service, ability)) {
+    await resolveRelationsBeforeRemove(context, ability, modelName)
   }
 
   return context
@@ -199,8 +221,15 @@ const handleSingle = async <H extends HookContext = HookContext>(
       throw err
     })
 
+    // its rules through relations, answered for it by the database
+    const itemAbility = mayResolveRelations(context.service, ability)
+      ? await resolveRelationsOfItems(context, ability, [method], modelName, [
+          item,
+        ])
+      : ability
+
     const restrictingFields = hasRestrictingFields(
-      ability,
+      itemAbility,
       method,
       subject(modelName, item),
       { availableFields },
@@ -230,7 +259,7 @@ const handleSingle = async <H extends HookContext = HookContext>(
     const forbiddenFields =
       !restrictingFields && !availableFields
         ? getForbiddenFields(
-            ability,
+            itemAbility,
             method,
             subject(modelName, item),
             context.data,
@@ -245,7 +274,21 @@ const handleSingle = async <H extends HookContext = HookContext>(
         ? omitPaths(context.data, forbiddenFields)
         : context.data
 
-    checkData(context, ability, modelName, data, options)
+    // the data's rules through relations, where it's checked at all
+    const checksData =
+      (method === 'patch' && options.usePatchData) ||
+      (method === 'update' && options.useUpdateData)
+    const dataAbility =
+      checksData && mayResolveRelations(context.service, ability)
+        ? await resolveRelationsOfData(
+            context,
+            ability,
+            [`${method}-data`],
+            modelName,
+            [data],
+          )
+        : ability
+    checkData(context, dataAbility, modelName, data, options)
 
     if (!restrictingFields && !forbiddenFields.length) {
       return context
