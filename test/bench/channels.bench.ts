@@ -1,13 +1,7 @@
 import { Channel } from '@feathersjs/transport-commons'
 import { defineAbility } from '@casl/ability'
 
-import type * as Lib from '../../src/index.js'
-
-// benchmark the build, not `src/` - vitest's module runner adds overhead to
-// every export access. `BENCH_DIST` points to another build for A/B runs.
-const { getChannelsWithReadAbility }: typeof Lib = await import(
-  process.env.BENCH_DIST ?? '../../dist/index.mjs'
-)
+import { measure } from './builds.js'
 
 const availableFields = ['id', 'title', 'body', 'secret', 'userId']
 
@@ -39,6 +33,19 @@ const context = {
   service: { options: { id: 'id' } },
 } as any
 
+// declared, as feathers-kysely's services do, but no rule reaches through one
+const contextWithRelations = {
+  ...context,
+  service: {
+    options: {
+      id: 'id',
+      relations: {
+        user: { service: 'users', keyHere: 'userId', keyThere: 'id' },
+      },
+    },
+  },
+} as any
+
 const data = () => ({ id: 1, title: 't', body: 'b', secret: 's', userId: 1 })
 
 for (const n of [100, 1000]) {
@@ -50,22 +57,23 @@ for (const n of [100, 1000]) {
     new Channel(connections.filter((_, i) => i % 2 === 0)),
   ]
 
-  test(`getChannelsWithReadAbility (${n} connections)`, async ({ bench }) => {
-    await bench.compare(
-      bench('restrictFields', () => {
+  test(`getChannelsWithReadAbility (${n} connections)`, (context_) =>
+    measure(context_, ({ getChannelsWithReadAbility }) => ({
+      restrictFields: () =>
         getChannelsWithReadAbility(app, data(), context, {
           channels,
           availableFields,
-        })
-      }),
-
-      bench('restrictFields: false', () => {
+        }),
+      'restrictFields, relations declared': () =>
+        getChannelsWithReadAbility(app, data(), contextWithRelations, {
+          channels,
+          availableFields,
+        }),
+      'restrictFields: false': () =>
         getChannelsWithReadAbility(app, data(), context, {
           channels,
           availableFields,
           restrictFields: false,
-        })
-      }),
-    )
-  })
+        }),
+    })))
 }

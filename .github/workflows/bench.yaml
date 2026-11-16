@@ -1,0 +1,38 @@
+# Benchmarks of a pull request against its base branch, both builds in the same run. Reported in
+# the job's summary, not failed: runners vary by about 15 % from run to run.
+
+name: Benchmarks
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # the base branch, to build what this is compared to
+          fetch-depth: 0
+
+      - run: npm install -g corepack@latest
+      - run: corepack enable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: "pnpm"
+      - run: pnpm i
+      - name: compare with ${{ github.base_ref || 'main' }}
+        run: pnpm run bench:compare
+        env:
+          BENCH_BASE_REF: origin/${{ github.base_ref || 'main' }}
+          BENCH_SUMMARY: ${{ runner.temp }}/bench-summary.md
+      - name: summary
+        if: always()
+        run: |
+          {
+            echo "### Benchmarks against ${{ github.base_ref || 'main' }}"
+            echo "Median latency per case; ⚠️ beyond +15 %, about what runners vary by."
+            cat "${{ runner.temp }}/bench-summary.md" 2>/dev/null || echo "No results."
+          } >> "$GITHUB_STEP_SUMMARY"

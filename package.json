@@ -46,6 +46,8 @@
     "typecheck:casl6": "tsc --noEmit -p tsconfig.casl6.json",
     "coverage": "vitest run --coverage",
     "bench": "tsdown && vitest bench --run",
+    "bench:base": "node scripts/bench-base.mjs",
+    "bench:compare": "tsdown && node scripts/bench-base.mjs && BENCH_BASE=node_modules/.cache/bench-base/dist/index.mjs vitest bench --run",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "attw": "attw --pack . --profile esm-only",
